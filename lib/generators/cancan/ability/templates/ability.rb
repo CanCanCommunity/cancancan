@@ -27,6 +27,6 @@ class Ability
     #   can :update, Article, :published => true
     #
     # See the wiki for details:
-    # https://github.com/ryanb/cancan/wiki/Defining-Abilities
+    # https://github.com/bryanrite/cancancan/wiki/Defining-Abilities
   end
 end

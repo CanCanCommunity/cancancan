@@ -3,21 +3,21 @@ Master
 
 1.7.0 (February 19th, 2014)
 
-* [Feature] Adds support for strong_parameters (bryanrite)
+* Feature #988 Adds support for strong_parameters (bryanrite)
 
-* [Fix] #726 - Allow multiple abilities with associations (elabs-dev)
+* Fix #726 - Allow multiple abilities with associations (elabs-dev)
 
-* [Fix] #864 - Fix id_param in shallow routes (francocatena)
+* Fix #864 - Fix id_param in shallow routes (francocatena)
 
-* [Fix] #871 - Fixes nested ability conditions (ricec)
+* Fix #871 - Fixes nested ability conditions (ricec)
 
-* [Fix] #935 - Reduce unnecessary object allocations (grosser)
+* Fix #935 - Reduce unnecessary object allocations (grosser)
 
-* [Fix] #966 - Fixes a variable name collision in nested conditions (knoopx)
+* Fix #966 - Fixes a variable name collision in nested conditions (knoopx)
 
-* [Fix] #971 - Does not execute "empty?" scope when checking class rule (matt-glover)
+* Fix #971 - Does not execute "empty?" scope when checking class rule (matt-glover)
 
-* [Fix] #974 - Avoid unnecessary sql execution (inkstak)
+* Fix #974 - Avoid unnecessary sql execution (inkstak)
 
 
 1.6.10 (May 7, 2013)

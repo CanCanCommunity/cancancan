@@ -12,5 +12,5 @@ matrix:
     - rvm: rbx
 notifications:
   recipients:
-    - graf.otodrakula@gmail.com
+    - bryan@bryanrite.com
     - ryan@railscasts.com
