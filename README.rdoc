@@ -10,7 +10,7 @@ CanCan is an authorization library for Ruby on Rails which restricts what resour
 
 == Mission
 
-This repo is a continuation of the dead CanCan[https://github.com/rbates/cancan] project. Our mission is to keep CanCan alive and moving forward, with maintenance fixes and new features. Pull Requests are welcome!
+This repo is a continuation of the dead CanCan[https://github.com/ryanb/cancan] project. Our mission is to keep CanCan alive and moving forward, with maintenance fixes and new features. Pull Requests are welcome!
 
 I am currently focusing on the 1.x branch for the immediate future, making sure it is up to date as well as ensuring compatibility with Rails 4+. I will take a look into the 2.x branch and try to see what improvements, reorganizations and redesigns Ryan was attempting and go forward from there.
 
