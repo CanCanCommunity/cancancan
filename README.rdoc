@@ -19,7 +19,7 @@ Any help is greatly appreciated, feel free to submit pull-requests or open issue
 
 == Installation
 
-In <b>Rails 3</b>, add this to your Gemfile and run the +bundle+ command.
+In <b>Rails 3 and 4</b>, add this to your Gemfile and run the +bundle+ command.
 
   gem 'cancancan', '~> 1.7'
 
@@ -39,7 +39,7 @@ CanCan expects a +current_user+ method to exist in the controller. First, set up
 
 === 1. Define Abilities
 
-User permissions are defined in an +Ability+ class. CanCan 1.5 includes a Rails 3 generator for creating this class.
+User permissions are defined in an +Ability+ class. CanCan 1.5 includes a Rails 3 and 4 generator for creating this class.
 
   rails g cancan:ability
 
