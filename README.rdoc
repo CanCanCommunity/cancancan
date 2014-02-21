@@ -114,6 +114,8 @@ Additionally, <tt>load_and_authorize_resource</tt> can now take a <tt>param_meth
       params.require(:article).permit(:name)
     end
   end
+  
+See {Strong Parameters}[https://github.com/bryanrite/cancancan/wiki/Strong-Parameters] for more information.
 
 === 3. Handle Unauthorized Access
 
