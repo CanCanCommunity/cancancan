@@ -7,6 +7,7 @@ Gem::Specification.new do |s|
   s.summary     = "Simple authorization solution for Rails."
   s.description = "Continuation of the simple authorization solution for Rails which is decoupled from user roles. All permissions are stored in a single location."
   s.platform    = Gem::Platform::RUBY
+  s.license     = "MIT"
 
   s.files        = Dir["{lib,spec}/**/*", "[A-Z]*", "init.rb"] - ["Gemfile.lock"]
   s.require_path = "lib"
