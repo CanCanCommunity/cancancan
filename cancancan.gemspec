@@ -1,6 +1,11 @@
+# coding: utf-8
+lib = File.expand_path('../lib', __FILE__)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+require 'cancan/version'
+
 Gem::Specification.new do |s|
   s.name        = "cancancan"
-  s.version     = "1.7.0"
+  s.version     = CanCan::VERSION
   s.authors     = ["Bryan Rite", "Ryan Bates"]
   s.email       = "bryan@bryanrite.com"
   s.homepage    = "http://github.com/bryanrite/cancancan"
