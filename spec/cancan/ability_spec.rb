@@ -147,6 +147,20 @@ describe CanCan::Ability do
     expect(@ability.can?(:update, 123)).to be_false
   end
 
+  it "should be able to match multiple classes" do
+    @ability.can :update, [String, Range]
+    expect(@ability.can?(:update, "foo")).to be_true
+    expect(@ability.can?(:update, ["foo", 1..3])).to be_true
+    expect(@ability.can?(:update, [1..3, "foo"])).to be_true
+  end
+
+  it "should be able to match at least one of given class" do
+    @ability.can :update, [String, Range]
+    expect(@ability.can?(:update, ["foo", 1..3])).to be_true
+    expect(@ability.can?(:update, [123, "foo"])).to be_true
+    expect(@ability.can?(:update, 123)).to be_false
+  end
+
   it "supports custom objects in the rule" do
     @ability.can :read, :stats
     expect(@ability.can?(:read, :stats)).to be_true
