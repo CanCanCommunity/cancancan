@@ -6,7 +6,7 @@ describe CanCan::InheritedResource do
     @controller_class = Class.new
     @controller = @controller_class.new
     @ability = Ability.new(nil)
-    allow(@controller).to receive(:params).and_return { @params }
+    allow(@controller).to receive(:params).and_return(@params)
     allow(@controller).to receive(:current_ability) { @ability }
     allow(@controller_class).to receive(:cancan_skipper) { {:authorize => {}, :load => {}} }
   end
