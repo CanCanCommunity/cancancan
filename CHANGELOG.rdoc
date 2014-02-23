@@ -1,6 +1,11 @@
 Master
 
 
+1.7.1 (February 22th, 2014)
+
+* Feature #3 - Permit "can?" check multiple subjects (cefigueiredo)
+
+
 1.7.0 (February 19th, 2014)
 
 * Feature #988 Adds support for strong_parameters (bryanrite)
