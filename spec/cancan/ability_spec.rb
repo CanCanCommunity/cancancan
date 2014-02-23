@@ -158,6 +158,7 @@ describe CanCan::Ability do
     @ability.can :update, [String, Range]
     expect(@ability.can?(:update, ["foo", 1..3])).to be_true
     expect(@ability.can?(:update, [123, "foo"])).to be_true
+    expect(@ability.can?(:update, [123, 1.0])).to be_false
     expect(@ability.can?(:update, 123)).to be_false
   end
 
