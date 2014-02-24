@@ -1,6 +1,6 @@
 = CanCanCan
 {<img src="https://badge.fury.io/rb/cancancan.png" alt="Gem Version" />}[http://badge.fury.io/rb/cancancan]
-{<img src="https://travis-ci.org/bryanrite/cancancan.png" alt="Build Status" />}[https://travis-ci.org/bryanrite/cancancan]
+{<img src="https://travis-ci.org/CanCanCommunity/cancancan.png?branch=master" alt="Build Status" />}[https://travis-ci.org/CanCanCommunity/cancancan]
 {<img src="https://codeclimate.com/github/bryanrite/cancancan.png?" alt="Code Climate" />}[https://codeclimate.com/github/bryanrite/cancancan]
 
 Wiki[https://github.com/bryanrite/cancancan/wiki] | RDocs[http://rdoc.info/projects/ryanb/cancan] | Screencast[http://railscasts.com/episodes/192-authorization-with-cancan]
