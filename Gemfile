@@ -6,7 +6,7 @@ when nil, "active_record"
   gem "sqlite3", :platform => [:ruby, :mswin, :mingw]
   # Sqlite for JRuby
   gem 'activerecord-jdbcsqlite3-adapter', :platform => :jruby
-  gem "activerecord", '~> 3.0.9', :require => "active_record"
+  gem "activerecord", '~> 3.0.20', :require => "active_record"
   gem "with_model", "~> 0.2.5"
   gem "meta_where"
 when "data_mapper"
