@@ -7,6 +7,14 @@ require 'supermodel' # shouldn't Bundler do this already?
 require 'active_support/all'
 require 'matchers'
 require 'cancan/matchers'
+require 'i18n'
+
+
+# I8n setting to fix deprecation.
+# Seting it to true will skip the locale validation (Rails 3 behavior).
+# Seting it to false will raise an error if an invalid locale is passed (Rails 4 behavior).
+I18n.enforce_available_locales = false
+
 
 RSpec.configure do |config|
   config.treat_symbols_as_metadata_keys_with_true_values = true
