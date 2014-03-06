@@ -3,8 +3,11 @@
 *.swp
 **/*.swp
 *.gem
-Gemfile.lock
 .bundle
+
+gemfiles/*.lock
+Gemfile.lock
+
 .rvmrc
 .rbenv-version
 .ruby-version

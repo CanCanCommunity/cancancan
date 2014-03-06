@@ -22,6 +22,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'guard-rspec'
   s.add_development_dependency 'rails', '~> 3.0.20'
   s.add_development_dependency 'supermodel', '~> 0.1.6'
+  s.add_development_dependency 'appraisal', '>= 1.0.0.beta3'
 
   s.rubyforge_project = s.name
   s.required_rubygems_version = ">= 1.3.4"
