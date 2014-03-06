@@ -18,6 +18,8 @@ Gem::Specification.new do |s|
   s.require_path = "lib"
 
   s.add_development_dependency 'rspec', '~> 2.14'
+  s.add_development_dependency 'guard'
+  s.add_development_dependency 'guard-rspec'
   s.add_development_dependency 'rails', '~> 3.0.20'
   s.add_development_dependency 'supermodel', '~> 0.1.6'
 

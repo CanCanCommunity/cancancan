@@ -9,3 +9,4 @@ Gemfile.lock
 .rbenv-version
 .ruby-version
 .ruby-gemset
+/tmp
