@@ -20,8 +20,6 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = ">= 1.3.4"
 
   s.add_development_dependency 'rspec', '~> 2.14'
-  s.add_development_dependency 'guard'
-  s.add_development_dependency 'guard-rspec'
   s.add_development_dependency 'appraisal', '>= 1.0.0.beta3'
 
   s.rubyforge_project = s.name
