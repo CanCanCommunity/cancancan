@@ -20,6 +20,9 @@ appraise "rails_3.0_datamapper" do
 end
 
 appraise "rails_3.0_mongoid" do
-  gem "bson_ext", "~> 1.1"
-  gem "mongoid", "~> 2.0.0.beta.20"
+  gem "mongoid", "~> 2.0.0"
+
+  gemfile.platforms :ruby, :mswin, :mingw do
+    gem "bson_ext", "~> 1.1"
+  end
 end
