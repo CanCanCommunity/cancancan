@@ -3,8 +3,6 @@ require 'bundler/setup'
 
 Bundler.require
 
-require 'supermodel' # shouldn't Bundler do this already?
-require 'active_support/all'
 require 'matchers'
 require 'cancan/matchers'
 require 'i18n'
@@ -30,7 +28,6 @@ RSpec.configure do |config|
     Project.delete_all
     Category.delete_all
   end
-  config.extend WithModel if ENV["MODEL_ADAPTER"].nil? || ENV["MODEL_ADAPTER"] == "active_record"
 end
 
 # Working around CVE-2012-5664 requires us to convert all ID params
