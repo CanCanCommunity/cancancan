@@ -3,6 +3,7 @@ require 'bundler/setup'
 
 Bundler.require
 
+require 'supermodel'
 require 'matchers'
 require 'cancan/matchers'
 require 'i18n'
