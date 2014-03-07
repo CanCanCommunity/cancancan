@@ -61,21 +61,16 @@ module CanCan
     #
     # Also see the RSpec Matchers to aid in testing.
     def can?(action, subject, *extra_args)
-      match = if subject.respond_to?(:keys) && subject.key?(:any)
-        matches = subject[:any].map do |subject|
-          relevant_rules_for_match(action, subject).detect do |rule|
-            rule.matches_conditions?(action, subject, extra_args)
-          end
-        end
-        matches.compact.first
-      else  
+      subject = extract_subjects(subject)
+
+      match = subject.map do |subject|
         relevant_rules_for_match(action, subject).detect do |rule|
           rule.matches_conditions?(action, subject, extra_args)
         end
-      end
+      end.compact.first
+
       match ? match.base_behavior : false
     end
-
     # Convenience method which works the same as "can?" but returns the opposite value.
     #
     #   cannot? :destroy, @project
@@ -286,6 +281,15 @@ module CanCan
 
     def expanded_actions
       @expanded_actions ||= {}
+    end
+
+    # It translates to an array the subject or the hash with multiple subjects given to can?. 
+    def extract_subjects(subject)
+      subject = if subject.respond_to?(:keys) && subject.key?(:any)
+        subject[:any]
+      else
+        [subject]
+      end 
     end
 
     # Given an action, it will try to find all of the actions which are aliased to it.
