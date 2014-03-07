@@ -1,7 +1,7 @@
 require 'rubygems'
 require 'bundler/setup'
 
-Bundler.require(:default)
+Bundler.require
 
 require 'supermodel' # shouldn't Bundler do this already?
 require 'active_support/all'
