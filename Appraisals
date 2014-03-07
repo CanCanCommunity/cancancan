@@ -1,6 +1,5 @@
 appraise "rails_3.0" do
   gem "activerecord", "~> 3.0.20", :require => "active_record"
-  gem "supermodel", "~> 0.1.6"
   gem "with_model", "~> 0.2.5"
   gem "meta_where"
 
@@ -15,14 +14,12 @@ appraise "rails_3.0" do
 end
 
 appraise "rails_3.0_datamapper" do
-  gem "supermodel", "~> 0.1.6"
   gem "dm-core", "~> 1.0.2"
   gem "dm-sqlite-adapter", "~> 1.0.2"
   gem "dm-migrations", "~> 1.0.2"
 end
 
 appraise "rails_3.0_mongoid" do
-  gem "supermodel", "~> 0.1.6"
   gem "bson_ext", "~> 1.1"
   gem "mongoid", "~> 2.0.0.beta.20"
 end
