@@ -1,5 +1,6 @@
-if ENV["MODEL_ADAPTER"] == "data_mapper"
-  require "spec_helper"
+require "spec_helper"
+
+if defined? CanCan::ModelAdapters::DataMapperAdapter
 
   DataMapper.setup(:default, 'sqlite::memory:')
 

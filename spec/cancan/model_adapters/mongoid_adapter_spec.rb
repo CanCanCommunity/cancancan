@@ -1,5 +1,6 @@
-if ENV["MODEL_ADAPTER"] == "mongoid"
-  require "spec_helper"
+require "spec_helper"
+
+if defined? CanCan::ModelAdapters::MongoidAdapter
 
   class MongoidCategory
     include Mongoid::Document
