@@ -159,7 +159,7 @@ If you have any issues with CanCan which you cannot find the solution to in the 
 
 == Development
 
-Cancancan using {appraisals}[https://github.com/thoughtbot/appraisal] to test the code base against multiple versions of rails, as well as the different model adapters.
+Cancancan uses {appraisals}[https://github.com/thoughtbot/appraisal] to test the code base against multiple versions of rails, as well as the different model adapters.
 
 When first developing, you may need to run +bundle install+ and then +appraisal install+, to install the different sets.
 
