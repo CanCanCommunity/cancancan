@@ -1,5 +1,7 @@
 Master
 
+* Fix ryanb/cancan#992 - Remove Rails 4 deprecations for scoped (thejchap & hitendrasingh)
+
 
 1.7.0 (February 19th, 2014)
 
