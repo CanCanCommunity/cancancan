@@ -14,8 +14,11 @@ Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.license     = "MIT"
 
-  s.files        = Dir["{lib,spec}/**/*", "[A-Z]*", "init.rb"] - ["Gemfile.lock"]
+  s.files       = `git ls-files`.split($/)
+  s.test_files  = `git ls-files -- Appraisals {spec,features,gemfiles}/*`.split($/)
+  s.executables = `git ls-files -- bin/*`.split($/).map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
+
   s.required_ruby_version = Gem::Requirement.new(">= 1.8.7")
   s.required_rubygems_version = ">= 1.3.4"
 
