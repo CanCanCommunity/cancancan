@@ -6,6 +6,7 @@ require 'cancan/controller_additions'
 require 'cancan/model_additions'
 require 'cancan/exceptions'
 require 'cancan/inherited_resource'
+require 'cancan/matchers'
 
 require 'cancan/model_adapters/abstract_adapter'
 require 'cancan/model_adapters/default_adapter'
