@@ -3,7 +3,7 @@ Kernel.const_get(rspec_module)::Matchers.define :be_able_to do |*args|
   match do |ability|
     if args[0].is_a? Array
       args[0].all? do |action|
-        ability.can?(action, subject)
+        ability.can?(action, args[1])
       endx
     else
       ability.can?(*args)
