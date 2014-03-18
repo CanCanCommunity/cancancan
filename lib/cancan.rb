@@ -1,4 +1,4 @@
-require "cancan/version"
+require 'cancan/version'
 require 'cancan/ability'
 require 'cancan/rule'
 require 'cancan/controller_resource'
@@ -6,7 +6,6 @@ require 'cancan/controller_additions'
 require 'cancan/model_additions'
 require 'cancan/exceptions'
 require 'cancan/inherited_resource'
-require 'cancan/matchers'
 
 require 'cancan/model_adapters/abstract_adapter'
 require 'cancan/model_adapters/default_adapter'
