@@ -1,7 +1,12 @@
-rspec_module = defined?(RSpec::Core) ? 'RSpec' : 'Spec'  # for RSpec 1 compatability
-Kernel.const_get(rspec_module)::Matchers.define :be_able_to do |*args|
+RSpec::Matchers.define :be_able_to do |*args|
   match do |ability|
-    ability.can?(*args)
+    if args[0].is_a? Array
+      args[0].all? do |action|
+        ability.can?(action, args[1])
+      end
+    else
+      ability.can?(*args)
+    end
   end
 
   failure_message_for_should do |ability|

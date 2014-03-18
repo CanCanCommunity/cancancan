@@ -1,4 +1,4 @@
-require "cancan/version"
+require 'cancan/version'
 require 'cancan/ability'
 require 'cancan/rule'
 require 'cancan/controller_resource'
