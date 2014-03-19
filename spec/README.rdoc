@@ -18,11 +18,10 @@ Or individual ones:
 
   appraisal rails_3.0 rake
 
-A list of the test tests is in the +Appraisal+ file.
+A list of the tests is in the +Appraisal+ file.
 
 The specs support Ruby 1.8.7+
 
 == Model Adapters
 
 The model adapter ENV setting has been removed and replaced with the +Appraisal+ file.
-

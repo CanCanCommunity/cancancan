@@ -35,7 +35,7 @@ Alternatively, you can install it as a plugin.
 
 == Getting Started
 
-CanCanCan expects a +current_user+ method to exist in the controller. First, set up some authentication (such as Authlogic[https://github.com/binarylogic/authlogic] or Devise[https://github.com/plataformatec/devise]). See {Changing Defaults}[https://github.com/bryanrite/cancan/wiki/changing-defaults] if you need different behavior.
+CanCanCan expects a +current_user+ method to exist in the controller. First, set up some authentication (such as Authlogic[https://github.com/binarylogic/authlogic] or Devise[https://github.com/plataformatec/devise]). See {Changing Defaults}[https://github.com/bryanrite/cancancan/wiki/changing-defaults] if you need different behavior.
 
 
 === 1. Define Abilities
@@ -53,7 +53,7 @@ In Rails 2.3, just add a new class in <tt>app/models/ability.rb</tt> with the fo
     end
   end
 
-See {Defining Abilities}[https://github.com/bryanrite/cancan/wiki/defining-abilities] for details.
+See {Defining Abilities}[https://github.com/bryanrite/cancancan/wiki/defining-abilities] for details.
 
 
 === 2. Check Abilities & Authorization
@@ -161,11 +161,11 @@ If you have any issues with CanCan which you cannot find the solution to in the 
 
 Cancancan uses {appraisals}[https://github.com/thoughtbot/appraisal] to test the code base against multiple versions of rails, as well as the different model adapters.
 
-When first developing, you may need to run +bundle install+ and then +appraisal install+, to install the different sets.
+When first developing, you may need to run <tt>bundle install</tt> and then <tt>appraisal install</tt>, to install the different sets.
 
-You can then run all appraisal files (like CI does), with +appraisal rake+ or just run a specific set +appraisal rails_3.0 rake+.
+You can then run all appraisal files (like CI does), with <tt>appraisal rake</tt> or just run a specific set <tt>appraisal rails_3.0 rake</tt>.
 
-See the {spec/README}[https://github.com/bryanrite/cancancan/blob/master/spec/README.rdoc] for more information.
+See the {CONTRIBUTING}[https://github.com/CanCanCommunity/cancancan/blob/develop/CONTRIBUTING.md] and {spec/README}[https://github.com/bryanrite/cancancan/blob/master/spec/README.rdoc] for more information.
 
 
 == Special Thanks
