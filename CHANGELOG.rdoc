@@ -1,5 +1,8 @@
 Master
 
+
+1.7.1 (March 19th, 2014)
+
 * Fix ryanb/cancan#992 - Remove Rails 4 deprecations for scoped (thejchap & hitendrasingh)
 
 * Fix cancancan#16 - RSpec expectations are not explicitly required in RSpec > 2.13 (justinaiken & bryanrite)
