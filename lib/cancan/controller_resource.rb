@@ -248,7 +248,7 @@ module CanCan
     end
 
     def namespace
-      @params[:controller].split(/::|\//)[0..-2]
+      @params[:controller].split(/::|\//)[0..-2].map(&:camelize)
     end
 
     def namespaced_name
