@@ -23,6 +23,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = ">= 1.3.4"
 
   s.add_development_dependency 'rspec', '~> 2.14'
+  s.add_development_dependency 'rake', '~> 10.1.1'
   s.add_development_dependency 'supermodel', '~> 0.1.6'
   s.add_development_dependency 'appraisal', '>= 1.0.0.beta3'
 
