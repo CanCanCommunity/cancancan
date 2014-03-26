@@ -505,13 +505,25 @@ describe CanCan::ControllerResource do
       resource.send("resource_params")
     end
 
-    it "uses the specified option for santitizing input" do
+    it "accepts and uses the specified symbol for santitizing input" do
       @params.merge!(:controller => "project", :action => "create")
       @controller.stub(:resource_params).and_return(:resource => 'params')
       @controller.stub(:project_params).and_return(:model => 'params')
       @controller.stub(:create_params).and_return(:create => 'params')
       @controller.stub(:custom_params).and_return(:custom => 'params')
       resource = CanCan::ControllerResource.new(@controller, {:param_method => :custom_params})
+      expect(resource.send("resource_params")).to eq(:custom => 'params')
+    end
+    
+    it "accepts the specified string for sanitizing input" do
+      @params.merge!(:controller => "project", :action => "create")
+      resource = CanCan::ControllerResource.new(@controller, {:param_method => "{:custom => 'params'}"})
+      expect(resource.send("resource_params")).to eq(:custom => 'params')
+    end
+
+    it "accepts the specified proc for sanitizing input" do
+      @params.merge!(:controller => "project", :action => "create")
+      resource = CanCan::ControllerResource.new(@controller, {:param_method => Proc.new { |c| {:custom => 'params'}}})
       expect(resource.send("resource_params")).to eq(:custom => 'params')
     end
 

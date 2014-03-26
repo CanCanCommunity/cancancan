@@ -98,6 +98,8 @@ By default, CanCan will try to sanitize the input on <tt>:create</tt> and <tt>:u
 
 Additionally, <tt>load_and_authorize_resource</tt> can now take a <tt>param_method</tt> option to specify a custom method in the controller to run to sanitize input.
 
+You can associate the <tt>param_method</tt> option with a symbol corresponding to the name of a method that will get called:
+
   class ArticlesController < ApplicationController
     load_and_authorize_resource param_method: :my_sanitizer
 
@@ -115,6 +117,14 @@ Additionally, <tt>load_and_authorize_resource</tt> can now take a <tt>param_meth
       params.require(:article).permit(:name)
     end
   end
+
+You can also use a string that will be evaluated in the context of the controller using <tt>instance_eval</tt> and needs to contain valid Ruby code. This does come in handy when using a PermittedParams class as suggested in Railscast 371:
+
+  load_and_authorize_resource param_method: 'permitted_params.article'
+
+Finally, it's possible to associate <tt>param_method</tt> with a Proc object which will be called with the controller as the only argument:
+
+  load_and_authorize_resource param_method: Proc.new { |c| c.params.require(:article).permit(:name) }
 
 See {Strong Parameters}[https://github.com/bryanrite/cancancan/wiki/Strong-Parameters] for more information.
 
