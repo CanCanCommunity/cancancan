@@ -523,7 +523,7 @@ describe CanCan::ControllerResource do
 
     it "accepts the specified proc for sanitizing input" do
       @params.merge!(:controller => "project", :action => "create")
-      resource = CanCan::ControllerResource.new(@controller, {:param_method => ->(c) {{:custom => 'params'}}})
+      resource = CanCan::ControllerResource.new(@controller, {:param_method => Proc.new { |c| {:custom => 'params'}}})
       expect(resource.send("resource_params")).to eq(:custom => 'params')
     end
 
