@@ -11,10 +11,12 @@ module CanCan
 
       def self.matches_condition?(subject, name, value)
         subject_value = subject.send(name.column)
-        if name.method.to_s.ends_with? "_any"
-          value.any? { |v| meta_where_match? subject_value, name.method.to_s.sub("_any", ""), v }
-        elsif name.method.to_s.ends_with? "_all"
-          value.all? { |v| meta_where_match? subject_value, name.method.to_s.sub("_all", ""), v }
+        str_name_method = name.method.to_s
+
+        if str_name_method.ends_with? "_any"
+          meta_where_match_value(value, subject_value, str_name_method, "_any")
+        elsif str_name_method.ends_with? "_all"
+          meta_where_match_value(value, subject_value, str_name_method, "_all")
         else
           meta_where_match? subject_value, name.method, value
         end
@@ -111,6 +113,15 @@ module CanCan
       end
 
       private
+
+      def self.meta_where_match_value(value, subject_value, name_method, name_method_ending)
+        case name_method_ending
+          when "_any"
+            value.any? { |v| meta_where_match? subject_value, name_method.sub(name_method_ending, ""), v }
+          when "_all"
+            value.all? { |v| meta_where_match? subject_value, name_method.sub(name_method_ending, ""), v }
+        end
+      end
 
       def override_scope
         conditions = @rules.map(&:conditions).compact
