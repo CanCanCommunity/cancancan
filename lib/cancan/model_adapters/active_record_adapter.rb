@@ -101,9 +101,9 @@ module CanCan
         elsif @model_class.respond_to?(:where) && @model_class.respond_to?(:joins)
           mergeable_conditions = @rules.select {|rule| rule.unmergeable? }.blank?
           if mergeable_conditions
-            @model_class.where(conditions).includes(joins)
+            build_relation(conditions)
           else
-            @model_class.where(*(@rules.map(&:conditions))).includes(joins)
+            build_relation(*(@rules.map(&:conditions)))
           end
         else
           @model_class.all(:conditions => conditions, :joins => joins)
@@ -111,6 +111,15 @@ module CanCan
       end
 
       private
+
+      def build_relation(*where_conditions)
+        if ADD_REFERENCES
+          join_tables = joins
+          @model_class.where(*where_conditions).includes(join_tables).references(join_tables)
+        else
+          @model_class.where(*where_conditions).includes(joins)
+        end
+      end
 
       def override_scope
         conditions = @rules.map(&:conditions).compact
@@ -173,6 +182,8 @@ module CanCan
       end
     end
   end
+
+  ADD_REFERENCES = defined?(ActiveRecord::Relation) && ActiveRecord::Relation.instance_methods.include?(:references)
 end
 
 ActiveRecord::Base.class_eval do
