@@ -135,7 +135,8 @@ module CanCan
     def condition_match?(attribute, value)
       case value
       when Hash       then hash_condition_match?(attribute, value)
-      when Enumerable then (!value.is_a?(String) && value.include?(attribute))
+      when String     then attribute == value
+      when Enumerable then value.include?(attribute)
       else attribute == value
       end
     end
