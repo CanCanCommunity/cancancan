@@ -22,10 +22,9 @@ Gem::Specification.new do |s|
   s.required_ruby_version = Gem::Requirement.new(">= 1.8.7")
   s.required_rubygems_version = ">= 1.3.4"
 
-  s.add_development_dependency 'rspec', '~> 2.14'
-  s.add_development_dependency 'rake', '~> 10.1.1'
-  s.add_development_dependency 'supermodel', '~> 0.1.6'
-  s.add_development_dependency 'appraisal', '>= 1.0.0.beta3'
+  s.add_development_dependency 'rspec', '~> 3.0.0.beta2'
+  s.add_development_dependency 'rails', '~> 3.0.9'
+  s.add_development_dependency 'supermodel', '~> 0.1.4'
 
   s.rubyforge_project = s.name
 end

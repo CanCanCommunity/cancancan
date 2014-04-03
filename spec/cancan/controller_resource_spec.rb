@@ -128,7 +128,7 @@ describe CanCan::ControllerResource do
     resource = CanCan::ControllerResource.new(@controller)
     resource.load_resource
     expect(@controller.instance_variable_get(:@project)).to be_nil
-    expect(@controller.instance_variable_defined?(:@projects)).to be_false
+    expect(@controller.instance_variable_defined?(:@projects)).to be_falsy
   end
 
   it "does not use accessible_by when defining abilities through a block" do
@@ -138,7 +138,7 @@ describe CanCan::ControllerResource do
     resource = CanCan::ControllerResource.new(@controller)
     resource.load_resource
     expect(@controller.instance_variable_get(:@project)).to be_nil
-    expect(@controller.instance_variable_defined?(:@projects)).to be_false
+    expect(@controller.instance_variable_defined?(:@projects)).to be_falsy
   end
 
   it "does not authorize single resource in collection action" do
@@ -448,41 +448,41 @@ describe CanCan::ControllerResource do
   it "skips resource behavior for :only actions in array" do
     allow(@controller_class).to receive(:cancan_skipper) { {:load => {nil => {:only => [:index, :show]}}} }
     @params.merge!(:action => "index")
-    expect(CanCan::ControllerResource.new(@controller).skip?(:load)).to be_true
-    expect(CanCan::ControllerResource.new(@controller, :some_resource).skip?(:load)).to be_false
+    expect(CanCan::ControllerResource.new(@controller).skip?(:load)).to be(true)
+    expect(CanCan::ControllerResource.new(@controller, :some_resource).skip?(:load)).to be_falsy
     @params.merge!(:action => "show")
-    expect(CanCan::ControllerResource.new(@controller).skip?(:load)).to be_true
+    expect(CanCan::ControllerResource.new(@controller).skip?(:load)).to be(true)
     @params.merge!(:action => "other_action")
-    expect(CanCan::ControllerResource.new(@controller).skip?(:load)).to be_false
+    expect(CanCan::ControllerResource.new(@controller).skip?(:load)).to be_falsy
   end
 
   it "skips resource behavior for :only one action on resource" do
     allow(@controller_class).to receive(:cancan_skipper) { {:authorize => {:project => {:only => :index}}} }
     @params.merge!(:action => "index")
-    expect(CanCan::ControllerResource.new(@controller).skip?(:authorize)).to be_false
-    expect(CanCan::ControllerResource.new(@controller, :project).skip?(:authorize)).to be_true
+    expect(CanCan::ControllerResource.new(@controller).skip?(:authorize)).to be_falsy
+    expect(CanCan::ControllerResource.new(@controller, :project).skip?(:authorize)).to be(true)
     @params.merge!(:action => "other_action")
-    expect(CanCan::ControllerResource.new(@controller, :project).skip?(:authorize)).to be_false
+    expect(CanCan::ControllerResource.new(@controller, :project).skip?(:authorize)).to be_falsy
   end
 
   it "skips resource behavior :except actions in array" do
     allow(@controller_class).to receive(:cancan_skipper) { {:load => {nil => {:except => [:index, :show]}}} }
     @params.merge!(:action => "index")
-    expect(CanCan::ControllerResource.new(@controller).skip?(:load)).to be_false
+    expect(CanCan::ControllerResource.new(@controller).skip?(:load)).to be_falsy
     @params.merge!(:action => "show")
-    expect(CanCan::ControllerResource.new(@controller).skip?(:load)).to be_false
+    expect(CanCan::ControllerResource.new(@controller).skip?(:load)).to be_falsy
     @params.merge!(:action => "other_action")
-    expect(CanCan::ControllerResource.new(@controller).skip?(:load)).to be_true
-    expect(CanCan::ControllerResource.new(@controller, :some_resource).skip?(:load)).to be_false
+    expect(CanCan::ControllerResource.new(@controller).skip?(:load)).to be(true)
+    expect(CanCan::ControllerResource.new(@controller, :some_resource).skip?(:load)).to be_falsy
   end
 
   it "skips resource behavior :except one action on resource" do
     allow(@controller_class).to receive(:cancan_skipper) { {:authorize => {:project => {:except => :index}}} }
     @params.merge!(:action => "index")
-    expect(CanCan::ControllerResource.new(@controller, :project).skip?(:authorize)).to be_false
+    expect(CanCan::ControllerResource.new(@controller, :project).skip?(:authorize)).to be_falsy
     @params.merge!(:action => "other_action")
-    expect(CanCan::ControllerResource.new(@controller).skip?(:authorize)).to be_false
-    expect(CanCan::ControllerResource.new(@controller, :project).skip?(:authorize)).to be_true
+    expect(CanCan::ControllerResource.new(@controller).skip?(:authorize)).to be_falsy
+    expect(CanCan::ControllerResource.new(@controller, :project).skip?(:authorize)).to be(true)
   end
 
   it "skips loading and authorization" do
@@ -497,20 +497,21 @@ describe CanCan::ControllerResource do
 
     it "only calls the santitize method with actions matching param_actions" do
       @params.merge!(:controller => "project", :action => "update")
-      @controller.stub(:resource_params).and_return(:resource => 'params')
+      allow(@controller).to receive(:resource_params).and_return(:resource => 'params')
+      allow(@controller).to receive(:send)
       resource = CanCan::ControllerResource.new(@controller)
-      resource.stub(:param_actions => [:create])
+      allow(resource).to receive(:param_actions).and_return([:create])
+      expect(@controller).to_not have_received(:send).with(:resource_params)
 
-      @controller.should_not_receive(:send).with(:resource_params)
       resource.send("resource_params")
     end
 
     it "accepts and uses the specified symbol for santitizing input" do
       @params.merge!(:controller => "project", :action => "create")
-      @controller.stub(:resource_params).and_return(:resource => 'params')
-      @controller.stub(:project_params).and_return(:model => 'params')
-      @controller.stub(:create_params).and_return(:create => 'params')
-      @controller.stub(:custom_params).and_return(:custom => 'params')
+      allow(@controller).to receive(:resource_params).and_return(:resource => 'params')
+      allow(@controller).to receive(:project_params).and_return(:model => 'params')
+      allow(@controller).to receive(:create_params).and_return(:create => 'params')
+      allow(@controller).to receive(:custom_params).and_return(:custom => 'params')
       resource = CanCan::ControllerResource.new(@controller, {:param_method => :custom_params})
       expect(resource.send("resource_params")).to eq(:custom => 'params')
     end
@@ -529,35 +530,35 @@ describe CanCan::ControllerResource do
 
     it "prefers to use the create_params method for santitizing input" do
       @params.merge!(:controller => "project", :action => "create")
-      @controller.stub(:resource_params).and_return(:resource => 'params')
-      @controller.stub(:project_params).and_return(:model => 'params')
-      @controller.stub(:create_params).and_return(:create => 'params')
-      @controller.stub(:custom_params).and_return(:custom => 'params')
+      allow(@controller).to receive(:resource_params).and_return(:resource => 'params')
+      allow(@controller).to receive(:project_params).and_return(:model => 'params')
+      allow(@controller).to receive(:create_params).and_return(:create => 'params')
+      allow(@controller).to receive(:custom_params).and_return(:custom => 'params')
       resource = CanCan::ControllerResource.new(@controller)
       expect(resource.send("resource_params")).to eq(:create => 'params')
     end
 
     it "uses the proper action param based on the action" do
       @params.merge!(:controller => "project", :action => "update")
-      @controller.stub(:create_params).and_return(:create => 'params')
-      @controller.stub(:update_params).and_return(:update => 'params')
+      allow(@controller).to receive(:create_params).and_return(:create => 'params')
+      allow(@controller).to receive(:update_params).and_return(:update => 'params')
       resource = CanCan::ControllerResource.new(@controller)
       expect(resource.send("resource_params")).to eq(:update => 'params')
     end
 
     it "prefers to use the <model_name>_params method for santitizing input if create is not found" do
       @params.merge!(:controller => "project", :action => "create")
-      @controller.stub(:resource_params).and_return(:resource => 'params')
-      @controller.stub(:project_params).and_return(:model => 'params')
-      @controller.stub(:custom_params).and_return(:custom => 'params')
+      allow(@controller).to receive(:resource_params).and_return(:resource => 'params')
+      allow(@controller).to receive(:project_params).and_return(:model => 'params')
+      allow(@controller).to receive(:custom_params).and_return(:custom => 'params')
       resource = CanCan::ControllerResource.new(@controller)
       expect(resource.send("resource_params")).to eq(:model => 'params')
     end
 
     it "prefers to use the resource_params method for santitizing input if create or model is not found" do
       @params.merge!(:controller => "project", :action => "create")
-      @controller.stub(:resource_params).and_return(:resource => 'params')
-      @controller.stub(:custom_params).and_return(:custom => 'params')
+      allow(@controller).to receive(:resource_params).and_return(:resource => 'params')
+      allow(@controller).to receive(:custom_params).and_return(:custom => 'params')
       resource = CanCan::ControllerResource.new(@controller)
       expect(resource.send("resource_params")).to eq(:resource => 'params')
     end
