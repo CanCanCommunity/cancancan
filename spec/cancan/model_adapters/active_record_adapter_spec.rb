@@ -2,57 +2,61 @@ require "spec_helper"
 
 if defined? CanCan::ModelAdapters::ActiveRecordAdapter
 
-  RSpec.configure do |config|
-    config.extend WithModel
-  end
-
   ActiveRecord::Base.establish_connection(:adapter => "sqlite3", :database => ":memory:")
 
+  ActiveRecord::Base.connection.create_table(:categories) do |t|
+    t.string :name
+    t.boolean :visible
+    t.timestamps
+  end
+
+  ActiveRecord::Base.connection.create_table(:projects) do |t|
+    t.string :name
+    t.timestamps
+  end
+
+  ActiveRecord::Base.connection.create_table(:articles) do |t|
+    t.string :name
+    t.timestamps
+    t.boolean :published
+    t.boolean :secret
+    t.integer :priority
+    t.integer :category_id
+    t.integer :user_id
+  end
+
+  ActiveRecord::Base.connection.create_table(:comments) do |t|
+    t.boolean :spam
+    t.integer :article_id
+    t.timestamps
+  end
+
+  ActiveRecord::Base.connection.create_table(:users) do |t|
+    t.timestamps
+  end
+
+  class Project < ActiveRecord::Base
+  end
+
+  class Category < ActiveRecord::Base
+    has_many :articles
+  end
+
+  class Article < ActiveRecord::Base
+    belongs_to :category
+    has_many :comments
+    belongs_to :user
+  end
+
+  class Comment < ActiveRecord::Base
+    belongs_to :article
+  end
+
+  class User < ActiveRecord::Base
+    has_many :articles
+  end
+
   describe CanCan::ModelAdapters::ActiveRecordAdapter do
-    with_model :category do
-      table do |t|
-        t.string "name"
-        t.boolean "visible"
-      end
-      model do
-        has_many :articles
-      end
-    end
-
-    with_model :article do
-      table do |t|
-        t.string  "name"
-        t.boolean "published"
-        t.boolean "secret"
-        t.integer "priority"
-        t.integer "category_id"
-        t.integer "user_id"
-      end
-      model do
-        belongs_to :category
-        has_many :comments
-        belongs_to :user
-      end
-    end
-
-    with_model :comment do
-      table do |t|
-        t.boolean "spam"
-        t.integer "article_id"
-      end
-      model do
-        belongs_to :article
-      end
-    end
-
-    with_model :user do
-      table do |t|
-
-      end
-      model do
-        has_many :articles
-      end
-    end
 
     before(:each) do
       Article.delete_all
