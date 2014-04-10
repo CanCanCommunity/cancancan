@@ -3,10 +3,10 @@ require 'bundler/setup'
 
 Bundler.require
 
-require 'supermodel'
 require 'matchers'
 require 'cancan/matchers'
 require 'i18n'
+require 'active_support/all'
 
 # I8n setting to fix deprecation.
 # Seting it to true will skip the locale validation (Rails 3 behavior).
@@ -22,60 +22,15 @@ RSpec.configure do |config|
   config.expect_with :rspec do |c|
     c.syntax = :expect
   end
+end
 
-  config.before(:each) do
-    Project.delete_all
-    Category.delete_all
+
+if defined?(CanCan::ModelAdapters::MongoidAdapter) || defined?(CanCan::ModelAdapters::DataMapperAdapter)
+  RSpec.configure do |config|
+    config.filter_run_excluding :activerecord_depend => true
   end
 end
 
-# Working around CVE-2012-5664 requires us to convert all ID params
-# to strings. Let's switch to using string IDs in tests, otherwise
-# SuperModel and/or RR will fail (as strings are not fixnums).
-
-module SuperModel
-  class Base
-    def generate_id
-      object_id.to_s
-    end
-  end
-end
-
-class Ability
-  include CanCan::Ability
-
-  def initialize(user)
-  end
-end
-
-class Category < SuperModel::Base
-  has_many :projects
-end
-
-module Sub
-  class Project < SuperModel::Base
-    belongs_to :category
-    attr_accessor :category # why doesn't SuperModel do this automatically?
-
-    def self.respond_to?(method, include_private = false)
-      if method.to_s == "find_by_name!" # hack to simulate ActiveRecord
-        true
-      else
-        super
-      end
-    end
-  end
-end
-
-class Project < SuperModel::Base
-  belongs_to :category
-  attr_accessor :category # why doesn't SuperModel do this automatically?
-
-  def self.respond_to?(method, include_private = false)
-    if method.to_s == "find_by_name!" # hack to simulate ActiveRecord
-      true
-    else
-      super
-    end
-  end
-end
+# Add support to load paths
+$:.unshift File.expand_path('../support', __FILE__)
+Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }

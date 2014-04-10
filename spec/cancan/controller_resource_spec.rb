@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe CanCan::ControllerResource do
+describe CanCan::ControllerResource, :activerecord_depend => true do
   before(:each) do
     @params = HashWithIndifferentAccess.new(:controller => "projects")
     @controller_class = Class.new
@@ -124,11 +124,25 @@ describe CanCan::ControllerResource do
   end
 
   it "does not build a collection when on index action when class does not respond to accessible_by" do
-    @params[:action] = "index"
-    resource = CanCan::ControllerResource.new(@controller)
+    class Item
+
+    end
+
+    params = HashWithIndifferentAccess.new(:controller => "items")
+    controller_class = Class.new
+    controller = controller_class.new
+    ability = Ability.new(nil)
+
+    allow(controller).to receive(:params) { params }
+    allow(controller).to receive(:current_ability) { ability }
+    allow(controller_class).to receive(:cancan_skipper) { {:authorize => {}, :load => {}} }
+
+    params[:action] = "index"
+    resource = CanCan::ControllerResource.new(controller)
     resource.load_resource
-    expect(@controller.instance_variable_get(:@project)).to be_nil
-    expect(@controller.instance_variable_defined?(:@projects)).to be_false
+
+    expect(controller.instance_variable_get(:@item)).to be_nil
+    expect(controller.instance_variable_defined?(:@items)).to be_false
   end
 
   it "does not use accessible_by when defining abilities through a block" do
