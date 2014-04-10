@@ -5,9 +5,6 @@
 *.gem
 .bundle
 
-gemfiles/*.lock
-Gemfile.lock
-
 .rvmrc
 .rbenv-version
 .ruby-version

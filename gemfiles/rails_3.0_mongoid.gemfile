@@ -8,4 +8,4 @@ platforms :ruby, :mswin, :mingw do
   gem "bson_ext", "~> 1.1"
 end
 
-gemspec :path=>".././"
+gemspec :path => "../"
