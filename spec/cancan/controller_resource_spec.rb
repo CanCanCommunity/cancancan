@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe CanCan::ControllerResource, activerecord_depend: true do
+describe CanCan::ControllerResource, :activerecord_depend => true do
   before(:each) do
     @params = HashWithIndifferentAccess.new(:controller => "projects")
     @controller_class = Class.new

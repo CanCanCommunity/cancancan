@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe CanCan::InheritedResource, activerecord_depend: true do
+describe CanCan::InheritedResource, :activerecord_depend => true do
   before(:each) do
     @params = HashWithIndifferentAccess.new(:controller => "projects")
     @controller_class = Class.new
