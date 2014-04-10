@@ -12,6 +12,10 @@ require 'i18n'
 # Seting it to false will raise an error if an invalid locale is passed (Rails 4 behavior).
 I18n.enforce_available_locales = false
 
+# Add support to load paths
+$:.unshift File.expand_path('../support', __FILE__)
+Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }
+
 RSpec.configure do |config|
   config.treat_symbols_as_metadata_keys_with_true_values = true
   config.filter_run :focus => true
