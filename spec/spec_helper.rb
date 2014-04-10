@@ -6,6 +6,7 @@ Bundler.require
 require 'matchers'
 require 'cancan/matchers'
 require 'i18n'
+require 'active_support/all'
 
 # I8n setting to fix deprecation.
 # Seting it to true will skip the locale validation (Rails 3 behavior).
@@ -24,6 +25,9 @@ RSpec.configure do |config|
 end
 
 
+if defined?(CanCan::ModelAdapters::MongoidAdapter) || defined?(CanCan::ModelAdapters::DataMapperAdapter)
+  RSpec.configure do |config|
+    config.filter_run_excluding :activerecord_depend => true
   end
 end
 
