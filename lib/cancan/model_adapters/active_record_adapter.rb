@@ -101,9 +101,9 @@ module CanCan
         elsif @model_class.respond_to?(:where) && @model_class.respond_to?(:joins)
           mergeable_conditions = @rules.select {|rule| rule.unmergeable? }.blank?
           if mergeable_conditions
-            @model_class.where(conditions).includes(joins)
+            build_query(@model_class, { where: conditions, includes: joins })
           else
-            @model_class.where(*(@rules.map(&:conditions))).includes(joins)
+            build_query(@model_class, { where: @rules.map(&:conditions), includes: joins })
           end
         else
           @model_class.all(:conditions => conditions, :joins => joins)
@@ -170,6 +170,20 @@ module CanCan
           joins << (nested.empty? ? name : {name => clean_joins(nested)})
         end
         joins
+      end
+
+
+      def reference_required?
+        @reference_required ||= ActiveRecord.version > Gem::Version.new('4.0.0')
+      end
+
+      def build_query(obj, args)
+        if joins
+          args.merge! references: joins if reference_required?
+        else
+          args.delete :includes
+        end
+        args.inject(obj) { |obj, method| obj.send(method[0], *(method[1])) }
       end
     end
   end
