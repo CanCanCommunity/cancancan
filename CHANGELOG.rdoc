@@ -2,6 +2,13 @@ Master
 
 * Feature #3 - Permit "can?" check multiple subjects (cefigueiredo)
 
+1.7.1 (March 19th, 2014)
+
+* Fix ryanb/cancan#992 - Remove Rails 4 deprecations for scoped (thejchap & hitendrasingh)
+
+* Fix cancancan#16 - RSpec expectations are not explicitly required in RSpec > 2.13 (justinaiken & bryanrite)
+
+
 1.7.0 (February 19th, 2014)
 
 * Feature #988 Adds support for strong_parameters (bryanrite)
