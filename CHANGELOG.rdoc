@@ -1,5 +1,6 @@
 Master
 
+* Feature #3 - Permit "can?" check multiple subjects (cefigueiredo)
 
 1.7.1 (March 19th, 2014)
 
