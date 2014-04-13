@@ -1,7 +1,8 @@
 = CanCanCan
 {<img src="https://badge.fury.io/rb/cancancan.png" alt="Gem Version" />}[http://badge.fury.io/rb/cancancan]
-{<img src="https://travis-ci.org/bryanrite/cancancan.png" alt="Build Status" />}[https://travis-ci.org/bryanrite/cancancan]
+{<img src="https://travis-ci.org/CanCanCommunity/cancancan.png?branch=master" alt="Build Status" />}[https://travis-ci.org/CanCanCommunity/cancancan]
 {<img src="https://codeclimate.com/github/bryanrite/cancancan.png?" alt="Code Climate" />}[https://codeclimate.com/github/bryanrite/cancancan]
+{<img src="http://inch-pages.github.io/github/CanCanCommunity/cancancan.png" alt="Inline docs" />}[http://inch-pages.github.io/github/CanCanCommunity/cancancan]
 
 Wiki[https://github.com/bryanrite/cancancan/wiki] | RDocs[http://rdoc.info/projects/ryanb/cancan] | Screencast[http://railscasts.com/episodes/192-authorization-with-cancan]
 
@@ -34,7 +35,7 @@ Alternatively, you can install it as a plugin.
 
 == Getting Started
 
-CanCan expects a +current_user+ method to exist in the controller. First, set up some authentication (such as Authlogic[https://github.com/binarylogic/authlogic] or Devise[https://github.com/plataformatec/devise]). See {Changing Defaults}[https://github.com/bryanrite/cancan/wiki/changing-defaults] if you need different behavior.
+CanCanCan expects a +current_user+ method to exist in the controller. First, set up some authentication (such as Authlogic[https://github.com/binarylogic/authlogic] or Devise[https://github.com/plataformatec/devise]). See {Changing Defaults}[https://github.com/bryanrite/cancancan/wiki/changing-defaults] if you need different behavior.
 
 
 === 1. Define Abilities
@@ -52,7 +53,7 @@ In Rails 2.3, just add a new class in <tt>app/models/ability.rb</tt> with the fo
     end
   end
 
-See {Defining Abilities}[https://github.com/bryanrite/cancan/wiki/defining-abilities] for details.
+See {Defining Abilities}[https://github.com/bryanrite/cancancan/wiki/defining-abilities] for details.
 
 
 === 2. Check Abilities & Authorization
@@ -114,7 +115,7 @@ Additionally, <tt>load_and_authorize_resource</tt> can now take a <tt>param_meth
       params.require(:article).permit(:name)
     end
   end
-  
+
 See {Strong Parameters}[https://github.com/bryanrite/cancancan/wiki/Strong-Parameters] for more information.
 
 === 3. Handle Unauthorized Access
@@ -153,9 +154,18 @@ This will raise an exception if authorization is not performed in an action. If 
 
 == Questions or Problems?
 
-If you have any issues with CanCan which you cannot find the solution to in the documentation[https://github.com/bryanrite/cancancan/wiki], please add an {issue on GitHub}[https://github.com/bryanrite/cancancan/issues] or fork the project and send a pull request.
+If you have any issues with CanCan which you cannot find the solution to in the documentation[https://github.com/bryanrite/cancancan/wiki] or our mailing list: http://groups.google.com/group/cancancan, please add an {issue on GitHub}[https://github.com/bryanrite/cancancan/issues] or fork the project and send a pull request.
 
-To get the specs running you should call +bundle+ and then +rake+. See the {spec/README}[https://github.com/bryanrite/cancancan/blob/master/spec/README.rdoc] for more information.
+
+== Development
+
+Cancancan uses {appraisals}[https://github.com/thoughtbot/appraisal] to test the code base against multiple versions of rails, as well as the different model adapters.
+
+When first developing, you may need to run <tt>bundle install</tt> and then <tt>appraisal install</tt>, to install the different sets.
+
+You can then run all appraisal files (like CI does), with <tt>appraisal rake</tt> or just run a specific set <tt>appraisal rails_3.0 rake</tt>.
+
+See the {CONTRIBUTING}[https://github.com/CanCanCommunity/cancancan/blob/develop/CONTRIBUTING.md] and {spec/README}[https://github.com/bryanrite/cancancan/blob/master/spec/README.rdoc] for more information.
 
 
 == Special Thanks
