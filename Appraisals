@@ -25,4 +25,8 @@ appraise "rails_3.0_mongoid" do
   gemfile.platforms :ruby, :mswin, :mingw do
     gem "bson_ext", "~> 1.1"
   end
+
+  gemfile.platforms :jruby do
+    gem "mongo", "~> 1.9.2"
+  end
 end
