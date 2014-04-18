@@ -2,6 +2,7 @@ Develop
 
 * Feature cancancan#29 - Add ability to use a String that will get instance_eval'd or a Proc that will get called as the parameter method option for strong_parameter santization (svoop)
 
+* Feature cancancan#48 - Define a CanCanCan module. Even though it is not used, it is standard practice to define the module, and helpful for determining between CanCanCan and CanCan for external libraries.
 
 1.7.1 (March 19th, 2014)
 
