@@ -2,8 +2,7 @@
 
 source "https://rubygems.org"
 
-gem "activerecord", "~> 3.0.20", :require=>"active_record"
-gem "with_model", "~> 0.2.5"
+gem "activerecord", "~> 3.0.20", :require => "active_record"
 gem "meta_where"
 
 platforms :jruby do
@@ -15,4 +14,4 @@ platforms :ruby, :mswin, :mingw do
   gem "sqlite3"
 end
 
-gemspec :path=>".././"
+gemspec :path => "../"

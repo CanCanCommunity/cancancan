@@ -1,6 +1,5 @@
 appraise "rails_3.0" do
   gem "activerecord", "~> 3.0.20", :require => "active_record"
-  gem "with_model", "~> 0.2.5"
   gem "meta_where"
 
   gemfile.platforms :jruby do

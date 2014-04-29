@@ -12,4 +12,4 @@ platforms :jruby do
   gem "mongo", "~> 1.9.2"
 end
 
-gemspec :path=>".././"
+gemspec :path => "../"
