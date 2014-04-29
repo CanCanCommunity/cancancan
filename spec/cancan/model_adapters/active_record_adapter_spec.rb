@@ -2,65 +2,65 @@ require "spec_helper"
 
 if defined? CanCan::ModelAdapters::ActiveRecordAdapter
 
-  ActiveRecord::Base.establish_connection(:adapter => "sqlite3", :database => ":memory:")
-
-  ActiveRecord::Base.connection.create_table(:categories) do |t|
-    t.string :name
-    t.boolean :visible
-    t.timestamps
-  end
-
-  ActiveRecord::Base.connection.create_table(:projects) do |t|
-    t.string :name
-    t.timestamps
-  end
-
-  ActiveRecord::Base.connection.create_table(:articles) do |t|
-    t.string :name
-    t.timestamps
-    t.boolean :published
-    t.boolean :secret
-    t.integer :priority
-    t.integer :category_id
-    t.integer :user_id
-  end
-
-  ActiveRecord::Base.connection.create_table(:comments) do |t|
-    t.boolean :spam
-    t.integer :article_id
-    t.timestamps
-  end
-
-  ActiveRecord::Base.connection.create_table(:users) do |t|
-    t.timestamps
-  end
-
-  class Project < ActiveRecord::Base
-  end
-
-  class Category < ActiveRecord::Base
-    has_many :articles
-  end
-
-  class Article < ActiveRecord::Base
-    belongs_to :category
-    has_many :comments
-    belongs_to :user
-  end
-
-  class Comment < ActiveRecord::Base
-    belongs_to :article
-  end
-
-  class User < ActiveRecord::Base
-    has_many :articles
-  end
-
   describe CanCan::ModelAdapters::ActiveRecordAdapter do
 
-    before(:each) do
-      Article.delete_all
-      Comment.delete_all
+    before :each do
+      ActiveRecord::Base.establish_connection(:adapter => "sqlite3", :database => ":memory:")
+      ActiveRecord::Migration.verbose = false
+      ActiveRecord::Schema.define do
+        create_table(:categories) do |t|
+          t.string :name
+          t.boolean :visible
+          t.timestamps
+        end
+
+        create_table(:projects) do |t|
+          t.string :name
+          t.timestamps
+        end
+
+        create_table(:articles) do |t|
+          t.string :name
+          t.timestamps
+          t.boolean :published
+          t.boolean :secret
+          t.integer :priority
+          t.integer :category_id
+          t.integer :user_id
+        end
+
+        create_table(:comments) do |t|
+          t.boolean :spam
+          t.integer :article_id
+          t.timestamps
+        end
+
+        create_table(:users) do |t|
+          t.timestamps
+        end
+      end
+
+      class Project < ActiveRecord::Base
+      end
+
+      class Category < ActiveRecord::Base
+        has_many :articles
+      end
+
+      class Article < ActiveRecord::Base
+        belongs_to :category
+        has_many :comments
+        belongs_to :user
+      end
+
+      class Comment < ActiveRecord::Base
+        belongs_to :article
+      end
+
+      class User < ActiveRecord::Base
+        has_many :articles
+      end
+
       (@ability = double).extend(CanCan::Ability)
       @article_table = Article.table_name
       @comment_table = Comment.table_name
