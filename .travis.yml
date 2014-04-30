@@ -8,9 +8,11 @@ rvm:
   - jruby
   - rbx
 gemfile:
-  - gemfiles/rails_3.0.gemfile
-  - gemfiles/rails_3.0_datamapper.gemfile
-  - gemfiles/rails_3.0_mongoid.gemfile
+  - gemfiles/activerecord_3.0.gemfile
+  - gemfiles/activerecord_3.1.gemfile
+  - gemfiles/activerecord_3.2.gemfile
+  - gemfiles/datamapper_1.x.gemfile
+  - gemfiles/mongoid_2.x.gemfile
 services:
   - mongodb
 matrix:
