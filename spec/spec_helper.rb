@@ -5,12 +5,9 @@ Bundler.require
 
 require 'matchers'
 require 'cancan/matchers'
-require 'i18n'
 
 # I8n setting to fix deprecation.
-# Seting it to true will skip the locale validation (Rails 3 behavior).
-# Seting it to false will raise an error if an invalid locale is passed (Rails 4 behavior).
-I18n.enforce_available_locales = false
+I18n.enforce_available_locales = false if defined? I18n
 
 # Add support to load paths
 $:.unshift File.expand_path('../support', __FILE__)
