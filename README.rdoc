@@ -1,7 +1,7 @@
 = CanCanCan
 {<img src="https://badge.fury.io/rb/cancancan.png" alt="Gem Version" />}[http://badge.fury.io/rb/cancancan]
 {<img src="https://travis-ci.org/CanCanCommunity/cancancan.png?branch=master" alt="Build Status" />}[https://travis-ci.org/CanCanCommunity/cancancan]
-{<img src="https://codeclimate.com/github/bryanrite/cancancan.png?" alt="Code Climate" />}[https://codeclimate.com/github/bryanrite/cancancan]
+{<img src="https://codeclimate.com/github/CanCanCommunity/cancancan.png" />}[https://codeclimate.com/github/CanCanCommunity/cancancan]
 {<img src="http://inch-pages.github.io/github/CanCanCommunity/cancancan.png" alt="Inline docs" />}[http://inch-pages.github.io/github/CanCanCommunity/cancancan]
 
 Wiki[https://github.com/bryanrite/cancancan/wiki] | RDocs[http://rdoc.info/projects/ryanb/cancan] | Screencast[http://railscasts.com/episodes/192-authorization-with-cancan]
@@ -22,7 +22,7 @@ Any help is greatly appreciated, feel free to submit pull-requests or open issue
 
 In <b>Rails 3 and 4</b>, add this to your Gemfile and run the +bundle+ command.
 
-  gem 'cancancan', '~> 1.7'
+  gem 'cancancan', '~> 1.8'
 
 In <b>Rails 2</b>, add this to your environment.rb file.
 
@@ -98,6 +98,8 @@ By default, CanCan will try to sanitize the input on <tt>:create</tt> and <tt>:u
 
 Additionally, <tt>load_and_authorize_resource</tt> can now take a <tt>param_method</tt> option to specify a custom method in the controller to run to sanitize input.
 
+You can associate the <tt>param_method</tt> option with a symbol corresponding to the name of a method that will get called:
+
   class ArticlesController < ApplicationController
     load_and_authorize_resource param_method: :my_sanitizer
 
@@ -115,6 +117,14 @@ Additionally, <tt>load_and_authorize_resource</tt> can now take a <tt>param_meth
       params.require(:article).permit(:name)
     end
   end
+
+You can also use a string that will be evaluated in the context of the controller using <tt>instance_eval</tt> and needs to contain valid Ruby code. This does come in handy when using a PermittedParams class as suggested in Railscast 371:
+
+  load_and_authorize_resource param_method: 'permitted_params.article'
+
+Finally, it's possible to associate <tt>param_method</tt> with a Proc object which will be called with the controller as the only argument:
+
+  load_and_authorize_resource param_method: Proc.new { |c| c.params.require(:article).permit(:name) }
 
 See {Strong Parameters}[https://github.com/bryanrite/cancancan/wiki/Strong-Parameters] for more information.
 
