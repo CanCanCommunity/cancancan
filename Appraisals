@@ -58,3 +58,16 @@ appraise "mongoid_2.x" do
     gem "mongo", "~> 1.9.2"
   end
 end
+
+appraise "sequel_3.x" do
+  gem "sequel", "~> 3.47.0"
+
+  gemfile.platforms :jruby do
+    gem "activerecord-jdbcsqlite3-adapter"
+    gem "jdbc-sqlite3"
+  end
+
+  gemfile.platforms :ruby, :mswin, :mingw do
+    gem "sqlite3"
+  end
+end
