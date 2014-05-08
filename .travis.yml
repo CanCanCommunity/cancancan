@@ -13,6 +13,7 @@ gemfile:
   - gemfiles/activerecord_3.2.gemfile
   - gemfiles/datamapper_1.x.gemfile
   - gemfiles/mongoid_2.x.gemfile
+  - gemfiles/sequel_3.x.gemfile
 services:
   - mongodb
 matrix:

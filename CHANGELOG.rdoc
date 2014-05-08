@@ -1,5 +1,7 @@
 Develop
 
+* Feature cancan#884 - Add a Sequel model adapter (szetobo)
+
 * Feature cancancan#3 - Permit "can?" check multiple subjects (cefigueiredo)
 
 * Feature cancancan#29 - Add ability to use a String that will get instance_eval'd or a Proc that will get called as the parameter method option for strong_parameter santization (svoop)
