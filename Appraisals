@@ -61,6 +61,7 @@ end
 
 appraise "sequel_3.x" do
   gem "sequel", "~> 3.47.0"
+  gem 'activesupport', '~> 3.0', :require => 'active_support/all'
 
   gemfile.platforms :jruby do
     gem "activerecord-jdbcsqlite3-adapter"
