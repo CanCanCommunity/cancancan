@@ -1,5 +1,8 @@
 Develop
 
+
+1.8.0 (May 8th, 2014)
+
 * Feature cancan#884 - Add a Sequel model adapter (szetobo)
 
 * Feature cancancan#3 - Permit "can?" check multiple subjects (cefigueiredo)

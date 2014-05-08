@@ -22,7 +22,7 @@ Any help is greatly appreciated, feel free to submit pull-requests or open issue
 
 In <b>Rails 3 and 4</b>, add this to your Gemfile and run the +bundle+ command.
 
-  gem 'cancancan', '~> 1.7'
+  gem 'cancancan', '~> 1.8'
 
 In <b>Rails 2</b>, add this to your environment.rb file.
 
