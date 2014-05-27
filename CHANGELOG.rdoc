@@ -1,5 +1,7 @@
 Develop
 
+* Fix cancancan#67 - Sequel tests are run properly for JRuby.
+
 
 1.8.0 (May 8th, 2014)
 
