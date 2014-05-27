@@ -1,5 +1,8 @@
 Develop
 
+
+1.8.1 (May 27th, 2014)
+
 * Fix cancancan#67 - Sequel tests are run properly for JRuby. (bryanrite)
 
 * Fix cancancan#68 - Checks for hash-like objects in subject better. (bryanrite)
