@@ -1,5 +1,7 @@
 Develop
 
+* Fix cancancan#68 - Checks for hash-like objects in subject better.
+
 
 1.8.0 (May 8th, 2014)
 
