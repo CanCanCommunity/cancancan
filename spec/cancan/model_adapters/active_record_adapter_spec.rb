@@ -305,7 +305,7 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
         article.secret == true
       end
 
-      relation.stub(:count).and_raise('Unexpected scope execution.')
+      allow(relation).to receive(:count).and_raise('Unexpected scope execution.')
 
       expect { @ability.can? :read, Article }.not_to raise_error
     end
