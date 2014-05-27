@@ -285,7 +285,7 @@ module CanCan
 
     # It translates to an array the subject or the hash with multiple subjects given to can?.
     def extract_subjects(subject)
-      subject = if subject.respond_to?(:keys) && subject.key?(:any)
+      subject = if subject.respond_to?(:key?) && subject.key?(:any)
         subject[:any]
       else
         [subject]
