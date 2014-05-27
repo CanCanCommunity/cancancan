@@ -127,10 +127,10 @@ describe CanCan::ControllerResource do
     context "with a strong parameters method" do
       it "accepts and uses the specified symbol for santitizing input" do
         params.merge!(:controller => "model")
-        controller.stub(:resource_params).and_return(:resource => 'params')
-        controller.stub(:model_params).and_return(:model => 'params')
-        controller.stub(:create_params).and_return(:create => 'params')
-        controller.stub(:custom_params).and_return(:custom => 'params')
+        allow(controller).to receive(:resource_params).and_return(:resource => 'params')
+        allow(controller).to receive(:model_params).and_return(:model => 'params')
+        allow(controller).to receive(:create_params).and_return(:create => 'params')
+        allow(controller).to receive(:custom_params).and_return(:custom => 'params')
         resource = CanCan::ControllerResource.new(controller, {:param_method => :custom_params})
         expect(resource.send("resource_params")).to eq(:custom => 'params')
       end
@@ -149,27 +149,27 @@ describe CanCan::ControllerResource do
 
       it "prefers to use the create_params method for santitizing input" do
         params.merge!(:controller => "model")
-        controller.stub(:resource_params).and_return(:resource => 'params')
-        controller.stub(:model_params).and_return(:model => 'params')
-        controller.stub(:create_params).and_return(:create => 'params')
-        controller.stub(:custom_params).and_return(:custom => 'params')
+        allow(controller).to receive(:resource_params).and_return(:resource => 'params')
+        allow(controller).to receive(:model_params).and_return(:model => 'params')
+        allow(controller).to receive(:create_params).and_return(:create => 'params')
+        allow(controller).to receive(:custom_params).and_return(:custom => 'params')
         resource = CanCan::ControllerResource.new(controller)
         expect(resource.send("resource_params")).to eq(:create => 'params')
       end
 
       it "prefers to use the <model_name>_params method for santitizing input if create is not found" do
         params.merge!(:controller => "model")
-        controller.stub(:resource_params).and_return(:resource => 'params')
-        controller.stub(:model_params).and_return(:model => 'params')
-        controller.stub(:custom_params).and_return(:custom => 'params')
+        allow(controller).to receive(:resource_params).and_return(:resource => 'params')
+        allow(controller).to receive(:model_params).and_return(:model => 'params')
+        allow(controller).to receive(:custom_params).and_return(:custom => 'params')
         resource = CanCan::ControllerResource.new(controller)
         expect(resource.send("resource_params")).to eq(:model => 'params')
       end
 
       it "prefers to use the resource_params method for santitizing input if create or model is not found" do
         params.merge!(:controller => "model")
-        controller.stub(:resource_params).and_return(:resource => 'params')
-        controller.stub(:custom_params).and_return(:custom => 'params')
+        allow(controller).to receive(:resource_params).and_return(:resource => 'params')
+        allow(controller).to receive(:custom_params).and_return(:custom => 'params')
         resource = CanCan::ControllerResource.new(controller)
         expect(resource.send("resource_params")).to eq(:resource => 'params')
       end
@@ -515,17 +515,17 @@ describe CanCan::ControllerResource do
 
     context "with a strong parameters method" do
       it "only calls the santitize method with actions matching param_actions" do
-        controller.stub(:resource_params).and_return(:resource => 'params')
+        allow(controller).to receive(:resource_params).and_return(:resource => 'params')
         resource = CanCan::ControllerResource.new(controller)
         resource.stub(:param_actions => [:create])
 
-        controller.should_not_receive(:send).with(:resource_params)
+        expect(controller).not_to receive(:send).with(:resource_params)
         resource.send("resource_params")
       end
 
       it "uses the proper action param based on the action" do
-        controller.stub(:create_params).and_return(:create => 'params')
-        controller.stub(:update_params).and_return(:update => 'params')
+        allow(controller).to receive(:create_params).and_return(:create => 'params')
+        allow(controller).to receive(:update_params).and_return(:update => 'params')
         resource = CanCan::ControllerResource.new(controller)
         expect(resource.send("resource_params")).to eq(:update => 'params')
       end

@@ -173,7 +173,7 @@ Cancancan uses {appraisals}[https://github.com/thoughtbot/appraisal] to test the
 
 When first developing, you may need to run <tt>bundle install</tt> and then <tt>appraisal install</tt>, to install the different sets.
 
-You can then run all appraisal files (like CI does), with <tt>appraisal rake</tt> or just run a specific set <tt>appraisal rails_3.0 rake</tt>.
+You can then run all appraisal files (like CI does), with <tt>appraisal rake</tt> or just run a specific set <tt>appraisal activerecord_3.0 rake</tt>.
 
 See the {CONTRIBUTING}[https://github.com/CanCanCommunity/cancancan/blob/develop/CONTRIBUTING.md] and {spec/README}[https://github.com/bryanrite/cancancan/blob/master/spec/README.rdoc] for more information.
 
