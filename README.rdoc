@@ -2,7 +2,7 @@
 {<img src="https://badge.fury.io/rb/cancancan.png" alt="Gem Version" />}[http://badge.fury.io/rb/cancancan]
 {<img src="https://travis-ci.org/CanCanCommunity/cancancan.png?branch=master" alt="Build Status" />}[https://travis-ci.org/CanCanCommunity/cancancan]
 {<img src="https://codeclimate.com/github/CanCanCommunity/cancancan.png" />}[https://codeclimate.com/github/CanCanCommunity/cancancan]
-{<img src="http://inch-pages.github.io/github/CanCanCommunity/cancancan.png" alt="Inline docs" />}[http://inch-pages.github.io/github/CanCanCommunity/cancancan]
+{<img src="http://inch-ci.org/github/CanCanCommunity/cancancan.png" alt="Inline docs" />}[http://inch-ci.org/github/CanCanCommunity/cancancan]
 
 Wiki[https://github.com/bryanrite/cancancan/wiki] | RDocs[http://rdoc.info/projects/ryanb/cancan] | Screencast[http://railscasts.com/episodes/192-authorization-with-cancan]
 
