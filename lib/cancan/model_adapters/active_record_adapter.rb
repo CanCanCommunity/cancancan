@@ -1,41 +1,6 @@
 module CanCan
   module ModelAdapters
-    class ActiveRecordAdapter < AbstractAdapter
-      def self.for_class?(model_class)
-        model_class <= ActiveRecord::Base
-      end
-
-      def self.override_condition_matching?(subject, name, value)
-        name.kind_of?(MetaWhere::Column) if defined? MetaWhere
-      end
-
-      def self.matches_condition?(subject, name, value)
-        subject_value = subject.send(name.column)
-        if name.method.to_s.ends_with? "_any"
-          value.any? { |v| meta_where_match? subject_value, name.method.to_s.sub("_any", ""), v }
-        elsif name.method.to_s.ends_with? "_all"
-          value.all? { |v| meta_where_match? subject_value, name.method.to_s.sub("_all", ""), v }
-        else
-          meta_where_match? subject_value, name.method, value
-        end
-      end
-
-      def self.meta_where_match?(subject_value, method, value)
-        case method.to_sym
-        when :eq      then subject_value == value
-        when :not_eq  then subject_value != value
-        when :in      then value.include?(subject_value)
-        when :not_in  then !value.include?(subject_value)
-        when :lt      then subject_value < value
-        when :lteq    then subject_value <= value
-        when :gt      then subject_value > value
-        when :gteq    then subject_value >= value
-        when :matches then subject_value =~ Regexp.new("^" + Regexp.escape(value).gsub("%", ".*") + "$", true)
-        when :does_not_match then !meta_where_match?(subject_value, :matches, value)
-        else raise NotImplemented, "The #{method} MetaWhere condition is not supported."
-        end
-      end
-
+    module ActiveRecordAdapter
       # Returns conditions intended to be used inside a database query. Normally you will not call this
       # method directly, but instead go through ModelAdditions#accessible_by.
       #
@@ -99,11 +64,10 @@ module CanCan
         if override_scope
           @model_class.where(nil).merge(override_scope)
         elsif @model_class.respond_to?(:where) && @model_class.respond_to?(:joins)
-          mergeable_conditions = @rules.select {|rule| rule.unmergeable? }.blank?
-          if mergeable_conditions
-            @model_class.where(conditions).includes(joins)
+          if mergeable_conditions?
+            build_relation(conditions)
           else
-            @model_class.where(*(@rules.map(&:conditions))).includes(joins)
+            build_relation(*(@rules.map(&:conditions)))
           end
         else
           @model_class.all(:conditions => conditions, :joins => joins)
@@ -111,6 +75,10 @@ module CanCan
       end
 
       private
+
+      def mergeable_conditions?
+        @rules.find {|rule| rule.unmergeable? }.blank?
+      end
 
       def override_scope
         conditions = @rules.map(&:conditions).compact
