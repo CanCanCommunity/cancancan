@@ -67,14 +67,22 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
     end
 
     it "is for only active record classes" do
-      expect(CanCan::ModelAdapters::ActiveRecordAdapter).to_not be_for_class(Object)
-      expect(CanCan::ModelAdapters::ActiveRecordAdapter).to be_for_class(Article)
-      expect(CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article)).to eq(CanCan::ModelAdapters::ActiveRecordAdapter)
+      if ActiveRecord.respond_to?(:version) &&
+          ActiveRecord.version > Gem::Version.new("4")
+        expect(CanCan::ModelAdapters::ActiveRecord4Adapter).to_not be_for_class(Object)
+        expect(CanCan::ModelAdapters::ActiveRecord4Adapter).to be_for_class(Article)
+        expect(CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article)).to eq(CanCan::ModelAdapters::ActiveRecord4Adapter)
+      else
+        expect(CanCan::ModelAdapters::ActiveRecord3Adapter).to_not be_for_class(Object)
+        expect(CanCan::ModelAdapters::ActiveRecord3Adapter).to be_for_class(Article)
+        expect(CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article)).to eq(CanCan::ModelAdapters::ActiveRecord3Adapter)
+      end
     end
 
     it "finds record" do
       article = Article.create!
-      expect(CanCan::ModelAdapters::ActiveRecordAdapter.find(Article, article.id)).to eq(article)
+      adapter = CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article)
+      expect(adapter.find(Article, article.id)).to eq(article)
     end
 
     it "does not fetch any records when no abilities are defined" do
@@ -338,8 +346,7 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       end
 
       it "matches any MetaWhere condition" do
-
-        adapter = CanCan::ModelAdapters::ActiveRecordAdapter
+        adapter = CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article)
         article1 = Article.new(:priority => 1, :name => "Hello World")
         expect(adapter.matches_condition?(article1, :priority.eq, 1)).to be_true
         expect(adapter.matches_condition?(article1, :priority.eq, 2)).to be_false
