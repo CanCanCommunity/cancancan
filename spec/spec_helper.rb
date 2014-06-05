@@ -7,7 +7,9 @@ require 'matchers'
 require 'cancan/matchers'
 
 # I8n setting to fix deprecation.
-I18n.enforce_available_locales = false if defined? I18n
+if defined?(I18n) && I18n.respond_to?('enforce_available_locales=')
+  I18n.enforce_available_locales = false
+end
 
 # Add support to load paths
 $:.unshift File.expand_path('../support', __FILE__)
