@@ -21,6 +21,19 @@ services:
 matrix:
   allow_failures:
     - rvm: rbx
+  exclude:
+    - rvm: 1.8.7
+      gemfile: gemfiles/activerecord_4.0.gemfile
+    - rvm: 1.8.7
+      gemfile: gemfiles/activerecord_4.1.gemfile
+    - rvm: 1.9.2
+      gemfile: gemfiles/activerecord_4.0.gemfile
+    - rvm: 1.9.2
+      gemfile: gemfiles/activerecord_4.1.gemfile
+    - rvm: ree
+      gemfile: gemfiles/activerecord_4.0.gemfile
+    - rvm: ree
+      gemfile: gemfiles/activerecord_4.1.gemfile
 notifications:
   recipients:
     - bryan@bryanrite.com
