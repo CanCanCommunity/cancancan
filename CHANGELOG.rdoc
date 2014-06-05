@@ -1,6 +1,11 @@
 Develop
 
 
+1.8.2 (June 5th, 2014)
+
+* Fix cancancan#75 - More specific hash-like object check. (bryanrite)
+
+
 1.8.1 (May 27th, 2014)
 
 * Fix cancancan#67 - Sequel tests are run properly for JRuby. (bryanrite)
