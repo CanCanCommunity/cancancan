@@ -108,7 +108,7 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       ability.can :read, Namespace::TableX, :table_zs => { :user_id => user.id }
       
       table_x = Namespace::TableX.create!
-      table_z = table_x.table_zs.create( user: user )
+      table_z = table_x.table_zs.create( :user => user )
       expect(Namespace::TableX.accessible_by(ability)).to eq([table_x])
     end
 
