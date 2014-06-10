@@ -67,7 +67,7 @@ module CanCan
         conditions.inject({}) do |result_hash, (name, value)|
           if value.kind_of? Hash
             value = value.dup
-            association_class = model_class.reflect_on_association(name).class_name.constantize
+            association_class = model_class.reflect_on_association(name).klass.name.constantize
             nested = value.inject({}) do |nested,(k,v)|
               if v.kind_of? Hash
                 value.delete(k)
