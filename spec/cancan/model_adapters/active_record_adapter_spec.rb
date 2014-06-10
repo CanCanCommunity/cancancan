@@ -1,5 +1,9 @@
 require "spec_helper"
 
+# define a module namespace to use later
+module Namespace
+end
+
 if defined? CanCan::ModelAdapters::ActiveRecordAdapter
 
   describe CanCan::ModelAdapters::ActiveRecordAdapter do
@@ -38,6 +42,15 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
         create_table(:users) do |t|
           t.timestamps
         end
+
+        create_table( :table_xes ) do |t|
+          t.timestamps
+        end
+        create_table( :table_zs ) do |t|
+          t.integer :table_x_id
+          t.integer :user_id
+          t.timestamps
+        end
       end
 
       class Project < ActiveRecord::Base
@@ -61,10 +74,30 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
         has_many :articles
       end
 
+      class Namespace::TableX < ActiveRecord::Base
+        has_many :table_zs
+      end
+      class Namespace::TableZ < ActiveRecord::Base
+        belongs_to :table_x
+        belongs_to :user
+      end
+
       (@ability = double).extend(CanCan::Ability)
       @article_table = Article.table_name
       @comment_table = Comment.table_name
     end
+
+    it "fetches all namespace::table_x when one is related by table_y" do
+      user = User.create!
+
+      ability = Ability.new(user)
+      ability.can :read, Namespace::TableX, :table_zs => { :user_id => user.id }
+      
+      table_x = Namespace::TableX.create!
+      table_z = table_x.table_zs.create( user: user )
+      expect(Namespace::TableX.accessible_by(ability)).to eq([table_x])
+    end
+
 
     it "is for only active record classes" do
       expect(CanCan::ModelAdapters::ActiveRecordAdapter).to_not be_for_class(Object)
