@@ -1,5 +1,6 @@
-if ENV["MODEL_ADAPTER"] == "mongoid"
-  require "spec_helper"
+require "spec_helper"
+
+if defined? CanCan::ModelAdapters::MongoidAdapter
 
   class MongoidCategory
     include Mongoid::Document
@@ -118,7 +119,7 @@ if ENV["MODEL_ADAPTER"] == "mongoid"
           expect(MongoidProject.accessible_by(@ability, :read)).to eq([obj])
 
           obj2 = MongoidProject.create(:title => 'Lord')
-          expect(@ability.can?(:read, obj2)).to be_false
+          expect(@ability.can?(:read, obj2)).to be(false)
         end
 
         describe "activates only when there are Criteria in the hash" do
@@ -144,7 +145,7 @@ if ENV["MODEL_ADAPTER"] == "mongoid"
           expect(MongoidProject.accessible_by(@ability, :read)).to eq([obj])
 
           obj2 = MongoidProject.create(:title => 'Lord')
-          expect(@ability.can?(:read, obj2)).to be_false
+          expect(@ability.can?(:read, obj2)).to be(false)
         end
 
         it "handles :field.size" do
@@ -154,7 +155,7 @@ if ENV["MODEL_ADAPTER"] == "mongoid"
           expect(MongoidProject.accessible_by(@ability, :read)).to eq([obj])
 
           obj2 = MongoidProject.create(:titles => ['Palatin', 'Margrave', 'Marquis'])
-          expect(@ability.can?(:read, obj2)).to be_false
+          expect(@ability.can?(:read, obj2)).to be(false)
         end
 
         it "handles :field.exists" do
@@ -164,7 +165,7 @@ if ENV["MODEL_ADAPTER"] == "mongoid"
           expect(MongoidProject.accessible_by(@ability, :read)).to eq([obj])
 
           obj2 = MongoidProject.create
-          expect(@ability.can?(:read, obj2)).to be_false
+          expect(@ability.can?(:read, obj2)).to be(false)
         end
 
         it "handles :field.gt" do
@@ -174,7 +175,7 @@ if ENV["MODEL_ADAPTER"] == "mongoid"
           expect(MongoidProject.accessible_by(@ability, :read)).to eq([obj])
 
           obj2 = MongoidProject.create(:age => 40)
-          expect(@ability.can?(:read, obj2)).to be_false
+          expect(@ability.can?(:read, obj2)).to be(false)
         end
 
         it "handles instance not saved to database" do
@@ -186,7 +187,7 @@ if ENV["MODEL_ADAPTER"] == "mongoid"
           expect(MongoidProject.accessible_by(@ability, :read).entries).to eq([])
 
           obj2 = MongoidProject.new(:title => 'Lord')
-          expect(@ability.can?(:read, obj2)).to be_false
+          expect(@ability.can?(:read, obj2)).to be(false)
         end
       end
 

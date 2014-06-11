@@ -1,4 +1,34 @@
-Master
+Develop
+
+
+1.8.2 (June 5th, 2014)
+
+* Fix cancancan#75 - More specific hash-like object check. (bryanrite)
+
+
+1.8.1 (May 27th, 2014)
+
+* Fix cancancan#67 - Sequel tests are run properly for JRuby. (bryanrite)
+
+* Fix cancancan#68 - Checks for hash-like objects in subject better. (bryanrite)
+
+
+1.8.0 (May 8th, 2014)
+
+* Feature cancan#884 - Add a Sequel model adapter (szetobo)
+
+* Feature cancancan#3 - Permit "can?" check multiple subjects (cefigueiredo)
+
+* Feature cancancan#29 - Add ability to use a String that will get instance_eval'd or a Proc that will get called as the parameter method option for strong_parameter santization (svoop)
+
+* Feature cancancan#48 - Define a CanCanCan module. Even though it is not used, it is standard practice to define the module, and helpful for determining between CanCanCan and CanCan for external libraries.
+
+
+1.7.1 (March 19th, 2014)
+
+* Fix ryanb/cancan#992 - Remove Rails 4 deprecations for scoped (thejchap & hitendrasingh)
+
+* Fix cancancan#16 - RSpec expectations are not explicitly required in RSpec > 2.13 (justinaiken & bryanrite)
 
 
 1.7.0 (February 19th, 2014)

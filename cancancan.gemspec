@@ -8,19 +8,24 @@ Gem::Specification.new do |s|
   s.version     = CanCan::VERSION
   s.authors     = ["Bryan Rite", "Ryan Bates"]
   s.email       = "bryan@bryanrite.com"
-  s.homepage    = "http://github.com/bryanrite/cancancan"
+  s.homepage    = "https://github.com/CanCanCommunity/cancancan"
   s.summary     = "Simple authorization solution for Rails."
   s.description = "Continuation of the simple authorization solution for Rails which is decoupled from user roles. All permissions are stored in a single location."
   s.platform    = Gem::Platform::RUBY
   s.license     = "MIT"
 
-  s.files        = Dir["{lib,spec}/**/*", "[A-Z]*", "init.rb"] - ["Gemfile.lock"]
-  s.require_path = "lib"
+  s.files       = `git ls-files`.split($/)
+  s.test_files  = `git ls-files -- Appraisals {spec,features,gemfiles}/*`.split($/)
+  s.executables = `git ls-files -- bin/*`.split($/).map{ |f| File.basename(f) }
+  s.require_paths = ["lib"]
 
-  s.add_development_dependency 'rspec', '~> 3.0.0.beta2'
-  s.add_development_dependency 'rails', '~> 3.0.9'
-  s.add_development_dependency 'supermodel', '~> 0.1.4'
+  s.required_ruby_version = Gem::Requirement.new(">= 1.8.7")
+  s.required_rubygems_version = ">= 1.3.4"
+
+  s.add_development_dependency 'bundler', '~> 1.3'
+  s.add_development_dependency 'rake', '~> 10.1.1'
+  s.add_development_dependency 'rspec', '~> 3.0.0'
+  s.add_development_dependency 'appraisal', '>= 1.0.0'
 
   s.rubyforge_project = s.name
-  s.required_rubygems_version = ">= 1.3.4"
 end

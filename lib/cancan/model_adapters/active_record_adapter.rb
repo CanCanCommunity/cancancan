@@ -97,7 +97,7 @@ module CanCan
 
       def database_records
         if override_scope
-          @model_class.scoped.merge(override_scope)
+          @model_class.where(nil).merge(override_scope)
         elsif @model_class.respond_to?(:where) && @model_class.respond_to?(:joins)
           mergeable_conditions = @rules.select {|rule| rule.unmergeable? }.blank?
           if mergeable_conditions
@@ -106,7 +106,7 @@ module CanCan
             @model_class.where(*(@rules.map(&:conditions))).includes(joins)
           end
         else
-          @model_class.scoped(:conditions => conditions, :joins => joins)
+          @model_class.all(:conditions => conditions, :joins => joins)
         end
       end
 

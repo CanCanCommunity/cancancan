@@ -221,7 +221,11 @@ module CanCan
 
     def resource_params
       if param_actions.include?(@params[:action].to_sym) && params_method.present?
-        return @controller.send(params_method)
+        return case params_method
+          when Symbol then @controller.send(params_method)
+          when String then @controller.instance_eval(params_method)
+          when Proc then params_method.call(@controller)
+        end
       elsif @options[:class]
         params_key = extract_key(@options[:class])
         return @params[params_key] if @params[params_key]
@@ -236,7 +240,7 @@ module CanCan
 
     def params_method
       params_methods.each do |method|
-        return method if @controller.respond_to?(method, true)
+        return method if (method.is_a?(Symbol) && @controller.respond_to?(method, true)) || method.is_a?(String) || method.is_a?(Proc)
       end
       nil
     end

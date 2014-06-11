@@ -99,31 +99,19 @@ module CanCan
     # override_matching_for_conditions?(subject, conditions) and
     # matches_conditions_hash?(subject, conditions)
     def matches_conditions_hash?(subject, conditions = @conditions)
-      if conditions.empty?
-        true
-      else
-        if model_adapter(subject).override_conditions_hash_matching? subject, conditions
-          model_adapter(subject).matches_conditions_hash? subject, conditions
-        else
-          conditions.all? do |name, value|
-            if model_adapter(subject).override_condition_matching? subject, name, value
-              model_adapter(subject).matches_condition? subject, name, value
-            else
-              attribute = subject.send(name)
-              if value.kind_of?(Hash)
-                if attribute.kind_of?(Array) || attribute.kind_of?(ActiveRecord::Relation)
-                  attribute.any? { |element| matches_conditions_hash? element, value }
-                else
-                  !attribute.nil? && matches_conditions_hash?(attribute, value)
-                end
-              elsif !value.is_a?(String) && value.kind_of?(Enumerable)
-                value.include? attribute
-              else
-                attribute == value
-              end
-            end
-          end
+      return true if conditions.empty?
+      adapter = model_adapter(subject)
+
+      if adapter.override_conditions_hash_matching?(subject, conditions)
+        return adapter.matches_conditions_hash?(subject, conditions)
+      end
+
+      conditions.all? do |name, value|
+        if adapter.override_condition_matching?(subject, name, value)
+          return adapter.matches_condition?(subject, name, value)
         end
+
+        condition_match?(subject.send(name), value)
       end
     end
 
@@ -142,6 +130,23 @@ module CanCan
 
     def model_adapter(subject)
       CanCan::ModelAdapters::AbstractAdapter.adapter_class(subject_class?(subject) ? subject : subject.class)
+    end
+
+    def condition_match?(attribute, value)
+      case value
+      when Hash       then hash_condition_match?(attribute, value)
+      when String     then attribute == value
+      when Enumerable then value.include?(attribute)
+      else attribute == value
+      end
+    end
+
+    def hash_condition_match?(attribute, value)
+      if attribute.kind_of?(Array) || (defined?(ActiveRecord) && attribute.kind_of?(ActiveRecord::Relation))
+        attribute.any? { |element| matches_conditions_hash?(element, value) }
+      else
+        !attribute.nil? && matches_conditions_hash?(attribute, value)
+      end
     end
   end
 end
