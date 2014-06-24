@@ -12,13 +12,17 @@ Kernel.const_get(rspec_module)::Matchers.define :be_able_to do |*args|
     ability.can?(*args)
   end
 
+  unless defined?(failure_message) # RSpec < 3
+    alias :failure_message :failure_message_for_should
+    alias :failure_message_when_negated :failure_message_for_should_not
+  end
+
   failure_message do |ability|
     "expected to be able to #{args.map(&:inspect).join(" ")}"
   end
-  alias failure_message_for_should failure_message
 
   failure_message_when_negated do |ability|
     "expected not to be able to #{args.map(&:inspect).join(" ")}"
   end
-  alias failure_message_for_should_not failure_message_when_negated
+
 end
