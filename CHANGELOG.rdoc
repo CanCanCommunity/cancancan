@@ -1,6 +1,11 @@
 Develop
 
 
+1.8.4 (June 24th, 2014)
+
+* Fix cancancan#86 - Fixes previous RSpec 3 update as there was a bug in the fix for RSpec 2.99. (bryanrite)
+
+
 1.8.3 (June 24th, 2014)
 
 * Fix cancancan#85 - Remove deprecation notices for RSpec 3 and continue backwards compatibility. (andypike, bryanrite, porteta)
