@@ -1,5 +1,8 @@
 Develop
 
+
+1.8.3 (June 24th, 2014)
+
 * Fix cancancan#85 - Remove deprecation notices for RSpec 3 and continue backwards compatibility. (andypike, bryanrite, porteta)
 
 
