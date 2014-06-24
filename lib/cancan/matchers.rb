@@ -4,7 +4,7 @@ if rspec_module == 'RSpec'
   require 'rspec/core'
   require 'rspec/expectations'
 else
-  ActiveSupport::Deprecation.warn("RSpec v1 will not be supported in the CanCanCan >= 2.0.0")
+  ActiveSupport::Deprecation.warn("RSpec < 3 will not be supported in the CanCanCan >= 2.0.0")
 end
 
 Kernel.const_get(rspec_module)::Matchers.define :be_able_to do |*args|
@@ -12,11 +12,17 @@ Kernel.const_get(rspec_module)::Matchers.define :be_able_to do |*args|
     ability.can?(*args)
   end
 
-  failure_message_for_should do |ability|
+  unless defined?(failure_message) # RSpec < 3
+    alias :failure_message :failure_message_for_should
+    alias :failure_message_when_negated :failure_message_for_should_not
+  end
+
+  failure_message do |ability|
     "expected to be able to #{args.map(&:inspect).join(" ")}"
   end
 
-  failure_message_for_should_not do |ability|
+  failure_message_when_negated do |ability|
     "expected not to be able to #{args.map(&:inspect).join(" ")}"
   end
+
 end
