@@ -4,7 +4,7 @@ if rspec_module == 'RSpec'
   require 'rspec/core'
   require 'rspec/expectations'
 else
-  ActiveSupport::Deprecation.warn("RSpec v1 will not be supported in the CanCanCan >= 2.0.0")
+  ActiveSupport::Deprecation.warn("RSpec < 3 will not be supported in the CanCanCan >= 2.0.0")
 end
 
 Kernel.const_get(rspec_module)::Matchers.define :be_able_to do |*args|
