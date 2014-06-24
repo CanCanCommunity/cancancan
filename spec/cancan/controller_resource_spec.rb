@@ -194,7 +194,7 @@ describe CanCan::ControllerResource do
       resource = CanCan::ControllerResource.new(controller)
       resource.load_resource
       expect(controller.instance_variable_get(:@model)).to be_nil
-      expect(controller.instance_variable_defined?(:@models)).to be_false
+      expect(controller.instance_variable_defined?(:@models)).to be(false)
     end
 
     it "does not use accessible_by when defining abilities through a block" do
@@ -204,7 +204,7 @@ describe CanCan::ControllerResource do
       resource = CanCan::ControllerResource.new(controller)
       resource.load_resource
       expect(controller.instance_variable_get(:@model)).to be_nil
-      expect(controller.instance_variable_defined?(:@models)).to be_false
+      expect(controller.instance_variable_defined?(:@models)).to be(false)
     end
 
     it "does not authorize single resource in collection action" do
@@ -517,7 +517,7 @@ describe CanCan::ControllerResource do
       it "only calls the santitize method with actions matching param_actions" do
         allow(controller).to receive(:resource_params).and_return(:resource => 'params')
         resource = CanCan::ControllerResource.new(controller)
-        resource.stub(:param_actions => [:create])
+        allow(resource).to receive(:param_actions) { [:create] }
 
         expect(controller).not_to receive(:send).with(:resource_params)
         resource.send("resource_params")
@@ -579,41 +579,41 @@ describe CanCan::ControllerResource do
   it "skips resource behavior for :only actions in array" do
     allow(controller_class).to receive(:cancan_skipper) { {:load => {nil => {:only => [:index, :show]}}} }
     params.merge!(:action => "index")
-    expect(CanCan::ControllerResource.new(controller).skip?(:load)).to be_true
-    expect(CanCan::ControllerResource.new(controller, :some_resource).skip?(:load)).to be_false
+    expect(CanCan::ControllerResource.new(controller).skip?(:load)).to be(true)
+    expect(CanCan::ControllerResource.new(controller, :some_resource).skip?(:load)).to be(false)
     params.merge!(:action => "show")
-    expect(CanCan::ControllerResource.new(controller).skip?(:load)).to be_true
+    expect(CanCan::ControllerResource.new(controller).skip?(:load)).to be(true)
     params.merge!(:action => "other_action")
-    expect(CanCan::ControllerResource.new(controller).skip?(:load)).to be_false
+    expect(CanCan::ControllerResource.new(controller).skip?(:load)).to be_falsey
   end
 
   it "skips resource behavior for :only one action on resource" do
     allow(controller_class).to receive(:cancan_skipper) { {:authorize => {:model => {:only => :index}}} }
     params.merge!(:action => "index")
-    expect(CanCan::ControllerResource.new(controller).skip?(:authorize)).to be_false
-    expect(CanCan::ControllerResource.new(controller, :model).skip?(:authorize)).to be_true
+    expect(CanCan::ControllerResource.new(controller).skip?(:authorize)).to be(false)
+    expect(CanCan::ControllerResource.new(controller, :model).skip?(:authorize)).to be(true)
     params.merge!(:action => "other_action")
-    expect(CanCan::ControllerResource.new(controller, :model).skip?(:authorize)).to be_false
+    expect(CanCan::ControllerResource.new(controller, :model).skip?(:authorize)).to be_falsey
   end
 
   it "skips resource behavior :except actions in array" do
     allow(controller_class).to receive(:cancan_skipper) { {:load => {nil => {:except => [:index, :show]}}} }
     params.merge!(:action => "index")
-    expect(CanCan::ControllerResource.new(controller).skip?(:load)).to be_false
+    expect(CanCan::ControllerResource.new(controller).skip?(:load)).to be_falsey
     params.merge!(:action => "show")
-    expect(CanCan::ControllerResource.new(controller).skip?(:load)).to be_false
+    expect(CanCan::ControllerResource.new(controller).skip?(:load)).to be_falsey
     params.merge!(:action => "other_action")
-    expect(CanCan::ControllerResource.new(controller).skip?(:load)).to be_true
-    expect(CanCan::ControllerResource.new(controller, :some_resource).skip?(:load)).to be_false
+    expect(CanCan::ControllerResource.new(controller).skip?(:load)).to be(true)
+    expect(CanCan::ControllerResource.new(controller, :some_resource).skip?(:load)).to be(false)
   end
 
   it "skips resource behavior :except one action on resource" do
     allow(controller_class).to receive(:cancan_skipper) { {:authorize => {:model => {:except => :index}}} }
     params.merge!(:action => "index")
-    expect(CanCan::ControllerResource.new(controller, :model).skip?(:authorize)).to be_false
+    expect(CanCan::ControllerResource.new(controller, :model).skip?(:authorize)).to be_falsey
     params.merge!(:action => "other_action")
-    expect(CanCan::ControllerResource.new(controller).skip?(:authorize)).to be_false
-    expect(CanCan::ControllerResource.new(controller, :model).skip?(:authorize)).to be_true
+    expect(CanCan::ControllerResource.new(controller).skip?(:authorize)).to be(false)
+    expect(CanCan::ControllerResource.new(controller, :model).skip?(:authorize)).to be(true)
   end
 
   it "skips loading and authorization" do

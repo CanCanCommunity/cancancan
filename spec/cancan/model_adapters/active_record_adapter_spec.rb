@@ -311,7 +311,6 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
     end
 
     context "when MetaWhere is defined" do
-
       before :each do
         pending "[Deprecated] MetaWhere support is being removed" unless defined? MetaWhere
       end
@@ -338,39 +337,38 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       end
 
       it "matches any MetaWhere condition" do
-
         adapter = CanCan::ModelAdapters::ActiveRecordAdapter
         article1 = Article.new(:priority => 1, :name => "Hello World")
-        expect(adapter.matches_condition?(article1, :priority.eq, 1)).to be_true
-        expect(adapter.matches_condition?(article1, :priority.eq, 2)).to be_false
-        expect(adapter.matches_condition?(article1, :priority.eq_any, [1, 2])).to be_true
-        expect(adapter.matches_condition?(article1, :priority.eq_any, [2, 3])).to be_false
-        expect(adapter.matches_condition?(article1, :priority.eq_all, [1, 1])).to be_true
-        expect(adapter.matches_condition?(article1, :priority.eq_all, [1, 2])).to be_false
-        expect(adapter.matches_condition?(article1, :priority.ne, 2)).to be_true
-        expect(adapter.matches_condition?(article1, :priority.ne, 1)).to be_false
-        expect(adapter.matches_condition?(article1, :priority.in, [1, 2])).to be_true
-        expect(adapter.matches_condition?(article1, :priority.in, [2, 3])).to be_false
-        expect(adapter.matches_condition?(article1, :priority.nin, [2, 3])).to be_true
-        expect(adapter.matches_condition?(article1, :priority.nin, [1, 2])).to be_false
-        expect(adapter.matches_condition?(article1, :priority.lt, 2)).to be_true
-        expect(adapter.matches_condition?(article1, :priority.lt, 1)).to be_false
-        expect(adapter.matches_condition?(article1, :priority.lteq, 1)).to be_true
-        expect(adapter.matches_condition?(article1, :priority.lteq, 0)).to be_false
-        expect(adapter.matches_condition?(article1, :priority.gt, 0)).to be_true
-        expect(adapter.matches_condition?(article1, :priority.gt, 1)).to be_false
-        expect(adapter.matches_condition?(article1, :priority.gteq, 1)).to be_true
-        expect(adapter.matches_condition?(article1, :priority.gteq, 2)).to be_false
-        expect(adapter.matches_condition?(article1, :name.like, "%ello worl%")).to be_true
-        expect(adapter.matches_condition?(article1, :name.like, "hello world")).to be_true
-        expect(adapter.matches_condition?(article1, :name.like, "hello%")).to be_true
-        expect(adapter.matches_condition?(article1, :name.like, "h%d")).to be_true
-        expect(adapter.matches_condition?(article1, :name.like, "%helo%")).to be_false
-        expect(adapter.matches_condition?(article1, :name.like, "hello")).to be_false
-        expect(adapter.matches_condition?(article1, :name.like, "hello.world")).to be_false
+        expect(adapter.matches_condition?(article1, :priority.eq, 1)).to be(true)
+        expect(adapter.matches_condition?(article1, :priority.eq, 2)).to be(false)
+        expect(adapter.matches_condition?(article1, :priority.eq_any, [1, 2])).to be(true)
+        expect(adapter.matches_condition?(article1, :priority.eq_any, [2, 3])).to be(false)
+        expect(adapter.matches_condition?(article1, :priority.eq_all, [1, 1])).to be(true)
+        expect(adapter.matches_condition?(article1, :priority.eq_all, [1, 2])).to be(false)
+        expect(adapter.matches_condition?(article1, :priority.ne, 2)).to be(true)
+        expect(adapter.matches_condition?(article1, :priority.ne, 1)).to be(false)
+        expect(adapter.matches_condition?(article1, :priority.in, [1, 2])).to be(true)
+        expect(adapter.matches_condition?(article1, :priority.in, [2, 3])).to be(false)
+        expect(adapter.matches_condition?(article1, :priority.nin, [2, 3])).to be(true)
+        expect(adapter.matches_condition?(article1, :priority.nin, [1, 2])).to be(false)
+        expect(adapter.matches_condition?(article1, :priority.lt, 2)).to be(true)
+        expect(adapter.matches_condition?(article1, :priority.lt, 1)).to be(false)
+        expect(adapter.matches_condition?(article1, :priority.lteq, 1)).to be(true)
+        expect(adapter.matches_condition?(article1, :priority.lteq, 0)).to be(false)
+        expect(adapter.matches_condition?(article1, :priority.gt, 0)).to be(true)
+        expect(adapter.matches_condition?(article1, :priority.gt, 1)).to be(false)
+        expect(adapter.matches_condition?(article1, :priority.gteq, 1)).to be(true)
+        expect(adapter.matches_condition?(article1, :priority.gteq, 2)).to be(false)
+        expect(adapter.matches_condition?(article1, :name.like, "%ello worl%")).to be_truthy
+        expect(adapter.matches_condition?(article1, :name.like, "hello world")).to be_truthy
+        expect(adapter.matches_condition?(article1, :name.like, "hello%")).to be_truthy
+        expect(adapter.matches_condition?(article1, :name.like, "h%d")).to be_truthy
+        expect(adapter.matches_condition?(article1, :name.like, "%helo%")).to be_falsey
+        expect(adapter.matches_condition?(article1, :name.like, "hello")).to be_falsey
+        expect(adapter.matches_condition?(article1, :name.like, "hello.world")).to be_falsey
         # For some reason this is reporting "The not_matches MetaWhere condition is not supported."
-        # expect(adapter.matches_condition?(article1, :name.nlike, "%helo%")).to be_true
-        # expect(adapter.matches_condition?(article1, :name.nlike, "%ello worl%")).to be_false
+        # expect(adapter.matches_condition?(article1, :name.nlike, "%helo%")).to be(true)
+        # expect(adapter.matches_condition?(article1, :name.nlike, "%ello worl%")).to be(false)
       end
     end
   end
