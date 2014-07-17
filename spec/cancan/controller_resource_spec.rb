@@ -507,7 +507,7 @@ describe CanCan::ControllerResource do
   end
 
   it "calls the santitizer when the parameter hash matches our object" do
-    params.merge!(model: { name: 'test' })
+    params.merge!(:model => { :name => 'test' })
     resource = CanCan::ControllerResource.new(controller)
     expect(controller).to receive(:resource_params).and_return(nil)
     resource.send("resource_params")
@@ -521,7 +521,7 @@ describe CanCan::ControllerResource do
   end
 
   it "only calls the santitize method when action requires filtering params" do
-    params.merge!(not_our_model: { name: 'test' })
+    params.merge!(:not_our_model => { :name => 'test' })
 
     allow(controller).to receive(:resource_params).and_raise
     resource = CanCan::ControllerResource.new(controller)
