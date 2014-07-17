@@ -513,6 +513,13 @@ describe CanCan::ControllerResource do
     resource.send("resource_params")
   end
 
+  it "santitizes correctly when the instance name is overriden" do
+    params.merge!(:action => 'create', :custom_name => {:name => "foobar"})
+    resource = CanCan::ControllerResource.new(controller, :instance_name => :custom_name)
+    resource.load_resource
+    expect(controller.instance_variable_get(:@custom_name).name).to eq "foobar"
+  end
+
   it "only calls the santitize method when action requires filtering params" do
     params.merge!(not_our_model: { name: 'test' })
 

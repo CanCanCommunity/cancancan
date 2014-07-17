@@ -232,7 +232,9 @@ module CanCan
     end
 
     def resource_params_by_namespaced_name
-      if @options[:class] && @params.has_key?(extract_key(@options[:class]))
+      if @options[:instance_name] && @params.has_key?(extract_key(@options[:instance_name]))
+        @params[extract_key(@options[:instance_name])]
+      elsif @options[:class] && @params.has_key?(extract_key(@options[:class]))
         @params[extract_key(@options[:class])]
       else
         @params[extract_key(namespaced_name)]
