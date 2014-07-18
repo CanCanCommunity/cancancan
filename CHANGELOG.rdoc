@@ -1,5 +1,7 @@
 Develop
 
+* Fix cancancan#59 - Parameters are automatically detected and santitized for all actions, not just create and update. (bryanrite)
+
 
 1.8.4 (June 24th, 2014)
 
