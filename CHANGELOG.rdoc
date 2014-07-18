@@ -1,5 +1,7 @@
 Develop
 
+* Fix cancancan#97, 72, 40, 39, 26 - Support Active Record 4 properly with references on nested permissions. (scpike, tdg5, Crystark)
+
 
 1.8.4 (June 24th, 2014)
 
