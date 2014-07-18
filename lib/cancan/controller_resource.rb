@@ -220,7 +220,7 @@ module CanCan
     end
 
     def resource_params
-      if resource_params_by_namespaced_name.present? && params_method.present?
+      if parameters_require_sanitizing? && params_method.present?
         return case params_method
           when Symbol then @controller.send(params_method)
           when String then @controller.instance_eval(params_method)
@@ -229,6 +229,10 @@ module CanCan
       else
         resource_params_by_namespaced_name
       end
+    end
+
+    def parameters_require_sanitizing?
+      save_actions.include?(@params[:action].to_sym) || resource_params_by_namespaced_name.present?
     end
 
     def resource_params_by_namespaced_name
@@ -280,7 +284,7 @@ module CanCan
       [:new, :create] + Array(@options[:new])
     end
 
-    def param_actions
+    def save_actions
       [:create, :update]
     end
 

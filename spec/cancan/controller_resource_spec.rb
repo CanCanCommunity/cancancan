@@ -507,27 +507,39 @@ describe CanCan::ControllerResource do
   end
 
   it "calls the santitizer when the parameter hash matches our object" do
-    params.merge!(:model => { :name => 'test' })
+    params.merge!(:action => 'create', :model => { :name => 'test' })
+    allow(controller).to receive(:create_params).and_return({})
+
     resource = CanCan::ControllerResource.new(controller)
-    expect(controller).to receive(:resource_params).and_return(nil)
-    resource.send("resource_params")
+    resource.load_resource
+    expect(controller.instance_variable_get(:@model).name).to eq nil
   end
 
   it "santitizes correctly when the instance name is overriden" do
     params.merge!(:action => 'create', :custom_name => {:name => "foobar"})
+    allow(controller).to receive(:create_params).and_return({})
+
     resource = CanCan::ControllerResource.new(controller, :instance_name => :custom_name)
     resource.load_resource
-    expect(controller.instance_variable_get(:@custom_name).name).to eq "foobar"
+    expect(controller.instance_variable_get(:@custom_name).name).to eq nil
   end
 
-  it "only calls the santitize method when action requires filtering params" do
-    params.merge!(:not_our_model => { :name => 'test' })
+  it "calls the santitize method on non-save actions when required" do
+    params.merge!(:action => 'new', :model => { :name => 'test' })
 
-    allow(controller).to receive(:resource_params).and_raise
+    allow(controller).to receive(:resource_params).and_return({})
     resource = CanCan::ControllerResource.new(controller)
+    resource.load_resource
+    expect(controller.instance_variable_get(:@model).name).to eq nil
+  end
 
+  it "doesn't sanitize parameters on non-save actions when not required" do
+    params.merge!(:action => 'new', :not_our_model => { :name => 'test' })
+    allow(controller).to receive(:resource_params).and_raise
+
+    resource = CanCan::ControllerResource.new(controller)
     expect {
-      resource.send("resource_params")
+      resource.load_resource
     }.to_not raise_error
   end
 
