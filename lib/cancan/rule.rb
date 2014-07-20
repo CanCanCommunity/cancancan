@@ -56,7 +56,7 @@ module CanCan
 
     def unmergeable?
       @conditions.respond_to?(:keys) && @conditions.present? &&
-        (!@conditions.keys.first.kind_of? Symbol)
+          (!@conditions.keys.first.kind_of? Symbol)
     end
 
     def associations_hash(conditions = @conditions)
@@ -134,10 +134,10 @@ module CanCan
 
     def condition_match?(attribute, value)
       case value
-      when Hash       then hash_condition_match?(attribute, value)
-      when String     then attribute == value
-      when Enumerable then value.include?(attribute)
-      else attribute == value
+        when Hash       then hash_condition_match?(attribute, value)
+        when String     then attribute == value
+        when Enumerable then value.include?(attribute)
+        else attribute == value
       end
     end
 
