@@ -1,6 +1,13 @@
 Develop
 
 
+1.9.0 (July 20th, 2014)
+
+* Fix cancancan#59 - Parameters are automatically detected and santitized for all actions, not just create and update. (bryanrite)
+
+* Fix cancancan#97, 72, 40, 39, 26 - Support Active Record 4 properly with references on nested permissions. (scpike, tdg5, Crystark)
+
+
 1.8.4 (June 24th, 2014)
 
 * Fix cancancan#86 - Fixes previous RSpec 3 update as there was a bug in the fix for RSpec 2.99. (bryanrite)

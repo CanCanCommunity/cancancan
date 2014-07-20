@@ -125,8 +125,11 @@ describe CanCan::ControllerResource do
     end
 
     context "with a strong parameters method" do
+      before :each do
+        params.merge!(:controller => "model", :model => { :name => 'test'})
+      end
+
       it "accepts and uses the specified symbol for santitizing input" do
-        params.merge!(:controller => "model")
         allow(controller).to receive(:resource_params).and_return(:resource => 'params')
         allow(controller).to receive(:model_params).and_return(:model => 'params')
         allow(controller).to receive(:create_params).and_return(:create => 'params')
@@ -136,19 +139,16 @@ describe CanCan::ControllerResource do
       end
 
       it "accepts the specified string for sanitizing input" do
-        params.merge!(:controller => "model")
         resource = CanCan::ControllerResource.new(controller, {:param_method => "{:custom => 'params'}"})
         expect(resource.send("resource_params")).to eq(:custom => 'params')
       end
 
       it "accepts the specified proc for sanitizing input" do
-        params.merge!(:controller => "model")
         resource = CanCan::ControllerResource.new(controller, {:param_method => Proc.new { |c| {:custom => 'params'}}})
         expect(resource.send("resource_params")).to eq(:custom => 'params')
       end
 
       it "prefers to use the create_params method for santitizing input" do
-        params.merge!(:controller => "model")
         allow(controller).to receive(:resource_params).and_return(:resource => 'params')
         allow(controller).to receive(:model_params).and_return(:model => 'params')
         allow(controller).to receive(:create_params).and_return(:create => 'params')
@@ -158,7 +158,6 @@ describe CanCan::ControllerResource do
       end
 
       it "prefers to use the <model_name>_params method for santitizing input if create is not found" do
-        params.merge!(:controller => "model")
         allow(controller).to receive(:resource_params).and_return(:resource => 'params')
         allow(controller).to receive(:model_params).and_return(:model => 'params')
         allow(controller).to receive(:custom_params).and_return(:custom => 'params')
@@ -167,7 +166,6 @@ describe CanCan::ControllerResource do
       end
 
       it "prefers to use the resource_params method for santitizing input if create or model is not found" do
-        params.merge!(:controller => "model")
         allow(controller).to receive(:resource_params).and_return(:resource => 'params')
         allow(controller).to receive(:custom_params).and_return(:custom => 'params')
         resource = CanCan::ControllerResource.new(controller)
@@ -508,28 +506,41 @@ describe CanCan::ControllerResource do
     end
   end
 
-  context "on update actions" do
-    before :each do
-      params.merge!(:action => 'update')
-    end
+  it "calls the santitizer when the parameter hash matches our object" do
+    params.merge!(:action => 'create', :model => { :name => 'test' })
+    allow(controller).to receive(:create_params).and_return({})
 
-    context "with a strong parameters method" do
-      it "only calls the santitize method with actions matching param_actions" do
-        allow(controller).to receive(:resource_params).and_return(:resource => 'params')
-        resource = CanCan::ControllerResource.new(controller)
-        allow(resource).to receive(:param_actions) { [:create] }
+    resource = CanCan::ControllerResource.new(controller)
+    resource.load_resource
+    expect(controller.instance_variable_get(:@model).name).to eq nil
+  end
 
-        expect(controller).not_to receive(:send).with(:resource_params)
-        resource.send("resource_params")
-      end
+  it "santitizes correctly when the instance name is overriden" do
+    params.merge!(:action => 'create', :custom_name => {:name => "foobar"})
+    allow(controller).to receive(:create_params).and_return({})
 
-      it "uses the proper action param based on the action" do
-        allow(controller).to receive(:create_params).and_return(:create => 'params')
-        allow(controller).to receive(:update_params).and_return(:update => 'params')
-        resource = CanCan::ControllerResource.new(controller)
-        expect(resource.send("resource_params")).to eq(:update => 'params')
-      end
-    end
+    resource = CanCan::ControllerResource.new(controller, :instance_name => :custom_name)
+    resource.load_resource
+    expect(controller.instance_variable_get(:@custom_name).name).to eq nil
+  end
+
+  it "calls the santitize method on non-save actions when required" do
+    params.merge!(:action => 'new', :model => { :name => 'test' })
+
+    allow(controller).to receive(:resource_params).and_return({})
+    resource = CanCan::ControllerResource.new(controller)
+    resource.load_resource
+    expect(controller.instance_variable_get(:@model).name).to eq nil
+  end
+
+  it "doesn't sanitize parameters on non-save actions when not required" do
+    params.merge!(:action => 'new', :not_our_model => { :name => 'test' })
+    allow(controller).to receive(:resource_params).and_raise
+
+    resource = CanCan::ControllerResource.new(controller)
+    expect {
+      resource.load_resource
+    }.to_not raise_error
   end
 
   it "is a parent resource when name is provided which doesn't match controller" do
