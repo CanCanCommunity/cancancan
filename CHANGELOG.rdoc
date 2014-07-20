@@ -1,5 +1,7 @@
 Develop
 
+* Fix cancancan#59 - Parameters are automatically detected and santitized for all actions, not just create and update. (bryanrite)
+
 * Fix cancancan#97, 72, 40, 39, 26 - Support Active Record 4 properly with references on nested permissions. (scpike, tdg5, Crystark)
 
 
