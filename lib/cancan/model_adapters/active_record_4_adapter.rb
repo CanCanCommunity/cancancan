@@ -14,7 +14,8 @@ module CanCan
       # in addition to `includes()` to force the outer join.
       #
       def build_relation(*where_conditions)
-        @model_class.where(*where_conditions).includes(joins).references(joins)
+        @model_class.includes(joins).references(joins) if joins.present?
+        @model_class.where(*where_conditions)
       end
     end
   end
