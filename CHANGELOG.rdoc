@@ -1,5 +1,8 @@
 Develop
 
+
+1.9.1 (July 21st, 2014)
+
 * Fix cancancan#101 - Fixes an issue where overjealous use of references would cause issues with scopes when loading associations. (bryanrite)
 
 
