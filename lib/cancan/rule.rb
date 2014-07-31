@@ -17,6 +17,10 @@ module CanCan
       @actions = [action].flatten
       @subjects = [subject].flatten
       @conditions = conditions || {}
+      if conditions.is_a?(Hash)
+        @if_method =  conditions.delete(:if)
+        @unless_method = conditions.delete(:unless)
+      end
       @block = block
     end
 
@@ -30,6 +34,8 @@ module CanCan
     def matches_conditions?(action, subject, extra_args)
       if @match_all
         call_block_with_all(action, subject, extra_args)
+      elsif subject_conditions?
+        match_subject_conditions?(subject)
       elsif @block && !subject_class?(subject)
         @block.call(subject, *extra_args)
       elsif @conditions.kind_of?(Hash) && subject.class == Hash
@@ -57,6 +63,18 @@ module CanCan
     def unmergeable?
       @conditions.respond_to?(:keys) && @conditions.present? &&
         (!@conditions.keys.first.kind_of? Symbol)
+    end
+
+    def subject_conditions?
+      @if_method || @unless_method
+    end
+
+    def match_subject_conditions?(subject)
+      if @if_method
+        subject.send(@if_method)
+      elsif @unless_method
+        !subject.send(@unless_method)
+      end
     end
 
     def associations_hash(conditions = @conditions)

@@ -397,6 +397,35 @@ describe CanCan::Ability do
     expect(@ability).to have_block(:read, :foo)
   end
 
+  describe 'subject conditions' do
+
+    class A; def green?; true; end; def yellow?; false; end; end
+
+    it "works with if conditions" do
+      @ability.can :read, A, if: :green?
+      @ability.can :write, A, if: :yellow?
+      expect(@ability.can?(:read, A.new)).to be_truthy
+      expect(@ability.can?(:write, A.new)).to be_falsey
+    end
+
+    it "works with unless conditions" do
+      @ability.can :read, A, unless: :green?
+      @ability.can :write, A, unless: :yellow?
+      expect(@ability.can?(:read, A.new)).to be_falsey
+      expect(@ability.can?(:write, A.new)).to be_truthy
+    end
+
+    it "works with cannot rules" do
+      @ability.can :manage, :all
+      # Conditionally deny write and read according to conditions
+      @ability.cannot :read, A, if: :green?
+      @ability.cannot :write, A, unless: :yellow?
+      expect(@ability.can?(:read, A.new)).to be_falsey
+      expect(@ability.can?(:write, A.new)).to be_falsey
+    end
+
+  end
+
   it "knows when raw sql is used in conditions" do
     @ability.can :read, :foo
     expect(@ability).to_not have_raw_sql(:read, :foo)
@@ -429,7 +458,7 @@ describe CanCan::Ability do
       end
     }.to raise_error(CanCan::Error, "You are not able to supply a block with a hash of conditions in read Array ability. Use either one.")
   end
-
+  
   describe "unauthorized message" do
     after(:each) do
       I18n.backend = nil
