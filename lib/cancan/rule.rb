@@ -49,7 +49,7 @@ module CanCan
     end
 
     def only_block?
-      conditions_empty? && !@block.nil?
+      conditions_empty? && (!@block.nil? || subject_conditions?)
     end
 
     def only_raw_sql?
