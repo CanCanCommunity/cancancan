@@ -34,7 +34,7 @@ module CanCan
     def matches_conditions?(action, subject, extra_args)
       if @match_all
         call_block_with_all(action, subject, extra_args)
-      elsif subject_conditions?
+      elsif subject_conditions? && !subject_class?(subject)
         match_subject_conditions?(subject)
       elsif @block && !subject_class?(subject)
         @block.call(subject, *extra_args)

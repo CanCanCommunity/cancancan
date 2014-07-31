@@ -424,6 +424,13 @@ describe CanCan::Ability do
       expect(@ability.can?(:write, A.new)).to be_falsey
     end
 
+    it "works like simple blocks rules" do
+      # same thing as @ability.can(:read, A) { |a| a.green? }
+      @ability.can :read, A, if: :green?
+      expect(@ability.can?(:read, A)).to be_truthy
+      expect(@ability.can?(:read, A.new)).to be_truthy
+    end
+
   end
 
   it "knows when raw sql is used in conditions" do
