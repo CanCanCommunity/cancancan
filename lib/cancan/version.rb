@@ -1,3 +1,3 @@
 module CanCan
-  VERSION = "1.9.1"
+  VERSION = "1.9.2"
 end

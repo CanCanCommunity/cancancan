@@ -342,6 +342,45 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       expect { @ability.can? :read, Article }.not_to raise_error
     end
 
+    context "with namespaced models" do
+      before :each do
+        ActiveRecord::Schema.define do
+          create_table( :table_xes ) do |t|
+            t.timestamps
+          end
+
+          create_table( :table_zs ) do |t|
+            t.integer :table_x_id
+            t.integer :user_id
+            t.timestamps
+          end
+        end
+
+        module Namespace
+        end
+
+        class Namespace::TableX < ActiveRecord::Base
+          has_many :table_zs
+        end
+
+        class Namespace::TableZ < ActiveRecord::Base
+          belongs_to :table_x
+          belongs_to :user
+        end
+      end
+
+      it "fetches all namespace::table_x when one is related by table_y" do
+        user = User.create!
+
+        ability = Ability.new(user)
+        ability.can :read, Namespace::TableX, :table_zs => { :user_id => user.id }
+
+        table_x = Namespace::TableX.create!
+        table_z = table_x.table_zs.create( :user => user )
+        expect(Namespace::TableX.accessible_by(ability)).to eq([table_x])
+      end
+    end
+
     context "when MetaWhere is defined" do
       before :each do
         pending "[Deprecated] MetaWhere support is being removed" unless defined? MetaWhere
