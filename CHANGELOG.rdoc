@@ -1,5 +1,8 @@
 Develop
 
+
+1.9.2 (August 8th, 2014)
+
 * Fix cancancan#77, 78 - Fix an issue with associations for namespaced models. (jjp)
 
 
