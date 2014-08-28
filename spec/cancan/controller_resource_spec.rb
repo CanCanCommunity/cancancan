@@ -231,6 +231,14 @@ describe CanCan::ControllerResource do
       expect { resource.authorize_resource }.to raise_error(CanCan::AccessDenied)
     end
 
+    it "authorizes with :custom_action for parent collection action" do
+      controller.instance_variable_set(:@category, :some_category)
+      allow(controller).to receive(:authorize!).with(:custom_action, :some_category) { raise CanCan::AccessDenied }
+
+      resource = CanCan::ControllerResource.new(controller, :category, :parent => true, :parent_action => :custom_action )
+      expect { resource.authorize_resource }.to raise_error(CanCan::AccessDenied)
+    end
+
     it "has the specified nested resource_class when using / for namespace" do
       module Admin
         class Dashboard; end
