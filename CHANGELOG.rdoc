@@ -1,5 +1,8 @@
 Develop
 
+1.10.0 (Auguest 28, 2014)
+
+* Complete cancancan#115 - Specify authorization action for parent resources.
 
 1.9.2 (August 8th, 2014)
 
