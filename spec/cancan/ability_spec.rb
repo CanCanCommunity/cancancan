@@ -415,6 +415,17 @@ describe CanCan::Ability do
     end
   end
 
+  it "passes the match to CanCan::AccessDenied" do
+    @ability.cannot :read, :foo, nil, error: "Sorry, can't do that."
+    begin
+      @ability.authorize! :read, :foo
+    rescue CanCan::AccessDenied => e
+      expect(e.match.options).to eq(error: "Sorry, can't do that.")
+    else
+      fail "Expected CanCan::AccessDenied exception to be raised"
+    end
+  end
+
   it "determines model adapterO class by asking AbstractAdapter" do
     adapter_class, model_class = double, double
     allow(CanCan::ModelAdapters::AbstractAdapter).to receive(:adapter_class).with(model_class) { adapter_class }

@@ -126,8 +126,8 @@ module CanCan
     #     # check the database and return true/false
     #   end
     #
-    def can(action = nil, subject = nil, conditions = nil, &block)
-      rules << Rule.new(true, action, subject, conditions, block)
+    def can(action = nil, subject = nil, conditions = nil, options = nil, &block)
+      rules << Rule.new(true, action, subject, conditions, options, block)
     end
 
     # Defines an ability which cannot be done. Accepts the same arguments as "can".
@@ -142,8 +142,8 @@ module CanCan
     #     product.invisible?
     #   end
     #
-    def cannot(action = nil, subject = nil, conditions = nil, &block)
-      rules << Rule.new(false, action, subject, conditions, block)
+    def cannot(action = nil, subject = nil, conditions = nil, options = nil, &block)
+      rules << Rule.new(false, action, subject, conditions, options, block)
     end
 
     # Alias one or more actions into another one.
@@ -208,8 +208,11 @@ module CanCan
       if args.last.kind_of?(Hash) && args.last.has_key?(:message)
         message = args.pop[:message]
       end
-      if cannot?(action, subject, *args)
-        message ||= unauthorized_message(action, subject)
+      message ||= unauthorized_message(action, subject)
+      match = match(action, subject, *args)
+      if match
+        raise AccessDenied.new(message, action, subject, match) unless match.base_behavior
+      else
         raise AccessDenied.new(message, action, subject)
       end
       subject
