@@ -61,16 +61,10 @@ module CanCan
     #
     # Also see the RSpec Matchers to aid in testing.
     def can?(action, subject, *extra_args)
-      subject = extract_subjects(subject)
-
-      match = subject.map do |subject|
-        relevant_rules_for_match(action, subject).detect do |rule|
-          rule.matches_conditions?(action, subject, extra_args)
-        end
-      end.compact.first
-
+      match = match(action, subject, *extra_args)
       match ? match.base_behavior : false
     end
+
     # Convenience method which works the same as "can?" but returns the opposite value.
     #
     #   cannot? :destroy, @project
@@ -331,6 +325,16 @@ module CanCan
           raise Error, "The accessible_by call cannot be used with a block 'can' definition. The SQL cannot be determined for #{action.inspect} #{subject.inspect}"
         end
       end
+    end
+
+    def match(action, subject, *extra_args)
+      subject = extract_subjects(subject)
+
+      subject.map do |subject|
+        relevant_rules_for_match(action, subject).detect do |rule|
+          rule.matches_conditions?(action, subject, extra_args)
+        end
+      end.compact.first
     end
 
     def default_alias_actions
