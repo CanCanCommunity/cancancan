@@ -111,6 +111,16 @@ module CanCan
           return adapter.matches_condition?(subject, name, value)
         end
 
+        if subject.class.superclass == ActiveRecord::Base
+          begin
+            enum_hash = subject.class.send(name.to_s.pluralize)
+            unless enum_hash.empty?
+              return condition_match?(enum_hash[subject.send(name)], value)
+            end
+          rescue
+          end
+        end
+
         condition_match?(subject.send(name), value)
       end
     end
