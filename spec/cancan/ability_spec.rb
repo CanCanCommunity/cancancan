@@ -402,15 +402,15 @@ describe CanCan::Ability do
     class A; def green?; true; end; def yellow?; false; end; end
 
     it "works with if conditions" do
-      @ability.can :read, A, if: :green?
-      @ability.can :write, A, if: :yellow?
+      @ability.can :read, A, :if => :green?
+      @ability.can :write, A, :if => :yellow?
       expect(@ability.can?(:read, A.new)).to be_truthy
       expect(@ability.can?(:write, A.new)).to be_falsey
     end
 
     it "works with unless conditions" do
-      @ability.can :read, A, unless: :green?
-      @ability.can :write, A, unless: :yellow?
+      @ability.can :read, A, :unless => :green?
+      @ability.can :write, A, :unless => :yellow?
       expect(@ability.can?(:read, A.new)).to be_falsey
       expect(@ability.can?(:write, A.new)).to be_truthy
     end
@@ -418,15 +418,15 @@ describe CanCan::Ability do
     it "works with cannot rules" do
       @ability.can :manage, :all
       # Conditionally deny write and read according to conditions
-      @ability.cannot :read, A, if: :green?
-      @ability.cannot :write, A, unless: :yellow?
+      @ability.cannot :read, A, :if => :green?
+      @ability.cannot :write, A, :unless => :yellow?
       expect(@ability.can?(:read, A.new)).to be_falsey
       expect(@ability.can?(:write, A.new)).to be_falsey
     end
 
     it "works like simple blocks rules" do
       # same thing as @ability.can(:read, A) { |a| a.green? }
-      @ability.can :read, A, if: :green?
+      @ability.can :read, A, :if => :green?
       expect(@ability.can?(:read, A)).to be_truthy
       expect(@ability.can?(:read, A.new)).to be_truthy
     end

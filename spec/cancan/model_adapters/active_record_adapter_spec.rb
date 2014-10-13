@@ -219,7 +219,7 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
     end
 
     it "does not allow to fetch records when ability with just subject conditions" do
-      @ability.can :read, Article, if: :new_record?
+      @ability.can :read, Article, :if => :new_record?
       expect(lambda { Article.accessible_by(@ability) }).to raise_error(CanCan::Error)
     end
 
