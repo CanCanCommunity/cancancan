@@ -12,6 +12,13 @@ if defined? CanCan::ModelAdapters::MongoidAdapter
     include Mongoid::Document
 
     referenced_in :mongoid_category
+    references_many :mongoid_sub_projects
+  end
+
+  class MongoidSubProject
+    include Mongoid::Document
+
+    referenced_in :mongoid_project
   end
 
   Mongoid.configure do |config|
@@ -222,6 +229,19 @@ if defined? CanCan::ModelAdapters::MongoidAdapter
           MongoidProject.accessible_by(@ability)
         }.to raise_error(CanCan::Error)
       end
+
+      it "can handle nested queries for accessible_by" do
+        @ability.can :read, MongoidSubProject, {:mongoid_project => {:mongoid_category => { :name => 'Authorization'}}}
+        cat1 = MongoidCategory.create name: 'Authentication'
+        cat2 = MongoidCategory.create name: 'Authorization'
+        proj1 = cat1.mongoid_projects.create name: 'Proj1'
+        proj2 = cat2.mongoid_projects.create name: 'Proj2'
+        sub1 = proj1.mongoid_sub_projects.create name: 'Sub1'
+        sub2 = proj2.mongoid_sub_projects.create name: 'Sub2'
+        expect(MongoidSubProject.accessible_by(@ability)).to match_array([sub1])
+      end
+
+
     end
   end
 end

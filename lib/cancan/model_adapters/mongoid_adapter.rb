@@ -35,14 +35,35 @@ module CanCan
 
           rules.inject(@model_class.all) do |records, rule|
             if process_can_rules && rule.base_behavior
-              records.or rule.conditions
+              records.or simplify_relations(@model_class, rule.conditions)
             elsif !rule.base_behavior
-              records.excludes rule.conditions
+              records.excludes simplify_relations(@model_class, rule.conditions)
             else
               records
             end
           end
         end
+      end
+
+      private
+      # Look for criteria on relations and replace with simple id queries
+      # eg.
+      # {user: {:tags.all => []}} becomes {"user_id" => {"$in" => [__, ..]}}
+      # {user: {:session => {:tags.all => []}}} becomes {"user_id" => {"session_id" => {"$in" => [__, ..]} }}
+      def simplify_relations model_class, conditions
+        model_relations = model_class.relations.with_indifferent_access
+        Hash[
+          conditions.map {|k,v|
+            if relation = model_relations[k]
+              relation_class_name = relation[:class_name].blank? ? k.to_s.classify : relation[:class_name]
+              v = simplify_relations(relation_class_name.constantize, v)
+              relation_ids = relation_class_name.constantize.where(v).only(:id).map(&:id)
+              k = "#{k}_id"
+              v = { "$in" => relation_ids }
+            end
+            [k,v]
+          }
+        ]
       end
     end
   end
