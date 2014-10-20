@@ -111,7 +111,7 @@ module CanCan
           return adapter.matches_condition?(subject, name, value)
         end
 
-        if subject.class.superclass == ActiveRecord::Base
+        if (adapter == ActiveRecord3Adapter or adapter == ActiveRecord4Adapter) and subject.class.superclass == ActiveRecord::Base
           begin
             enum_hash = subject.class.send(name.to_s.pluralize)
             unless enum_hash.empty?
