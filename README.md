@@ -64,7 +64,7 @@ See [Defining Abilities](https://github.com/bryanrite/cancancan/wiki/defining-ab
 
 The current user's permissions can then be checked using the `can?` and `cannot?` methods in the view and controller.
 
-```html.erb
+```erb
 <% if can? :update, @article %>
   <%= link_to "Edit", edit_article_path(@article) %>
 <% end %>
