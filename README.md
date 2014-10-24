@@ -9,7 +9,7 @@
 
 [Wiki](https://github.com/bryanrite/cancancan/wiki) | [RDocs](http://rdoc.info/projects/ryanb/cancan) | [Screencast](http://railscasts.com/episodes/192-authorization-with-cancan)
 
-CanCan is an authorization library for Ruby on Rails which restricts what resources a given user is allowed to access. All permissions are defined in a single location (the +Ability+ class) and not duplicated across controllers, views, and database queries.
+CanCan is an authorization library for Ruby on Rails which restricts what resources a given user is allowed to access. All permissions are defined in a single location (the `Ability` class) and not duplicated across controllers, views, and database queries.
 
 
 ## Mission
@@ -64,7 +64,7 @@ See [Defining Abilities](https://github.com/bryanrite/cancancan/wiki/defining-ab
 
 The current user's permissions can then be checked using the `can?` and `cannot?` methods in the view and controller.
 
-```ruby
+```html.erb
 <% if can? :update, @article %>
   <%= link_to "Edit", edit_article_path(@article) %>
 <% end %>
@@ -81,7 +81,7 @@ def show
 end
 ```
 
-Setting this for every action can be tedious, therefore the +load_and_authorize_resource+ method is provided to automatically authorize all actions in a RESTful style resource controller. It will use a before filter to load the resource into an instance variable and authorize it for every action.
+Setting this for every action can be tedious, therefore the `load_and_authorize_resource` method is provided to automatically authorize all actions in a RESTful style resource controller. It will use a before filter to load the resource into an instance variable and authorize it for every action.
 
 ```ruby
 class ArticlesController < ApplicationController
@@ -142,7 +142,7 @@ See [Strong Parameters](https://github.com/bryanrite/cancancan/wiki/Strong-Param
 
 ### 3. Handle Unauthorized Access
 
-If the user authorization fails, a `CanCan::AccessDenied` exception will be raised. You can catch this and modify its behavior in the +ApplicationController+.
+If the user authorization fails, a `CanCan::AccessDenied` exception will be raised. You can catch this and modify its behavior in the `ApplicationController`.
 
 ```ruby
 class ApplicationController < ActionController::Base
@@ -157,7 +157,7 @@ See [Exception Handling](https://github.com/bryanrite/cancancan/wiki/exception-h
 
 ### 4. Lock It Down
 
-If you want to ensure authorization happens on every action in your application, add +check_authorization+ to your ApplicationController.
+If you want to ensure authorization happens on every action in your application, add `check_authorization` to your `ApplicationController`.
 
 ```ruby
 class ApplicationController < ActionController::Base
@@ -165,7 +165,7 @@ class ApplicationController < ActionController::Base
 end
 ```
 
-This will raise an exception if authorization is not performed in an action. If you want to skip this add +skip_authorization_check+ to a controller subclass. See [Ensure Authorization](https://github.com/bryanrite/cancancan/wiki/Ensure-Authorization) for more information.
+This will raise an exception if authorization is not performed in an action. If you want to skip this add `skip_authorization_check` to a controller subclass. See [Ensure Authorization](https://github.com/bryanrite/cancancan/wiki/Ensure-Authorization) for more information.
 
 
 ## Wiki Docs
