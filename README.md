@@ -1,68 +1,73 @@
-= CanCanCan
-{<img src="https://badge.fury.io/rb/cancancan.png" alt="Gem Version" />}[http://badge.fury.io/rb/cancancan]
-{<img src="https://travis-ci.org/CanCanCommunity/cancancan.png?branch=master" alt="Build Status" />}[https://travis-ci.org/CanCanCommunity/cancancan]
-{<img src="https://codeclimate.com/github/CanCanCommunity/cancancan.png" />}[https://codeclimate.com/github/CanCanCommunity/cancancan]
-{<img src="http://inch-ci.org/github/CanCanCommunity/cancancan.png" alt="Inline docs" />}[http://inch-ci.org/github/CanCanCommunity/cancancan]
+# CanCanCan
 
-Wiki[https://github.com/bryanrite/cancancan/wiki] | RDocs[http://rdoc.info/projects/ryanb/cancan] | Screencast[http://railscasts.com/episodes/192-authorization-with-cancan]
+[![Fury badge](https://badge.fury.io/rb/cancan.png)](https://travis-ci.org/CanCanCommunity/cancancan.png?branch=master)
+[![Travis badge](https://travis-ci.org/CanCanCommunity/cancancan.png?branch=master)](https://travis-ci.org/CanCanCommunity/cancancan)
+[![Code Climate Badge](https://codeclimate.com/github/CanCanCommunity/cancancan.png)](https://codeclimate.com/github/CanCanCommunity/cancancan)
+[![Inch CI](http://inch-ci.org/github/CanCanCommunity/cancancan.png)](http://inch-ci.org/github/CanCanCommunity/cancancan)
+
+
+
+[Wiki](https://github.com/bryanrite/cancancan/wiki) | [RDocs](http://rdoc.info/projects/ryanb/cancan) | [Screencast](http://railscasts.com/episodes/192-authorization-with-cancan)
 
 CanCan is an authorization library for Ruby on Rails which restricts what resources a given user is allowed to access. All permissions are defined in a single location (the +Ability+ class) and not duplicated across controllers, views, and database queries.
 
 
-== Mission
+## Mission
 
-This repo is a continuation of the dead CanCan[https://github.com/ryanb/cancan] project. Our mission is to keep CanCan alive and moving forward, with maintenance fixes and new features. Pull Requests are welcome!
+This repo is a continuation of the dead [CanCan](https://github.com/ryanb/cancan) project. Our mission is to keep CanCan alive and moving forward, with maintenance fixes and new features. Pull Requests are welcome!
 
 I am currently focusing on the 1.x branch for the immediate future, making sure it is up to date as well as ensuring compatibility with Rails 4+. I will take a look into the 2.x branch and try to see what improvements, reorganizations and redesigns Ryan was attempting and go forward from there.
 
 Any help is greatly appreciated, feel free to submit pull-requests or open issues.
 
 
-== Installation
+## Installation
 
-In <b>Rails 3 and 4</b>, add this to your Gemfile and run the +bundle+ command.
+In **Rails 3 and 4**, add this to your Gemfile and run the `bundle install` command.
 
-  gem 'cancancan', '~> 1.9'
+    gem 'cancancan', '~> 1.9'
 
-In <b>Rails 2</b>, add this to your environment.rb file.
+In **Rails 2**, add this to your environment.rb file.
 
-  config.gem "cancancan"
+    config.gem "cancancan"
 
 Alternatively, you can install it as a plugin.
 
-  rails plugin install git://github.com/bryanrite/cancancan.git
+    rails plugin install git://github.com/bryanrite/cancancan.git
+
+## Getting Started
+
+CanCanCan expects a `current_user` method to exist in the controller. First, set up some authentication (such as [Authlogic](https://github.com/binarylogic/authlogic) or [Devise](https://github.com/plataformatec/devise)). See [Changing Defaults](https://github.com/bryanrite/cancancan/wiki/changing-defaults) if you need different behavior.
 
 
-== Getting Started
+### 1. Define Abilities
 
-CanCanCan expects a +current_user+ method to exist in the controller. First, set up some authentication (such as Authlogic[https://github.com/binarylogic/authlogic] or Devise[https://github.com/plataformatec/devise]). See {Changing Defaults}[https://github.com/bryanrite/cancancan/wiki/changing-defaults] if you need different behavior.
+User permissions are defined in an `Ability` class. CanCan 1.5 includes a Rails 3 and 4 generator for creating this class.
 
+    rails g cancan:ability
 
-=== 1. Define Abilities
+In Rails 2.3, just add a new class in `app/models/ability.rb` with the following contents:
 
-User permissions are defined in an +Ability+ class. CanCan 1.5 includes a Rails 3 and 4 generator for creating this class.
-
-  rails g cancan:ability
-
-In Rails 2.3, just add a new class in <tt>app/models/ability.rb</tt> with the following contents:
-
-  class Ability
-    include CanCan::Ability
-
-    def initialize(user)
-    end
+```ruby
+class Ability
+  include CanCan::Ability
+  def initialize(user)
   end
+end
+```
 
-See {Defining Abilities}[https://github.com/bryanrite/cancancan/wiki/defining-abilities] for details.
+See [Defining Abilities](https://github.com/bryanrite/cancancan/wiki/defining-abilities) for details.
 
 
-=== 2. Check Abilities & Authorization
+### 2. Check Abilities & Authorization
 
-The current user's permissions can then be checked using the <tt>can?</tt> and <tt>cannot?</tt> methods in the view and controller.
+The current user's permissions can then be checked using the `can?` and `cannot?` methods in the view and controller.
 
+```ruby
   <% if can? :update, @article %>
     <%= link_to "Edit", edit_article_path(@article) %>
   <% end %>
+```
 
 See {Checking Abilities}[https://github.com/bryanrite/cancancan/wiki/checking-abilities] for more information
 
