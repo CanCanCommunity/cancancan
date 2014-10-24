@@ -51,6 +51,7 @@ In Rails 2.3, just add a new class in `app/models/ability.rb` with the following
 ```ruby
 class Ability
   include CanCan::Ability
+
   def initialize(user)
   end
 end
@@ -64,125 +65,135 @@ See [Defining Abilities](https://github.com/bryanrite/cancancan/wiki/defining-ab
 The current user's permissions can then be checked using the `can?` and `cannot?` methods in the view and controller.
 
 ```ruby
-  <% if can? :update, @article %>
-    <%= link_to "Edit", edit_article_path(@article) %>
-  <% end %>
+<% if can? :update, @article %>
+  <%= link_to "Edit", edit_article_path(@article) %>
+<% end %>
 ```
 
-See {Checking Abilities}[https://github.com/bryanrite/cancancan/wiki/checking-abilities] for more information
+See [Checking Abilities](https://github.com/bryanrite/cancancan/wiki/checking-abilities) for more information
 
-The <tt>authorize!</tt> method in the controller will raise an exception if the user is not able to perform the given action.
+The `authorize!` method in the controller will raise an exception if the user is not able to perform the given action.
 
-  def show
-    @article = Article.find(params[:id])
-    authorize! :read, @article
-  end
+```ruby
+def show
+  @article = Article.find(params[:id])
+  authorize! :read, @article
+end
+```
 
 Setting this for every action can be tedious, therefore the +load_and_authorize_resource+ method is provided to automatically authorize all actions in a RESTful style resource controller. It will use a before filter to load the resource into an instance variable and authorize it for every action.
 
-  class ArticlesController < ApplicationController
-    load_and_authorize_resource
+```ruby
+class ArticlesController < ApplicationController
+  load_and_authorize_resource
 
-    def show
-      # @article is already loaded and authorized
+  def show
+    # @article is already loaded and authorized
+  end
+end
+```
+
+See [Authorizing Controller Actions](https://github.com/bryanrite/cancancan/wiki/authorizing-controller-actions) for more information.
+
+
+#### Strong Parameters
+
+When using `strong_parameters` or Rails 4+, you have to sanitize inputs before saving the record, in actions such as `:create` and `:update`.
+
+By default, CanCan will try to sanitize the input on `:create` and `:update` routes by seeing if your controller will respond to the following methods (in order):
+
+* `create_params` or `update_params` (depending on the action you are performing)
+* `<model_name>_params` such as `article_params` (this is the default convention in rails for naming your param method)
+* `resource_params` (a generically named method you could specify in each controller)
+
+Additionally, `load_and_authorize_resource` can now take a `param_method` option to specify a custom method in the controller to run to sanitize input.
+
+You can associate the `param_method` option with a symbol corresponding to the name of a method that will get called:
+
+```ruby
+class ArticlesController < ApplicationController
+  load_and_authorize_resource param_method: :my_sanitizer
+
+  def create
+    if @article.save
+      # hurray
+    else
+      render :new
     end
   end
 
-See {Authorizing Controller Actions}[https://github.com/bryanrite/cancancan/wiki/authorizing-controller-actions] for more information.
+  private
 
-
-==== Strong Parameters
-
-When using <tt>strong_parameters</tt> or Rails 4+, you have to sanitize inputs before saving the record, in actions such as <tt>:create</tt> and <tt>:update</tt>.
-
-By default, CanCan will try to sanitize the input on <tt>:create</tt> and <tt>:update</tt> routes by seeing if your controller will respond to the following methods (in order):
-
-* <tt>create_params</tt> or <tt>update_params</tt> (depending on the action you are performing)
-* <tt><model_name>_params</tt> such as <tt>article_params</tt> (this is the default convention in rails for naming your param method)
-* <tt>resource_params</tt> (a generically named method you could specify in each controller)
-
-Additionally, <tt>load_and_authorize_resource</tt> can now take a <tt>param_method</tt> option to specify a custom method in the controller to run to sanitize input.
-
-You can associate the <tt>param_method</tt> option with a symbol corresponding to the name of a method that will get called:
-
-  class ArticlesController < ApplicationController
-    load_and_authorize_resource param_method: :my_sanitizer
-
-    def create
-      if @article.save
-        # hurray
-      else
-        render :new
-      end
-    end
-
-    private
-
-    def my_sanitizer
-      params.require(:article).permit(:name)
-    end
+  def my_sanitizer
+    params.require(:article).permit(:name)
   end
+end
+```
 
-You can also use a string that will be evaluated in the context of the controller using <tt>instance_eval</tt> and needs to contain valid Ruby code. This does come in handy when using a PermittedParams class as suggested in Railscast 371:
+You can also use a string that will be evaluated in the context of the controller using `instance_eval` and needs to contain valid Ruby code. This does come in handy when using a PermittedParams class as suggested in Railscast 371:
 
-  load_and_authorize_resource param_method: 'permitted_params.article'
+    load_and_authorize_resource param_method: 'permitted_params.article'
 
-Finally, it's possible to associate <tt>param_method</tt> with a Proc object which will be called with the controller as the only argument:
+Finally, it's possible to associate `param_method` with a Proc object which will be called with the controller as the only argument:
 
-  load_and_authorize_resource param_method: Proc.new { |c| c.params.require(:article).permit(:name) }
+    load_and_authorize_resource param_method: Proc.new [ |c| c.params.require(:article).permit(:name) ]
 
-See {Strong Parameters}[https://github.com/bryanrite/cancancan/wiki/Strong-Parameters] for more information.
+See [Strong Parameters](https://github.com/bryanrite/cancancan/wiki/Strong-Parameters) for more information.
 
-=== 3. Handle Unauthorized Access
+### 3. Handle Unauthorized Access
 
-If the user authorization fails, a <tt>CanCan::AccessDenied</tt> exception will be raised. You can catch this and modify its behavior in the +ApplicationController+.
+If the user authorization fails, a `CanCan::AccessDenied` exception will be raised. You can catch this and modify its behavior in the +ApplicationController+.
 
-  class ApplicationController < ActionController::Base
-    rescue_from CanCan::AccessDenied do |exception|
-      redirect_to root_url, :alert => exception.message
-    end
+```ruby
+class ApplicationController < ActionController::Base
+  rescue_from CanCan::AccessDenied do |exception|
+    redirect_to root_url, :alert => exception.message
   end
+end
+```
 
-See {Exception Handling}[https://github.com/bryanrite/cancancan/wiki/exception-handling] for more information.
+See [Exception Handling](https://github.com/bryanrite/cancancan/wiki/exception-handling) for more information.
 
 
-=== 4. Lock It Down
+### 4. Lock It Down
 
 If you want to ensure authorization happens on every action in your application, add +check_authorization+ to your ApplicationController.
 
-  class ApplicationController < ActionController::Base
-    check_authorization
-  end
+```ruby
+class ApplicationController < ActionController::Base
+  check_authorization
+end
+```
 
-This will raise an exception if authorization is not performed in an action. If you want to skip this add +skip_authorization_check+ to a controller subclass. See {Ensure Authorization}[https://github.com/bryanrite/cancancan/wiki/Ensure-Authorization] for more information.
-
-
-== Wiki Docs
-
-* {Upgrading to 1.6}[https://github.com/bryanrite/cancancan/wiki/Upgrading-to-1.6]
-* {Defining Abilities}[https://github.com/bryanrite/cancancan/wiki/Defining-Abilities]
-* {Checking Abilities}[https://github.com/bryanrite/cancancan/wiki/Checking-Abilities]
-* {Authorizing Controller Actions}[https://github.com/bryanrite/cancancan/wiki/Authorizing-Controller-Actions]
-* {Exception Handling}[https://github.com/bryanrite/cancancan/wiki/Exception-Handling]
-* {Changing Defaults}[https://github.com/bryanrite/cancancan/wiki/Changing-Defaults]
-* {See more}[https://github.com/bryanrite/cancancan/wiki]
-
-== Questions or Problems?
-
-If you have any issues with CanCan which you cannot find the solution to in the documentation[https://github.com/bryanrite/cancancan/wiki] or our mailing list: http://groups.google.com/group/cancancan, please add an {issue on GitHub}[https://github.com/bryanrite/cancancan/issues] or fork the project and send a pull request.
+This will raise an exception if authorization is not performed in an action. If you want to skip this add +skip_authorization_check+ to a controller subclass. See [Ensure Authorization](https://github.com/bryanrite/cancancan/wiki/Ensure-Authorization) for more information.
 
 
-== Development
+## Wiki Docs
 
-Cancancan uses {appraisals}[https://github.com/thoughtbot/appraisal] to test the code base against multiple versions of rails, as well as the different model adapters.
+* [Upgrading to 1.6](https://github.com/bryanrite/cancancan/wiki/Upgrading-to-1.6)
+* [Defining Abilities](https://github.com/bryanrite/cancancan/wiki/Defining-Abilities)
+* [Checking Abilities](https://github.com/bryanrite/cancancan/wiki/Checking-Abilities)
+* [Authorizing Controller Actions](https://github.com/bryanrite/cancancan/wiki/Authorizing-Controller-Actions)
+* [Exception Handling](https://github.com/bryanrite/cancancan/wiki/Exception-Handling)
+* [Changing Defaults](https://github.com/bryanrite/cancancan/wiki/Changing-Defaults)
+* [See more](https://github.com/bryanrite/cancancan/wiki)
 
-When first developing, you may need to run <tt>bundle install</tt> and then <tt>appraisal install</tt>, to install the different sets.
+## Questions or Problems?
 
-You can then run all appraisal files (like CI does), with <tt>appraisal rake</tt> or just run a specific set <tt>appraisal activerecord_3.0 rake</tt>.
-
-See the {CONTRIBUTING}[https://github.com/CanCanCommunity/cancancan/blob/develop/CONTRIBUTING.md] and {spec/README}[https://github.com/bryanrite/cancancan/blob/master/spec/README.rdoc] for more information.
+If you have any issues with CanCan which you cannot find the solution to in the [documentation](https://github.com/bryanrite/cancancan/wiki) or our mailing list: http://groups.google.com/group/cancancan, please add an [issue on GitHub](https://github.com/bryanrite/cancancan/issues) or fork the project and send a pull request.
 
 
-== Special Thanks
+## Development
 
-CanCan was inspired by declarative_authorization[https://github.com/stffn/declarative_authorization/] and aegis[https://github.com/makandra/aegis]. Also many thanks to the CanCan contributors[https://github.com/bryanrite/cancancan/contributors]. See the CHANGELOG[https://github.com/bryanrite/cancancan/blob/master/CHANGELOG.rdoc] for the full list.
+Cancancan uses [appraisals](https://github.com/thoughtbot/appraisal) to test the code base against multiple versions of rails, as well as the different model adapters.
+
+When first developing, you may need to run `bundle install` and then `appraisal install`, to install the different sets.
+
+You can then run all appraisal files (like CI does), with `appraisal rake` or just run a specific set `appraisal activerecord_3.0 rake`.
+
+See the [CONTRIBUTING](https://github.com/CanCanCommunity/cancancan/blob/develop/CONTRIBUTING.md) and [spec/README](https://github.com/bryanrite/cancancan/blob/master/spec/README.rdoc) for more information.
+
+
+## Special Thanks
+
+CanCan was inspired by [declarative_authorization](https://github.com/stffn/declarative_authorization/) and [aegis](https://github.com/makandra/aegis). Also many thanks to the [CanCan contributors](https://github.com/bryanrite/cancancan/contributors). See the [CHANGELOG](https://github.com/bryanrite/cancancan/blob/master/CHANGELOG.rdoc) for the full list.
