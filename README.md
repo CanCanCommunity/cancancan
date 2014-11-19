@@ -5,9 +5,7 @@
 [![Code Climate Badge](https://codeclimate.com/github/CanCanCommunity/cancancan.png)](https://codeclimate.com/github/CanCanCommunity/cancancan)
 [![Inch CI](http://inch-ci.org/github/CanCanCommunity/cancancan.png)](http://inch-ci.org/github/CanCanCommunity/cancancan)
 
-
-
-[Wiki](https://github.com/bryanrite/cancancan/wiki) | [RDocs](http://rdoc.info/projects/ryanb/cancan) | [Screencast](http://railscasts.com/episodes/192-authorization-with-cancan)
+[Wiki](https://github.com/CanCanCommunity/cancancan/wiki) | [RDocs](http://rdoc.info/projects/CanCanCommunity/cancan) | [Screencast](http://railscasts.com/episodes/192-authorization-with-cancan)
 
 CanCan is an authorization library for Ruby on Rails which restricts what resources a given user is allowed to access. All permissions are defined in a single location (the `Ability` class) and not duplicated across controllers, views, and database queries.
 
@@ -33,11 +31,11 @@ In **Rails 2**, add this to your environment.rb file.
 
 Alternatively, you can install it as a plugin.
 
-    rails plugin install git://github.com/bryanrite/cancancan.git
+    rails plugin install git://github.com/CanCanCommunity/cancancan.git
 
 ## Getting Started
 
-CanCanCan expects a `current_user` method to exist in the controller. First, set up some authentication (such as [Authlogic](https://github.com/binarylogic/authlogic) or [Devise](https://github.com/plataformatec/devise)). See [Changing Defaults](https://github.com/bryanrite/cancancan/wiki/changing-defaults) if you need different behavior.
+CanCanCan expects a `current_user` method to exist in the controller. First, set up some authentication (such as [Authlogic](https://github.com/binarylogic/authlogic) or [Devise](https://github.com/plataformatec/devise)). See [Changing Defaults](https://github.com/CanCanCommunity/cancancan/wiki/changing-defaults) if you need different behavior.
 
 
 ### 1. Define Abilities
@@ -57,7 +55,7 @@ class Ability
 end
 ```
 
-See [Defining Abilities](https://github.com/bryanrite/cancancan/wiki/defining-abilities) for details.
+See [Defining Abilities](https://github.com/CanCanCommunity/cancancan/wiki/defining-abilities) for details.
 
 
 ### 2. Check Abilities & Authorization
@@ -70,7 +68,7 @@ The current user's permissions can then be checked using the `can?` and `cannot?
 <% end %>
 ```
 
-See [Checking Abilities](https://github.com/bryanrite/cancancan/wiki/checking-abilities) for more information
+See [Checking Abilities](https://github.com/CanCanCommunity/cancancan/wiki/checking-abilities) for more information
 
 The `authorize!` method in the controller will raise an exception if the user is not able to perform the given action.
 
@@ -93,7 +91,7 @@ class ArticlesController < ApplicationController
 end
 ```
 
-See [Authorizing Controller Actions](https://github.com/bryanrite/cancancan/wiki/authorizing-controller-actions) for more information.
+See [Authorizing Controller Actions](https://github.com/CanCanCommunity/cancancan/wiki/authorizing-controller-actions) for more information.
 
 
 #### Strong Parameters
@@ -138,7 +136,7 @@ Finally, it's possible to associate `param_method` with a Proc object which will
 
     load_and_authorize_resource param_method: Proc.new [ |c| c.params.require(:article).permit(:name) ]
 
-See [Strong Parameters](https://github.com/bryanrite/cancancan/wiki/Strong-Parameters) for more information.
+See [Strong Parameters](https://github.com/CanCanCommunity/cancancan/wiki/Strong-Parameters) for more information.
 
 ### 3. Handle Unauthorized Access
 
@@ -152,7 +150,7 @@ class ApplicationController < ActionController::Base
 end
 ```
 
-See [Exception Handling](https://github.com/bryanrite/cancancan/wiki/exception-handling) for more information.
+See [Exception Handling](https://github.com/CanCanCommunity/cancancan/wiki/exception-handling) for more information.
 
 
 ### 4. Lock It Down
@@ -165,22 +163,22 @@ class ApplicationController < ActionController::Base
 end
 ```
 
-This will raise an exception if authorization is not performed in an action. If you want to skip this add `skip_authorization_check` to a controller subclass. See [Ensure Authorization](https://github.com/bryanrite/cancancan/wiki/Ensure-Authorization) for more information.
+This will raise an exception if authorization is not performed in an action. If you want to skip this add `skip_authorization_check` to a controller subclass. See [Ensure Authorization](https://github.com/CanCanCommunity/cancancan/wiki/Ensure-Authorization) for more information.
 
 
 ## Wiki Docs
 
-* [Upgrading to 1.6](https://github.com/bryanrite/cancancan/wiki/Upgrading-to-1.6)
-* [Defining Abilities](https://github.com/bryanrite/cancancan/wiki/Defining-Abilities)
-* [Checking Abilities](https://github.com/bryanrite/cancancan/wiki/Checking-Abilities)
-* [Authorizing Controller Actions](https://github.com/bryanrite/cancancan/wiki/Authorizing-Controller-Actions)
-* [Exception Handling](https://github.com/bryanrite/cancancan/wiki/Exception-Handling)
-* [Changing Defaults](https://github.com/bryanrite/cancancan/wiki/Changing-Defaults)
-* [See more](https://github.com/bryanrite/cancancan/wiki)
+* [Upgrading to 1.6](https://github.com/CanCanCommunity/cancancan/wiki/Upgrading-to-1.6)
+* [Defining Abilities](https://github.com/CanCanCommunity/cancancan/wiki/Defining-Abilities)
+* [Checking Abilities](https://github.com/CanCanCommunity/cancancan/wiki/Checking-Abilities)
+* [Authorizing Controller Actions](https://github.com/CanCanCommunity/cancancan/wiki/Authorizing-Controller-Actions)
+* [Exception Handling](https://github.com/CanCanCommunity/cancancan/wiki/Exception-Handling)
+* [Changing Defaults](https://github.com/CanCanCommunity/cancancan/wiki/Changing-Defaults)
+* [See more](https://github.com/CanCanCommunity/cancancan/wiki)
 
 ## Questions or Problems?
 
-If you have any issues with CanCan which you cannot find the solution to in the [documentation](https://github.com/bryanrite/cancancan/wiki) or our mailing list: http://groups.google.com/group/cancancan, please add an [issue on GitHub](https://github.com/bryanrite/cancancan/issues) or fork the project and send a pull request.
+If you have any issues with CanCan which you cannot find the solution to in the [documentation](https://github.com/CanCanCommunity/cancancan/wiki) or our mailing list: http://groups.google.com/group/cancancan, please add an [issue on GitHub](https://github.com/CanCanCommunity/cancancan/issues) or fork the project and send a pull request.
 
 
 ## Development
@@ -191,9 +189,9 @@ When first developing, you may need to run `bundle install` and then `appraisal 
 
 You can then run all appraisal files (like CI does), with `appraisal rake` or just run a specific set `appraisal activerecord_3.0 rake`.
 
-See the [CONTRIBUTING](https://github.com/CanCanCommunity/cancancan/blob/develop/CONTRIBUTING.md) and [spec/README](https://github.com/bryanrite/cancancan/blob/master/spec/README.rdoc) for more information.
+See the [CONTRIBUTING](https://github.com/CanCanCommunity/cancancan/blob/develop/CONTRIBUTING.md) and [spec/README](https://github.com/CanCanCommunity/cancancan/blob/master/spec/README.rdoc) for more information.
 
 
 ## Special Thanks
 
-CanCan was inspired by [declarative_authorization](https://github.com/stffn/declarative_authorization/) and [aegis](https://github.com/makandra/aegis). Also many thanks to the [CanCan contributors](https://github.com/bryanrite/cancancan/contributors). See the [CHANGELOG](https://github.com/bryanrite/cancancan/blob/master/CHANGELOG.rdoc) for the full list.
+CanCan was inspired by [declarative_authorization](https://github.com/stffn/declarative_authorization/) and [aegis](https://github.com/makandra/aegis). Also many thanks to the [CanCan contributors](https://github.com/CanCanCommunity/cancancan/contributors). See the [CHANGELOG](https://github.com/CanCanCommunity/cancancan/blob/master/CHANGELOG.rdoc) for the full list.
