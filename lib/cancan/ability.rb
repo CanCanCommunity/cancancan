@@ -246,10 +246,16 @@ module CanCan
     end
 
     def merge(ability)
-      ability.send(:rules).each do |rule|
+      ability.rules.each do |rule|
         rules << rule.dup
       end
       self
+    end
+
+    protected
+
+    def rules
+      @rules ||= []
     end
 
     private
@@ -300,10 +306,6 @@ module CanCan
         results += aliases_for_action(aliased_action) if actions.include? action
       end
       results
-    end
-
-    def rules
-      @rules ||= []
     end
 
     # Returns an array of Rule instances which match the action and subject
