@@ -634,4 +634,33 @@ describe CanCan::ControllerResource do
     expect { resource.load_and_authorize_resource }.not_to raise_error
     expect(controller.instance_variable_get(:@model)).to be_nil
   end
+
+  context "when model name is Action" do
+    let(:action_params) { HashWithIndifferentAccess.new(:controller => "actions") }
+    let(:action_controller_class) { Class.new }
+    let(:action_controller) { controller_class.new }
+    before :each do
+      class Action
+        attr_accessor :name
+
+        def initialize(attributes={})
+          attributes.each do |attribute, value|
+            send("#{attribute}=", value)
+          end
+        end
+      end
+
+    allow(action_controller).to receive(:params) { action_params }
+    allow(action_controller).to receive(:current_ability) { ability }
+    allow(action_controller_class).to receive(:cancan_skipper) { {:authorize => {}, :load => {}} }
+    end
+
+    it "builds a new resource with attributes from current ability" do
+      action_params.merge!(:action => 'create')
+      ability.can(:create, Action, :name => "from conditions")
+      resource = CanCan::ControllerResource.new(action_controller)
+      resource.load_resource
+      expect(action_controller.instance_variable_get(:@action).name).to eq("from conditions")
+    end
+  end
 end
