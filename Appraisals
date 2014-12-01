@@ -69,9 +69,9 @@ end
 
 appraise "datamapper_1.x" do
   gem 'activesupport', '~> 3.0', :require => 'active_support/all'
-  gem "dm-core", "~> 1.0.2"
-  gem "dm-sqlite-adapter", "~> 1.0.2"
-  gem "dm-migrations", "~> 1.0.2"
+  gem "dm-core", "~> 1.0"
+  gem "dm-sqlite-adapter", "~> 1.0"
+  gem "dm-migrations", "~> 1.0"
 end
 
 appraise "mongoid_2.x" do
