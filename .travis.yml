@@ -34,6 +34,8 @@ matrix:
       gemfile: gemfiles/activerecord_4.0.gemfile
     - rvm: ree
       gemfile: gemfiles/activerecord_4.1.gemfile
+    - rvm: jruby
+      gemfile: gemfiles/datamapper_1.x.gemfile
 notifications:
   recipients:
     - bryan@bryanrite.com
