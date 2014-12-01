@@ -103,6 +103,17 @@ describe CanCan::ControllerResource do
       expect(controller.instance_variable_get(:@sub_model).name).to eq("foobar")
     end
 
+    it "builds a new resource for namespaced controller given through folder format" do
+      module Admin
+        module SubModule
+          class HiddenModel < ::Model; end
+        end
+      end
+      params.merge!(:controller => "admin/sub_module/hidden_models")
+      resource = CanCan::ControllerResource.new(controller)
+      expect { resource.load_resource }.not_to raise_error
+    end
+
     it "does not build record through has_one association with :singleton option because it can cause it to delete it in the database" do
       category = Class.new
       allow_any_instance_of(Model).to receive('category=').with(category)
