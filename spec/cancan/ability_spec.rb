@@ -45,6 +45,13 @@ describe CanCan::Ability do
     expect(@ability.can?(:read, 6)).to be(false)
   end
 
+  it "overrides earlier rules with later ones (even if a different exact subject)" do
+    @ability.cannot :read, Numeric
+    @ability.can :read, Integer
+
+    expect(@ability.can?(:read, 6)).to be(true)
+  end
+
   it "does not pass class with object if :all objects are accepted" do
     @ability.can :preview, :all do |object|
       expect(object).to eq(123)
