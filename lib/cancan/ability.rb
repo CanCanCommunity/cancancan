@@ -284,7 +284,7 @@ module CanCan
     protected
 
     def rules
-      @rules.values.flatten
+      @rules
     end
 
     private
@@ -338,10 +338,19 @@ module CanCan
     end
 
     def add_rule(rule)
-      @rules ||= Hash.new { |h, k| h[k] = [] }
-      @rules[:all] << rule if rule.subjects.compact.empty?
-      rule.subjects.each do |subject|
-        @rules[subject] << rule
+      @rules ||= []
+      @rules << rule
+      add_rule_to_index(rule, @rules.size - 1)
+    end
+
+    def add_rule_to_index(rule, position)
+      @rules_index ||= Hash.new { |h, k| h[k] = [] }
+
+      subjects = rule.subjects.compact
+      subjects << :all if subjects.empty?
+
+      subjects.each do |subject|
+        @rules_index[subject] << position
       end
     end
 
@@ -367,7 +376,9 @@ module CanCan
       if subject.is_a?(Hash)
         rules
       else
-        @rules.values_at(subject, *alternative_subjects(subject)).flatten
+        positions = @rules_index.values_at(subject, *alternative_subjects(subject))
+        positions.flatten!.sort!
+        positions.map { |i| @rules[i] }
       end
     end
 
