@@ -1,6 +1,6 @@
 # CanCanCan
 
-[![Fury badge](https://badge.fury.io/rb/cancan.png)](https://travis-ci.org/CanCanCommunity/cancancan.png?branch=master)
+[![Gem Version](https://badge.fury.io/rb/cancancan.svg)](http://badge.fury.io/rb/cancancan)
 [![Travis badge](https://travis-ci.org/CanCanCommunity/cancancan.png?branch=master)](https://travis-ci.org/CanCanCommunity/cancancan)
 [![Code Climate Badge](https://codeclimate.com/github/CanCanCommunity/cancancan.png)](https://codeclimate.com/github/CanCanCommunity/cancancan)
 [![Inch CI](http://inch-ci.org/github/CanCanCommunity/cancancan.png)](http://inch-ci.org/github/CanCanCommunity/cancancan)
