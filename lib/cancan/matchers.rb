@@ -38,6 +38,6 @@ Kernel.const_get(rspec_module)::Matchers.define :be_able_to do |*args|
   end
 
   description do
-    "expected to be able to #{args.map(&:to_s).join(' ')}"
+    "be able to #{args.map(&:to_s).join(' ')}"
   end
 end
