@@ -75,6 +75,20 @@ appraise "activerecord_4.1" do
   end
 end
 
+appraise "activerecord_4.2" do
+  gem "activerecord", "~> 4.2.0", :require => "active_record"
+  gem 'activesupport', '~> 4.2.0', :require => 'active_support/all'
+
+  gemfile.platforms :jruby do
+    gem "activerecord-jdbcsqlite3-adapter"
+    gem "jdbc-sqlite3"
+  end
+
+  gemfile.platforms :ruby, :mswin, :mingw do
+    gem "sqlite3"
+  end
+end
+
 appraise "datamapper_1.x" do
   gem "activesupport", "~> 3.0", :require => "active_support/all"
   gem "dm-core", "~> 1.0"
