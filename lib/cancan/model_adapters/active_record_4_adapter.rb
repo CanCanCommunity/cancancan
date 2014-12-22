@@ -17,6 +17,18 @@ module CanCan
         relation = relation.includes(joins).references(joins) if joins.present?
         relation
       end
+
+      # Rails 4.2 deprecates `sanitize_sql_hash_for_conditions`
+      def sanitize_sql(conditions)
+        if ActiveRecord::VERSION::MINOR >= 2 && Hash === conditions
+          relation = @model_class.unscope(:where).where(conditions)
+          predicates = relation.where_values
+          bind_values = relation.bind_values
+          query = Arel::Nodes::And.new(predicates).to_sql
+          conditions = [query, *bind_values.map { |col, val| val }]
+        end
+        @model_class.send(:sanitize_sql, conditions)
+      end
     end
   end
 end
