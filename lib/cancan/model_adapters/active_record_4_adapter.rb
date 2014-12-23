@@ -21,7 +21,7 @@ module CanCan
       # Rails 4.2 deprecates `sanitize_sql_hash_for_conditions`
       def sanitize_sql(conditions)
         if ActiveRecord::VERSION::MINOR >= 2 && Hash === conditions
-          relation = @model_class.unscope(:where).where(conditions)
+          relation = @model_class.unscoped.where(conditions)
           predicates = relation.where_values
           bind_values = relation.bind_values
           query = Arel::Nodes::And.new(predicates).to_sql
