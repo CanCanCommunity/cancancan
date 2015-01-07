@@ -23,7 +23,7 @@ Any help is greatly appreciated, feel free to submit pull-requests or open issue
 
 In **Rails 3 and 4**, add this to your Gemfile and run the `bundle install` command.
 
-    gem 'cancancan', '~> 1.9'
+    gem 'cancancan', '~> 1.10'
 
 In **Rails 2**, add this to your environment.rb file.
 
