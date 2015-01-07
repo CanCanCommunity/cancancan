@@ -7,11 +7,11 @@ if defined? CanCan::ModelAdapters::ActiveRecord4Adapter
       ActiveRecord::Migration.verbose = false
       ActiveRecord::Schema.define do
         create_table(:parents) do |t|
-          t.timestamps
+          t.timestamps :null => false
         end
 
         create_table(:children) do |t|
-          t.timestamps
+          t.timestamps :null => false
           t.integer :parent_id
         end
       end

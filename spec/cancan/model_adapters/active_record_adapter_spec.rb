@@ -11,17 +11,17 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
         create_table(:categories) do |t|
           t.string :name
           t.boolean :visible
-          t.timestamps
+          t.timestamps :null => false
         end
 
         create_table(:projects) do |t|
           t.string :name
-          t.timestamps
+          t.timestamps :null => false
         end
 
         create_table(:articles) do |t|
           t.string :name
-          t.timestamps
+          t.timestamps :null => false
           t.boolean :published
           t.boolean :secret
           t.integer :priority
@@ -32,17 +32,17 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
         create_table(:comments) do |t|
           t.boolean :spam
           t.integer :article_id
-          t.timestamps
+          t.timestamps :null => false
         end
 
         create_table(:legacy_mentions) do |t|
           t.integer :user_id
           t.integer :article_id
-          t.timestamps
+          t.timestamps :null => false
         end
 
         create_table(:users) do |t|
-          t.timestamps
+          t.timestamps :null => false
         end
       end
 
@@ -346,13 +346,13 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       before :each do
         ActiveRecord::Schema.define do
           create_table( :table_xes ) do |t|
-            t.timestamps
+            t.timestamps :null => false
           end
 
           create_table( :table_zs ) do |t|
             t.integer :table_x_id
             t.integer :user_id
-            t.timestamps
+            t.timestamps :null => false
           end
         end
 
