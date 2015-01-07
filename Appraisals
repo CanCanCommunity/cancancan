@@ -3,10 +3,6 @@ appraise "activerecord_3.0" do
   gem 'activesupport', '~> 3.0.20', :require => 'active_support/all'
   gem "meta_where"
 
-  gemfile.platforms :ruby_18, :ruby_19 do
-    gem "i18n", "< 0.7"
-  end
-
   gemfile.platforms :jruby do
     gem "activerecord-jdbcsqlite3-adapter"
     gem "jdbc-sqlite3"
