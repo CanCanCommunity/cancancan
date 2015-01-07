@@ -51,10 +51,6 @@ appraise "activerecord_4.0" do
   gem "activerecord", "~> 4.0.5", :require => "active_record"
   gem "activesupport", "~> 4.0.5", :require => "active_support/all"
 
-  gemfile.platforms :ruby_18, :ruby_19 do
-    gem "i18n", "< 0.7"
-  end
-
   gemfile.platforms :jruby do
     gem "activerecord-jdbcsqlite3-adapter"
     gem "jdbc-sqlite3"
@@ -68,10 +64,6 @@ end
 appraise "activerecord_4.1" do
   gem "activerecord", "~> 4.1.1", :require => "active_record"
   gem "activesupport", "~> 4.1.1", :require => "active_support/all"
-
-  gemfile.platforms :ruby_18, :ruby_19 do
-    gem "i18n", "< 0.7"
-  end
 
   gemfile.platforms :jruby do
     gem "activerecord-jdbcsqlite3-adapter"
