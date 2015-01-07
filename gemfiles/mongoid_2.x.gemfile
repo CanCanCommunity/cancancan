@@ -5,6 +5,10 @@ source "https://rubygems.org"
 gem "activesupport", "~> 3.0", :require => "active_support/all"
 gem "mongoid", "~> 2.0.0"
 
+platforms :ruby_18, :ruby_19 do
+  gem "i18n", "< 0.7"
+end
+
 platforms :ruby, :mswin, :mingw do
   gem "bson_ext", "~> 1.1"
 end
