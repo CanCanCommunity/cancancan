@@ -92,6 +92,10 @@ appraise "datamapper_1.x" do
   gem "dm-core", "~> 1.0"
   gem "dm-sqlite-adapter", "~> 1.0"
   gem "dm-migrations", "~> 1.0"
+
+  gemfile.platforms :ruby_18, :ruby_19 do
+    gem "i18n", "< 0.7"
+  end
 end
 
 appraise "mongoid_2.x" do
