@@ -263,7 +263,7 @@ module CanCan
     end
 
     def namespaced_name
-      [namespace, name.camelize].join('::').singularize.camelize.constantize
+      [namespace, name.camelize].flatten.map(&:camelize).join('::').singularize.constantize
     rescue NameError
       name
     end
