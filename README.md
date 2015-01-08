@@ -134,7 +134,7 @@ You can also use a string that will be evaluated in the context of the controlle
 
 Finally, it's possible to associate `param_method` with a Proc object which will be called with the controller as the only argument:
 
-    load_and_authorize_resource param_method: Proc.new [ |c| c.params.require(:article).permit(:name) ]
+    load_and_authorize_resource param_method: Proc.new { |c| c.params.require(:article).permit(:name) }
 
 See [Strong Parameters](https://github.com/CanCanCommunity/cancancan/wiki/Strong-Parameters) for more information.
 
