@@ -182,6 +182,35 @@ describe CanCan::ControllerResource do
         resource = CanCan::ControllerResource.new(controller)
         expect(resource.send("resource_params")).to eq(:resource => 'params')
       end
+
+      it "calls the create_params method when loading the resource" do
+        allow(controller).to receive(:create_params).and_return(:name => 'success')
+        resource = CanCan::ControllerResource.new(controller)
+        resource.load_resource
+        expect(controller.instance_variable_get(:@model).name).to eq('success')
+      end
+    end
+  end
+
+  context "on update actions" do
+    before :each do
+      params.merge!(:action => 'update')
+    end
+
+    context "with a strong parameters method" do
+      before :each do
+        params.merge!(:controller => "model", :id => '1', :model => { :name => 'test'})
+      end
+
+      it "calls the update_params method when loading the resource" do
+        model = Model.new
+        allow(Model).to receive(:find).with("1") { model }
+
+        allow(controller).to receive(:update_params).and_return(:name => 'success')
+        resource = CanCan::ControllerResource.new(controller)
+        resource.load_resource
+        expect(controller.instance_variable_get(:@model).name).to eq('success')
+      end
     end
   end
 
