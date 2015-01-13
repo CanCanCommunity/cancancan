@@ -21,13 +21,17 @@ module CanCan
       # Rails 4.2 deprecates `sanitize_sql_hash_for_conditions`
       def sanitize_sql(conditions)
         if ActiveRecord::VERSION::MINOR >= 2 && Hash === conditions
-          relation = @model_class.unscoped.where(conditions)
-          predicates = relation.where_values
-          bind_values = relation.bind_values
-          query = Arel::Nodes::And.new(predicates).to_sql
-          conditions = [query, *bind_values.map { |col, val| val }]
+          table = Arel::Table.new(@model_class.send(:table_name))
+
+          conditions = ActiveRecord::PredicateBuilder.resolve_column_aliases @model_class, conditions
+          conditions = @model_class.send(:expand_hash_conditions_for_aggregates, conditions)
+
+          ActiveRecord::PredicateBuilder.build_from_hash(@model_class, conditions, table).map { |b|
+            @model_class.send(:connection).visitor.compile b
+          }.join(' AND ')
+        else
+          @model_class.send(:sanitize_sql, conditions)
         end
-        @model_class.send(:sanitize_sql, conditions)
       end
     end
   end
