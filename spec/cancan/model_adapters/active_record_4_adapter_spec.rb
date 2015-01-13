@@ -69,7 +69,7 @@ if defined? CanCan::ModelAdapters::ActiveRecord4Adapter
           (@ability = double).extend(CanCan::Ability)
         end
 
-        it "allows complex conditions in SQL and merge with hash conditions" do
+        it "allows overlapping conditions in SQL and merge with hash conditions" do
           @ability.can :read, Parent, :children => {:parent_id => 1}
           @ability.can :read, Parent, :children => {:parent_id => 1}
 
