@@ -1,6 +1,11 @@
 Develop
 
 
+1.10.1 (January 13th, 2015)
+
+* Fix cancancan#168 - A bug with ActiveRecord 4.2 support causing ProtocolViolation due to named parameters not being passed in.
+
+
 1.10.0 (January 7th, 2015)
 
 * Fix i18n issue for Ruby < 1.9.3 (bryanrite)
