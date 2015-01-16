@@ -46,17 +46,12 @@ module CanCan
       @options.has_key?(:parent) ? @options[:parent] : @name && @name != name_from_controller.to_sym
     end
 
-    def skip?(behavior) # This could probably use some refactoring
-      options = @controller.class.cancan_skipper[behavior][@name]
-      if options.nil?
-        false
-      elsif options == {}
-        true
-      elsif options[:except] && ![options[:except]].flatten.include?(@params[:action].to_sym)
-        true
-      elsif [options[:only]].flatten.include?(@params[:action].to_sym)
-        true
-      end
+    def skip?(behavior)
+      return false unless options = @controller.class.cancan_skipper[behavior][@name]
+
+      options == {} ||
+      options[:except] && !action_exists_in?(options[:except]) ||
+      action_exists_in?(options[:only])
     end
 
     protected
@@ -289,6 +284,10 @@ module CanCan
     end
 
     private
+
+    def action_exists_in?(options)
+      Array(options).include?(@params[:action].to_sym)
+    end
 
     def extract_key(value)
        value.to_s.underscore.gsub('/', '_')
