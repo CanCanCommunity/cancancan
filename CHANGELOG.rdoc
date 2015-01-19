@@ -1,5 +1,8 @@
 Develop
 
+1.9.3 (November 25th, 2014)
+
+* Fix cancancan#125 - Fix an issue where model is named Action. (yoongkang)
 
 1.10.1 (January 13th, 2015)
 

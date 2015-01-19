@@ -235,6 +235,8 @@ module CanCan
         @params[extract_key(@options[:instance_name])]
       elsif @options[:class] && @params.has_key?(extract_key(@options[:class]))
         @params[extract_key(@options[:class])]
+      elsif name == "action"
+        nil
       else
         @params[extract_key(namespaced_name)]
       end
