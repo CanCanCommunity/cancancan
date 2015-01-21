@@ -28,7 +28,7 @@ module CanCan
         end
       end
 
-      def database_records
+      def database_records(eager_load = true)
         if @rules.size == 0
           @model_class.where('1=0')
         else

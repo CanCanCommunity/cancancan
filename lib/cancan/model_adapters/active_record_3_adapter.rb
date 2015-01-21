@@ -39,8 +39,12 @@ module CanCan
 
       private
 
-      def build_relation(*where_conditions)
-        @model_class.where(*where_conditions).includes(joins)
+      def build_relation(eager_load = true, *where_conditions)
+        if eager_load
+          @model_class.where(*where_conditions).includes(joins)
+        else
+          @model_class.where(*where_conditions).joins(joins)
+        end
       end
     end
   end
