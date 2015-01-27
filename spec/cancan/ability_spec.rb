@@ -376,6 +376,7 @@ describe CanCan::Ability do
       expect(e.message).to eq("Access denied!")
       expect(e.action).to eq(:read)
       expect(e.subject).to eq(:foo)
+      expect(e.extra_args.first).to eq(1)
     else
       fail "Expected CanCan::AccessDenied exception to be raised"
     end

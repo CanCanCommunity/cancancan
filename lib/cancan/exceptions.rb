@@ -33,13 +33,14 @@ module CanCan
   # See ControllerAdditions#authorized! for more information on rescuing from this exception
   # and customizing the message using I18n.
   class AccessDenied < Error
-    attr_reader :action, :subject
+    attr_reader :action, :subject, :extra_args
     attr_writer :default_message
 
-    def initialize(message = nil, action = nil, subject = nil)
+    def initialize(message = nil, action = nil, subject = nil, extra_args = nil)
       @message = message
       @action = action
       @subject = subject
+      @extra_args = extra_args
       @default_message = I18n.t(:"unauthorized.default", :default => "You are not authorized to access this page.")
     end
 
