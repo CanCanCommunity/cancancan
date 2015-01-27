@@ -17,6 +17,22 @@ module CanCan
         relation = relation.includes(joins).references(joins) if joins.present?
         relation
       end
+
+      # Rails 4.2 deprecates `sanitize_sql_hash_for_conditions`
+      def sanitize_sql(conditions)
+        if ActiveRecord::VERSION::MINOR >= 2 && Hash === conditions
+          table = Arel::Table.new(@model_class.send(:table_name))
+
+          conditions = ActiveRecord::PredicateBuilder.resolve_column_aliases @model_class, conditions
+          conditions = @model_class.send(:expand_hash_conditions_for_aggregates, conditions)
+
+          ActiveRecord::PredicateBuilder.build_from_hash(@model_class, conditions, table).map { |b|
+            @model_class.send(:connection).visitor.compile b
+          }.join(' AND ')
+        else
+          @model_class.send(:sanitize_sql, conditions)
+        end
+      end
     end
   end
 end
