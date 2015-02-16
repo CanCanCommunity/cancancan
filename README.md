@@ -100,9 +100,9 @@ When using `strong_parameters` or Rails 4+, you have to sanitize inputs before s
 
 By default, CanCan will try to sanitize the input on `:create` and `:update` routes by seeing if your controller will respond to the following methods (in order):
 
-* `create_params` or `update_params` (depending on the action you are performing)
-* `<model_name>_params` such as `article_params` (this is the default convention in rails for naming your param method)
-* `resource_params` (a generically named method you could specify in each controller)
+1. `create_params` or `update_params` (depending on the action you are performing)
+2. `<model_name>_params` such as `article_params` (this is the default convention in rails for naming your param method)
+3. `resource_params` (a generically named method you could specify in each controller)
 
 Additionally, `load_and_authorize_resource` can now take a `param_method` option to specify a custom method in the controller to run to sanitize input.
 
