@@ -72,7 +72,7 @@ describe CanCan::ControllerResource do
         class Model < ::Model; end
       end
 
-      params.merge!(:controller => "MyEngine::ModelsController", :my_engine_model => {:name => "foobar"})
+      params.merge!(:controller => "my_engine/models", :my_engine_model => {:name => "foobar"})
       resource = CanCan::ControllerResource.new(controller)
       resource.load_resource
       expect(controller.instance_variable_get(:@model).name).to eq("foobar")
@@ -97,7 +97,7 @@ describe CanCan::ControllerResource do
     end
 
     it "builds a new resource for namespaced controller and namespaced model with hash if params[:id] is not specified" do
-      params.merge!(:controller => "Admin::SubModelsController", 'sub_model' => {:name => "foobar"})
+      params.merge!(:controller => "admin/sub_models", 'sub_model' => {:name => "foobar"})
       resource = CanCan::ControllerResource.new(controller, :class => Model)
       resource.load_resource
       expect(controller.instance_variable_get(:@sub_model).name).to eq("foobar")
