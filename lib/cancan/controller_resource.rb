@@ -254,7 +254,7 @@ module CanCan
     end
 
     def namespace
-      @params[:controller].split(/::|\//)[0..-2]
+      @params[:controller].split('/')[0..-2]
     end
 
     def namespaced_name
@@ -264,7 +264,7 @@ module CanCan
     end
 
     def name_from_controller
-      @params[:controller].sub("Controller", "").underscore.split('/').last.singularize
+      @params[:controller].split('/').last.singularize
     end
 
     def instance_name
