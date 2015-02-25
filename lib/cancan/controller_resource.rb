@@ -60,7 +60,7 @@ module CanCan
       if !parent? && new_actions.include?(@params[:action].to_sym)
         build_resource
       elsif id_param || @options[:singleton]
-        find_resource
+        set_resource_params(find_resource)
       end
     end
 
@@ -111,6 +111,13 @@ module CanCan
           adapter.find(resource_base, id_param)
         end
       end
+    end
+
+    def set_resource_params(resource)
+      Hash(resource_params).each do |attr, value|
+        resource.send("#{attr}=", value)
+      end
+      resource
     end
 
     def adapter
