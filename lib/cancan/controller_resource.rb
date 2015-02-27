@@ -114,7 +114,7 @@ module CanCan
     end
 
     def set_resource_params(resource)
-      Hash(resource_params).each do |attr, value|
+      (resource_params || {}).each do |attr, value|
         resource.send("#{attr}=", value)
       end
       resource
