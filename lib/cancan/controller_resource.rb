@@ -107,7 +107,7 @@ module CanCan
 
     def parent_tuple
       [*@options[:through]].each do |name|
-        parent = fetch_parent(name)
+        parent = name && fetch_parent(name)
         return [name, parent] if parent
       end
       [nil, nil]
