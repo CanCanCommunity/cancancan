@@ -146,17 +146,17 @@ describe CanCan::ControllerResource do
         allow(controller).to receive(:create_params).and_return(:create => 'params')
         allow(controller).to receive(:custom_params).and_return(:custom => 'params')
         resource = CanCan::ControllerResource.new(controller, {:param_method => :custom_params})
-        expect(resource.send("resource_params")).to eq(:custom => 'params')
+        expect(resource.loader.send("resource_params")).to eq(:custom => 'params')
       end
 
       it "accepts the specified string for sanitizing input" do
         resource = CanCan::ControllerResource.new(controller, {:param_method => "{:custom => 'params'}"})
-        expect(resource.send("resource_params")).to eq(:custom => 'params')
+        expect(resource.loader.send("resource_params")).to eq(:custom => 'params')
       end
 
       it "accepts the specified proc for sanitizing input" do
         resource = CanCan::ControllerResource.new(controller, {:param_method => Proc.new { |c| {:custom => 'params'}}})
-        expect(resource.send("resource_params")).to eq(:custom => 'params')
+        expect(resource.loader.send("resource_params")).to eq(:custom => 'params')
       end
 
       it "prefers to use the create_params method for santitizing input" do
@@ -165,7 +165,7 @@ describe CanCan::ControllerResource do
         allow(controller).to receive(:create_params).and_return(:create => 'params')
         allow(controller).to receive(:custom_params).and_return(:custom => 'params')
         resource = CanCan::ControllerResource.new(controller)
-        expect(resource.send("resource_params")).to eq(:create => 'params')
+        expect(resource.loader.send("resource_params")).to eq(:create => 'params')
       end
 
       it "prefers to use the <model_name>_params method for santitizing input if create is not found" do
@@ -173,14 +173,14 @@ describe CanCan::ControllerResource do
         allow(controller).to receive(:model_params).and_return(:model => 'params')
         allow(controller).to receive(:custom_params).and_return(:custom => 'params')
         resource = CanCan::ControllerResource.new(controller)
-        expect(resource.send("resource_params")).to eq(:model => 'params')
+        expect(resource.loader.send("resource_params")).to eq(:model => 'params')
       end
 
       it "prefers to use the resource_params method for santitizing input if create or model is not found" do
         allow(controller).to receive(:resource_params).and_return(:resource => 'params')
         allow(controller).to receive(:custom_params).and_return(:custom => 'params')
         resource = CanCan::ControllerResource.new(controller)
-        expect(resource.send("resource_params")).to eq(:resource => 'params')
+        expect(resource.loader.send("resource_params")).to eq(:resource => 'params')
       end
     end
   end
@@ -487,13 +487,13 @@ describe CanCan::ControllerResource do
     it "always converts id param to string" do
       params.merge!(:the_model => { :malicious => "I am" })
       resource = CanCan::ControllerResource.new(controller, :id_param => :the_model)
-      expect(resource.send(:id_param).class).to eq(String)
+      expect(resource.loader.send(:id_param).class).to eq(String)
     end
 
     it "should id param return nil if param is nil" do
       params.merge!(:the_model => nil)
       resource = CanCan::ControllerResource.new(controller, :id_param => :the_model)
-      expect(resource.send(:id_param)).to be_nil
+      expect(resource.loader.send(:id_param)).to be_nil
     end
 
     it "loads resource using custom find_by attribute" do
