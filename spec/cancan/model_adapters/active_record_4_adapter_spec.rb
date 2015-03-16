@@ -41,6 +41,31 @@ if defined? CanCan::ModelAdapters::ActiveRecord4Adapter
           expect(Parent.accessible_by(@ability).order(:created_at => :asc).includes(:children).first.children).to eq [child2, child1]
         end
       end
+
+      context 'conditions' do
+        before :each do
+          ActiveRecord::Schema.define do
+            create_table(:records) do |t|
+              t.timestamps :null => false
+              t.string :name
+            end
+          end
+
+          class Record < ActiveRecord::Base
+          end
+        end
+
+        it 'uses :not for negative conditions' do
+          @ability.can :read, Record, :not => {:name => 'unreadable'}
+
+          unreadable = Record.create! :name => 'unreadable'
+          readable = Record.create! :name => 'readable'
+
+          accessible = Record.accessible_by(@ability)
+          expect(accessible).to include readable
+          expect(accessible).not_to include unreadable
+        end
+      end
     end
 
     if Gem::Specification.find_all_by_name('pg').any?
