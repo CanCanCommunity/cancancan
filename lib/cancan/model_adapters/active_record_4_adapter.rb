@@ -2,8 +2,23 @@ module CanCan
   module ModelAdapters
     class ActiveRecord4Adapter < AbstractAdapter
       include ActiveRecordAdapter
-      def self.for_class?(model_class)
-        model_class <= ActiveRecord::Base
+
+      class << self
+        def for_class?(model_class)
+          model_class <= ActiveRecord::Base
+        end
+
+        def override_condition_matching?(subject, name, value)
+          name == :not || super
+        end
+
+        def matches_condition?(subject, name, value)
+          if name == :not && value.kind_of?(Hash)
+            value.none? {|attribute, test| subject.send(attribute) == test }
+          else
+            super
+          end
+        end
       end
 
       private
