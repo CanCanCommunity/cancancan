@@ -1,5 +1,6 @@
 Develop
 
+* Fix cancancan#102 - Support for ActiveRecord 4.x enums (markpmitchell)
 
 1.10.1 (January 13th, 2015)
 
