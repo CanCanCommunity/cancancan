@@ -18,6 +18,21 @@ module CanCan
         relation
       end
 
+      def self.override_condition_matching?(subject, name, value)
+        subject.class.defined_enums.include? name.to_s
+      end
+
+      def self.matches_condition?(subject, name, value)
+        # Get the mapping from enum strings to values.
+        enum = subject.class.send(name.to_s.pluralize)
+        # Get the value of the attribute as an integer.
+        attribute = enum[subject.send(name)]
+        # Check to see if the value matches the condition.
+        value.is_a?(Enumerable) ? 
+          (value.include? attribute) :
+          attribute == value
+      end
+
       # Rails 4.2 deprecates `sanitize_sql_hash_for_conditions`
       def sanitize_sql(conditions)
         if ActiveRecord::VERSION::MINOR >= 2 && Hash === conditions

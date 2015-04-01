@@ -37,6 +37,43 @@ if defined? CanCan::ModelAdapters::ActiveRecord4Adapter
 
         expect(Parent.accessible_by(@ability).order(:created_at => :asc).includes(:children).first.children).to eq [child2, child1]
       end
+
+      it "allows filters on enums" do
+        ActiveRecord::Schema.define do
+          create_table(:shapes) do |t|
+            t.integer :color, default: 0, null: false
+          end
+        end
+        
+        class Shape < ActiveRecord::Base
+          enum color: [:red, :green, :blue]
+        end
+
+        red = Shape.create!(color: :red)
+        green = Shape.create!(color: :green)
+        blue = Shape.create!(color: :blue)
+
+        # A condition with a single value.
+        @ability.can :read, Shape, color: Shape.colors[:green]
+
+        expect(@ability.cannot? :read, red).to be true
+        expect(@ability.can? :read, green).to be true
+        expect(@ability.cannot? :read, blue).to be true
+
+        accessible = Shape.accessible_by(@ability)
+        expect(accessible).to contain_exactly(green)
+
+        # A condition with multiple values.
+        @ability.can :update, Shape, color: [Shape.colors[:red],
+                                             Shape.colors[:blue]]
+
+        expect(@ability.can? :update, red).to be true
+        expect(@ability.cannot? :update, green).to be true
+        expect(@ability.can? :update, blue).to be true
+
+        accessible = Shape.accessible_by(@ability, :update)
+        expect(accessible).to contain_exactly(red, blue)
+      end
     end
 
     if Gem::Specification.find_all_by_name('pg').any?
