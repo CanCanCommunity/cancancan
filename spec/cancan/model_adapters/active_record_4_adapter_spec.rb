@@ -42,20 +42,20 @@ if defined? CanCan::ModelAdapters::ActiveRecord4Adapter
         it "allows filters on enums" do
           ActiveRecord::Schema.define do
             create_table(:shapes) do |t|
-              t.integer :color, default: 0, null: false
+              t.integer :color, :default => 0, :null => false
             end
           end
 
           class Shape < ActiveRecord::Base
-            enum color: [:red, :green, :blue]
+            enum :color => [:red, :green, :blue]
           end
 
-          red = Shape.create!(color: :red)
-          green = Shape.create!(color: :green)
-          blue = Shape.create!(color: :blue)
+          red = Shape.create!(:color => :red)
+          green = Shape.create!(:color => :green)
+          blue = Shape.create!(:color => :blue)
 
           # A condition with a single value.
-          @ability.can :read, Shape, color: Shape.colors[:green]
+          @ability.can :read, Shape, :color => Shape.colors[:green]
 
           expect(@ability.cannot? :read, red).to be true
           expect(@ability.can? :read, green).to be true
@@ -65,8 +65,8 @@ if defined? CanCan::ModelAdapters::ActiveRecord4Adapter
           expect(accessible).to contain_exactly(green)
 
           # A condition with multiple values.
-          @ability.can :update, Shape, color: [Shape.colors[:red],
-                                               Shape.colors[:blue]]
+          @ability.can :update, Shape, :color => [Shape.colors[:red],
+                                                  Shape.colors[:blue]]
 
           expect(@ability.can? :update, red).to be true
           expect(@ability.cannot? :update, green).to be true
