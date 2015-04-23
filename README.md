@@ -5,7 +5,7 @@
 [![Code Climate Badge](https://codeclimate.com/github/CanCanCommunity/cancancan.png)](https://codeclimate.com/github/CanCanCommunity/cancancan)
 [![Inch CI](http://inch-ci.org/github/CanCanCommunity/cancancan.png)](http://inch-ci.org/github/CanCanCommunity/cancancan)
 
-[Wiki](https://github.com/CanCanCommunity/cancancan/wiki) | [RDocs](http://rdoc.info/projects/CanCanCommunity/cancan) | [Screencast](http://railscasts.com/episodes/192-authorization-with-cancan)
+[Wiki](https://github.com/CanCanCommunity/cancancan/wiki) | [RDocs](http://rdoc.info/projects/CanCanCommunity/cancancan) | [Screencast](http://railscasts.com/episodes/192-authorization-with-cancan)
 
 CanCan is an authorization library for Ruby on Rails which restricts what resources a given user is allowed to access. All permissions are defined in a single location (the `Ability` class) and not duplicated across controllers, views, and database queries.
 
