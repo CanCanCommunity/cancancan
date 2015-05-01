@@ -14,8 +14,8 @@ module CanCan
       raise Error, "You are not able to supply a block with a hash of conditions in #{action} #{subject} ability. Use either one." if conditions.kind_of?(Hash) && !block.nil?
       @match_all = action.nil? && subject.nil?
       @base_behavior = base_behavior
-      @actions = [action].flatten
-      @subjects = [subject].flatten
+      @actions = Array(action)
+      @subjects = Array(subject)
       @conditions = conditions || {}
       @block = block
     end
