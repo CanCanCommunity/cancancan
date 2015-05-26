@@ -252,6 +252,20 @@ module CanCan
       self
     end
 
+    def list_can(filter_action = nil)
+      can_do_list = list_abilities[:can]
+      filter_action ? can_do_list[filter_action] : can_do_list
+    end
+
+    def list_cannot(filter_action = nil)
+      cannot_do_list = list_abilities[:cannot]
+      filter_action ? cannot_do_list[filter_action] : cannot_do_list
+    end
+
+    def list_all
+      list_abilities
+    end
+
     private
 
     def unauthorized_message_keys(action, subject)
@@ -340,5 +354,25 @@ module CanCan
         :update => [:edit],
       }
     end
+
+    def list_abilities
+      abilities_list = {can: {}, cannot: {}}
+
+      rules.each do |rule|
+        subjects = rule.subjects
+        expand_actions(rule.actions).each do |action|
+          if(rule.base_behavior)
+            abilities_list[:can][action] ||= []
+            abilities_list[:can][action] += subjects.map {|sub| sub.respond_to?(:name) ? sub.name : sub}
+          else
+            abilities_list[:cannot][action] ||= []
+            abilities_list[:cannot][action] += subjects.map {|sub| sub.respond_to?(:name) ? sub.name : sub}
+          end
+        end
+      end
+
+      abilities_list
+    end
+
   end
 end
