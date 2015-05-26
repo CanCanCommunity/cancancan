@@ -11,7 +11,7 @@ CanCan is an authorization library for Ruby on Rails which restricts what resour
 
 # New Maintainer Needed
 
-Cancancan is looking for someone new to maintain the project. If you are interested, please join the converstaion at #209
+Cancancan is looking for someone new to maintain the project. If you are interested, please join the converstaion at https://github.com/CanCanCommunity/cancancan/issues/209
 
 ## Mission
 
