@@ -351,14 +351,14 @@ describe CanCan::Ability do
     @ability.cannot :read, Hash
     @ability.cannot :preview, Array
 
-    expected_list_all = {can: {manage: [:all],
-                               learn: ["Range"]
-                              },
-                         cannot: {read: ["String", "Hash"],
-                                  index: ["String", "Hash"],
-                                  show: ["String", "Hash"],
-                                  preview: ["Array"]
-                                 }
+    expected_list_all = {:can => {:manage => [:all],
+                                  :learn => ["Range"]
+                                 },
+                         :cannot => {:read => ["String", "Hash"],
+                                     :index => ["String", "Hash"],
+                                     :show => ["String", "Hash"],
+                                     :preview => ["Array"]
+                                    }
                         }
 
     expect(@ability.list_all).to eq(expected_list_all)
@@ -371,8 +371,8 @@ describe CanCan::Ability do
     @ability.cannot :read, Hash
     @ability.cannot :preview, Array
 
-    expected_list_can = {manage: [:all],
-                         learn: ["Range"]
+    expected_list_can = {:manage => [:all],
+                         :learn => ["Range"]
                         }
     expect(@ability.list_can).to eq(expected_list_can)
 
@@ -380,17 +380,17 @@ describe CanCan::Ability do
     expect(@ability.list_can(:manage)).to eq(expected_list_can_with_manage_filter)
   end
 
-    it "lists 'cannot' abilities of a user with and without filter" do
+  it "lists 'cannot' abilities of a user with and without filter" do
     @ability.can :manage, :all
     @ability.can :learn, Range
     @ability.cannot :read, String
     @ability.cannot :read, Hash
     @ability.cannot :preview, Array
 
-    expected_list_cannot = {read: ["String", "Hash"],
-                            index: ["String", "Hash"],
-                            show: ["String", "Hash"],
-                            preview: ["Array"]
+    expected_list_cannot = {:read => ["String", "Hash"],
+                            :index => ["String", "Hash"],
+                            :show => ["String", "Hash"],
+                            :preview => ["Array"]
                            }
     expect(@ability.list_cannot).to eq(expected_list_cannot)
 

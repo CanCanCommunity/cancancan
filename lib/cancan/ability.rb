@@ -356,7 +356,7 @@ module CanCan
     end
 
     def list_abilities
-      abilities_list = {can: {}, cannot: {}}
+      abilities_list = {:can => {}, :cannot => {}}
 
       rules.each do |rule|
         subjects = rule.subjects
