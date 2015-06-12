@@ -11,7 +11,7 @@ CanCan is an authorization library for Ruby on Rails which restricts what resour
 
 # New Maintainer Needed
 
-Cancancan is looking for someone new to maintain the project. If you are interested, please join the converstaion at https://github.com/CanCanCommunity/cancancan/issues/209
+Cancancan is looking for someone new to maintain the project. If you are interested, please join the conversation at https://github.com/CanCanCommunity/cancancan/issues/209
 
 ## Mission
 
@@ -166,7 +166,7 @@ class ApplicationController < ActionController::Base
 end
 ```
 
-This will raise an exception if authorization is not performed in an action. If you want to skip this add `skip_authorization_check` to a controller subclass. See [Ensure Authorization](https://github.com/CanCanCommunity/cancancan/wiki/Ensure-Authorization) for more information.
+This will raise an exception if authorization is not performed in an action. If you want to skip this, add `skip_authorization_check` to a controller subclass. See [Ensure Authorization](https://github.com/CanCanCommunity/cancancan/wiki/Ensure-Authorization) for more information.
 
 
 ## Wiki Docs
@@ -186,7 +186,7 @@ If you have any issues with CanCan which you cannot find the solution to in the 
 
 ## Development
 
-Cancancan uses [appraisals](https://github.com/thoughtbot/appraisal) to test the code base against multiple versions of rails, as well as the different model adapters.
+Cancancan uses [appraisals](https://github.com/thoughtbot/appraisal) to test the code base against multiple versions of Rails, as well as the different model adapters.
 
 When first developing, you may need to run `bundle install` and then `appraisal install`, to install the different sets.
 
