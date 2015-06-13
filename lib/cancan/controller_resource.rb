@@ -118,7 +118,11 @@ module CanCan
     end
 
     def authorization_action
-      parent? ? :show : @params[:action].to_sym
+      parent? ? parent_authorization_action : @params[:action].to_sym
+    end
+
+    def parent_authorization_action
+      @options[:parent_action] || :show
     end
 
     def id_param
