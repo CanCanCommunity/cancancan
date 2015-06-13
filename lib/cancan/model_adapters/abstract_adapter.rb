@@ -47,7 +47,7 @@ module CanCan
         @rules = rules
       end
 
-      def database_records
+      def database_records(eager_load)
         # This should be overridden in a subclass to return records which match @rules
         raise NotImplemented, "This model adapter does not support fetching records from the database."
       end

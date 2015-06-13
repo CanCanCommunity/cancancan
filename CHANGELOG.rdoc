@@ -1,5 +1,7 @@
 Develop
 
+* Fix cancancan#60 - Allow disabling eager loading via ActiveRecord#includes
+
 
 1.10.1 (January 13th, 2015)
 

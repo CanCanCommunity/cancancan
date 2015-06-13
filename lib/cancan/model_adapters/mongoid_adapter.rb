@@ -22,7 +22,7 @@ module CanCan
         subject.matches?( subject.class.where(conditions).selector )
       end
 
-      def database_records
+      def database_records(eager_load = true)
         if @rules.size == 0
           @model_class.where(:_id => {'$exists' => false, '$type' => 7}) # return no records in Mongoid
         elsif @rules.size == 1 && @rules[0].conditions.is_a?(Mongoid::Criteria)

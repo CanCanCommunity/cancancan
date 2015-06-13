@@ -19,8 +19,14 @@ module CanCan
       #   @articles = Article.accessible_by(current_ability, :update)
       #
       # Here only the articles which the user can update are returned.
-      def accessible_by(ability, action = :index)
-        ability.model_adapter(self, action).database_records
+      #
+      # To prevent N+1 query problems, relations included in conditions are
+      # included in the query by default. eager_load allows disabling eager
+      # loading when needed. When eager_load is specified, only the model
+      # attributes will be loaded. Currently, this only has an effect for
+      # ActiveRecord.
+      def accessible_by(ability, action = :index, eager_load = true)
+        ability.model_adapter(self, action).database_records(eager_load)
       end
     end
 

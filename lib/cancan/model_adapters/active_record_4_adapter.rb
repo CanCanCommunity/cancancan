@@ -12,9 +12,15 @@ module CanCan
       # look inside the where clause to decide to outer join tables
       # you're using in the where. Instead, `references()` is required
       # in addition to `includes()` to force the outer join.
-      def build_relation(*where_conditions)
+      def build_relation(eager_load = true, *where_conditions)
         relation = @model_class.where(*where_conditions)
-        relation = relation.includes(joins).references(joins) if joins.present?
+        if joins.present?
+          if eager_load
+            relation = relation.includes(joins).references(joins)
+          else
+            relation = relation.joins(joins)
+          end
+        end
         relation
       end
 

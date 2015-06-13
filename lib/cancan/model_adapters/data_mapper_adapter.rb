@@ -18,7 +18,7 @@ module CanCan
         !!collection.first(conditions)
       end
 
-      def database_records
+      def database_records(eager_load = true)
         scope = @model_class.all(:conditions => ["0 = 1"])
         cans, cannots = @rules.partition { |r| r.base_behavior }
         return scope if cans.empty?

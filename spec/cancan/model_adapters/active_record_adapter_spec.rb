@@ -179,6 +179,27 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       expect(Comment.accessible_by(@ability)).to eq([comment1])
     end
 
+    it "continues to load comments with eager loading disabled" do
+      @ability.can :read, Comment, :article => { :category => { :visible => true } }
+      comment1 = Comment.create!(:article => Article.create!(:category => Category.create!(:visible => true)))
+      comment2 = Comment.create!(:article => Article.create!(:category => Category.create!(:visible => false)))
+      expect(Comment.accessible_by(@ability, :index, false)).to eq([comment1])
+    end
+
+    it "eager loads associated records by default" do
+      @ability.can :read, Comment, :article => { :category => { :visible => true } }
+      comment1 = Comment.create!(:article => Article.create!(:category => Category.create!(:visible => true)))
+      # loaded? and other methods I could find didn't return the correct values. Not sure why. This way works.
+      expect(Comment.accessible_by(@ability).first.instance_variable_get("@article")).not_to be_nil
+    end
+
+    it "allows disabling eager loading" do
+      @ability.can :read, Comment, :article => { :category => { :visible => true } }
+      comment1 = Comment.create!(:article => Article.create!(:category => Category.create!(:visible => true)))
+      # loaded? and other methods I could find didn't return the correct values. Not sure why. This way works.
+      expect(Comment.accessible_by(@ability, :index, false).first.instance_variable_get("@article")).to be_nil
+    end
+
     it "allows conditions in SQL and merge with hash conditions" do
       @ability.can :read, Article, :published => true
       @ability.can :read, Article, ["secret=?", true]
