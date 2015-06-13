@@ -72,7 +72,7 @@ describe CanCan::ControllerResource do
         class Model < ::Model; end
       end
 
-      params.merge!(:controller => "MyEngine::ModelsController", :my_engine_model => {:name => "foobar"})
+      params.merge!(:controller => "my_engine/models", :my_engine_model => {:name => "foobar"})
       resource = CanCan::ControllerResource.new(controller)
       resource.load_resource
       expect(controller.instance_variable_get(:@model).name).to eq("foobar")
@@ -97,7 +97,7 @@ describe CanCan::ControllerResource do
     end
 
     it "builds a new resource for namespaced controller and namespaced model with hash if params[:id] is not specified" do
-      params.merge!(:controller => "Admin::SubModelsController", 'sub_model' => {:name => "foobar"})
+      params.merge!(:controller => "admin/sub_models", 'sub_model' => {:name => "foobar"})
       resource = CanCan::ControllerResource.new(controller, :class => Model)
       resource.load_resource
       expect(controller.instance_variable_get(:@sub_model).name).to eq("foobar")
@@ -302,30 +302,6 @@ describe CanCan::ControllerResource do
       allow(Model).to receive(:find).with("123") { model }
       params.merge!(:controller => "admin/models")
 
-      resource = CanCan::ControllerResource.new(controller)
-      resource.load_resource
-      expect(controller.instance_variable_get(:@model)).to eq(model)
-    end
-
-    it "attempts to load a resource with the same namespace as the controller when using :: for namespace" do
-      module MyEngine
-        class Model < ::Model; end
-      end
-
-      model = MyEngine::Model.new
-      allow(MyEngine::Model).to receive(:find).with("123") { model }
-
-      params.merge!(:controller => "MyEngine::ModelsController")
-      resource = CanCan::ControllerResource.new(controller)
-      resource.load_resource
-      expect(controller.instance_variable_get(:@model)).to eq(model)
-    end
-
-    it "loads resource for namespaced controller when using '::' for namespace" do
-      model = Model.new
-      allow(Model).to receive(:find).with("123") { model }
-
-      params.merge!(:controller => "Admin::ModelsController")
       resource = CanCan::ControllerResource.new(controller)
       resource.load_resource
       expect(controller.instance_variable_get(:@model)).to eq(model)
