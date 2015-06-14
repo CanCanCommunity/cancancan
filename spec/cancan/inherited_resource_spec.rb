@@ -15,6 +15,12 @@ describe CanCan::InheritedResource do
           send("#{attribute}=", value)
         end
       end
+
+      def attributes=(attributes={})
+        attributes.each do |attribute, value|
+          send("#{attribute}=", value)
+        end
+      end
     end
 
     allow(controller).to receive(:params) { params }
