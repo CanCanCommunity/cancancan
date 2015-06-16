@@ -9,10 +9,6 @@
 
 CanCan is an authorization library for Ruby on Rails which restricts what resources a given user is allowed to access. All permissions are defined in a single location (the `Ability` class) and not duplicated across controllers, views, and database queries.
 
-# New Maintainer Needed
-
-Cancancan is looking for someone new to maintain the project. If you are interested, please join the conversation at https://github.com/CanCanCommunity/cancancan/issues/209
-
 ## Mission
 
 This repo is a continuation of the dead [CanCan](https://github.com/ryanb/cancan) project. Our mission is to keep CanCan alive and moving forward, with maintenance fixes and new features. Pull Requests are welcome!
