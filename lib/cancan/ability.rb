@@ -61,16 +61,10 @@ module CanCan
     #
     # Also see the RSpec Matchers to aid in testing.
     def can?(action, subject, *extra_args)
-      subject = extract_subjects(subject)
-
-      match = subject.map do |subject|
-        relevant_rules_for_match(action, subject).detect do |rule|
-          rule.matches_conditions?(action, subject, extra_args)
-        end
-      end.compact.first
-
+      match = match(action, subject, *extra_args)
       match ? match.base_behavior : false
     end
+
     # Convenience method which works the same as "can?" but returns the opposite value.
     #
     #   cannot? :destroy, @project
@@ -132,8 +126,8 @@ module CanCan
     #     # check the database and return true/false
     #   end
     #
-    def can(action = nil, subject = nil, conditions = nil, &block)
-      rules << Rule.new(true, action, subject, conditions, block)
+    def can(action = nil, subject = nil, conditions = nil, options = nil, &block)
+      rules << Rule.new(true, action, subject, conditions, options, block)
     end
 
     # Defines an ability which cannot be done. Accepts the same arguments as "can".
@@ -148,8 +142,8 @@ module CanCan
     #     product.invisible?
     #   end
     #
-    def cannot(action = nil, subject = nil, conditions = nil, &block)
-      rules << Rule.new(false, action, subject, conditions, block)
+    def cannot(action = nil, subject = nil, conditions = nil, options = nil, &block)
+      rules << Rule.new(false, action, subject, conditions, options, block)
     end
 
     # Alias one or more actions into another one.
@@ -214,8 +208,11 @@ module CanCan
       if args.last.kind_of?(Hash) && args.last.has_key?(:message)
         message = args.pop[:message]
       end
-      if cannot?(action, subject, *args)
-        message ||= unauthorized_message(action, subject)
+      message ||= unauthorized_message(action, subject)
+      match = match(action, subject, *args)
+      if match
+        raise AccessDenied.new(message, action, subject, match) unless match.base_behavior
+      else
         raise AccessDenied.new(message, action, subject)
       end
       subject
@@ -331,6 +328,16 @@ module CanCan
           raise Error, "The accessible_by call cannot be used with a block 'can' definition. The SQL cannot be determined for #{action.inspect} #{subject.inspect}"
         end
       end
+    end
+
+    def match(action, subject, *extra_args)
+      subject = extract_subjects(subject)
+
+      subject.map do |subject|
+        relevant_rules_for_match(action, subject).detect do |rule|
+          rule.matches_conditions?(action, subject, extra_args)
+        end
+      end.compact.first
     end
 
     def default_alias_actions
