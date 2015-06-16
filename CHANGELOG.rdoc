@@ -1,6 +1,6 @@
 Develop
 
-1.11.0
+1.11.0 (June 15th, 2015)
 
 * Complete cancancan#115 - Specify authorization action for parent resources. (phallguy)
 
