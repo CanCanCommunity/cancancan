@@ -24,14 +24,6 @@ In **Rails 3 and 4**, add this to your Gemfile and run the `bundle install` comm
 
     gem 'cancancan', '~> 1.10'
 
-In **Rails 2**, add this to your environment.rb file.
-
-    config.gem "cancancan"
-
-Alternatively, you can install it as a plugin.
-
-    rails plugin install git://github.com/CanCanCommunity/cancancan.git
-
 ## Getting Started
 
 CanCanCan expects a `current_user` method to exist in the controller. First, set up some authentication (such as [Authlogic](https://github.com/binarylogic/authlogic) or [Devise](https://github.com/plataformatec/devise)). See [Changing Defaults](https://github.com/CanCanCommunity/cancancan/wiki/changing-defaults) if you need different behavior.
