@@ -9,7 +9,6 @@
 
 CanCan is an authorization library for Ruby on Rails which restricts what resources a given user is allowed to access. All permissions are defined in a single location (the `Ability` class) and not duplicated across controllers, views, and database queries.
 
-
 ## Mission
 
 This repo is a continuation of the dead [CanCan](https://github.com/ryanb/cancan) project. Our mission is to keep CanCan alive and moving forward, with maintenance fixes and new features. Pull Requests are welcome!
@@ -24,14 +23,6 @@ Any help is greatly appreciated, feel free to submit pull-requests or open issue
 In **Rails 3 and 4**, add this to your Gemfile and run the `bundle install` command.
 
     gem 'cancancan', '~> 1.10'
-
-In **Rails 2**, add this to your environment.rb file.
-
-    config.gem "cancancan"
-
-Alternatively, you can install it as a plugin.
-
-    rails plugin install git://github.com/CanCanCommunity/cancancan.git
 
 ## Getting Started
 
@@ -163,7 +154,7 @@ class ApplicationController < ActionController::Base
 end
 ```
 
-This will raise an exception if authorization is not performed in an action. If you want to skip this add `skip_authorization_check` to a controller subclass. See [Ensure Authorization](https://github.com/CanCanCommunity/cancancan/wiki/Ensure-Authorization) for more information.
+This will raise an exception if authorization is not performed in an action. If you want to skip this, add `skip_authorization_check` to a controller subclass. See [Ensure Authorization](https://github.com/CanCanCommunity/cancancan/wiki/Ensure-Authorization) for more information.
 
 
 ## Wiki Docs
@@ -183,7 +174,7 @@ If you have any issues with CanCan which you cannot find the solution to in the 
 
 ## Development
 
-Cancancan uses [appraisals](https://github.com/thoughtbot/appraisal) to test the code base against multiple versions of rails, as well as the different model adapters.
+Cancancan uses [appraisals](https://github.com/thoughtbot/appraisal) to test the code base against multiple versions of Rails, as well as the different model adapters.
 
 When first developing, you may need to run `bundle install` and then `appraisal install`, to install the different sets.
 
