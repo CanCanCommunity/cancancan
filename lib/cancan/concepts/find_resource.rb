@@ -10,8 +10,8 @@ module CanCan
       end
 
       def find_resource
-        if options[:singleton] && parent_resource.respond_to?(name)
-          parent_resource.send(name)
+        if options[:singleton] && parent_resource.respond_to?(resource_name)
+          parent_resource.send(resource_name)
         else
           if options[:find_by]
             if resource_base.respond_to? find_by_field
@@ -34,7 +34,7 @@ module CanCan
       end
 
       def resource_base
-        @base ||= ResourceClass.new(@controller, @args).base
+        @base ||= ResourceClass.new(@controller, @name, @options).base
       end
 
       def find_by_field

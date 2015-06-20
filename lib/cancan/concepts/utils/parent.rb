@@ -7,7 +7,7 @@ module CanCan
           if options.has_key?(:parent)
             options[:parent]
           else
-            passed_name && passed_name != name_from_controller.to_sym
+            @name.present? && @name != name_from_controller.to_sym
           end
         end
 

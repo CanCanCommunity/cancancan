@@ -41,19 +41,19 @@ module CanCan
       end
 
       def resource_class
-        @resource_class ||= ResourceClass.new(@controller, @args).base
+        @resource_class ||= ResourceClass.new(@controller, @name, @options).base
       end
 
       def accessor
-        @accessor ||= Accessor.new(@controller, @args)
+        @accessor ||= Accessor.new(@controller, @name, @options)
       end
 
       def builder
-        @builder ||= BuildResource.new(@controller, @args)
+        @builder ||= BuildResource.new(@controller, @name, @options)
       end
 
       def finder
-        @finder ||= FindResource.new(@controller, @args)
+        @finder ||= FindResource.new(@controller, @name, @options)
       end
 
     end

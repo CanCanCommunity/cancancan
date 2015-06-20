@@ -13,7 +13,7 @@ module CanCan
       private
 
       def accessor
-        @accessor ||= Accessor.new(@controller, @args)
+        @accessor ||= Accessor.new(@controller, @name, @options)
       end
 
     end

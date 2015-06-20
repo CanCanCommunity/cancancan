@@ -64,7 +64,7 @@ module CanCan
       end
 
       def params_methods
-        methods = ["#{@controller.params[:action]}_params".to_sym, "#{name}_params".to_sym, :resource_params]
+        methods = ["#{@controller.params[:action]}_params".to_sym, "#{resource_name}_params".to_sym, :resource_params]
         methods.unshift(options[:param_method]) if options[:param_method].present?
         methods
       end
@@ -74,11 +74,11 @@ module CanCan
       end
 
       def resource_base
-        @resource_base ||= ResourceClass.new @controller, @args
+        @resource_base ||= ResourceClass.new @controller, @name, @options
       end
 
       def accessor
-        @accessor ||= Accessor.new @controller, @args
+        @accessor ||= Accessor.new @controller, @name, @options
       end
 
     end

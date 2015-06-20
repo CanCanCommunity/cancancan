@@ -28,7 +28,7 @@ module CanCan
       end
 
       def parent_through_class
-        parent_resource.send(options[:through_association] || name.to_s.pluralize)
+        parent_resource.send(options[:through_association] || resource_name.to_s.pluralize)
       end
 
     end

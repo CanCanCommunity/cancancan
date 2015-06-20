@@ -12,13 +12,13 @@ module CanCan
     end
 
     def initialize(controller, *args)
-      @controller         = controller
-      @build_resource     = Concepts::BuildResource.new(controller, args.dup)
-      @load_resource      = Concepts::LoadResource.new(controller, args.dup)
-      @authorize_resource = Concepts::AuthorizeResource.new(controller, args.dup)
-      @resource_class     = Concepts::ResourceClass.new(controller, args.dup)
-      @override_auth      = Concepts::OverrideAuthorization.new(controller, args.dup)
       options = args.extract_options!
+      name = args.first
+      @build_resource     = Concepts::BuildResource.new(controller, name, options)
+      @load_resource      = Concepts::LoadResource.new(controller, name, options)
+      @authorize_resource = Concepts::AuthorizeResource.new(controller, name, options)
+      @resource_class     = Concepts::ResourceClass.new(controller, name, options)
+      @override_auth      = Concepts::OverrideAuthorization.new(controller, name, options)
       raise CanCan::ImplementationRemoved, "The :nested option is no longer supported, instead use :through with separate load/authorize call." if options[:nested]
       raise CanCan::ImplementationRemoved, "The :name option is no longer supported, instead pass the name as the first argument." if options[:name]
       raise CanCan::ImplementationRemoved, "The :resource option has been renamed back to :class, use false if no class." if options[:resource]

@@ -11,7 +11,7 @@ module CanCan
           if options[:id_param]
             options[:id_param]
           else
-            parent? ? :"#{name}_id" : :id
+            parent? ? :"#{resource_name}_id" : :id
           end
         end
 

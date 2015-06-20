@@ -3,7 +3,7 @@ module CanCan
     class OverrideAuthorization < Base
 
       def skip?(behavior)
-        return false unless skip_options = @controller.class.cancan_skipper[behavior][passed_name]
+        return false unless skip_options = @controller.class.cancan_skipper[behavior][@name]
 
         skip_options == {} ||
         skip_options[:except] && !action_exists_in?(skip_options[:except]) ||

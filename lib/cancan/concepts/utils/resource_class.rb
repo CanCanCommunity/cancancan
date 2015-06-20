@@ -5,7 +5,7 @@ module CanCan
 
         def resource_class
           case options[:class]
-          when false  then name.to_sym
+          when false  then resource_name.to_sym
           when nil    then namespaced_name.to_s.camelize.constantize
           when String then options[:class].constantize
           else options[:class]
@@ -13,17 +13,17 @@ module CanCan
         end
 
         def name_with_namespace
-          [controller_namespace, name.camelize].flatten.map(&:camelize).join('::').singularize.constantize
+          [controller_namespace, resource_name.camelize].flatten.map(&:camelize).join('::').singularize.constantize
         rescue NameError
-          name
+          resource_name
         end
 
         private
 
         def namespaced_name
-          [controller_namespace, name.camelize].flatten.map(&:camelize).join('::').singularize.constantize
+          [controller_namespace, resource_name.camelize].flatten.map(&:camelize).join('::').singularize.constantize
         rescue NameError
-          name
+          resource_name
         end
 
         def controller_namespace
