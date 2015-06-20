@@ -1,5 +1,5 @@
 module CanCan
-  module Helpers
+  module Concepts
     class Finder < Base
       include Utils::Parent
       include Utils::IdParam

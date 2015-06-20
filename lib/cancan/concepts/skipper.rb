@@ -1,5 +1,5 @@
 module CanCan
-  module Helpers
+  module Concepts
     class Skipper < Base
 
       def skip?(behavior)

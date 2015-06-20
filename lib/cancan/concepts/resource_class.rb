@@ -1,5 +1,5 @@
 module CanCan
-  module Helpers
+  module Concepts
     class ResourceClass < Base
       include Utils::Parent
       include Utils::ResourceClass

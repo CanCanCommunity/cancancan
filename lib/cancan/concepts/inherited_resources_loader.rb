@@ -1,5 +1,5 @@
 module CanCan
-  module Helpers
+  module Concepts
     class InheritedResourcesLoader < Loader
 
       def load_resource_instance

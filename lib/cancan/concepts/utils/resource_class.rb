@@ -1,5 +1,5 @@
 module CanCan
-  module Helpers
+  module Concepts
     module Utils
       module ResourceClass
 

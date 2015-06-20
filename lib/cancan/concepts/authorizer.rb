@@ -1,5 +1,5 @@
 module CanCan
-  module Helpers
+  module Concepts
     class Authorizer < Base
       include Utils::Parent
       include Utils::ResourceClass

@@ -1,5 +1,5 @@
 module CanCan
-  module Helpers
+  module Concepts
     class Base
       include Utils::NameMethods
       include Utils::Options

@@ -1,5 +1,5 @@
 module CanCan
-  module Helpers
+  module Concepts
     module Utils
       module Actions
 
@@ -16,9 +16,9 @@ module CanCan
         end
 
         def member_action?
-          new_actions.include?(@controller.params[:action].to_sym) ||
-          options[:singleton] ||
-          ((@controller.params[:id] || @controller.params[options[:id_param]]) &&
+          new_actions.include?(@controller.params[:action].to_sym) || 
+          options[:singleton] || 
+          ((@controller.params[:id] || @controller.params[options[:id_param]]) && 
             !collection_actions.include?(@controller.params[:action].to_sym))
         end
 

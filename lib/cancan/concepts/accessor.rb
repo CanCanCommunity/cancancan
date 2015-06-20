@@ -1,5 +1,5 @@
 module CanCan
-  module Helpers
+  module Concepts
     class Accessor < Base
 
       def get(instance_or_collection)
