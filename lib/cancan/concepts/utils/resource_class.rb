@@ -27,7 +27,7 @@ module CanCan
         end
 
         def controller_namespace
-          @controller.params[:controller].split(/::|\//)[0..-2]
+          @controller.params[:controller].split('/')[0..-2]
         end
 
       end

@@ -21,7 +21,7 @@ module CanCan
         end
 
         def name_from_controller
-          @controller.params[:controller].sub("Controller", "").underscore.split('/').last.singularize
+          @controller.params[:controller].split('/').last.singularize
         end
 
       end
