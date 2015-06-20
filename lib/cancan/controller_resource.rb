@@ -12,12 +12,12 @@ module CanCan
     end
 
     def initialize(controller, *args)
-      @controller     = controller
-      @builder        = Helpers::Builder.new(controller, args.dup)
-      @loader         = Helpers::Loader.new(controller, args.dup)
-      @authorizer     = Helpers::Authorizer.new(controller, args.dup)
-      @resource_class = Helpers::ResourceClass.new(controller, args.dup)
-      @skipper        = Helpers::Skipper.new(controller, args.dup)
+      @controller         = controller
+      @build_resource     = Concepts::BuildResource.new(controller, args.dup)
+      @load_resource      = Concepts::LoadResource.new(controller, args.dup)
+      @authorize_resource = Concepts::AuthorizeResource.new(controller, args.dup)
+      @resource_class     = Concepts::ResourceClass.new(controller, args.dup)
+      @override_auth      = Concepts::OverrideAuthorization.new(controller, args.dup)
       options = args.extract_options!
       raise CanCan::ImplementationRemoved, "The :nested option is no longer supported, instead use :through with separate load/authorize call." if options[:nested]
       raise CanCan::ImplementationRemoved, "The :name option is no longer supported, instead pass the name as the first argument." if options[:name]
@@ -30,19 +30,19 @@ module CanCan
     end
 
     def load_resource
-      @loader.load unless skip? :load
+      @load_resource.load unless skip? :load
     end
 
     def authorize_resource
-      @authorizer.authorize unless skip? :authorize
+      @authorize_resource.authorize unless skip? :authorize
     end
 
-    def_delegator :@skipper, :skip?
+    def_delegator :@override_auth, :skip?
 
     protected
 
-    def_delegators :@builder, :build_resource, :assign_attributes, :resource_params
-    def_delegators :@loader, :parent?, :instance_name, :id_param, :assign_attributes, :resource_params
+    def_delegators :@build_resource, :build_resource, :assign_attributes, :resource_params
+    def_delegators :@load_resource, :parent?, :instance_name, :id_param, :assign_attributes, :resource_params
 
     def resource_class
       @resource_class.base

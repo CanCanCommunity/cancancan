@@ -1,6 +1,6 @@
 module CanCan
   module Concepts
-    class Builder < Base
+    class BuildResource < Base
       include Utils::Parent
       include Utils::ResourceClass
       include Utils::Actions

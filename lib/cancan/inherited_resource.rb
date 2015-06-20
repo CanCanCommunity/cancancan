@@ -4,7 +4,7 @@ module CanCan
 
     def initialize(controller, *args)
       super
-      @loader = Helpers::InheritedResourcesLoader.new(controller, args.dup)
+      @load_resource = Concepts::LoadInheritedResource.new(controller, args.dup)
     end
 
     def resource_base

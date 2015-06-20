@@ -1,6 +1,6 @@
 module CanCan
-  module Helpers
-    class Loader < Base
+  module Concepts
+    class LoadResource < Base
       extend Forwardable
       include Utils::Parent
       include Utils::IdParam
@@ -49,11 +49,11 @@ module CanCan
       end
 
       def builder
-        @builder ||= Builder.new(@controller, @args)
+        @builder ||= BuildResource.new(@controller, @args)
       end
 
       def finder
-        @finder ||= Finder.new(@controller, @args)
+        @finder ||= FindResource.new(@controller, @args)
       end
 
     end

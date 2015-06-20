@@ -1,6 +1,6 @@
 module CanCan
   module Concepts
-    class Finder < Base
+    class FindResource < Base
       include Utils::Parent
       include Utils::IdParam
       include Utils::ResourceClass

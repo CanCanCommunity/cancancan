@@ -1,6 +1,6 @@
 module CanCan
   module Concepts
-    class Skipper < Base
+    class OverrideAuthorization < Base
 
       def skip?(behavior)
         return false unless skip_options = @controller.class.cancan_skipper[behavior][passed_name]

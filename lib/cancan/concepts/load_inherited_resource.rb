@@ -1,6 +1,6 @@
 module CanCan
   module Concepts
-    class InheritedResourcesLoader < Loader
+    class LoadInheritedResource < LoadResource
 
       def load_resource_instance
         if parent?
