@@ -118,7 +118,11 @@ module CanCan
     end
 
     def authorization_action
-      parent? ? :show : @params[:action].to_sym
+      parent? ? parent_authorization_action : @params[:action].to_sym
+    end
+
+    def parent_authorization_action
+      @options[:parent_action] || :show
     end
 
     def id_param
@@ -254,7 +258,7 @@ module CanCan
     end
 
     def namespace
-      @params[:controller].split(/::|\//)[0..-2]
+      @params[:controller].split('/')[0..-2]
     end
 
     def namespaced_name
@@ -264,7 +268,7 @@ module CanCan
     end
 
     def name_from_controller
-      @params[:controller].sub("Controller", "").underscore.split('/').last.singularize
+      @params[:controller].split('/').last.singularize
     end
 
     def instance_name
