@@ -155,6 +155,26 @@ describe CanCan::Ability do
     expect(@ability.can?(:update, {:any => [123, 1.0]})).to be(false)
   end
 
+  it "lists all permissions" do
+    @ability.can :manage, :all
+    @ability.can :learn, Range
+    @ability.cannot :read, String
+    @ability.cannot :read, Hash
+    @ability.cannot :preview, Array
+
+    expected_list = {:can => {:manage => ["all"],
+                              :learn => ["Range"]
+                             },
+                     :cannot => {:read => ["String", "Hash"],
+                                 :index => ["String", "Hash"],
+                                 :show => ["String", "Hash"],
+                                 :preview => ["Array"]
+                                }
+                    }
+
+    expect(@ability.permissions).to eq(expected_list)
+  end
+
   it "supports custom objects in the rule" do
     @ability.can :read, :stats
     expect(@ability.can?(:read, :stats)).to be(true)
