@@ -4,12 +4,7 @@ module CanCan
       module NameMethods
 
         def passed_name
-          if @name.blank?
-            args = @args.dup
-            args.extract_options!
-            @name = args.first
-          end
-          @name
+          @name ||= @args.first unless @args.first.is_a? Hash
         end
 
         def name
