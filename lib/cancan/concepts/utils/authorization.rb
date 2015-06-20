@@ -4,7 +4,13 @@ module CanCan
       module Authorization
 
         def authorization_action
-          parent? ? :show : @controller.params[:action].to_sym
+          parent? ? parent_authorization_action : @controller.params[:action].to_sym
+        end
+
+        private
+
+        def parent_authorization_action
+          @options[:parent_action] || :show
         end
 
       end
