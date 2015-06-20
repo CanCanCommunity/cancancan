@@ -252,18 +252,23 @@ module CanCan
       self
     end
 
-    def list_can(filter_action = nil)
-      can_do_list = list_abilities[:can]
-      filter_action ? can_do_list[filter_action] : can_do_list
-    end
+    def permissions
+      permissions_list = {:can => {}, :cannot => {}}
 
-    def list_cannot(filter_action = nil)
-      cannot_do_list = list_abilities[:cannot]
-      filter_action ? cannot_do_list[filter_action] : cannot_do_list
-    end
+      rules.each do |rule|
+        subjects = rule.subjects
+        expand_actions(rule.actions).each do |action|
+          if(rule.base_behavior)
+            permissions_list[:can][action] ||= []
+            permissions_list[:can][action] += subjects.map(&:to_s)
+          else
+            permissions_list[:cannot][action] ||= []
+            permissions_list[:cannot][action] += subjects.map(&:to_s)
+          end
+        end
+      end
 
-    def list_all
-      list_abilities
+      permissions_list
     end
 
     private
@@ -353,25 +358,6 @@ module CanCan
         :create => [:new],
         :update => [:edit],
       }
-    end
-
-    def list_abilities
-      abilities_list = {:can => {}, :cannot => {}}
-
-      rules.each do |rule|
-        subjects = rule.subjects
-        expand_actions(rule.actions).each do |action|
-          if(rule.base_behavior)
-            abilities_list[:can][action] ||= []
-            abilities_list[:can][action] += subjects.map {|sub| sub.respond_to?(:name) ? sub.name : sub}
-          else
-            abilities_list[:cannot][action] ||= []
-            abilities_list[:cannot][action] += subjects.map {|sub| sub.respond_to?(:name) ? sub.name : sub}
-          end
-        end
-      end
-
-      abilities_list
     end
 
   end
