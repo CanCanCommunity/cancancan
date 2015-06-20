@@ -19,15 +19,15 @@ module CanCan
       protected
 
       def_delegators :builder, :assign_attributes, :resource_params
-      
+
       private
 
       def load_instance?
         parent? || member_action?
       end
 
-      def load_collection?  
-        resource_class.respond_to?(:accessible_by) && 
+      def load_collection?
+        resource_class.respond_to?(:accessible_by) &&
         !@controller.current_ability.has_block?(authorization_action, resource_class)
       end
 
