@@ -344,6 +344,26 @@ describe CanCan::Ability do
     expect(@ability.can?(:read, {:any => [{"food" => Range}, {"foobar" => Range}]})).to be(false)
   end
 
+  it "lists all permissions of a user" do
+    @ability.can :manage, :all
+    @ability.can :learn, Range
+    @ability.cannot :read, String
+    @ability.cannot :read, Hash
+    @ability.cannot :preview, Array
+
+    expected_list = {:can => {:manage => ["all"],
+                              :learn => ["Range"]
+                             },
+                     :cannot => {:read => ["String", "Hash"],
+                                 :index => ["String", "Hash"],
+                                 :show => ["String", "Hash"],
+                                 :preview => ["Array"]
+                                }
+                    }
+
+    expect(@ability.permissions).to eq(expected_list)
+  end
+
   it "checks permissions correctly when passing a hash of subjects with multiple definitions" do
     @ability.can :read, Range, :string => {:length => 4}
     @ability.can [:create, :read], Range, :string => {:upcase => 'FOO'}
