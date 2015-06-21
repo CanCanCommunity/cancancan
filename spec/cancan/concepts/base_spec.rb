@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe CanCan::Concepts::Accessor do
+describe CanCan::Concepts::Base do
   let(:controller_class) { Class.new }
   let(:params) { HashWithIndifferentAccess.new(:controller => "models") }
   let(:controller) { controller_class.new }

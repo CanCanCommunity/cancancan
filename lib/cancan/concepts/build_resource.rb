@@ -73,10 +73,6 @@ module CanCan
          value.to_s.underscore.gsub('/', '_')
       end
 
-      def resource_base
-        @resource_base ||= ResourceClass.new @controller, @name, @options
-      end
-
       def accessor
         @accessor ||= Accessor.new @controller, @name, @options
       end
