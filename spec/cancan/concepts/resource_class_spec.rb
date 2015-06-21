@@ -25,10 +25,12 @@ describe CanCan::Concepts::ResourceClass do
         end
 
         it 'does not scope outside of ActiveRecord 3' do
+          return unless defined? ActiveRecord
           expect(@resource_class.base).to eq controller_parent_models unless ActiveRecord::VERSION::MAJOR == 3
         end
 
         it 'can handle ActiveRecord 3 scoped' do
+          return unless defined? ActiveRecord
           expect(@resource_class.base).to eq controller_parent_models_scoped if ActiveRecord::VERSION::MAJOR == 3
         end
       end
