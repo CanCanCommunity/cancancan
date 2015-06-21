@@ -15,6 +15,8 @@ module CanCan
         options[:instance_name] || resource_name
       end
 
+      private
+
       def name_from_controller
         @controller.params[:controller].split('/').last.singularize
       end
