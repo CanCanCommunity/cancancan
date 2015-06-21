@@ -3,7 +3,6 @@ module CanCan
     class AuthorizeResource < Base
       include Utils::Parent
       include Utils::ResourceClass
-      include Utils::ResourceClassParent
       include Utils::Authorization
 
       def authorize
