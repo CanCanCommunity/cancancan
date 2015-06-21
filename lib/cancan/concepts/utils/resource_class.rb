@@ -16,12 +16,6 @@ module CanCan
           parent_resource ? {parent_resource => resource_class} : resource_class
         end
 
-        def name_with_namespace
-          [controller_namespace, resource_name.camelize].flatten.map(&:camelize).join('::').singularize.constantize
-        rescue NameError
-          resource_name
-        end
-
         private
 
         def namespaced_name
