@@ -23,10 +23,6 @@ module CanCan
 
       private
 
-      def active_record_v3?
-        defined?(ActiveRecord) && ActiveRecord::VERSION::MAJOR == 3
-      end
-
       def parent_through_class
         parent_resource.send(options[:through_association] || resource_name.to_s.pluralize)
       end
