@@ -40,7 +40,7 @@ module CanCan
       end
 
       def resource_class
-        @resource_class ||= ResourceClass.new(@controller, @name, @options).base
+        @resource_class ||= BaseResourceClass.new(@controller, @name, @options).base
       end
 
       def accessor

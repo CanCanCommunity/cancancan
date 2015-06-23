@@ -1,6 +1,6 @@
 module CanCan
   module Concepts
-    class ResourceClass < Base
+    class BaseResourceClass < Base
       include Utils::Parent
       include Utils::ResourceClass
       include Utils::Authorization

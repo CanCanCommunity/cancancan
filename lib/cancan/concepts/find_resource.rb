@@ -34,7 +34,7 @@ module CanCan
       end
 
       def resource_base
-        @base ||= ResourceClass.new(@controller, @name, @options).base
+        @base ||= BaseResourceClass.new(@controller, @name, @options).base
       end
 
       def find_by_field

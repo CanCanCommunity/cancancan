@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe CanCan::Concepts::ResourceClass do
+describe CanCan::Concepts::BaseResourceClass do
   let(:controller_class) { Class.new }
   let(:controller) { controller_class.new }
   let(:controller_parent) { controller_class.new }
@@ -16,7 +16,7 @@ describe CanCan::Concepts::ResourceClass do
       before do
         allow(controller).to receive(:model_through) { controller_parent }
         allow(controller_parent).to receive(:models) { controller_parent_models }
-        @resource_class = CanCan::Concepts::ResourceClass.new(controller, 'model', { through: :model_through })
+        @resource_class = CanCan::Concepts::BaseResourceClass.new(controller, 'model', { through: :model_through })
       end
 
       context 'Active Record 3 scoping' do
@@ -71,7 +71,7 @@ describe CanCan::Concepts::ResourceClass do
 
     context 'through option is not specified' do
       before do
-        @resource_class = CanCan::Concepts::ResourceClass.new(controller, 'model')
+        @resource_class = CanCan::Concepts::BaseResourceClass.new(controller, 'model')
         class Custom; end
         module Deep; module Nested; class Model; end; end; end
       end
