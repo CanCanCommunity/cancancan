@@ -3,9 +3,7 @@ module CanCan
     class LoadResource < Base
       extend Forwardable
       include Utils::Parent
-      include Utils::IdParam
       include Utils::Actions
-      include Utils::ResourceClass
       include Utils::Authorization
 
       def load
@@ -19,6 +17,7 @@ module CanCan
       protected
 
       def_delegators :builder, :assign_attributes, :resource_params
+      def_delegators :finder, :id_param
 
       private
 

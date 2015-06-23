@@ -17,7 +17,6 @@ module CanCan
       @build_resource     = Concepts::BuildResource.new(controller, name, options)
       @load_resource      = Concepts::LoadResource.new(controller, name, options)
       @authorize_resource = Concepts::AuthorizeResource.new(controller, name, options)
-      @resource_class     = Concepts::ResourceClass.new(controller, name, options)
       @override_auth      = Concepts::OverrideAuthorization.new(controller, name, options)
       raise CanCan::ImplementationRemoved, "The :nested option is no longer supported, instead use :through with separate load/authorize call." if options[:nested]
       raise CanCan::ImplementationRemoved, "The :name option is no longer supported, instead pass the name as the first argument." if options[:name]
@@ -37,16 +36,11 @@ module CanCan
       @authorize_resource.authorize unless skip? :authorize
     end
 
-    def_delegator :@override_auth, :skip?
-
     protected
 
+    def_delegator  :@override_auth, :skip?
     def_delegators :@build_resource, :build_resource, :assign_attributes, :resource_params
-    def_delegators :@load_resource, :parent?, :instance_name, :id_param, :assign_attributes, :resource_params
-
-    def resource_class
-      @resource_class.base
-    end
+    def_delegators :@load_resource, :parent?, :instance_name, :id_param, :assign_attributes, :resource_class, :resource_params
 
   end
 end
