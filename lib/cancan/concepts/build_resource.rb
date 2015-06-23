@@ -14,6 +14,8 @@ module CanCan
         assign_attributes accessor.get(:instance)
       end
 
+      private
+
       def assign_attributes(resource)
         resource.send("#{parent_name}=", parent_resource) if options[:singleton] && parent_resource
         initial_attributes.each do |attr_name, value|
@@ -33,8 +35,6 @@ module CanCan
           resource_params_by_namespaced_name
         end
       end
-
-      private
 
       def initial_attributes
         @controller.current_ability.attributes_for(@controller.params[:action].to_sym, resource_class).delete_if do |key, value|

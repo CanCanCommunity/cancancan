@@ -40,11 +40,48 @@ describe CanCan::Concepts::BuildResource do
   describe '#build_resource' do
     before do
       allow(controller).to receive(:current_ability) { ability }
-      allow(controller).to receive(:params) { { controller: 'model', action: :create, model: { name: 'a name!'} } }
+      allow(controller).to receive(:params) { { controller: 'model', action: :create } }
     end
 
     it 'builds a new resource' do
       ability.can(:create, Model, name: "a name!")
+      build_resource.build_resource
+      model = controller.instance_variable_get(:"@model")
+      expect(model).to be_present
+      expect(model.name).to eq 'a name!'
+    end
+
+    it 'can use the action params' do
+      allow(controller).to receive(:create_params) { { name: 'a name!' } }
+      ability.can(:create, Model)
+      build_resource.build_resource
+      model = controller.instance_variable_get(:"@model")
+      expect(model).to be_present
+      expect(model.name).to eq 'a name!'
+    end
+
+    it 'can use the resource named params' do
+      allow(controller).to receive(:model_params) { { name: 'a name!' } }
+      ability.can(:create, Model)
+      build_resource.build_resource
+      model = controller.instance_variable_get(:"@model")
+      expect(model).to be_present
+      expect(model.name).to eq 'a name!'
+    end
+
+    it 'can use the resource params' do
+      allow(controller).to receive(:resource_params) { { name: 'a name!' } }
+      ability.can(:create, Model)
+      build_resource.build_resource
+      model = controller.instance_variable_get(:"@model")
+      expect(model).to be_present
+      expect(model.name).to eq 'a name!'
+    end
+
+    it 'can handle a custom params_method' do
+      allow(controller).to receive(:custom_params) { { name: 'a name!' } }
+      ability.can(:create, Model)
+      build_resource.options[:param_method] = :custom_params
       build_resource.build_resource
       model = controller.instance_variable_get(:"@model")
       expect(model).to be_present
