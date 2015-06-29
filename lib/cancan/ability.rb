@@ -252,6 +252,16 @@ module CanCan
       self
     end
 
+    # Return a hash of permissions for the user in the format of:
+    #   {
+    #     can: can_hash,
+    #     cannot: cannot_hash
+    #   }
+    #
+    # Where can_hash and cannot_hash are formatted thusly:
+    #   {
+    #     action: array_of_objects
+    #   }
     def permissions
       permissions_list = {:can => {}, :cannot => {}}
 
