@@ -12,7 +12,7 @@ describe CanCan::Concepts::Base do
 
   describe '#options' do
     it 'has a getter fo the passed options' do
-      base = base_class.new(controller, :model, {option: 'value'})
+      base = base_class.new(controller, :model, {:option => 'value'})
       expect(base.options[:option]).to eq 'value'
     end
   end
@@ -42,7 +42,7 @@ describe CanCan::Concepts::Base do
     end
 
     it 'returns the instance_name option if it is passed' do
-      base = base_class.new(controller, :model, instance_name: :something_else)
+      base = base_class.new(controller, :model, :instance_name => :something_else)
       expect(base.instance_name).to eq :something_else
     end
   end

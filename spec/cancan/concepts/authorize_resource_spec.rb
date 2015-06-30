@@ -12,7 +12,7 @@ describe CanCan::Concepts::AuthorizeResource do
 
     before do
       class Model; end
-      allow(controller).to receive(:params) { { controller: 'model', action: :show } }
+      allow(controller).to receive(:params) { { :controller => 'model', :action => :show } }
     end
 
     it 'authorizes a resource' do

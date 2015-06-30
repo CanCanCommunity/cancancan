@@ -16,7 +16,7 @@ describe CanCan::Concepts::BaseResourceClass do
       before do
         allow(controller).to receive(:model_through) { controller_parent }
         allow(controller_parent).to receive(:models) { controller_parent_models }
-        @resource_class = CanCan::Concepts::BaseResourceClass.new(controller, 'model', { through: :model_through })
+        @resource_class = CanCan::Concepts::BaseResourceClass.new(controller, 'model', { :through => :model_through })
       end
 
       context 'Active Record 3 scoping' do
@@ -25,13 +25,15 @@ describe CanCan::Concepts::BaseResourceClass do
         end
 
         it 'does not scope outside of ActiveRecord 3' do
-          break unless defined? ActiveRecord
-          expect(@resource_class.base).to eq controller_parent_models unless ActiveRecord::VERSION::MAJOR == 3
+          if defined? ActiveRecord
+            expect(@resource_class.base).to eq controller_parent_models unless ActiveRecord::VERSION::MAJOR == 3
+          end
         end
 
         it 'can handle ActiveRecord 3 scoped' do
-          break unless defined? ActiveRecord
-          expect(@resource_class.base).to eq controller_parent_models_scoped if ActiveRecord::VERSION::MAJOR == 3
+          if defined? ActiveRecord
+            expect(@resource_class.base).to eq controller_parent_models_scoped if ActiveRecord::VERSION::MAJOR == 3
+          end
         end
       end
 
@@ -55,7 +57,7 @@ describe CanCan::Concepts::BaseResourceClass do
       context 'parent association cannot be found exist' do
         before do
           @resource_class.options[:through] = :not_a_thing
-          allow(controller).to receive(:params) { { controller: 'not_a_controller' } }
+          allow(controller).to receive(:params) { { :controller => 'not_a_controller' } }
         end
 
         it 'raises a record not found error if parent resource is not found' do
@@ -81,7 +83,7 @@ describe CanCan::Concepts::BaseResourceClass do
       end
 
       it 'can handle a nested controller' do
-        allow(controller).to receive(:params) { HashWithIndifferentAccess.new(controller: 'deep/nested/model') }
+        allow(controller).to receive(:params) { HashWithIndifferentAccess.new(:controller => 'deep/nested/model') }
         @resource_class.options[:class] = nil
         expect(@resource_class.resource_class).to eq Deep::Nested::Model
       end

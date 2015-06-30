@@ -10,7 +10,7 @@ describe CanCan::Concepts::FindResource do
 
   before do
       class Model; end
-    allow(controller).to receive(:params) { { controller: 'model', action: :show } }
+    allow(controller).to receive(:params) { { :controller => 'model', :action => :show } }
   end
 
   describe '#can_find?' do
@@ -21,7 +21,7 @@ describe CanCan::Concepts::FindResource do
     end
 
     it 'returns true if an id field is found on the controller params' do
-      allow(controller).to receive(:params) { { controller: 'model', action: :show, id: 5 } }
+      allow(controller).to receive(:params) { { :controller => 'model', :action => :show, :id => 5 } }
       expect(find_resource.can_find?).to be_truthy
     end
 
@@ -31,7 +31,7 @@ describe CanCan::Concepts::FindResource do
 
     it 'returns true if the id_param option is found on the controller params' do
       find_resource.options[:id_param] = :id_param
-      allow(controller).to receive(:params) { { controller: 'model', action: :show, id_param: 5 } }
+      allow(controller).to receive(:params) { { :controller => 'model', :action => :show, :id_param => 5 } }
       expect(find_resource.can_find?).to be_truthy
     end
 

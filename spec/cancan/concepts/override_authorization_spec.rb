@@ -4,10 +4,10 @@ describe CanCan::Concepts::OverrideAuthorization do
   let(:controller_class) { Class.new }
   let(:controller) { controller_class.new }
   let(:override_auth) { CanCan::Concepts::OverrideAuthorization.new(controller, :model) }
-  let(:default_skipper) { { authorize: { model: { } } } }
+  let(:default_skipper) { { :authorize => { :model => {} } } }
 
   before(:each) do
-    allow(controller).to receive(:params) { HashWithIndifferentAccess.new(action: :show) }
+    allow(controller).to receive(:params) { HashWithIndifferentAccess.new(:action => :show) }
     allow(controller_class).to receive(:cancan_skipper) { default_skipper }
   end
 
