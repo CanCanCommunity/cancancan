@@ -54,17 +54,6 @@ appraise "activerecord_4.2" do
   end
 end
 
-appraise "datamapper_1.x" do
-  gem "activesupport", "~> 3.0", :require => "active_support/all"
-  gem "dm-core", "~> 1.0"
-  gem "dm-sqlite-adapter", "~> 1.0"
-  gem "dm-migrations", "~> 1.0"
-
-  gemfile.platforms :ruby_18, :ruby_19 do
-    gem "i18n", "< 0.7"
-  end
-end
-
 appraise "mongoid_2.x" do
   gem "activesupport", "~> 3.0", :require => "active_support/all"
   gem "mongoid", "~> 2.0.0"

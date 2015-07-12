@@ -9,7 +9,6 @@ gemfile:
   - gemfiles/activerecord_4.0.gemfile
   - gemfiles/activerecord_4.1.gemfile
   - gemfiles/activerecord_4.2.gemfile
-  - gemfiles/datamapper_1.x.gemfile
   - gemfiles/mongoid_2.x.gemfile
   - gemfiles/sequel_3.x.gemfile
 services:
@@ -17,8 +16,6 @@ services:
 matrix:
   allow_failures:
     - rvm: rbx
-    - rvm: jruby
-      gemfile: gemfiles/datamapper_1.x.gemfile
   exclude:
     - rvm: 2.2.0
       gemfile: gemfiles/activerecord_3.2.gemfile
