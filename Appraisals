@@ -1,35 +1,3 @@
-appraise "activerecord_3.0" do
-  gem "activerecord", "~> 3.0.20", :require => "active_record"
-  gem "activesupport", "~> 3.0.20", :require => "active_support/all"
-  gem "meta_where"
-
-  gemfile.platforms :jruby do
-    gem "activerecord-jdbcsqlite3-adapter"
-    gem "jdbc-sqlite3"
-  end
-
-  gemfile.platforms :ruby, :mswin, :mingw do
-    gem "sqlite3"
-  end
-end
-
-appraise "activerecord_3.1" do
-  gem "activerecord", "~> 3.1.0", :require => "active_record"
-
-  gemfile.platforms :ruby_18, :ruby_19 do
-    gem "i18n", "< 0.7"
-  end
-
-  gemfile.platforms :jruby do
-    gem "activerecord-jdbcsqlite3-adapter"
-    gem "jdbc-sqlite3"
-  end
-
-  gemfile.platforms :ruby, :mswin, :mingw do
-    gem "sqlite3"
-  end
-end
-
 appraise "activerecord_3.2" do
   gem "activerecord", "~> 3.2.0", :require => "active_record"
 

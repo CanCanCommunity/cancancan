@@ -5,8 +5,6 @@ rvm:
   - jruby
   - rbx
 gemfile:
-  - gemfiles/activerecord_3.0.gemfile
-  - gemfiles/activerecord_3.1.gemfile
   - gemfiles/activerecord_3.2.gemfile
   - gemfiles/activerecord_4.0.gemfile
   - gemfiles/activerecord_4.1.gemfile
@@ -22,10 +20,6 @@ matrix:
     - rvm: jruby
       gemfile: gemfiles/datamapper_1.x.gemfile
   exclude:
-    - rvm: 2.2.0
-      gemfile: gemfiles/activerecord_3.0.gemfile
-    - rvm: 2.2.0
-      gemfile: gemfiles/activerecord_3.1.gemfile
     - rvm: 2.2.0
       gemfile: gemfiles/activerecord_3.2.gemfile
 notifications:
