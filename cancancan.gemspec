@@ -6,8 +6,8 @@ require 'cancan/version'
 Gem::Specification.new do |s|
   s.name        = "cancancan"
   s.version     = CanCan::VERSION
-  s.authors     = ["Bryan Rite", "Ryan Bates"]
-  s.email       = "bryan@bryanrite.com"
+  s.authors     = ["Bryan Rite", "Ryan Bates", "Richard Wilson"]
+  s.email       = "r.crawfordwilson@gmail.com"
   s.homepage    = "https://github.com/CanCanCommunity/cancancan"
   s.summary     = "Simple authorization solution for Rails."
   s.description = "Continuation of the simple authorization solution for Rails which is decoupled from user roles. All permissions are stored in a single location."
