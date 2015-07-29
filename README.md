@@ -89,9 +89,26 @@ See [Authorizing Controller Actions](https://github.com/CanCanCommunity/cancanca
 
 When using `strong_parameters` or Rails 4+, you have to sanitize inputs before saving the record, in actions such as `:create` and `:update`.
 
-By default, CanCan will try to sanitize the input on `:create` and `:update` routes by seeing if your controller will respond to the following methods (in order):
+For the `:update` action, CanCan will load and authorize the resource but *not* change it automatically, so the typical usage would be something like:
 
-1. `create_params` or `update_params` (depending on the action you are performing)
+```ruby
+def update
+  if @article.update_attributes(update_params)
+    # hurray
+  else
+    render :edit
+  end
+end
+...
+
+def update_params
+  params.require(:article).permit(:body)
+end
+```
+
+For the `:create` action, CanCan will try to initialize a new instance with sanitized input by seeing if your controller will respond to the following methods (in order):
+
+1. `create_params`
 2. `<model_name>_params` such as `article_params` (this is the default convention in rails for naming your param method)
 3. `resource_params` (a generically named method you could specify in each controller)
 
