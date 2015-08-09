@@ -40,7 +40,7 @@ module CanCan
       private
 
       def build_relation(*where_conditions)
-        @model_class.where(*where_conditions).includes(joins)
+        @model_class.where(*where_conditions).joins(joins)
       end
     end
   end
