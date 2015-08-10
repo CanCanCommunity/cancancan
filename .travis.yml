@@ -8,7 +8,6 @@ rvm:
   - 2.0.0
   - 2.1.0
   - 2.2.0
-  - ree
   - jruby
   - rbx
 gemfile:
@@ -48,12 +47,6 @@ matrix:
       gemfile: gemfiles/activerecord_3.1.gemfile
     - rvm: 2.2.0
       gemfile: gemfiles/activerecord_3.2.gemfile
-    - rvm: ree
-      gemfile: gemfiles/activerecord_4.0.gemfile
-    - rvm: ree
-      gemfile: gemfiles/activerecord_4.1.gemfile
-    - rvm: ree
-      gemfile: gemfiles/activerecord_4.2.gemfile
 notifications:
   recipients:
     - bryan@bryanrite.com
