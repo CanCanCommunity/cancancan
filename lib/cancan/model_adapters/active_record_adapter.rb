@@ -65,6 +65,7 @@ module CanCan
           @model_class.where(nil).merge(override_scope)
         elsif @model_class.respond_to?(:where) && @model_class.respond_to?(:joins)
           if mergeable_conditions?
+            puts conditions
             build_relation(conditions)
           else
             build_relation(*(@rules.map(&:conditions)))
@@ -117,6 +118,8 @@ module CanCan
       end
 
       def sanitize_sql(conditions)
+        puts "conditions:"
+        puts conditions
         @model_class.send(:sanitize_sql, conditions)
       end
 

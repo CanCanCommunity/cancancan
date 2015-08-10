@@ -1,3 +1,4 @@
+require 'cancan/model_adapters/ar_outer_joins/ar_outer_joins'
 module CanCan
   module ModelAdapters
     class ActiveRecord3Adapter < AbstractAdapter
@@ -40,7 +41,7 @@ module CanCan
       private
 
       def build_relation(*where_conditions)
-        @model_class.where(*where_conditions).joins(joins)
+        @model_class.where(*where_conditions).includes(joins)
       end
     end
   end
