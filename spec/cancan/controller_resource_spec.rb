@@ -453,7 +453,7 @@ describe CanCan::ControllerResource do
       allow(Model).to receive(:find).with("123") { model }
       allow(controller).to receive(:model) { Model }
 
-      resource = CanCan::ControllerResource.new(controller, class: :model)
+      resource = CanCan::ControllerResource.new(controller, :class => :model)
       resource.load_resource
       expect(controller.instance_variable_get(:@model)).to eq(model)
     end
@@ -462,7 +462,7 @@ describe CanCan::ControllerResource do
       model = Model.new
       allow(Model).to receive(:find).with("123") { model }
 
-      resource = CanCan::ControllerResource.new(controller, class: proc { Model })
+      resource = CanCan::ControllerResource.new(controller, :class => proc { Model })
       resource.load_resource
       expect(controller.instance_variable_get(:@model)).to eq(model)
     end
