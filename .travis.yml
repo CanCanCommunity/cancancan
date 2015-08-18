@@ -1,9 +1,13 @@
+language: ruby
+cache: bundler
+sudo: false
 rvm:
   - 1.8.7
   - 1.9.2
   - 1.9.3
   - 2.0.0
   - 2.1.0
+  - 2.2.0
   - ree
   - jruby
   - rbx
@@ -11,14 +15,45 @@ gemfile:
   - gemfiles/activerecord_3.0.gemfile
   - gemfiles/activerecord_3.1.gemfile
   - gemfiles/activerecord_3.2.gemfile
+  - gemfiles/activerecord_4.0.gemfile
+  - gemfiles/activerecord_4.1.gemfile
+  - gemfiles/activerecord_4.2.gemfile
   - gemfiles/datamapper_1.x.gemfile
   - gemfiles/mongoid_2.x.gemfile
   - gemfiles/sequel_3.x.gemfile
 services:
   - mongodb
 matrix:
+  fast_finish: true
   allow_failures:
     - rvm: rbx
+    - rvm: jruby
+      gemfile: gemfiles/datamapper_1.x.gemfile
+  exclude:
+    - rvm: 1.8.7
+      gemfile: gemfiles/activerecord_4.0.gemfile
+    - rvm: 1.8.7
+      gemfile: gemfiles/activerecord_4.1.gemfile
+    - rvm: 1.8.7
+      gemfile: gemfiles/activerecord_4.2.gemfile
+    - rvm: 1.9.2
+      gemfile: gemfiles/activerecord_4.0.gemfile
+    - rvm: 1.9.2
+      gemfile: gemfiles/activerecord_4.1.gemfile
+    - rvm: 1.9.2
+      gemfile: gemfiles/activerecord_4.2.gemfile
+    - rvm: 2.2.0
+      gemfile: gemfiles/activerecord_3.0.gemfile
+    - rvm: 2.2.0
+      gemfile: gemfiles/activerecord_3.1.gemfile
+    - rvm: 2.2.0
+      gemfile: gemfiles/activerecord_3.2.gemfile
+    - rvm: ree
+      gemfile: gemfiles/activerecord_4.0.gemfile
+    - rvm: ree
+      gemfile: gemfiles/activerecord_4.1.gemfile
+    - rvm: ree
+      gemfile: gemfiles/activerecord_4.2.gemfile
 notifications:
   recipients:
     - bryan@bryanrite.com

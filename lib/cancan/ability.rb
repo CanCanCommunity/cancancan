@@ -252,6 +252,35 @@ module CanCan
       self
     end
 
+    # Return a hash of permissions for the user in the format of:
+    #   {
+    #     can: can_hash,
+    #     cannot: cannot_hash
+    #   }
+    #
+    # Where can_hash and cannot_hash are formatted thusly:
+    #   {
+    #     action: array_of_objects
+    #   }
+    def permissions
+      permissions_list = {:can => {}, :cannot => {}}
+
+      rules.each do |rule|
+        subjects = rule.subjects
+        expand_actions(rule.actions).each do |action|
+          if(rule.base_behavior)
+            permissions_list[:can][action] ||= []
+            permissions_list[:can][action] += subjects.map(&:to_s)
+          else
+            permissions_list[:cannot][action] ||= []
+            permissions_list[:cannot][action] += subjects.map(&:to_s)
+          end
+        end
+      end
+
+      permissions_list
+    end
+
     private
 
     def unauthorized_message_keys(action, subject)
@@ -285,7 +314,7 @@ module CanCan
 
     # It translates to an array the subject or the hash with multiple subjects given to can?.
     def extract_subjects(subject)
-      subject = if subject.respond_to?(:keys) && subject.key?(:any)
+      subject = if subject.kind_of?(Hash) && subject.key?(:any)
         subject[:any]
       else
         [subject]

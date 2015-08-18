@@ -3,7 +3,11 @@ require "spec_helper"
 if defined? CanCan::ModelAdapters::SequelAdapter
 
   describe CanCan::ModelAdapters::SequelAdapter do
-    DB = Sequel.sqlite
+    DB = if RUBY_PLATFORM == 'java'
+      Sequel.connect('jdbc:sqlite:db.sqlite3')
+    else
+      Sequel.sqlite
+    end
 
     DB.create_table :users do
       primary_key :id

@@ -1,5 +1,67 @@
 Develop
 
+1.12.0 (June 28th, 2015)
+
+* Add a permissions method to Ability (devaroop)
+
+1.11.0 (June 15th, 2015)
+
+* Complete cancancan#115 - Specify authorization action for parent resources. (phallguy)
+
+1.10.1 (January 13th, 2015)
+
+* Fix cancancan#168 - A bug with ActiveRecord 4.2 support causing ProtocolViolation due to named parameters not being passed in.
+
+
+1.10.0 (January 7th, 2015)
+
+* Fix i18n issue for Ruby < 1.9.3 (bryanrite)
+
+* Fix cancancan#149 - Fix an issue loading namespaced models (darthjee)
+
+* Fix cancancan#160 - Support for Rails 4.2 (marshall-lee)
+
+* Fix cancancan#153 - More useful output in ability spec matchers (jondkinney)
+
+
+1.9.2 (August 8th, 2014)
+
+* Fix cancancan#77, 78 - Fix an issue with associations for namespaced models. (jjp)
+
+
+1.9.1 (July 21st, 2014)
+
+* Fix cancancan#101 - Fixes an issue where overjealous use of references would cause issues with scopes when loading associations. (bryanrite)
+
+
+1.9.0 (July 20th, 2014)
+
+* Fix cancancan#59 - Parameters are automatically detected and santitized for all actions, not just create and update. (bryanrite)
+
+* Fix cancancan#97, 72, 40, 39, 26 - Support Active Record 4 properly with references on nested permissions. (scpike, tdg5, Crystark)
+
+
+1.8.4 (June 24th, 2014)
+
+* Fix cancancan#86 - Fixes previous RSpec 3 update as there was a bug in the fix for RSpec 2.99. (bryanrite)
+
+
+1.8.3 (June 24th, 2014)
+
+* Fix cancancan#85 - Remove deprecation notices for RSpec 3 and continue backwards compatibility. (andypike, bryanrite, porteta)
+
+
+1.8.2 (June 5th, 2014)
+
+* Fix cancancan#75 - More specific hash-like object check. (bryanrite)
+
+
+1.8.1 (May 27th, 2014)
+
+* Fix cancancan#67 - Sequel tests are run properly for JRuby. (bryanrite)
+
+* Fix cancancan#68 - Checks for hash-like objects in subject better. (bryanrite)
+
 
 1.8.0 (May 8th, 2014)
 

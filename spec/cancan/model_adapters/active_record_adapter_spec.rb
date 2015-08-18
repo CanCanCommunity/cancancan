@@ -11,17 +11,17 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
         create_table(:categories) do |t|
           t.string :name
           t.boolean :visible
-          t.timestamps
+          t.timestamps :null => false
         end
 
         create_table(:projects) do |t|
           t.string :name
-          t.timestamps
+          t.timestamps :null => false
         end
 
         create_table(:articles) do |t|
           t.string :name
-          t.timestamps
+          t.timestamps :null => false
           t.boolean :published
           t.boolean :secret
           t.integer :priority
@@ -32,11 +32,17 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
         create_table(:comments) do |t|
           t.boolean :spam
           t.integer :article_id
-          t.timestamps
+          t.timestamps :null => false
+        end
+
+        create_table(:legacy_mentions) do |t|
+          t.integer :user_id
+          t.integer :article_id
+          t.timestamps :null => false
         end
 
         create_table(:users) do |t|
-          t.timestamps
+          t.timestamps :null => false
         end
       end
 
@@ -50,7 +56,15 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       class Article < ActiveRecord::Base
         belongs_to :category
         has_many :comments
+        has_many :mentions
+        has_many :mentioned_users, :through => :mentions, :source => :user
         belongs_to :user
+      end
+
+      class Mention < ActiveRecord::Base
+        self.table_name = 'legacy_mentions'
+        belongs_to :user
+        belongs_to :article
       end
 
       class Comment < ActiveRecord::Base
@@ -67,14 +81,22 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
     end
 
     it "is for only active record classes" do
-      expect(CanCan::ModelAdapters::ActiveRecordAdapter).to_not be_for_class(Object)
-      expect(CanCan::ModelAdapters::ActiveRecordAdapter).to be_for_class(Article)
-      expect(CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article)).to eq(CanCan::ModelAdapters::ActiveRecordAdapter)
+      if ActiveRecord.respond_to?(:version) &&
+          ActiveRecord.version > Gem::Version.new("4")
+        expect(CanCan::ModelAdapters::ActiveRecord4Adapter).to_not be_for_class(Object)
+        expect(CanCan::ModelAdapters::ActiveRecord4Adapter).to be_for_class(Article)
+        expect(CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article)).to eq(CanCan::ModelAdapters::ActiveRecord4Adapter)
+      else
+        expect(CanCan::ModelAdapters::ActiveRecord3Adapter).to_not be_for_class(Object)
+        expect(CanCan::ModelAdapters::ActiveRecord3Adapter).to be_for_class(Article)
+        expect(CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article)).to eq(CanCan::ModelAdapters::ActiveRecord3Adapter)
+      end
     end
 
     it "finds record" do
       article = Article.create!
-      expect(CanCan::ModelAdapters::ActiveRecordAdapter.find(Article, article.id)).to eq(article)
+      adapter = CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article)
+      expect(adapter.find(Article, article.id)).to eq(article)
     end
 
     it "does not fetch any records when no abilities are defined" do
@@ -103,6 +125,16 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       article3 = Article.create!(:published => false, :secret => true)
       article4 = Article.create!(:published => false, :secret => false)
       expect(Article.accessible_by(@ability)).to eq([article1, article2, article3])
+    end
+
+    it "fetches any articles which we are cited in" do
+      user = User.create!
+      cited = Article.create!
+      not_cited = Article.create!
+      cited.mentioned_users << user
+      @ability.can :read, Article, { :mentioned_users => { :id => user.id } }
+      @ability.can :read, Article, { :mentions => { :user_id => user.id } }
+      expect(Article.accessible_by(@ability)).to eq([cited])
     end
 
     it "fetches only the articles that are published and not secret" do
@@ -305,13 +337,51 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
         article.secret == true
       end
 
-      relation.stub(:count).and_raise('Unexpected scope execution.')
+      allow(relation).to receive(:count).and_raise('Unexpected scope execution.')
 
       expect { @ability.can? :read, Article }.not_to raise_error
     end
 
-    context "when MetaWhere is defined" do
+    context "with namespaced models" do
+      before :each do
+        ActiveRecord::Schema.define do
+          create_table( :table_xes ) do |t|
+            t.timestamps :null => false
+          end
 
+          create_table( :table_zs ) do |t|
+            t.integer :table_x_id
+            t.integer :user_id
+            t.timestamps :null => false
+          end
+        end
+
+        module Namespace
+        end
+
+        class Namespace::TableX < ActiveRecord::Base
+          has_many :table_zs
+        end
+
+        class Namespace::TableZ < ActiveRecord::Base
+          belongs_to :table_x
+          belongs_to :user
+        end
+      end
+
+      it "fetches all namespace::table_x when one is related by table_y" do
+        user = User.create!
+
+        ability = Ability.new(user)
+        ability.can :read, Namespace::TableX, :table_zs => { :user_id => user.id }
+
+        table_x = Namespace::TableX.create!
+        table_z = table_x.table_zs.create( :user => user )
+        expect(Namespace::TableX.accessible_by(ability)).to eq([table_x])
+      end
+    end
+
+    context "when MetaWhere is defined" do
       before :each do
         pending "[Deprecated] MetaWhere support is being removed" unless defined? MetaWhere
       end
@@ -338,39 +408,38 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       end
 
       it "matches any MetaWhere condition" do
-
-        adapter = CanCan::ModelAdapters::ActiveRecordAdapter
+        adapter = CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article)
         article1 = Article.new(:priority => 1, :name => "Hello World")
-        expect(adapter.matches_condition?(article1, :priority.eq, 1)).to be_true
-        expect(adapter.matches_condition?(article1, :priority.eq, 2)).to be_false
-        expect(adapter.matches_condition?(article1, :priority.eq_any, [1, 2])).to be_true
-        expect(adapter.matches_condition?(article1, :priority.eq_any, [2, 3])).to be_false
-        expect(adapter.matches_condition?(article1, :priority.eq_all, [1, 1])).to be_true
-        expect(adapter.matches_condition?(article1, :priority.eq_all, [1, 2])).to be_false
-        expect(adapter.matches_condition?(article1, :priority.ne, 2)).to be_true
-        expect(adapter.matches_condition?(article1, :priority.ne, 1)).to be_false
-        expect(adapter.matches_condition?(article1, :priority.in, [1, 2])).to be_true
-        expect(adapter.matches_condition?(article1, :priority.in, [2, 3])).to be_false
-        expect(adapter.matches_condition?(article1, :priority.nin, [2, 3])).to be_true
-        expect(adapter.matches_condition?(article1, :priority.nin, [1, 2])).to be_false
-        expect(adapter.matches_condition?(article1, :priority.lt, 2)).to be_true
-        expect(adapter.matches_condition?(article1, :priority.lt, 1)).to be_false
-        expect(adapter.matches_condition?(article1, :priority.lteq, 1)).to be_true
-        expect(adapter.matches_condition?(article1, :priority.lteq, 0)).to be_false
-        expect(adapter.matches_condition?(article1, :priority.gt, 0)).to be_true
-        expect(adapter.matches_condition?(article1, :priority.gt, 1)).to be_false
-        expect(adapter.matches_condition?(article1, :priority.gteq, 1)).to be_true
-        expect(adapter.matches_condition?(article1, :priority.gteq, 2)).to be_false
-        expect(adapter.matches_condition?(article1, :name.like, "%ello worl%")).to be_true
-        expect(adapter.matches_condition?(article1, :name.like, "hello world")).to be_true
-        expect(adapter.matches_condition?(article1, :name.like, "hello%")).to be_true
-        expect(adapter.matches_condition?(article1, :name.like, "h%d")).to be_true
-        expect(adapter.matches_condition?(article1, :name.like, "%helo%")).to be_false
-        expect(adapter.matches_condition?(article1, :name.like, "hello")).to be_false
-        expect(adapter.matches_condition?(article1, :name.like, "hello.world")).to be_false
+        expect(adapter.matches_condition?(article1, :priority.eq, 1)).to be(true)
+        expect(adapter.matches_condition?(article1, :priority.eq, 2)).to be(false)
+        expect(adapter.matches_condition?(article1, :priority.eq_any, [1, 2])).to be(true)
+        expect(adapter.matches_condition?(article1, :priority.eq_any, [2, 3])).to be(false)
+        expect(adapter.matches_condition?(article1, :priority.eq_all, [1, 1])).to be(true)
+        expect(adapter.matches_condition?(article1, :priority.eq_all, [1, 2])).to be(false)
+        expect(adapter.matches_condition?(article1, :priority.ne, 2)).to be(true)
+        expect(adapter.matches_condition?(article1, :priority.ne, 1)).to be(false)
+        expect(adapter.matches_condition?(article1, :priority.in, [1, 2])).to be(true)
+        expect(adapter.matches_condition?(article1, :priority.in, [2, 3])).to be(false)
+        expect(adapter.matches_condition?(article1, :priority.nin, [2, 3])).to be(true)
+        expect(adapter.matches_condition?(article1, :priority.nin, [1, 2])).to be(false)
+        expect(adapter.matches_condition?(article1, :priority.lt, 2)).to be(true)
+        expect(adapter.matches_condition?(article1, :priority.lt, 1)).to be(false)
+        expect(adapter.matches_condition?(article1, :priority.lteq, 1)).to be(true)
+        expect(adapter.matches_condition?(article1, :priority.lteq, 0)).to be(false)
+        expect(adapter.matches_condition?(article1, :priority.gt, 0)).to be(true)
+        expect(adapter.matches_condition?(article1, :priority.gt, 1)).to be(false)
+        expect(adapter.matches_condition?(article1, :priority.gteq, 1)).to be(true)
+        expect(adapter.matches_condition?(article1, :priority.gteq, 2)).to be(false)
+        expect(adapter.matches_condition?(article1, :name.like, "%ello worl%")).to be_truthy
+        expect(adapter.matches_condition?(article1, :name.like, "hello world")).to be_truthy
+        expect(adapter.matches_condition?(article1, :name.like, "hello%")).to be_truthy
+        expect(adapter.matches_condition?(article1, :name.like, "h%d")).to be_truthy
+        expect(adapter.matches_condition?(article1, :name.like, "%helo%")).to be_falsey
+        expect(adapter.matches_condition?(article1, :name.like, "hello")).to be_falsey
+        expect(adapter.matches_condition?(article1, :name.like, "hello.world")).to be_falsey
         # For some reason this is reporting "The not_matches MetaWhere condition is not supported."
-        # expect(adapter.matches_condition?(article1, :name.nlike, "%helo%")).to be_true
-        # expect(adapter.matches_condition?(article1, :name.nlike, "%ello worl%")).to be_false
+        # expect(adapter.matches_condition?(article1, :name.nlike, "%helo%")).to be(true)
+        # expect(adapter.matches_condition?(article1, :name.nlike, "%ello worl%")).to be(false)
       end
     end
   end

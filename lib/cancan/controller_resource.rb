@@ -46,17 +46,12 @@ module CanCan
       @options.has_key?(:parent) ? @options[:parent] : @name && @name != name_from_controller.to_sym
     end
 
-    def skip?(behavior) # This could probably use some refactoring
-      options = @controller.class.cancan_skipper[behavior][@name]
-      if options.nil?
-        false
-      elsif options == {}
-        true
-      elsif options[:except] && ![options[:except]].flatten.include?(@params[:action].to_sym)
-        true
-      elsif [options[:only]].flatten.include?(@params[:action].to_sym)
-        true
-      end
+    def skip?(behavior)
+      return false unless options = @controller.class.cancan_skipper[behavior][@name]
+
+      options == {} ||
+      options[:except] && !action_exists_in?(options[:except]) ||
+      action_exists_in?(options[:only])
     end
 
     protected
@@ -123,7 +118,11 @@ module CanCan
     end
 
     def authorization_action
-      parent? ? :show : @params[:action].to_sym
+      parent? ? parent_authorization_action : @params[:action].to_sym
+    end
+
+    def parent_authorization_action
+      @options[:parent_action] || :show
     end
 
     def id_param
@@ -222,22 +221,29 @@ module CanCan
     end
 
     def resource_params
-      if param_actions.include?(@params[:action].to_sym) && params_method.present?
+      if parameters_require_sanitizing? && params_method.present?
         return case params_method
           when Symbol then @controller.send(params_method)
           when String then @controller.instance_eval(params_method)
           when Proc then params_method.call(@controller)
         end
-      elsif @options[:class]
-        params_key = extract_key(@options[:class])
-        return @params[params_key] if @params[params_key]
+      else
+        resource_params_by_namespaced_name
       end
+    end
 
-      resource_params_by_namespaced_name
+    def parameters_require_sanitizing?
+      save_actions.include?(@params[:action].to_sym) || resource_params_by_namespaced_name.present?
     end
 
     def resource_params_by_namespaced_name
-      @params[extract_key(namespaced_name)]
+      if @options[:instance_name] && @params.has_key?(extract_key(@options[:instance_name]))
+        @params[extract_key(@options[:instance_name])]
+      elsif @options[:class] && @params.has_key?(extract_key(@options[:class]))
+        @params[extract_key(@options[:class])]
+      else
+        @params[extract_key(namespaced_name)]
+      end
     end
 
     def params_method
@@ -254,17 +260,17 @@ module CanCan
     end
 
     def namespace
-      @params[:controller].split(/::|\//)[0..-2]
+      @params[:controller].split('/')[0..-2]
     end
 
     def namespaced_name
-      [namespace, name.camelize].join('::').singularize.camelize.constantize
+      [namespace, name.camelize].flatten.map(&:camelize).join('::').singularize.constantize
     rescue NameError
       name
     end
 
     def name_from_controller
-      @params[:controller].sub("Controller", "").underscore.split('/').last.singularize
+      @params[:controller].split('/').last.singularize
     end
 
     def instance_name
@@ -279,11 +285,15 @@ module CanCan
       [:new, :create] + Array(@options[:new])
     end
 
-    def param_actions
+    def save_actions
       [:create, :update]
     end
 
     private
+
+    def action_exists_in?(options)
+      Array(options).include?(@params[:action].to_sym)
+    end
 
     def extract_key(value)
        value.to_s.underscore.gsub('/', '_')

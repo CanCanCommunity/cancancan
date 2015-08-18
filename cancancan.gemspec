@@ -6,8 +6,8 @@ require 'cancan/version'
 Gem::Specification.new do |s|
   s.name        = "cancancan"
   s.version     = CanCan::VERSION
-  s.authors     = ["Bryan Rite", "Ryan Bates"]
-  s.email       = "bryan@bryanrite.com"
+  s.authors     = ["Bryan Rite", "Ryan Bates", "Richard Wilson"]
+  s.email       = "r.crawfordwilson@gmail.com"
   s.homepage    = "https://github.com/CanCanCommunity/cancancan"
   s.summary     = "Simple authorization solution for Rails."
   s.description = "Continuation of the simple authorization solution for Rails which is decoupled from user roles. All permissions are stored in a single location."
@@ -24,8 +24,6 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency 'bundler', '~> 1.3'
   s.add_development_dependency 'rake', '~> 10.1.1'
-  s.add_development_dependency 'rspec', '~> 2.14'
-  s.add_development_dependency 'appraisal', '>= 1.0.0'
-
-  s.rubyforge_project = s.name
+  s.add_development_dependency 'rspec', '~> 3.0.0'
+  s.add_development_dependency 'appraisal', '>= 2.0.0'
 end
