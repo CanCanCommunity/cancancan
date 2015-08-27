@@ -28,6 +28,12 @@ In **Rails 3 and 4**, add this to your Gemfile and run the `bundle install` comm
 
 CanCanCan expects a `current_user` method to exist in the controller. First, set up some authentication (such as [Authlogic](https://github.com/binarylogic/authlogic) or [Devise](https://github.com/plataformatec/devise)). See [Changing Defaults](https://github.com/CanCanCommunity/cancancan/wiki/changing-defaults) if you need different behavior.
 
+When using [rails-api](https://github.com/rails-api/rails-api), you have to manually include the controller methods for CanCan:
+```ruby
+class ApplicationController < ActionController::API
+  include CanCan::ControllerAdditions
+end
+```
 
 ### 1. Define Abilities
 
