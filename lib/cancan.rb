@@ -20,6 +20,5 @@ if defined? ActiveRecord
   end
 end
 
-require 'cancan/model_adapters/data_mapper_adapter' if defined? DataMapper
 require 'cancan/model_adapters/mongoid_adapter' if defined?(Mongoid) && defined?(Mongoid::Document)
 require 'cancan/model_adapters/sequel_adapter' if defined? Sequel
