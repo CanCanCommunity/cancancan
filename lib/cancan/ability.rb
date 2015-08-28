@@ -30,7 +30,7 @@ module CanCan
     #   can? :create, @category => Project
     #
     # You can also pass multiple objects to check. You only need to pass a hash
-    # following the pattern { :any => [many subjects] }. The behaviour is check if
+    # following the pattern { :any => [many subjects] }. The behaviour is to check if
     # there is a permission on any of the given objects.
     #
     #   can? :create, {:any => [Project, Rule]}
