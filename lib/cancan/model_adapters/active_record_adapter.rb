@@ -117,8 +117,6 @@ module CanCan
       end
 
       def sanitize_sql(conditions)
-        puts "conditions:"
-        puts conditions
         @model_class.send(:sanitize_sql, conditions)
       end
 
