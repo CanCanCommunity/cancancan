@@ -2,9 +2,9 @@
 
 ### Reporting an Issue
 
-1. If you have any questions about CanCanCan, search the [Wiki](https://github.com/bryanrite/cancancan/wiki), use [Stack Overflow](http://stackoverflow.com/questions/tagged/cancancan), or [our mailing list](https://groups.google.com/forum/#!forum/cancancan). Do not post questions here.
+1. If you have any questions about CanCanCan, search the [Wiki](https://github.com/cancancommunity/cancancan/wiki), use [Stack Overflow](http://stackoverflow.com/questions/tagged/cancancan), or [our mailing list](https://groups.google.com/forum/#!forum/cancancan). Do not post questions here.
 
-1. If you find a security bug, **DO NOT** submit an issue here. Please send an e-mail to [bryan@bryanrite.com](mailto:bryan@bryanrite.com) instead.
+1. If you find a security bug, **DO NOT** submit an issue here. Please send an e-mail to the current maintainer instead.
 
 1. Do a small search on the issues tracker before submitting your issue to see if it was already reported / fixed.
 

@@ -119,7 +119,7 @@ module CanCan
     #   can :read, :stats
     #   can? :read, :stats # => true
     #
-    # IMPORTANT: Neither a hash of conditions or a block will be used when checking permission on a class.
+    # IMPORTANT: Neither a hash of conditions nor a block will be used when checking permission on a class.
     #
     #   can :update, Project, :priority => 3
     #   can? :update, Project # => true
