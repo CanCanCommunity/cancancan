@@ -15,6 +15,9 @@ Kernel.const_get(rspec_module)::Matchers.define :be_able_to do |*args|
   # Check that RSpec is < 2.99
   if !respond_to?(:failure_message) && respond_to?(:failure_message_for_should)
     alias :failure_message :failure_message_for_should
+  end
+
+  if !respond_to?(:failure_message_when_negated) && respond_to?(:failure_message_for_should_not)
     alias :failure_message_when_negated :failure_message_for_should_not
   end
 
