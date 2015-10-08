@@ -283,9 +283,9 @@ module CanCan
 
     protected
 
-    def rules
-      @rules
-    end
+    # Must be protected as an ability can merge with other abilities.
+    # This means that an ability must expose their rules with another ability.
+    attr_reader :rules
 
     private
 
@@ -356,8 +356,7 @@ module CanCan
 
     def alternative_subjects(subject)
       subject = subject.class unless subject.is_a?(Module)
-      descendants = []
-      [:all, *subject.ancestors, *descendants, subject.class.to_s]
+      [:all, *subject.ancestors,  subject.class.to_s]
     end
 
     # Returns an array of Rule instances which match the action and subject
