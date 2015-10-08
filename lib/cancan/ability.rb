@@ -285,7 +285,9 @@ module CanCan
 
     # Must be protected as an ability can merge with other abilities.
     # This means that an ability must expose their rules with another ability.
-    attr_reader :rules
+    def rules
+      @rules ||= []
+    end
 
     private
 
@@ -338,9 +340,8 @@ module CanCan
     end
 
     def add_rule(rule)
-      @rules ||= []
-      @rules << rule
-      add_rule_to_index(rule, @rules.size - 1)
+      rules << rule
+      add_rule_to_index(rule, rules.size - 1)
     end
 
     def add_rule_to_index(rule, position)
