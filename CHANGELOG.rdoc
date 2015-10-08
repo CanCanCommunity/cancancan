@@ -1,9 +1,15 @@
 Develop
 
+Unreleased
+
+1.13.0 (Oct 7th, 2015)
+
+* Significantly improve rule lookup time (amarshall)
+* Removed deprecation warnings for RSpec 3.2 (NekoNova)
+
 1.12.0 (June 28th, 2015)
 
 * Add a permissions method to Ability (devaroop)
-* Removed deprecation warnings for RSpec 3.2 (NekoNova)
 
 1.11.0 (June 15th, 2015)
 
