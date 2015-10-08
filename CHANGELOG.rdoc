@@ -2,6 +2,10 @@ Develop
 
 Unreleased
 
+1.13.1 (Oct 8th, 2015)
+
+* Fix #merge with empty Ability (jhawthorn)
+
 1.13.0 (Oct 7th, 2015)
 
 * Significantly improve rule lookup time (amarshall)
