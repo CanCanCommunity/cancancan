@@ -510,5 +510,12 @@ describe CanCan::Ability do
       expect(@ability.can?(:use, :search)).to be(true)
       expect(@ability.send(:rules).size).to eq(2)
     end
+
+    it "can add an empty ability" do
+      (another_ability = double).extend(CanCan::Ability)
+
+      @ability.merge(another_ability)
+      expect(@ability.send(:rules).size).to eq(0)
+    end
   end
 end
