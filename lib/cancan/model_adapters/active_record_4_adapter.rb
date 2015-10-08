@@ -2,20 +2,53 @@ module CanCan
   module ModelAdapters
     class ActiveRecord4Adapter < AbstractAdapter
       include ActiveRecordAdapter
-      def self.for_class?(model_class)
-        model_class <= ActiveRecord::Base
+
+      class << self
+        def for_class?(model_class)
+          model_class <= ActiveRecord::Base
+        end
+
+        def override_condition_matching?(subject, name, value)
+          name == :not || super
+        end
+
+        def matches_condition?(subject, name, value)
+          if name == :not && value.kind_of?(Hash)
+            value.none? {|attribute, test| subject.send(attribute) == test }
+          else
+            super
+          end
+        end
       end
 
       private
+
+      def association_condition?(name, value)
+        name != :not && super
+      end
 
       # As of rails 4, `includes()` no longer causes active record to
       # look inside the where clause to decide to outer join tables
       # you're using in the where. Instead, `references()` is required
       # in addition to `includes()` to force the outer join.
       def build_relation(*where_conditions)
+        if where_conditions.kind_of?(Array) && where_conditions.size == 1
+          condition = where_conditions.first
+          if condition.kind_of? Hash
+            not_conditions = condition.delete(:not)
+            where_conditions = [condition]
+          end
+        end
+
         relation = @model_class.where(*where_conditions)
+        relation = relation.where.not(not_conditions) if not_conditions
         relation = relation.includes(joins).references(joins) if joins.present?
         relation
+      end
+
+      def merge_joins(base, add)
+        add.delete :not
+        super base, add
       end
 
       # Rails 4.2 deprecates `sanitize_sql_hash_for_conditions`

@@ -30,7 +30,7 @@ module CanCan
       def tableized_conditions(conditions, model_class = @model_class)
         return conditions unless conditions.kind_of? Hash
         conditions.inject({}) do |result_hash, (name, value)|
-          if value.kind_of? Hash
+          if association_condition? name, value
             value = value.dup
             association_class = model_class.reflect_on_association(name).klass.name.constantize
             nested = value.inject({}) do |nested,(k,v)|
@@ -75,6 +75,10 @@ module CanCan
       end
 
       private
+
+      def association_condition?(name, value)
+        value.kind_of? Hash
+      end
 
       def mergeable_conditions?
         @rules.find {|rule| rule.unmergeable? }.blank?
