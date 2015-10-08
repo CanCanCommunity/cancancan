@@ -2,6 +2,8 @@ Develop
 
 Unreleased
 
+* Add support for rails 4 enum's (markpmitchell)
+
 1.13.0 (Oct 7th, 2015)
 
 * Significantly improve rule lookup time (amarshall)
