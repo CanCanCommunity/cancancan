@@ -390,8 +390,12 @@ module CanCan
   end
 end
 
-if defined? ActionController::Base
-  ActionController::Base.class_eval do
-    include CanCan::ControllerAdditions
+if defined? ActionController
+  ['Base', 'API'].each do |klass|
+    if ActionController.const_defined?(klass)
+      ActionController.const_get(klass).class_eval do
+        include CanCan::ControllerAdditions
+      end
+    end
   end
 end
