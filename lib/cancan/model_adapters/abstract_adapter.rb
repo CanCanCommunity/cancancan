@@ -42,6 +42,17 @@ module CanCan
         raise NotImplemented, "This model adapter does not support matching on a specific condition."
       end
 
+      # Used to determine if this model adapter can provide optimized association matching.
+      # If this returns true then matches_association? will be called. See Rule#hash_condition_match?
+      def self.override_association_matching?(subject, conditions)
+        false
+      end
+
+      # Override if override_association_matching? returns true
+      def self.matches_association?(subject, conditions)
+        raise NotImplemented, "This model adapter does not support matching on an association."
+      end
+
       def initialize(model_class, rules)
         @model_class = model_class
         @rules = rules

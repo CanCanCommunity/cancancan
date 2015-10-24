@@ -148,6 +148,15 @@ if defined? CanCan::ModelAdapters::ActiveRecord4Adapter
 
           expect(Parent.accessible_by(@ability)).to eq([parent])
         end
+
+        it "allows querying hash conditions via the relation", focus: true do
+          @ability.can :read, Parent, :children => {:parent_id => 2}
+
+          parent = Parent.create!
+          expect(parent.children).to receive_message_chain(:where, :any?).and_return(true)
+
+          @ability.can?(:read, parent)
+        end
       end
     end
   end
