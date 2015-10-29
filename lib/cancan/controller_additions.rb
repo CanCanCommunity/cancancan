@@ -280,7 +280,7 @@ module CanCan
       end
 
       def cancan_resource_class
-        if ancestors.map(&:to_s).include? "InheritedResources::Actions"
+        if defined?(InheritedResources) && ancestors.map(&:to_s).include?("InheritedResources::Actions")
           InheritedResource
         else
           ControllerResource
