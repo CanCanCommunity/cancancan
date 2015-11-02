@@ -335,6 +335,15 @@ describe CanCan::Ability do
     expect(@ability.can?(:read, Range)).to be(true)
   end
 
+  it "matches right ability with hash rocket syntax" do
+    @ability.can :read, Range, :to_a => { :to_i => 3 }
+    @ability.cannot :read, Range, :begin => 1
+    expect(@ability.can?(:read, 2..5)).to be(true)
+    expect(@ability.can?(:read, 1..5)).to be(false)
+    expect(@ability.can?(:read, 1..4 => Range)).to be(false)
+    expect(@ability.can?(:read, 2..5 => Range)).to be(true)
+  end
+
   it "stops at cannot definition when no hash is present" do
     @ability.can :read, :all
     @ability.cannot :read, Range
@@ -366,7 +375,7 @@ describe CanCan::Ability do
 
     expect(@ability.can?(:read, "foo" => Range)).to be(true)
     expect(@ability.can?(:read, "foobar" => Range)).to be(false)
-    expect(@ability.can?(:read, 123 => Range)).to be(true)
+    expect(@ability.can?(:read, "123" => Range)).to be(true)
     expect(@ability.can?(:read, {:any => [{"foo" => Range}, {"foobar" => Range}]})).to be(true)
     expect(@ability.can?(:read, {:any => [{"food" => Range}, {"foobar" => Range}]})).to be(false)
   end
@@ -377,7 +386,7 @@ describe CanCan::Ability do
 
     expect(@ability.can?(:read, "foo" => Range)).to be(true)
     expect(@ability.can?(:read, "foobar" => Range)).to be(false)
-    expect(@ability.can?(:read, 1234 => Range)).to be(true)
+    expect(@ability.can?(:read, "1234" => Range)).to be(true)
     expect(@ability.can?(:read, {:any => [{"foo" => Range}, {"foobar" => Range}]})).to be(true)
     expect(@ability.can?(:read, {:any => [{"foo.bar" => Range}, {"foobar" => Range}]})).to be(false)
   end

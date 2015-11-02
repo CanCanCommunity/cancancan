@@ -121,7 +121,7 @@ module CanCan
 
     def nested_subject_matches_conditions?(subject_hash)
       parent, child = subject_hash.first
-      matches_conditions_hash?(parent, @conditions[parent.class.name.downcase.to_sym] || {})
+      matches_conditions_hash?(parent, @conditions[parent.class.name.downcase.to_sym] || @conditions)
     end
 
     def call_block_with_all(action, subject, extra_args)
