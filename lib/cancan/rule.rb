@@ -70,7 +70,7 @@ module CanCan
     def attributes_from_conditions
       attributes = {}
       @conditions.each do |key, value|
-        attributes[key] = value unless [Array, Range, Hash].include? value.class
+        attributes[key] = value unless [Array, Range].include? value.class
       end if @conditions.kind_of? Hash
       attributes
     end

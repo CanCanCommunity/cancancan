@@ -393,7 +393,12 @@ describe CanCan::Ability do
     @ability.can :create, Range, :bar => 123, :array => %w[skip arrays]
     @ability.can :new, Range, :baz => "baz", :range => 1..3
     @ability.cannot :new, Range, :ignore => "me"
-    expect(@ability.attributes_for(:new, Range)).to eq({:foo => "foo", :bar => 123, :baz => "baz"})
+    expect(@ability.attributes_for(:new, Range)).to eq({:foo => "foo", :bar => 123, :baz => "baz", :hash => {:skip => "hashes"}})
+  end
+
+  it "has attributes assigned with hash conditions" do
+    @ability.can :manage, Range, :hash => {:skip => "hashes"}
+    expect(@ability.attributes_for(:manage, Range)).to eq({:hash => {:skip => "hashes"}})
   end
 
   it "raises access denied exception if ability us unauthorized to perform a certain action" do
