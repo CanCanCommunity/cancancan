@@ -12,6 +12,7 @@ gemfile:
   - gemfiles/activerecord_4.1.gemfile
   - gemfiles/activerecord_4.2.gemfile
   - gemfiles/mongoid_2.x.gemfile
+  - gemfiles/mongoid_5.x.gemfile
   - gemfiles/sequel_3.x.gemfile
 services:
   - mongodb
