@@ -2,28 +2,58 @@ require "spec_helper"
 
 if defined? CanCan::ModelAdapters::MongoidAdapter
 
-  class MongoidCategory
-    include Mongoid::Document
+  if defined? Mongoid::VERSION and Mongoid::VERSION > '5'
+    class MongoidCategory
+      include Mongoid::Document
+      include Mongoid::Attributes::Dynamic
 
-    references_many :mongoid_projects
+      has_many :mongoid_projects
+    end
+
+    class MongoidProject
+      include Mongoid::Document
+      include Mongoid::Attributes::Dynamic
+
+      belongs_to :mongoid_category
+      has_many :mongoid_sub_projects
+    end
+
+    class MongoidSubProject
+      include Mongoid::Document
+      include Mongoid::Attributes::Dynamic
+
+      belongs_to :mongoid_project
+    end
+
+    Mongoid.load!("spec/mongoid.yml", :test)
+    Mongo::Logger.logger.level = Logger::INFO
+    
+  else
+
+    class MongoidCategory
+      include Mongoid::Document
+
+      references_many :mongoid_projects
+    end
+
+    class MongoidProject
+      include Mongoid::Document
+
+      referenced_in :mongoid_category
+      references_many :mongoid_sub_projects
+    end
+
+    class MongoidSubProject
+      include Mongoid::Document
+
+      referenced_in :mongoid_project
+    end
+    
+    Mongoid.configure do |config|
+      config.master = Mongo::Connection.new('127.0.0.1', 27017).db("cancan_mongoid_spec")
+    end
   end
 
-  class MongoidProject
-    include Mongoid::Document
-
-    referenced_in :mongoid_category
-    references_many :mongoid_sub_projects
-  end
-
-  class MongoidSubProject
-    include Mongoid::Document
-
-    referenced_in :mongoid_project
-  end
-
-  Mongoid.configure do |config|
-    config.master = Mongo::Connection.new('127.0.0.1', 27017).db("cancan_mongoid_spec")
-  end
 
   describe CanCan::ModelAdapters::MongoidAdapter do
     context "Mongoid defined" do
@@ -32,7 +62,7 @@ if defined? CanCan::ModelAdapters::MongoidAdapter
       end
 
       after(:each) do
-        Mongoid.master.collections.select do |collection|
+        (Mongoid.try(:master) || Mongoid.default_client).collections.select do |collection|
           collection.name !~ /system/
         end.each(&:drop)
       end
@@ -155,9 +185,10 @@ if defined? CanCan::ModelAdapters::MongoidAdapter
           expect(@ability.can?(:read, obj2)).to be(false)
         end
 
+        # For whatever reason Symbol#size does not work in Origin 2.1.1
         it "handles :field.size" do
           obj = MongoidProject.create(:titles => ['Palatin', 'Margrave'])
-          @ability.can :read, MongoidProject, :titles.size => 2
+          @ability.can :read, MongoidProject, 'titles' => {'$size' => 2}
           expect(@ability.can?(:read, obj)).to eq(true)
           expect(MongoidProject.accessible_by(@ability, :read)).to eq([obj])
 
@@ -218,7 +249,7 @@ if defined? CanCan::ModelAdapters::MongoidAdapter
         obj3 = MongoidProject.create(:bar => 3)
         @ability.can :read, MongoidProject, :bar => 1
         @ability.can :read, MongoidProject, :bar => 2
-        expect(MongoidProject.accessible_by(@ability, :read).entries).to match_array([obj, obj2])
+        expect(MongoidProject.accessible_by(@ability, :read).entries).to eq([obj, obj2])
       end
 
       it "does not allow to fetch records when ability with just block present" do
@@ -238,7 +269,46 @@ if defined? CanCan::ModelAdapters::MongoidAdapter
         proj2 = cat2.mongoid_projects.create name: 'Proj2'
         sub1 = proj1.mongoid_sub_projects.create name: 'Sub1'
         sub2 = proj2.mongoid_sub_projects.create name: 'Sub2'
-        expect(MongoidSubProject.accessible_by(@ability)).to match_array([sub1])
+        expect(MongoidSubProject.accessible_by(@ability)).to eq([sub2])
+      end
+      
+      if defined? Mongoid::VERSION and Mongoid::VERSION > '5'
+        context 'assuming version of Mongoid >= 5' do
+
+          it "excludes from the result if set to cannot combining several `cannot' rules" do
+            obj = MongoidProject.create(:bar => 1)
+            obj2 = MongoidProject.create(:bar => 2)
+            obj3 = MongoidProject.create(:bar => 3)
+            @ability.can :read, MongoidProject
+            @ability.cannot :read, MongoidProject, :bar => 2
+            @ability.cannot :read, MongoidProject, :bar => 3
+            expect(MongoidProject.accessible_by(@ability, :read).entries).to eq([obj])
+          end
+
+          it "combines the rules and excludes from the result if set to cannot" do
+            obj = MongoidProject.create(:bar => 1)
+            obj2 = MongoidProject.create(:bar => 1, :name => 'ActiveRecord')
+            obj3 = MongoidProject.create(:bar => 2)
+            @ability.can :read, MongoidProject, :bar => 1
+            @ability.can :read, MongoidProject, :bar => 2
+            @ability.cannot :read, MongoidProject, :name => 'ActiveRecord'
+            expect(MongoidProject.accessible_by(@ability, :read).entries).to eq([obj, obj3])
+          end
+
+          it "combines accessible_by with another OR'ed criteria intersecting them" do
+            @ability.can :read, MongoidProject, :title => 'Sir'
+            sir_mongoid      = MongoidProject.create(:title => 'Sir', :name => 'Mongoid')
+            sir_activemodel  = MongoidProject.create(:title => 'Sir', :name => 'ActiveModel')
+            just_sir         = MongoidProject.create(:title => 'Sir')
+            lord_mongoid     = MongoidProject.create(:title => 'Lord', :name => 'Mongoid')
+            just_activemodel = MongoidProject.create(:title => 'Lord', :name => 'ActiveModel')
+            dude_mongoid     = MongoidProject.create(:title => 'Dude', :name => 'Mongoid')
+            just_dude        = MongoidProject.create(:title => 'Dude')
+
+            expect(MongoidProject.where('$or' => [{name: 'Mongoid'}, {name: 'ActiveModel'}]).accessible_by(@ability)).to eq([sir_mongoid, sir_activemodel])
+          end
+          
+        end
       end
 
 

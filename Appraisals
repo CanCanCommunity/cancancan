@@ -67,6 +67,15 @@ appraise "mongoid_2.x" do
   end
 end
 
+appraise "mongoid_5.x" do
+  gem "activesupport", "~> 4.2.0", :require => "active_support/all"
+  gem "mongoid", "~> 5.0.0"
+
+  gemfile.platforms :jruby do
+    gem "mongo", "~> 2.1.1"
+  end
+end
+
 appraise "sequel_3.x" do
   gem "sequel", "~> 3.47.0"
   gem "activesupport", "~> 3.0", :require => "active_support/all"
