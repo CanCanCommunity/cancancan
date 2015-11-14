@@ -112,10 +112,10 @@ module CanCan
 
       conditions.all? do |name, value|
         if adapter.override_condition_matching?(subject, name, value)
-          return adapter.matches_condition?(subject, name, value)
+          adapter.matches_condition?(subject, name, value)
+        else
+          condition_match?(subject.send(name), value)
         end
-
-        condition_match?(subject.send(name), value)
       end
     end
 
