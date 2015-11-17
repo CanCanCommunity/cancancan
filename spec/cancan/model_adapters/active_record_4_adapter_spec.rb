@@ -75,6 +75,36 @@ if defined? CanCan::ModelAdapters::ActiveRecord4Adapter
           accessible = Shape.accessible_by(@ability, :update)
           expect(accessible).to contain_exactly(red, blue)
         end
+
+        it "allows dual filter on enums" do
+          ActiveRecord::Schema.define do
+            create_table(:discs) do |t|
+              t.integer :color, default: 0, null: false
+              t.integer :shape, default: 3, null: false
+            end
+          end
+
+          class Disc < ActiveRecord::Base
+            enum color: [:red, :green, :blue]
+            enum shape: { triangle: 3, rectangle: 4 }
+          end
+
+          red_triangle = Disc.create!(color: Disc.colors[:red], shape: Disc.shapes[:triangle])
+          green_triangle = Disc.create!(color: Disc.colors[:green], shape: Disc.shapes[:triangle])
+          green_rectangle = Disc.create!(color: Disc.colors[:green], shape: Disc.shapes[:rectangle])
+          blue_rectangle = Disc.create!(color: Disc.colors[:blue], shape: Disc.shapes[:rectangle])
+
+          # A condition with a dual filter.
+          @ability.can :read, Disc, color: Disc.colors[:green], shape: Disc.shapes[:rectangle]
+
+          expect(@ability.cannot? :read, red_triangle).to be true
+          expect(@ability.cannot? :read, green_triangle).to be true
+          expect(@ability.can? :read, green_rectangle).to be true
+          expect(@ability.cannot? :read, blue_rectangle).to be true
+
+          accessible = Disc.accessible_by(@ability)
+          expect(accessible).to contain_exactly(green_rectangle)
+        end
       end
     end
 

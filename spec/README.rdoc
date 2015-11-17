@@ -16,7 +16,7 @@ You can then run all test sets:
 
 Or individual ones:
 
-  appraisal rails_3.0 rake
+  appraisal activerecord_3.2 rake
 
 A list of the tests is in the +Appraisal+ file.
 
