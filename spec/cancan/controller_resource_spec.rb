@@ -501,6 +501,17 @@ describe CanCan::ControllerResource do
     end
   end
 
+  context 'when @name passed as symbol' do
+    it 'returns namespaced #resource_class' do
+      module Admin; end
+      class Admin::Dashboard; end;
+      params.merge!(:controller => "admin/dashboard")
+      resource = CanCan::ControllerResource.new(controller, :dashboard)
+
+      expect(resource.send(:resource_class)).to eq Admin::Dashboard
+    end
+  end
+
   it "calls the santitizer when the parameter hash matches our object" do
     params.merge!(:action => 'create', :model => { :name => 'test' })
     allow(controller).to receive(:create_params).and_return({})
