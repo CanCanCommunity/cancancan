@@ -140,6 +140,7 @@ module CanCan
       case value
       when Hash       then hash_condition_match?(attribute, value)
       when String     then attribute == value
+      when Range      then value.cover?(attribute)
       when Enumerable then value.include?(attribute)
       else attribute == value
       end
