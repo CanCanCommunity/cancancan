@@ -322,11 +322,11 @@ module CanCan
 
     # It translates to an array the subject or the hash with multiple subjects given to can?.
     def extract_subjects(subject)
-      _subject = if subject.kind_of?(Hash) && subject.key?(:any)
-                   subject[:any]
-                 else
-                   [subject]
-                 end
+      if subject.kind_of?(Hash) && subject.key?(:any)
+        subject[:any]
+      else
+        [subject]
+      end
     end
 
     # Given an action, it will try to find all of the actions which are aliased to it.
