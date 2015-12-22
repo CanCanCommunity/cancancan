@@ -91,7 +91,7 @@ module CanCan
 
     def initial_attributes
       current_ability.attributes_for(@params[:action].to_sym, resource_class).delete_if do |key, value|
-        resource_params && resource_params.include?(key)
+        resource_params && resource_params.has_key?(key)
       end
     end
 
