@@ -9,9 +9,6 @@
 
 CanCan is an authorization library for Ruby on Rails which restricts what resources a given user is allowed to access. All permissions are defined in a single location (the `Ability` class) and not duplicated across controllers, views, and database queries.
 
-## This is the master branch!
-This branch represents work towards version 2.0. Please checkout the 1.x branch for the stable release. Use master at your own risk.
-
 ## Mission
 
 This repo is a continuation of the dead [CanCan](https://github.com/ryanb/cancan) project. Our mission is to keep CanCan alive and moving forward, with maintenance fixes and new features. Pull Requests are welcome!
@@ -25,7 +22,7 @@ Any help is greatly appreciated, feel free to submit pull-requests or open issue
 
 In **Rails 3 and 4**, add this to your Gemfile and run the `bundle install` command.
 
-    gem 'cancancan', '~> 1.10'
+    gem 'cancancan', '~> 1.13'
 
 ## Getting Started
 
