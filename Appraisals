@@ -54,6 +54,21 @@ appraise "activerecord_4.2" do
   end
 end
 
+appraise "activerecord_5.0" do
+  gem "activerecord", "~> 5.0.0.beta1", :require => "active_record"
+  gem 'activesupport', '~> 5.0.0.beta1', :require => 'active_support/all'
+
+  gemfile.platforms :jruby do
+    gem "activerecord-jdbcsqlite3-adapter"
+    gem "jdbc-sqlite3"
+  end
+
+  gemfile.platforms :ruby, :mswin, :mingw do
+    gem "sqlite3"
+    gem "pg"
+  end
+end
+
 appraise "mongoid_2.x" do
   gem "activesupport", "~> 3.0", :require => "active_support/all"
   gem "mongoid", "~> 2.0.0"
