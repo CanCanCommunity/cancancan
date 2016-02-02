@@ -27,22 +27,51 @@ module CanCan
         end
       end
 
-      def tableized_conditions(conditions, model_class = @model_class)
+      def table_name_for_scope(current_scope)
+        current_table = current_scope.arel.source.right.last.left
+
+        case current_table
+        when Arel::Table
+          current_table.name
+        when Arel::Nodes::TableAlias
+          current_table.right
+        else
+          fail
+        end
+      end
+
+      def nesting_to_joins_hash(nesting)
+        nesting.reverse.reduce(nil) do |a, e|
+          if a.nil?
+            e
+          else
+            { e => a }
+          end
+        end
+      end
+
+      def tableized_conditions(conditions, model_class = @model_class,
+                               current_nesting = [], current_scope = model_class.all)
         return conditions unless conditions.kind_of? Hash
         conditions.inject({}) do |result_hash, (name, value)|
           if value.kind_of? Hash
             value = value.dup
+            new_nesting = current_nesting + [name]
+            joins_hash = nesting_to_joins_hash(new_nesting)
+            current_scope = current_scope.joins(joins_hash)
             association_class = model_class.reflect_on_association(name).klass.name.constantize
+            table_name = table_name_for_scope(current_scope).to_sym
             nested = value.inject({}) do |nested,(k,v)|
               if v.kind_of? Hash
                 value.delete(k)
                 nested[k] = v
               else
-                result_hash[model_class.reflect_on_association(name).table_name.to_sym] = value
+                result_hash[table_name] = value
               end
               nested
             end
-            result_hash.merge!(tableized_conditions(nested,association_class))
+            result_hash.merge!(tableized_conditions(nested, association_class,
+                                                    new_nesting, current_scope))
           else
             result_hash[name] = value
           end

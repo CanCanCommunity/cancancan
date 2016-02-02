@@ -227,6 +227,22 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       expect { Comment.accessible_by(@ability) }.to_not raise_error
     end
 
+    it "should support repeated tables in deeply nested conditions" do
+      @ability.can :read, Article, :mentioned_users => {
+        :articles => {
+          :published => true
+        }
+      }
+
+      user1 = User.create!
+      user2 = User.create!
+      article1 = Article.create!(user: user1)
+      article1.mentions.create!(user: user2)
+      article2 = Article.create!(user: user2, published: true)
+
+      expect(Article.accessible_by(@ability)).to contain_exactly(article1)
+    end
+
     it "does not allow to check ability on object against SQL conditions without block" do
       @ability.can :read, Article, ["secret=?", true]
       expect(lambda { @ability.can? :read, Article.new }).to raise_error(CanCan::Error)
