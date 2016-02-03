@@ -6,28 +6,27 @@ module CanCan
         model_class <= ActiveRecord::Base
       end
 
-      def tableized_conditions(conditions, model_class = @model_class,
-                               current_nesting = [], current_scope = model_class.all)
+      def tableized_conditions(conditions, current_scope = @model_class.all, current_nesting = [],
+                               table_aliases = {})
         return conditions unless conditions.kind_of? Hash
         conditions.inject({}) do |result_hash, (name, value)|
           if value.kind_of? Hash
-            value = value.dup
             new_nesting = current_nesting + [name]
-            joins_hash = nesting_to_joins_hash(new_nesting)
-            current_scope = current_scope.joins(joins_hash)
-            association_class = model_class.reflect_on_association(name).klass.name.constantize
-            table_name = table_name_for_scope(current_scope).to_sym
-            nested = value.inject({}) do |nested,(k,v)|
+            table_name, new_scope = table_name_for_nesting(new_nesting, current_scope,
+                                                           table_aliases)
+
+            nested_conditions = {}
+            current_conditions = {}
+            value.each do |(k,v)|
               if v.kind_of? Hash
-                value.delete(k)
-                nested[k] = v
+                nested_conditions[k] = v
               else
-                result_hash[table_name] = value
+                current_conditions[k] = v
               end
-              nested
             end
-            result_hash.merge!(tableized_conditions(nested, association_class,
-                                                    new_nesting, current_scope))
+            result_hash[table_name] = current_conditions unless current_conditions.empty?
+            result_hash.merge!(tableized_conditions(nested_conditions, new_scope, new_nesting,
+                                                    table_aliases))
           else
             result_hash[name] = value
           end
@@ -36,6 +35,16 @@ module CanCan
       end
 
       private
+
+      def table_name_for_nesting(nesting, scope, table_aliases)
+        keypath = nesting.reverse.join('.')
+        existing_table_name = table_aliases[keypath]
+        return existing_table_name, scope if existing_table_name
+
+        scope = scope.joins(nesting_to_joins_hash(nesting))
+        table_name = table_aliases[keypath] = table_name_for_scope(scope).to_sym
+        [table_name, scope]
+      end
 
       def table_name_for_scope(current_scope)
         current_table = current_scope.arel.source.right.last.left
