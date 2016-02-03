@@ -14,6 +14,7 @@ if defined? CanCan::ModelAdapters::ActiveRecord4Adapter
           create_table(:children) do |t|
             t.timestamps :null => false
             t.integer :parent_id
+            t.integer :other_parent_id
           end
         end
 
@@ -23,6 +24,7 @@ if defined? CanCan::ModelAdapters::ActiveRecord4Adapter
 
         class Child < ActiveRecord::Base
           belongs_to :parent
+          belongs_to :other_parent, class_name: Parent.name
         end
 
         (@ability = double).extend(CanCan::Ability)
@@ -36,6 +38,23 @@ if defined? CanCan::ModelAdapters::ActiveRecord4Adapter
         child2 = Child.create!(:parent => parent, :created_at => 2.hours.ago)
 
         expect(Parent.accessible_by(@ability).order(:created_at => :asc).includes(:children).first.children).to eq [child2, child1]
+      end
+
+      it "supports repeated tables in deeply nested conditions" do
+        parent1 = Parent.create!
+        parent2 = Parent.create!
+        @ability.can :read, Parent, :children => {
+          :other_parent => {
+            :id => parent1.id
+          }
+        }
+
+        # check that we are not directly accessible
+        expect(Parent.accessible_by(@ability)).to be_empty
+
+        child1 = Child.create!(parent: parent2, other_parent: parent1)
+
+        expect(Parent.accessible_by(@ability)).to contain_exactly(parent2)
       end
 
       if ActiveRecord::VERSION::MINOR >= 1
@@ -94,6 +113,7 @@ if defined? CanCan::ModelAdapters::ActiveRecord4Adapter
             create_table(:children) do |t|
               t.timestamps :null => false
               t.integer :parent_id
+              t.integer :other_parent_id
             end
           end
 
@@ -103,6 +123,7 @@ if defined? CanCan::ModelAdapters::ActiveRecord4Adapter
 
           class Child < ActiveRecord::Base
             belongs_to :parent
+            belongs_to :other_parent, class_name: Parent.name
           end
 
           (@ability = double).extend(CanCan::Ability)
