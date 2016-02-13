@@ -20,6 +20,7 @@ if defined? CanCan::ModelAdapters::ActiveRecord4Adapter
 
         class Parent < ActiveRecord::Base
           has_many :children, lambda { order(:id => :desc) }
+          has_many :other_parents, through: :children
         end
 
         class Child < ActiveRecord::Base
@@ -55,6 +56,17 @@ if defined? CanCan::ModelAdapters::ActiveRecord4Adapter
         child1 = Child.create!(parent: parent2, other_parent: parent1)
 
         expect(Parent.accessible_by(@ability)).to contain_exactly(parent2)
+      end
+
+      it "allows using accessible_by on a chained scope" do
+        parent1 = Parent.create!
+        parent2 = Parent.create!
+        parent3 = Parent.create!
+        child1 = Child.create!(:parent => parent1, :other_parent => parent2)
+        child2 = Child.create!(:parent => parent2, :other_parent => parent3)
+        @ability.can :read, Parent, :other_parents => { :id => parent3.id }
+
+        expect(parent1.other_parents.accessible_by(@ability)).to contain_exactly(parent2)
       end
 
       if ActiveRecord::VERSION::MINOR >= 1

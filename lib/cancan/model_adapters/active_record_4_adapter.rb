@@ -6,14 +6,20 @@ module CanCan
         model_class <= ActiveRecord::Base
       end
 
-      def tableized_conditions(conditions, current_scope = @model_class.all, current_nesting = [],
-                               table_aliases = {})
+      def tableized_conditions(conditions)
+        scope = joined_scope
+        table_aliases = build_table_aliases(scope)
+        tableize_conditions(conditions, table_aliases, [])
+      end
+
+      private
+
+      def tableize_conditions(conditions, table_aliases, current_nesting)
         return conditions unless conditions.kind_of? Hash
         conditions.inject({}) do |result_hash, (name, value)|
           if value.kind_of? Hash
             new_nesting = current_nesting + [name]
-            table_name, new_scope = table_name_for_nesting(new_nesting, current_scope,
-                                                           table_aliases)
+            table_name = table_name_for_nesting(new_nesting, table_aliases)
 
             nested_conditions = {}
             current_conditions = {}
@@ -25,8 +31,7 @@ module CanCan
               end
             end
             result_hash[table_name] = current_conditions unless current_conditions.empty?
-            result_hash.merge!(tableized_conditions(nested_conditions, new_scope, new_nesting,
-                                                    table_aliases))
+            result_hash.merge!(tableize_conditions(nested_conditions, table_aliases, new_nesting))
           else
             result_hash[name] = value
           end
@@ -34,39 +39,9 @@ module CanCan
         end
       end
 
-      private
-
-      def table_name_for_nesting(nesting, scope, table_aliases)
-        keypath = nesting.reverse.join('.')
-        existing_table_name = table_aliases[keypath]
-        return existing_table_name, scope if existing_table_name
-
-        scope = scope.joins(nesting_to_joins_hash(nesting))
-        table_name = table_aliases[keypath] = table_name_for_scope(scope).to_sym
-        [table_name, scope]
-      end
-
-      def table_name_for_scope(current_scope)
-        current_table = current_scope.arel.source.right.last.left
-
-        case current_table
-        when Arel::Table
-          current_table.name
-        when Arel::Nodes::TableAlias
-          current_table.right
-        else
-          fail
-        end
-      end
-
-      def nesting_to_joins_hash(nesting)
-        nesting.reverse.reduce(nil) do |a, e|
-          if a.nil?
-            e
-          else
-            { e => a }
-          end
-        end
+      def table_name_for_nesting(nesting, table_aliases)
+        keypath = nesting.join('.')
+        table_aliases.fetch(keypath) { fail ArgumentError }
       end
 
       # As of rails 4, `includes()` no longer causes active record to
@@ -74,9 +49,42 @@ module CanCan
       # you're using in the where. Instead, `references()` is required
       # in addition to `includes()` to force the outer join.
       def build_relation(*where_conditions)
-        relation = @model_class.where(*where_conditions)
+        joined_scope.where(*where_conditions)
+      end
+
+      def joined_scope
+        relation = @model_class.all
         relation = relation.includes(joins).references(joins) if joins.present?
         relation
+      end
+
+      def build_table_aliases(scope)
+        aliases = {}
+        build_table_alias(build_join_dependency_root(scope), aliases, [])
+        aliases
+      end
+
+      def build_table_alias(join_part, aliases, nesting)
+        join_part.children.each do |join_child|
+          new_nesting = nesting + [join_child.name]
+          aliases[new_nesting.join('.')] = join_child.aliased_table_name.to_sym
+          build_table_alias(join_child, aliases, new_nesting)
+        end
+      end
+
+      if ActiveRecord::VERSION::MINOR >= 1
+        def build_join_dependency_root(scope)
+          scope.send(:construct_join_dependency, scope.joins_values).join_root
+        end
+      else
+        def build_join_dependency_root(scope)
+          build_join_dependency(scope).join_base
+        end
+
+        def build_join_dependency(scope)
+          ActiveRecord::Associations::JoinDependency.new(scope.klass, scope.eager_load_values +
+                                                         scope.includes_values, scope.joins_values)
+        end
       end
 
       def self.override_condition_matching?(subject, name, value)
