@@ -1,16 +1,12 @@
 module CanCan
   # For use with Inherited Resources
   class InheritedResource < ControllerResource # :nodoc:
-    def load_resource_instance
-      if parent?
-        @controller.send :association_chain
-        @controller.instance_variable_get("@#{instance_name}")
-      elsif new_actions.include? @params[:action].to_sym
-        resource = @controller.send :build_resource
-        assign_attributes(resource)
-      else
-        @controller.send :resource
-      end
+
+    def initialize(controller, *args)
+      super
+      options = args.extract_options!
+      name = args.first
+      @load_resource = Concepts::LoadInheritedResource.new(controller, name, options)
     end
 
     def resource_base
