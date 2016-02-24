@@ -12,7 +12,7 @@ require 'cancan/model_adapters/default_adapter'
 
 if defined? ActiveRecord
   require 'cancan/model_adapters/active_record_adapter'
-  if ActiveRecord.respond_to?(:version) && ActiveRecord.version >= Gem::Version.new("5.0.0.beta1")
+  if ActiveRecord.respond_to?(:version) && ActiveRecord.version >= Gem::Version.new("5.0.0.beta2")
     require 'cancan/model_adapters/active_record_5_adapter'
   elsif ActiveRecord.respond_to?(:version) && ActiveRecord.version >= Gem::Version.new("4")
     require 'cancan/model_adapters/active_record_4_adapter'
