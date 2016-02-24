@@ -46,8 +46,6 @@ module CanCan
 
           conditions.stringify_keys!
 
-          conditions, binds = predicate_builder.create_binds(conditions)
-
           predicate_builder.build_from_hash(conditions).map { |b|
             @model_class.send(:connection).visitor.compile b
           }.join(' AND ')
