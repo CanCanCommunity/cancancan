@@ -120,7 +120,7 @@ module CanCan
     end
 
     def nested_subject_matches_conditions?(subject_hash)
-      parent, child = subject_hash.first
+      parent, _child = subject_hash.first
       matches_conditions_hash?(parent, @conditions[parent.class.name.downcase.to_sym] || {})
     end
 
