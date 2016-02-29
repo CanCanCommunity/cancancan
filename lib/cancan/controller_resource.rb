@@ -262,9 +262,7 @@ module CanCan
     end
 
     def namespaced_name
-      [namespace, name.camelize].flatten.map(&:camelize).join('::').singularize.constantize
-    rescue NameError
-      name
+      ([namespace, name] * '/').singularize.camelize.safe_constantize || name
     end
 
     def name_from_controller
