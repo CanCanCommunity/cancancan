@@ -52,6 +52,22 @@ describe CanCan::Ability do
     expect(@ability.can?(:read, 6)).to be(true)
   end
 
+  it "performs can(_, :all) before other checks when can(_, :all) is defined before" do
+    @ability.can :manage, :all
+    @ability.can :edit, String do |_string|
+      fail 'Performed a check for :edit before the check for :all'
+    end
+    expect { @ability.can? :edit, 'a' }.to_not raise_exception
+  end
+
+  it "performs can(_, :all) before other checks when can(_, :all) is defined after" do
+    @ability.can :edit, String do |_string|
+      fail 'Performed a check for :edit before the check for :all'
+    end
+    @ability.can :manage, :all
+    expect { @ability.can? :edit, 'a' }.to_not raise_exception
+  end
+
   it "does not pass class with object if :all objects are accepted" do
     @ability.can :preview, :all do |object|
       expect(object).to eq(123)
