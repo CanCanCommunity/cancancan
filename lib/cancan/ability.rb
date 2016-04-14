@@ -61,14 +61,11 @@ module CanCan
     #
     # Also see the RSpec Matchers to aid in testing.
     def can?(action, subject, *extra_args)
-      subject = extract_subjects(subject)
-
-      match = subject.map do |subject|
-        relevant_rules_for_match(action, subject).detect do |rule|
-          rule.matches_conditions?(action, subject, extra_args)
+      match = extract_subjects(subject).lazy.map do |a_subject|
+        relevant_rules_for_match(action, a_subject).detect do |rule|
+          rule.matches_conditions?(action, a_subject, extra_args)
         end
-      end.compact.first
-
+      end.reject(&:nil?).first
       match ? match.base_behavior : false
     end
     # Convenience method which works the same as "can?" but returns the opposite value.
@@ -369,7 +366,22 @@ module CanCan
         rule.relevant? action, subject
       end
       relevant.reverse!.uniq!
+      optimize_order! relevant
       relevant
+    end
+
+    # Optimizes the order of the rules, so that rules with the :all subject are evaluated first.
+    def optimize_order!(rules)
+      first_can_in_group = -1
+      rules.each_with_index do |rule, i|
+        (first_can_in_group = -1) and next unless rule.base_behavior
+        (first_can_in_group = i) and next if first_can_in_group == -1
+        if rule.subjects == [:all]
+          rules[i] = rules[first_can_in_group]
+          rules[first_can_in_group] = rule
+          first_can_in_group += 1
+        end
+      end
     end
 
     def possible_relevant_rules(subject)
