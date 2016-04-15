@@ -17,7 +17,7 @@ describe CanCan::ControllerAdditions do
   it "authorize! assigns @_authorized instance variable and pass args to current ability" do
     allow(@controller.current_ability).to receive(:cannot?).with(:foo, :bar).and_return(false)
     @controller.authorize!(:foo, :bar)
-    expect(@controller.current_ability.instance_variable_get(:@_authorized)).to be(true)
+    expect(@controller.current_ability.authorize_called?).to be(true)
   end
 
   it "has a current_ability method which generates an ability for the current user" do
