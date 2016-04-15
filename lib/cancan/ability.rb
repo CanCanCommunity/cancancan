@@ -222,7 +222,7 @@ module CanCan
 
     # Returns whether this ability has had authorize! called
     def authorize_called?
-      @_authorized
+      @_authorized == true
     end
 
     def unauthorized_message(action, subject)
