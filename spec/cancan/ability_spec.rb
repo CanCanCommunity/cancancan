@@ -480,6 +480,15 @@ describe CanCan::Ability do
     }.to raise_error(CanCan::Error, "You are not able to supply a block with a hash of conditions in read Array ability. Use either one.")
   end
 
+  it "calling #authorize! changes #authorize_called? to true" do
+    allow(@ability).to receive(:cannot?).with(:foo, :bar).and_return(false)
+    expect{
+      @ability.authorize! :foo, :bar
+    }.to change{
+      @ability.authorize_called?
+    }.from(false).to(true)
+  end
+
   describe "unauthorized message" do
     after(:each) do
       I18n.backend = nil

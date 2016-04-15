@@ -20,12 +20,6 @@ describe CanCan::ControllerAdditions do
     expect(@controller.current_ability.instance_variable_get(:@_authorized)).to be(true)
   end
 
-  it "authorize! results in current ability#authorize_called? returning true" do
-    allow(@controller.current_ability).to receive(:cannot?).with(:foo, :bar).and_return(false)
-    @controller.authorize!(:foo, :bar)
-    expect(@controller.current_ability.authorize_called?).to be(true)
-  end
-
   it "has a current_ability method which generates an ability for the current user" do
     expect(@controller.current_ability).to be_kind_of(Ability)
   end
