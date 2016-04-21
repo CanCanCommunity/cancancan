@@ -419,7 +419,7 @@ describe CanCan::Ability do
     expect(@ability.attributes_for(:new, Range)).to eq({:foo => "foo", :bar => 123, :baz => "baz"})
   end
 
-  it "raises access denied exception if ability us unauthorized to perform a certain action" do
+  it "raises access denied exception if ability is unauthorized to perform a certain action" do
     begin
       @ability.authorize! :read, :foo, 1, 2, 3, :message => "Access denied!"
     rescue CanCan::AccessDenied => e
@@ -428,6 +428,20 @@ describe CanCan::Ability do
       expect(e.subject).to eq(:foo)
     else
       fail "Expected CanCan::AccessDenied exception to be raised"
+    end
+  end
+
+  it "raises a custom exception if ability is unauthorized to perform a certain action and is given a custom error class" do
+    begin
+      class MyCustomAccessDenied < CanCan::AccessDenied; end
+      @ability.authorize! :read, :foo, 1, 2, 3, message: "Access denied!", error: MyCustomAccessDenied
+    rescue MyCustomAccessDenied => e
+      expect(e.message).to eq("Access denied!")
+      expect(e.action).to eq(:read)
+      expect(e.subject).to eq(:foo)
+      expect(e.class).to eq(MyCustomAccessDenied)
+    else
+      fail "Expected MyCustomAccessDenied exception to be raised"
     end
   end
 

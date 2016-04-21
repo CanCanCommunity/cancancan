@@ -207,13 +207,16 @@ module CanCan
 
     # See ControllerAdditions#authorize! for documentation.
     def authorize!(action, subject, *args)
-      message = nil
-      if args.last.kind_of?(Hash) && args.last.has_key?(:message)
-        message = args.pop[:message]
+      message, error = nil
+      if args.last.is_a?(Hash)
+        args_hash = args.pop
+        message = args_hash[:message]
+        error = args_hash[:error]
       end
       if cannot?(action, subject, *args)
         message ||= unauthorized_message(action, subject)
-        raise AccessDenied.new(message, action, subject)
+        error ||= AccessDenied
+        raise error.new(message, action, subject)
       end
       subject
     end
