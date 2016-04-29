@@ -1,9 +1,9 @@
 # CanCanCan
 
 [![Gem Version](https://badge.fury.io/rb/cancancan.svg)](http://badge.fury.io/rb/cancancan)
-[![Travis badge](https://travis-ci.org/CanCanCommunity/cancancan.png?branch=develop)](https://travis-ci.org/CanCanCommunity/cancancan)
-[![Code Climate Badge](https://codeclimate.com/github/CanCanCommunity/cancancan.png)](https://codeclimate.com/github/CanCanCommunity/cancancan)
-[![Inch CI](http://inch-ci.org/github/CanCanCommunity/cancancan.png)](http://inch-ci.org/github/CanCanCommunity/cancancan)
+[![Travis badge](https://travis-ci.org/CanCanCommunity/cancancan.svg?branch=develop)](https://travis-ci.org/CanCanCommunity/cancancan)
+[![Code Climate Badge](https://codeclimate.com/github/CanCanCommunity/cancancan.svg)](https://codeclimate.com/github/CanCanCommunity/cancancan)
+[![Inch CI](http://inch-ci.org/github/CanCanCommunity/cancancan.svg)](http://inch-ci.org/github/CanCanCommunity/cancancan)
 
 [Wiki](https://github.com/CanCanCommunity/cancancan/wiki) | [RDocs](http://rdoc.info/projects/CanCanCommunity/cancancan) | [Screencast](http://railscasts.com/episodes/192-authorization-with-cancan) | [IRC: #cancancan (freenode)](http://webchat.freenode.net/?channels=cancancan)
 
