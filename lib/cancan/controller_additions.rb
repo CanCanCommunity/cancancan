@@ -255,7 +255,7 @@ module CanCan
       #
       def check_authorization(options = {})
         self.after_filter(options.slice(:only, :except)) do |controller|
-          next if controller.instance_variable_defined?(:@_authorized)
+          next if controller.current_ability && controller.current_ability.authorize_called?
           next if options[:if] && !controller.send(options[:if])
           next if options[:unless] && controller.send(options[:unless])
           raise AuthorizationNotPerformed, "This action failed the check_authorization because it does not authorize_resource. Add skip_authorization_check to bypass this check."
@@ -334,7 +334,6 @@ module CanCan
     # See the load_and_authorize_resource method to automatically add the authorize! behavior
     # to the default RESTful actions.
     def authorize!(*args)
-      @_authorized = true
       current_ability.authorize!(*args)
     end
 

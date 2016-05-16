@@ -15,9 +15,9 @@ describe CanCan::ControllerAdditions do
   end
 
   it "authorize! assigns @_authorized instance variable and pass args to current ability" do
-    allow(@controller.current_ability).to receive(:authorize!).with(:foo, :bar)
+    allow(@controller.current_ability).to receive(:cannot?).with(:foo, :bar).and_return(false)
     @controller.authorize!(:foo, :bar)
-    expect(@controller.instance_variable_get(:@_authorized)).to be(true)
+    expect(@controller.current_ability.authorize_called?).to be(true)
   end
 
   it "has a current_ability method which generates an ability for the current user" do
@@ -92,8 +92,8 @@ describe CanCan::ControllerAdditions do
     }.not_to raise_error
   end
 
-  it "check_authorization does not raise error when @_authorized is set" do
-    @controller.instance_variable_set(:@_authorized, true)
+  it "check_authorization does not raise error when @_authorized is set on current_ability" do
+    @controller.current_ability.instance_variable_set(:@_authorized, true)
     expect(@controller_class).to receive(:after_filter).with(:only => [:test]) { |options, &block| block.call(@controller) }
     expect {
       @controller_class.check_authorization(:only => [:test])
