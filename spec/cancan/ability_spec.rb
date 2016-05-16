@@ -52,6 +52,22 @@ describe CanCan::Ability do
     expect(@ability.can?(:read, 6)).to be(true)
   end
 
+  it "performs can(_, :all) before other checks when can(_, :all) is defined before" do
+    @ability.can :manage, :all
+    @ability.can :edit, String do |_string|
+      fail 'Performed a check for :edit before the check for :all'
+    end
+    expect { @ability.can? :edit, 'a' }.to_not raise_exception
+  end
+
+  it "performs can(_, :all) before other checks when can(_, :all) is defined after" do
+    @ability.can :edit, String do |_string|
+      fail 'Performed a check for :edit before the check for :all'
+    end
+    @ability.can :manage, :all
+    expect { @ability.can? :edit, 'a' }.to_not raise_exception
+  end
+
   it "does not pass class with object if :all objects are accepted" do
     @ability.can :preview, :all do |object|
       expect(object).to eq(123)
@@ -292,6 +308,13 @@ describe CanCan::Ability do
     expect(@ability.can?(:read, 1..10)).to be(true)
     expect(@ability.can?(:read, 3..30)).to be(true)
     expect(@ability.can?(:read, 4..40)).to be(false)
+  end
+
+  it "allows a range of time in conditions hash" do
+    @ability.can :read, Range, :begin => 1.day.from_now..3.days.from_now
+    expect(@ability.can?(:read, 1.day.from_now..10.days.from_now)).to be(true)
+    expect(@ability.can?(:read, 2.days.from_now..20.days.from_now)).to be(true)
+    expect(@ability.can?(:read, 4.days.from_now..40.days.from_now)).to be(false)
   end
 
   it "allows nested hashes in conditions hash" do

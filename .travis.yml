@@ -6,7 +6,7 @@ rvm:
   - 2.1.0
   - 2.2.0
   - 2.2.2
-  - jruby
+  - jruby-9.0.5.0
 gemfile:
   - gemfiles/activerecord_3.2.gemfile
   - gemfiles/activerecord_4.0.gemfile
@@ -26,7 +26,7 @@ matrix:
       gemfile: gemfiles/activerecord_5.0.gemfile
     - rvm: 2.2.0
       gemfile: gemfiles/activerecord_5.0.gemfile
-    - rvm: jruby
+    - rvm: jruby-9.0.5.0
       gemfile: gemfiles/activerecord_5.0.gemfile
 notifications:
   recipients:

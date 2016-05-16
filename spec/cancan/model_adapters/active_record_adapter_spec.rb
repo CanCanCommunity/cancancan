@@ -385,5 +385,26 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
         expect(Namespace::TableX.accessible_by(ability)).to eq([table_x])
       end
     end
+
+    context 'when conditions are non iterable ranges' do
+      before :each do
+        ActiveRecord::Schema.define do
+          create_table( :courses ) do |t|
+            t.datetime :start_at
+          end
+        end
+
+        class Course < ActiveRecord::Base
+        end
+      end
+
+      it 'fetches only the valid records' do
+        @ability.can :read, Course, :start_at => 1.day.ago..1.day.from_now
+        Course.create!(:start_at => 10.days.ago)
+        valid_course = Course.create!(:start_at => Time.now)
+
+        expect(Course.accessible_by(@ability)).to eq([valid_course])
+      end
+    end
   end
 end
