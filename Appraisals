@@ -1,5 +1,6 @@
 appraise "activerecord_3.2" do
   gem "activerecord", "~> 3.2.0", :require => "active_record"
+  gem "actionpack", "~> 3.2.0", :require => "action_pack"
 
   gemfile.platforms :jruby do
     gem "activerecord-jdbcsqlite3-adapter"
@@ -14,6 +15,8 @@ end
 appraise "activerecord_4.0" do
   gem "activerecord", "~> 4.0.5", :require => "active_record"
   gem "activesupport", "~> 4.0.5", :require => "active_support/all"
+  gem "actionpack", "~> 4.0.5", :require => "action_pack"
+
 
   gemfile.platforms :jruby do
     gem "activerecord-jdbcsqlite3-adapter"
@@ -28,6 +31,7 @@ end
 appraise "activerecord_4.1" do
   gem "activerecord", "~> 4.1.1", :require => "active_record"
   gem "activesupport", "~> 4.1.1", :require => "active_support/all"
+  gem "actionpack", "~> 4.1.1", :require => "action_pack"
 
   gemfile.platforms :jruby do
     gem "activerecord-jdbcsqlite3-adapter"
@@ -42,6 +46,7 @@ end
 appraise "activerecord_4.2" do
   gem "activerecord", "~> 4.2.0", :require => "active_record"
   gem 'activesupport', '~> 4.2.0', :require => 'active_support/all'
+  gem "actionpack", "~> 4.2.0", :require => "action_pack"
 
   gemfile.platforms :jruby do
     gem "activerecord-jdbcsqlite3-adapter"
@@ -57,6 +62,7 @@ end
 appraise "activerecord_5.0" do
   gem "activerecord", "~> 5.0.0.rc1", :require => "active_record"
   gem 'activesupport', '~> 5.0.0.rc1', :require => 'active_support/all'
+  gem "actionpack", "~> 5.0.0.rc1", :require => "action_pack"
 
   gemfile.platforms :jruby do
     gem "activerecord-jdbcsqlite3-adapter"
@@ -71,6 +77,7 @@ end
 
 appraise "mongoid_2.x" do
   gem "activesupport", "~> 3.0", :require => "active_support/all"
+  gem "actionpack", "~> 3.0", :require => "action_pack"
   gem "mongoid", "~> 2.0.0"
 
   gemfile.platforms :ruby, :mswin, :mingw do
@@ -83,8 +90,9 @@ appraise "mongoid_2.x" do
 end
 
 appraise "sequel_3.x" do
-  gem "sequel", "~> 3.47.0"
+  gem "sequel", "~> 3.48.0"
   gem "activesupport", "~> 3.0", :require => "active_support/all"
+  gem "actionpack", "~> 3.0", :require => "action_pack"
 
   gemfile.platforms :jruby do
     gem "jdbc-sqlite3"

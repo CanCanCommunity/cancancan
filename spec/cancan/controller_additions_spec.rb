@@ -142,7 +142,7 @@ describe CanCan::ControllerAdditions do
   private
 
   def callback_action(action)
-    if ActiveModel.respond_to?(:version) && ActiveModel.version >= Gem::Version.new("4")
+    if ActiveSupport.respond_to?(:version) && ActiveSupport.version >= Gem::Version.new("4")
       action
     else
       action.to_s.sub(/_action/, '_filter')
