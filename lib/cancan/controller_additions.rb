@@ -254,12 +254,16 @@ module CanCan
       #     check_authorization :unless => :devise_controller?
       #
       def check_authorization(options = {})
-        self.after_action(options.slice(:only, :except)) do |controller|
+        method_name = ActiveSupport.respond_to?(:version) && ActiveSupport.version >= Gem::Version.new("4") ? :after_action : :after_filter
+
+        block = Proc.new do |controller|
           next if controller.instance_variable_defined?(:@_authorized)
           next if options[:if] && !controller.send(options[:if])
           next if options[:unless] && controller.send(options[:unless])
           raise AuthorizationNotPerformed, "This action failed the check_authorization because it does not authorize_resource. Add skip_authorization_check to bypass this check."
         end
+
+        self.send(method_name, options.slice(:only, :except), &block)
       end
 
       # Call this in the class of a controller to skip the check_authorization behavior on the actions.
@@ -270,9 +274,9 @@ module CanCan
       #
       # Any arguments are passed to the +before_action+ it triggers.
       def skip_authorization_check(*args)
-        self.before_action(*args) do |controller|
-          controller.instance_variable_set(:@_authorized, true)
-        end
+        method_name = ActiveSupport.respond_to?(:version) && ActiveSupport.version >= Gem::Version.new("4") ? :before_action : :before_filter
+        block = Proc.new{ |controller| controller.instance_variable_set(:@_authorized, true) }
+        self.send(method_name, *args, &block)
       end
 
       def skip_authorization(*args)

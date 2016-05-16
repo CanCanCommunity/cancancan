@@ -5,9 +5,17 @@ module CanCan
     def self.add_before_action(controller_class, method, *args)
       options = args.extract_options!
       resource_name = args.first
-      before_action_method = options.delete(:prepend) ? :prepend_before_action : :before_action
+      before_action_method = before_callback_name(options)
       controller_class.send(before_action_method, options.slice(:only, :except, :if, :unless)) do |controller|
         controller.class.cancan_resource_class.new(controller, resource_name, options.except(:only, :except, :if, :unless)).send(method)
+      end
+    end
+
+    def self.before_callback_name(options)
+      if ActiveSupport.respond_to?(:version) && ActiveSupport.version >= Gem::Version.new("4")
+        options.delete(:prepend) ? :prepend_before_action : :before_action
+      else
+        options.delete(:prepend) ? :prepend_before_filter : :before_filter
       end
     end
 
