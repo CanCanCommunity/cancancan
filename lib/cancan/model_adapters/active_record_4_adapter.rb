@@ -20,7 +20,7 @@ module CanCan
 
       def self.override_condition_matching?(subject, name, value)
         # ActiveRecord introduced enums in version 4.1.
-        ActiveRecord::VERSION::MINOR >= 1 &&
+        (ActiveRecord::VERSION::MAJOR > 4 || ActiveRecord::VERSION::MINOR >= 1) &&
           subject.class.defined_enums.include?(name.to_s)
       end
 
@@ -37,7 +37,20 @@ module CanCan
 
       # Rails 4.2 deprecates `sanitize_sql_hash_for_conditions`
       def sanitize_sql(conditions)
-        if ActiveRecord::VERSION::MINOR >= 2 && Hash === conditions
+        if ActiveRecord::VERSION::MAJOR > 4 && Hash === conditions
+          table = @model_class.send(:arel_table)
+          table_metadata = ActiveRecord::TableMetadata.new(@model_class, table)
+          predicate_builder = ActiveRecord::PredicateBuilder.new(table_metadata)
+
+          conditions = predicate_builder.resolve_column_aliases(conditions)
+          conditions = @model_class.send(:expand_hash_conditions_for_aggregates, conditions)
+
+          conditions.stringify_keys!
+
+          predicate_builder.build_from_hash(conditions).map { |b|
+            @model_class.send(:connection).visitor.compile b
+          }.join(' AND ')
+        elsif ActiveRecord::VERSION::MINOR >= 2 && Hash === conditions
           table = Arel::Table.new(@model_class.send(:table_name))
 
           conditions = ActiveRecord::PredicateBuilder.resolve_column_aliases @model_class, conditions
