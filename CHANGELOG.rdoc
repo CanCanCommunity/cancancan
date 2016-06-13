@@ -2,7 +2,11 @@ Develop
 
 Unreleased
 
-1.14.0 (May 14th, 2016
+1.15.0 (June 13th, 2016)
+
+* Add support for Rails 5 (craig1410)
+
+1.14.0 (May 14th, 2016)
 
 * Use cover for ranges
 * Add support for rails 4 enum's (markpmitchell)
