@@ -23,7 +23,7 @@ Any help is greatly appreciated, feel free to submit pull-requests or open issue
 
 ## Installation
 
-In **Rails 3 and 4**, add this to your Gemfile and run the `bundle install` command.
+Add this to your Gemfile and run the `bundle install` command.
 
     gem 'cancancan', '~> 1.10'
 
@@ -40,7 +40,7 @@ end
 
 ### 1. Define Abilities
 
-User permissions are defined in an `Ability` class. CanCan 1.5 includes a Rails 3 and 4 generator for creating this class.
+User permissions are defined in an `Ability` class. CanCan 1.5 includes a Rails 4.2 and 5 generator for creating this class.
 
     rails g cancan:ability
 
@@ -85,7 +85,7 @@ See [Authorizing Controller Actions](https://github.com/CanCanCommunity/cancanca
 
 #### Strong Parameters
 
-When using `strong_parameters` or Rails 4+, you have to sanitize inputs before saving the record, in actions such as `:create` and `:update`.
+You have to sanitize inputs before saving the record, in actions such as `:create` and `:update`.
 
 For the `:update` action, CanCan will load and authorize the resource but *not* change it automatically, so the typical usage would be something like:
 
