@@ -25,7 +25,7 @@ Any help is greatly appreciated, feel free to submit pull-requests or open issue
 
 In **Rails 3 and 4**, add this to your Gemfile and run the `bundle install` command.
 
-    gem 'cancancan', '~> 1.10'
+    gem 'cancancan', '~> 1.15'
 
 ## Getting Started
 
@@ -44,7 +44,7 @@ User permissions are defined in an `Ability` class. CanCan 1.5 includes a Rails 
 
     rails g cancan:ability
 
-In Rails 2.3, just add a new class in `app/models/ability.rb` with the following contents:
+In Rails 2/3, just add a new class in `app/models/ability.rb` with the following contents:
 
 ```ruby
 class Ability
