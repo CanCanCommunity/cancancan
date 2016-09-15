@@ -23,7 +23,7 @@ Any help is greatly appreciated, feel free to submit pull-requests or open issue
 
 ## Installation
 
-In **Rails 3 and 4**, add this to your Gemfile and run the `bundle install` command.
+In **Rails 3, 4 and 5 **, add this to your Gemfile and run the `bundle install` command.
 
     gem 'cancancan', '~> 1.10'
 
@@ -162,8 +162,12 @@ If the user authorization fails, a `CanCan::AccessDenied` exception will be rais
 ```ruby
 class ApplicationController < ActionController::Base
   rescue_from CanCan::AccessDenied do |exception|
-    redirect_to root_url, :alert => exception.message
-  end
+      respond_to do |format|
+        format.json { render nothing: true, status: :forbidden }
+        format.html { redirect_to main_app.root_url, :alert => exception.message }
+        format.js   { render nothing: true, status: :forbidden }
+      end
+    end
 end
 ```
 
