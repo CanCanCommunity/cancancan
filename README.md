@@ -7,7 +7,7 @@
 
 [Wiki](https://github.com/CanCanCommunity/cancancan/wiki) | [RDocs](http://rdoc.info/projects/CanCanCommunity/cancancan) | [Screencast](http://railscasts.com/episodes/192-authorization-with-cancan) | [IRC: #cancancan (freenode)](http://webchat.freenode.net/?channels=cancancan)
 
-CanCan is an authorization library for Ruby on Rails which restricts what resources a given user is allowed to access. All permissions are defined in a single location (the `Ability` class) and not duplicated across controllers, views, and database queries.
+CanCan is an authorization library for Ruby 2.0+ and Ruby on Rails 3+ which restricts what resources a given user is allowed to access. All permissions are defined in a single location (the `Ability` class) and not duplicated across controllers, views, and database queries.
 
 ## This is the master branch!
 This branch represents work towards version 2.0. Please checkout the 1.x branch for the stable release. Use master at your own risk.
@@ -43,17 +43,6 @@ end
 User permissions are defined in an `Ability` class. CanCan 1.5 includes a Rails 3 and 4 generator for creating this class.
 
     rails g cancan:ability
-
-In Rails 2.3, just add a new class in `app/models/ability.rb` with the following contents:
-
-```ruby
-class Ability
-  include CanCan::Ability
-
-  def initialize(user)
-  end
-end
-```
 
 See [Defining Abilities](https://github.com/CanCanCommunity/cancancan/wiki/defining-abilities) for details.
 

@@ -19,6 +19,7 @@ Unreleased
 
 * Significantly improve rule lookup time (amarshall)
 * Removed deprecation warnings for RSpec 3.2 (NekoNova)
+* Drop support for REE and Ruby 1.x and so Rails 2 (Richard Wilson)
 
 1.12.0 (June 28th, 2015)
 
