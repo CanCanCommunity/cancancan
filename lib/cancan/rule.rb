@@ -56,11 +56,6 @@ module CanCan
       @conditions == {} || @conditions.nil?
     end
 
-    def unmergeable?
-      @conditions.respond_to?(:keys) && @conditions.present? &&
-        (!@conditions.keys.first.is_a? Symbol)
-    end
-
     def associations_hash(conditions = @conditions)
       hash = {}
       if conditions.is_a? Hash
