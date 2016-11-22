@@ -384,6 +384,20 @@ describe CanCan::Ability do
     expect(@ability.can?(:read, A)).to be(true)
   end
 
+  it "allows to check ability in a decorated class" do
+    class ADecorator < SimpleDelegator
+      def kind_of?(klass)
+        __getobj__.kind_of?(klass)
+      end
+      alias_method :is_a?, :kind_of?
+    end
+    class A; end
+
+    @ability.can :read, A
+    expect(@ability.can?(:read, A.new)).to be(true)
+    expect(@ability.can?(:read, ADecorator.new(A.new))).to be(true)
+  end
+
   it "checks permissions through association when passing a hash of subjects" do
     @ability.can :read, Range, :string => {:length => 3}
 
