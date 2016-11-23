@@ -23,6 +23,13 @@ describe CanCan::Ability do
     expect(@ability.can?(:read, :some_symbol)).to be(true)
   end
 
+  it "passes false to `can?` when false is returned in block and Subject is a class" do
+    @ability.can :read, Symbol do |sym|
+      false
+    end
+    expect(@ability.can?(:read, Symbol)).to be(false)
+  end
+
   it "passes nil to a block when no instance is passed" do
     @ability.can :read, Symbol do |sym|
       expect(sym).to be_nil
