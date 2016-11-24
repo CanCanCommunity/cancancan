@@ -441,6 +441,25 @@ describe CanCan::ControllerResource do
       expect(controller.instance_variable_get(:@model)).to eq(model)
     end
 
+    it "loads the model using a symbol" do
+      model = Model.new
+      allow(Model).to receive(:find).with("123") { model }
+      allow(controller).to receive(:model) { Model }
+
+      resource = CanCan::ControllerResource.new(controller, :class => :model)
+      resource.load_resource
+      expect(controller.instance_variable_get(:@model)).to eq(model)
+    end
+
+    it "loads the model using a proc" do
+      model = Model.new
+      allow(Model).to receive(:find).with("123") { model }
+
+      resource = CanCan::ControllerResource.new(controller, :class => proc { Model })
+      resource.load_resource
+      expect(controller.instance_variable_get(:@model)).to eq(model)
+    end
+
     it "authorizes based on resource name if class is false" do
       allow(controller).to receive(:authorize!).with(:show, :model) { raise CanCan::AccessDenied }
       resource = CanCan::ControllerResource.new(controller, :class => false)
