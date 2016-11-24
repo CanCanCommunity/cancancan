@@ -157,6 +157,8 @@ module CanCan
       when false  then name.to_sym
       when nil    then namespaced_name.to_s.camelize.constantize
       when String then @options[:class].constantize
+      when Symbol then @controller.send(@options[:class])
+      when Proc   then @options[:class].call(@controller)
       else @options[:class]
       end
     end
