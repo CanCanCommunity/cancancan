@@ -70,6 +70,9 @@ Metrics/AbcSize:
 # Offense count: 1
 # Configuration parameters: CountComments.
 Metrics/BlockLength:
+  Exclude:
+    - 'lib/cancan/matchers.rb'
+    - '**/*_spec.rb'
   Max: 28
 
 # Offense count: 2

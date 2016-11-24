@@ -2,6 +2,10 @@ Develop
 
 Unreleased
 
+1.15.1 (Dec 17th, 2016)
+
+* Add ability to rspec matcher to take array of abilities (gingray)
+
 1.15.0 (June 13th, 2016)
 
 * Add support for Rails 5 (craig1410)
