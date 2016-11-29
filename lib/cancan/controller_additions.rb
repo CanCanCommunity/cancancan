@@ -342,6 +342,7 @@ module CanCan
       current_ability.authorize!(*args)
     end
 
+    # The unauthorized! method has been removed from CanCan, use #authorize! instead.
     def unauthorized!(message = nil)
       raise ImplementationRemoved, "The unauthorized! method has been removed from CanCan, use authorize! instead."
     end
