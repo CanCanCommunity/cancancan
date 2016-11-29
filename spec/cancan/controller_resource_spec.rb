@@ -15,6 +15,12 @@ describe CanCan::ControllerResource do
           send("#{attribute}=", value)
         end
       end
+
+      def attributes=(attributes={})
+        attributes.each do |attribute, value|
+          send("#{attribute}=", value)
+        end
+      end
     end
 
     allow(controller).to receive(:params) { params }
@@ -44,10 +50,11 @@ describe CanCan::ControllerResource do
 
     it "builds a resource when on custom new action even when params[:id] exists" do
       params.merge!(:action => "build", :id => "123")
-      allow(Model).to receive(:new) { :some_model }
+      some_model = Model.new
+      allow(Model).to receive(:new) { some_model }
       resource = CanCan::ControllerResource.new(controller, :new => :build)
       resource.load_resource
-      expect(controller.instance_variable_get(:@model)).to eq(:some_model)
+      expect(controller.instance_variable_get(:@model)).to eq(some_model)
     end
 
     it "only authorizes :show action on parent resource" do
