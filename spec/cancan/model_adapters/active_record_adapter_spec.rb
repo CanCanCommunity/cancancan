@@ -218,6 +218,11 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       expect(lambda { Article.accessible_by(@ability) }).to raise_error(CanCan::Error)
     end
 
+    it "does not allow to fetch records when ability with just subject conditions" do
+      @ability.can :read, Article, :if => :new_record?
+      expect(lambda { Article.accessible_by(@ability) }).to raise_error(CanCan::Error)
+    end
+
     it "should support more than one deeply nested conditions" do
       @ability.can :read, Comment, :article => {
         :category => {
