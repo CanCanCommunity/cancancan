@@ -1,4 +1,4 @@
-require "cancan/version"
+require 'cancan/version'
 require 'cancan/ability'
 require 'cancan/rule'
 require 'cancan/controller_resource'
@@ -11,12 +11,7 @@ require 'cancan/model_adapters/default_adapter'
 
 if defined? ActiveRecord
   require 'cancan/model_adapters/active_record_adapter'
-  if ActiveRecord.respond_to?(:version) &&
-      ActiveRecord.version >= Gem::Version.new("4")
-    require 'cancan/model_adapters/active_record_4_adapter'
-  else
-    require 'cancan/model_adapters/active_record_3_adapter'
-  end
+  require 'cancan/model_adapters/active_record_4_adapter'
 end
 
 require 'cancan/model_adapters/mongoid_adapter' if defined?(Mongoid) && defined?(Mongoid::Document)

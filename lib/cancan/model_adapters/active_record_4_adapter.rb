@@ -19,9 +19,7 @@ module CanCan
       end
 
       def self.override_condition_matching?(subject, name, value)
-        # ActiveRecord introduced enums in version 4.1.
-        (ActiveRecord::VERSION::MAJOR > 4 || ActiveRecord::VERSION::MINOR >= 1) &&
-          subject.class.defined_enums.include?(name.to_s)
+        subject.class.defined_enums.include?(name.to_s)
       end
 
       def self.matches_condition?(subject, name, value)
@@ -30,7 +28,7 @@ module CanCan
         # Get the value of the attribute as an integer.
         attribute = enum[subject.send(name)]
         # Check to see if the value matches the condition.
-        value.is_a?(Enumerable) ? 
+        value.is_a?(Enumerable) ?
           (value.include? attribute) :
           attribute == value
       end
