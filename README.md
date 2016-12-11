@@ -16,7 +16,7 @@ All permissions are defined in a single location (the `Ability` class) and not d
 
 Add this to your Gemfile: 
 
-    gem 'cancancan', '~> 1.10'
+    gem 'cancancan'
     
 and run the `bundle install` command.
 
