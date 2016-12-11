@@ -259,10 +259,12 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       expect(@ability.model_adapter(Article, :read).conditions).to eq("'t'='f'")
     end
 
-    it "returns `not (sql)` for single `cannot` definition in front of default `can` condition" do
+    it "returns `(not (sql) OR (sql) IS NULL)` for single `cannot` definition in front of default `can` condition" do
       @ability.can :read, Article
       @ability.cannot :read, Article, :published => false, :secret => true
-      expect(@ability.model_adapter(Article, :read).conditions).to orderlessly_match(%Q["not (#{@article_table}"."published" = 'f' AND "#{@article_table}"."secret" = 't')])
+      expect(@ability.model_adapter(Article, :read).conditions).to orderlessly_match(
+        %Q[(not ("#{@article_table}"."published" = 'f' AND "#{@article_table}"."secret" = 't') OR ("#{@article_table}"."published" = 'f' AND "#{@article_table}"."secret" = 't') IS NULL)]
+      )
     end
 
     it "returns appropriate sql conditions in complex case" do
@@ -270,7 +272,9 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       @ability.can :manage, Article, :id => 1
       @ability.can :update, Article, :published => true
       @ability.cannot :update, Article, :secret => true
-      expect(@ability.model_adapter(Article, :update).conditions).to eq(%Q[not ("#{@article_table}"."secret" = 't') AND (("#{@article_table}"."published" = 't') OR ("#{@article_table}"."id" = 1))])
+      expect(@ability.model_adapter(Article, :update).conditions).to eq(
+        %Q[(not ("#{@article_table}"."secret" = 't') OR ("#{@article_table}"."secret" = 't') IS NULL) AND (("#{@article_table}"."published" = 't') OR ("#{@article_table}"."id" = 1))]
+      )
       expect(@ability.model_adapter(Article, :manage).conditions).to eq({:id => 1})
       expect(@ability.model_adapter(Article, :read).conditions).to eq("'t'='t'")
     end

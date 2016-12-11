@@ -14,7 +14,7 @@ module CanCan
       #   can :manage, User, :id => 1
       #   can :manage, User, :manager_id => 1
       #   cannot :manage, User, :self_managed => true
-      #   query(:manage, User).conditions # => "not (self_managed = 't') AND ((manager_id = 1) OR (id = 1))"
+      #   query(:manage, User).conditions # => "(not (self_managed = 't') OR (self_managed = 't') IS NULL) AND ((manager_id = 1) OR (id = 1))"
       #
       def conditions
         if @rules.size == 1 && @rules.first.base_behavior
@@ -99,11 +99,11 @@ module CanCan
           conditions = sanitize_sql(conditions_hash)
           case sql
           when true_sql
-            behavior ? true_sql : "not (#{conditions})"
+            behavior ? true_sql : "(not (#{conditions}) OR (#{conditions}) IS NULL)"
           when false_sql
             behavior ? conditions : false_sql
           else
-            behavior ? "(#{conditions}) OR (#{sql})" : "not (#{conditions}) AND (#{sql})"
+            behavior ? "(#{conditions}) OR (#{sql})" : "(not (#{conditions}) OR (#{conditions}) IS NULL) AND (#{sql})"
           end
         end
       end
