@@ -1,0 +1,6 @@
+test:
+  clients:
+    default:
+      database: cancan_mongoid_spec
+      hosts:
+        - 'localhost:27017'
