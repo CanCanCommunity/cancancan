@@ -83,7 +83,7 @@ module CanCan
     end
 
     def matches_action?(action)
-      @expanded_actions.include?(:manage) || @expanded_actions.include?(action)
+      @expanded_actions.include?(:manage) || ([action].flatten - @expanded_actions).empty?
     end
 
     def matches_subject?(subject)

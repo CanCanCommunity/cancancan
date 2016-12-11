@@ -163,6 +163,16 @@ describe CanCan::Ability do
     expect(@ability.can?(:count, 123)).to be(false)
   end
 
+  it "is able to specify multiple action to can? and match all" do
+    @ability.can [:read, :create], :all
+    expect(@ability.can?([:read, :create], 123)).to be(true)
+    expect(@ability.can?([:read], 123)).to be(true)
+    expect(@ability.can?([:create], 123)).to be(true)
+    expect(@ability.can?([:create, :read], 123)).to be(true)
+    expect(@ability.can?([:read, :update], 123)).to be(false)
+    expect(@ability.can?([:read, :create, :update], 123)).to be(false)
+  end
+
   it "is able to specify multiple classes and match any" do
     @ability.can :update, [String, Range]
     expect(@ability.can?(:update, "foo")).to be(true)
