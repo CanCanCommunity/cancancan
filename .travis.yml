@@ -19,6 +19,15 @@ services:
   - mongodb
 matrix:
   fast_finish: true
+  exclude:
+    - rvm: 2.0.0
+      gemfile: gemfiles/activerecord_5.0.gemfile
+    - rvm: 2.1.0
+      gemfile: gemfiles/activerecord_5.0.gemfile
+    - rvm: 2.2.0
+      gemfile: gemfiles/activerecord_5.0.gemfile
+    - rvm: jruby-9.0.5.0
+      gemfile: gemfiles/activerecord_5.0.gemfile
 notifications:
   recipients:
     - bryan@bryanrite.com
