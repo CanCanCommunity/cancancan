@@ -9,8 +9,8 @@
 
 CanCan is an authorization library for Ruby 2.0+ and Ruby on Rails 3+ which restricts what resources a given user is allowed to access. All permissions are defined in a single location (the `Ability` class) and not duplicated across controllers, views, and database queries.
 
-## This is the master branch!
-This branch represents work towards version 2.0. Please checkout the 1.x branch for the stable release. Use master at your own risk.
+## This is the develop branch!
+This branch represents work towards version 2.0. Please checkout the 1.x branch for the stable release. Use develop at your own risk.
 
 ## Mission
 
@@ -204,9 +204,9 @@ When first developing, you may need to run `bundle install` and then `appraisal 
 
 You can then run all appraisal files (like CI does), with `appraisal rake` or just run a specific set `appraisal activerecord_3.0 rake`.
 
-See the [CONTRIBUTING](https://github.com/CanCanCommunity/cancancan/blob/develop/CONTRIBUTING.md) and [spec/README](https://github.com/CanCanCommunity/cancancan/blob/master/spec/README.rdoc) for more information.
+See the [CONTRIBUTING](https://github.com/CanCanCommunity/cancancan/blob/develop/CONTRIBUTING.md) and [spec/README](https://github.com/CanCanCommunity/cancancan/blob/develop/spec/README.rdoc) for more information.
 
 
 ## Special Thanks
 
-CanCan was inspired by [declarative_authorization](https://github.com/stffn/declarative_authorization/) and [aegis](https://github.com/makandra/aegis). Also many thanks to the [CanCan contributors](https://github.com/CanCanCommunity/cancancan/contributors). See the [CHANGELOG](https://github.com/CanCanCommunity/cancancan/blob/master/CHANGELOG.rdoc) for the full list.
+CanCan was inspired by [declarative_authorization](https://github.com/stffn/declarative_authorization/) and [aegis](https://github.com/makandra/aegis). Also many thanks to the [CanCan contributors](https://github.com/CanCanCommunity/cancancan/contributors). See the [CHANGELOG](https://github.com/CanCanCommunity/cancancan/blob/develop/CHANGELOG.rdoc) for the full list.
