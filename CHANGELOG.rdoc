@@ -1,5 +1,30 @@
 Develop
 
+Unreleased
+
+2.0.0 (TBD)
+
+* Drop support for Rails < 4.2 (oliverklee)
+
+1.15.0 (June 13th, 2016)
+
+* Add support for Rails 5 (craig1410)
+
+1.14.0 (May 14th, 2016)
+
+* Use cover for ranges
+* Add support for rails 4 enum's (markpmitchell)
+
+1.13.1 (Oct 8th, 2015)
+
+* Fix #merge with empty Ability (jhawthorn)
+
+1.13.0 (Oct 7th, 2015)
+
+* Significantly improve rule lookup time (amarshall)
+* Removed deprecation warnings for RSpec 3.2 (NekoNova)
+* Drop support for REE and Ruby 1.x and so Rails 2 (Richard Wilson)
+
 1.12.0 (June 28th, 2015)
 
 * Add a permissions method to Ability (devaroop)

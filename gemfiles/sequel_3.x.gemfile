@@ -2,8 +2,9 @@
 
 source "https://rubygems.org"
 
-gem "sequel", "~> 3.47.0"
+gem "sequel", "~> 3.48.0"
 gem "activesupport", "~> 3.0", :require => "active_support/all"
+gem "actionpack", "~> 3.0", :require => "action_pack"
 
 platforms :jruby do
   gem "jdbc-sqlite3"

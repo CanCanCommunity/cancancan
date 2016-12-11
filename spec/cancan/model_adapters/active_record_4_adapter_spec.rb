@@ -37,6 +37,73 @@ if defined? CanCan::ModelAdapters::ActiveRecord4Adapter
 
         expect(Parent.accessible_by(@ability).order(:created_at => :asc).includes(:children).first.children).to eq [child2, child1]
       end
+
+      it "allows filters on enums" do
+        ActiveRecord::Schema.define do
+          create_table(:shapes) do |t|
+            t.integer :color, default: 0, null: false
+          end
+        end
+
+        class Shape < ActiveRecord::Base
+          enum color: [:red, :green, :blue]
+        end
+
+        red = Shape.create!(color: :red)
+        green = Shape.create!(color: :green)
+        blue = Shape.create!(color: :blue)
+
+        # A condition with a single value.
+        @ability.can :read, Shape, color: Shape.colors[:green]
+
+        expect(@ability.cannot? :read, red).to be true
+        expect(@ability.can? :read, green).to be true
+        expect(@ability.cannot? :read, blue).to be true
+
+        accessible = Shape.accessible_by(@ability)
+        expect(accessible).to contain_exactly(green)
+
+        # A condition with multiple values.
+        @ability.can :update, Shape, color: [Shape.colors[:red],
+                                             Shape.colors[:blue]]
+
+        expect(@ability.can? :update, red).to be true
+        expect(@ability.cannot? :update, green).to be true
+        expect(@ability.can? :update, blue).to be true
+
+        accessible = Shape.accessible_by(@ability, :update)
+        expect(accessible).to contain_exactly(red, blue)
+      end
+
+      it "allows dual filter on enums" do
+        ActiveRecord::Schema.define do
+          create_table(:discs) do |t|
+            t.integer :color, default: 0, null: false
+            t.integer :shape, default: 3, null: false
+          end
+        end
+
+        class Disc < ActiveRecord::Base
+          enum color: [:red, :green, :blue]
+          enum shape: { triangle: 3, rectangle: 4 }
+        end
+
+        red_triangle = Disc.create!(color: Disc.colors[:red], shape: Disc.shapes[:triangle])
+        green_triangle = Disc.create!(color: Disc.colors[:green], shape: Disc.shapes[:triangle])
+        green_rectangle = Disc.create!(color: Disc.colors[:green], shape: Disc.shapes[:rectangle])
+        blue_rectangle = Disc.create!(color: Disc.colors[:blue], shape: Disc.shapes[:rectangle])
+
+        # A condition with a dual filter.
+        @ability.can :read, Disc, color: Disc.colors[:green], shape: Disc.shapes[:rectangle]
+
+        expect(@ability.cannot? :read, red_triangle).to be true
+        expect(@ability.cannot? :read, green_triangle).to be true
+        expect(@ability.can? :read, green_rectangle).to be true
+        expect(@ability.cannot? :read, blue_rectangle).to be true
+
+        accessible = Disc.accessible_by(@ability)
+        expect(accessible).to contain_exactly(green_rectangle)
+      end
     end
 
     if Gem::Specification.find_all_by_name('pg').any?

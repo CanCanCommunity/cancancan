@@ -91,7 +91,11 @@ module CanCan
     end
 
     def matches_subject_class?(subject)
-      @subjects.any? { |sub| sub.kind_of?(Module) && (subject.kind_of?(sub) || subject.class.to_s == sub.to_s || subject.kind_of?(Module) && subject.ancestors.include?(sub)) }
+      @subjects.any? do |sub|
+        sub.kind_of?(Module) && (subject.kind_of?(sub) ||
+                                 subject.class.to_s == sub.to_s ||
+                                 (subject.kind_of?(Module) && subject.ancestors.include?(sub)))
+      end
     end
 
     # Checks if the given subject matches the given conditions hash.
@@ -108,15 +112,15 @@ module CanCan
 
       conditions.all? do |name, value|
         if adapter.override_condition_matching?(subject, name, value)
-          return adapter.matches_condition?(subject, name, value)
+          adapter.matches_condition?(subject, name, value)
+        else
+          condition_match?(subject.send(name), value)
         end
-
-        condition_match?(subject.send(name), value)
       end
     end
 
     def nested_subject_matches_conditions?(subject_hash)
-      parent, child = subject_hash.first
+      parent, _child = subject_hash.first
       matches_conditions_hash?(parent, @conditions[parent.class.name.downcase.to_sym] || {})
     end
 
@@ -136,6 +140,7 @@ module CanCan
       case value
       when Hash       then hash_condition_match?(attribute, value)
       when String     then attribute == value
+      when Range      then value.cover?(attribute)
       when Enumerable then value.include?(attribute)
       else attribute == value
       end

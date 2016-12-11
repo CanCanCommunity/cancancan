@@ -12,7 +12,7 @@ module CanCan
       #   end
       #
       def load_and_authorize_resource(*args)
-        cancan_resource_class.add_before_filter(self, :load_and_authorize_resource, *args)
+        cancan_resource_class.add_before_action(self, :load_and_authorize_resource, *args)
       end
 
       # Sets up a before filter which loads the model resource into an instance variable.
@@ -32,10 +32,10 @@ module CanCan
       #   end
       #
       # A resource is not loaded if the instance variable is already set. This makes it easy to override
-      # the behavior through a before_filter on certain actions.
+      # the behavior through a before_action on certain actions.
       #
       #   class BooksController < ApplicationController
-      #     before_filter :find_book_by_permalink, :only => :show
+      #     before_action :find_book_by_permalink, :only => :show
       #     load_resource
       #
       #     private
@@ -115,10 +115,10 @@ module CanCan
       #     load_resource :new => :build
       #
       # [:+prepend+]
-      #   Passing +true+ will use prepend_before_filter instead of a normal before_filter.
+      #   Passing +true+ will use prepend_before_action instead of a normal before_action.
       #
       def load_resource(*args)
-        cancan_resource_class.add_before_filter(self, :load_resource, *args)
+        cancan_resource_class.add_before_action(self, :load_resource, *args)
       end
 
       # Sets up a before filter which authorizes the resource using the instance variable.
@@ -174,10 +174,10 @@ module CanCan
       #   Authorize conditions on this parent resource when instance isn't available.
       #
       # [:+prepend+]
-      #   Passing +true+ will use prepend_before_filter instead of a normal before_filter.
+      #   Passing +true+ will use prepend_before_action instead of a normal before_action.
       #
       def authorize_resource(*args)
-        cancan_resource_class.add_before_filter(self, :authorize_resource, *args)
+        cancan_resource_class.add_before_action(self, :authorize_resource, *args)
       end
 
       # Skip both the loading and authorization behavior of CanCan for this given controller. This is primarily
@@ -254,12 +254,16 @@ module CanCan
       #     check_authorization :unless => :devise_controller?
       #
       def check_authorization(options = {})
-        self.after_filter(options.slice(:only, :except)) do |controller|
+        method_name = ActiveSupport.respond_to?(:version) && ActiveSupport.version >= Gem::Version.new("4") ? :after_action : :after_filter
+
+        block = Proc.new do |controller|
           next if controller.instance_variable_defined?(:@_authorized)
           next if options[:if] && !controller.send(options[:if])
           next if options[:unless] && controller.send(options[:unless])
           raise AuthorizationNotPerformed, "This action failed the check_authorization because it does not authorize_resource. Add skip_authorization_check to bypass this check."
         end
+
+        self.send(method_name, options.slice(:only, :except), &block)
       end
 
       # Call this in the class of a controller to skip the check_authorization behavior on the actions.
@@ -268,11 +272,11 @@ module CanCan
       #     skip_authorization_check :only => :index
       #   end
       #
-      # Any arguments are passed to the +before_filter+ it triggers.
+      # Any arguments are passed to the +before_action+ it triggers.
       def skip_authorization_check(*args)
-        self.before_filter(*args) do |controller|
-          controller.instance_variable_set(:@_authorized, true)
-        end
+        method_name = ActiveSupport.respond_to?(:version) && ActiveSupport.version >= Gem::Version.new("4") ? :before_action : :before_filter
+        block = Proc.new{ |controller| controller.instance_variable_set(:@_authorized, true) }
+        self.send(method_name, *args, &block)
       end
 
       def skip_authorization(*args)

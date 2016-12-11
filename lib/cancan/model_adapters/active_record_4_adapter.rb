@@ -19,9 +19,37 @@ module CanCan
         relation
       end
 
+      def self.override_condition_matching?(subject, name, value)
+        subject.class.defined_enums.include?(name.to_s)
+      end
+
+      def self.matches_condition?(subject, name, value)
+        # Get the mapping from enum strings to values.
+        enum = subject.class.send(name.to_s.pluralize)
+        # Get the value of the attribute as an integer.
+        attribute = enum[subject.send(name)]
+        # Check to see if the value matches the condition.
+        value.is_a?(Enumerable) ?
+          (value.include? attribute) :
+          attribute == value
+      end
+
       # Rails 4.2 deprecates `sanitize_sql_hash_for_conditions`
       def sanitize_sql(conditions)
-        if ActiveRecord::VERSION::MINOR >= 2 && Hash === conditions
+        if ActiveRecord::VERSION::MAJOR > 4 && Hash === conditions
+          table = @model_class.send(:arel_table)
+          table_metadata = ActiveRecord::TableMetadata.new(@model_class, table)
+          predicate_builder = ActiveRecord::PredicateBuilder.new(table_metadata)
+
+          conditions = predicate_builder.resolve_column_aliases(conditions)
+          conditions = @model_class.send(:expand_hash_conditions_for_aggregates, conditions)
+
+          conditions.stringify_keys!
+
+          predicate_builder.build_from_hash(conditions).map { |b|
+            @model_class.send(:connection).visitor.compile b
+          }.join(' AND ')
+        elsif ActiveRecord::VERSION::MINOR >= 2 && Hash === conditions
           table = Arel::Table.new(@model_class.send(:table_name))
 
           conditions = ActiveRecord::PredicateBuilder.resolve_column_aliases @model_class, conditions

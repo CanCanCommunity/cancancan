@@ -61,14 +61,11 @@ module CanCan
     #
     # Also see the RSpec Matchers to aid in testing.
     def can?(action, subject, *extra_args)
-      subject = extract_subjects(subject)
-
-      match = subject.map do |subject|
-        relevant_rules_for_match(action, subject).detect do |rule|
-          rule.matches_conditions?(action, subject, extra_args)
+      match = extract_subjects(subject).lazy.map do |a_subject|
+        relevant_rules_for_match(action, a_subject).detect do |rule|
+          rule.matches_conditions?(action, a_subject, extra_args)
         end
-      end.compact.first
-
+      end.reject(&:nil?).first
       match ? match.base_behavior : false
     end
     # Convenience method which works the same as "can?" but returns the opposite value.
@@ -133,7 +130,7 @@ module CanCan
     #   end
     #
     def can(action = nil, subject = nil, conditions = nil, &block)
-      rules << Rule.new(true, action, subject, conditions, block)
+      add_rule(Rule.new(true, action, subject, conditions, block))
     end
 
     # Defines an ability which cannot be done. Accepts the same arguments as "can".
@@ -149,7 +146,7 @@ module CanCan
     #   end
     #
     def cannot(action = nil, subject = nil, conditions = nil, &block)
-      rules << Rule.new(false, action, subject, conditions, block)
+      add_rule(Rule.new(false, action, subject, conditions, block))
     end
 
     # Alias one or more actions into another one.
@@ -246,8 +243,8 @@ module CanCan
     end
 
     def merge(ability)
-      ability.send(:rules).each do |rule|
-        rules << rule.dup
+      ability.rules.each do |rule|
+        add_rule(rule.dup)
       end
       self
     end
@@ -279,6 +276,14 @@ module CanCan
       end
 
       permissions_list
+    end
+
+    protected
+
+    # Must be protected as an ability can merge with other abilities.
+    # This means that an ability must expose their rules with another ability.
+    def rules
+      @rules ||= []
     end
 
     private
@@ -314,7 +319,7 @@ module CanCan
 
     # It translates to an array the subject or the hash with multiple subjects given to can?.
     def extract_subjects(subject)
-      subject = if subject.kind_of?(Hash) && subject.key?(:any)
+      if subject.kind_of?(Hash) && subject.key?(:any)
         subject[:any]
       else
         [subject]
@@ -331,19 +336,62 @@ module CanCan
       results
     end
 
-    def rules
-      @rules ||= []
+    def add_rule(rule)
+      rules << rule
+      add_rule_to_index(rule, rules.size - 1)
+    end
+
+    def add_rule_to_index(rule, position)
+      @rules_index ||= Hash.new { |h, k| h[k] = [] }
+
+      subjects = rule.subjects.compact
+      subjects << :all if subjects.empty?
+
+      subjects.each do |subject|
+        @rules_index[subject] << position
+      end
+    end
+
+    def alternative_subjects(subject)
+      subject = subject.class unless subject.is_a?(Module)
+      [:all, *subject.ancestors,  subject.class.to_s]
     end
 
     # Returns an array of Rule instances which match the action and subject
     # This does not take into consideration any hash conditions or block statements
     def relevant_rules(action, subject)
-      relevant = rules.select do |rule|
+      return [] unless @rules
+      relevant = possible_relevant_rules(subject).select do |rule|
         rule.expanded_actions = expand_actions(rule.actions)
         rule.relevant? action, subject
       end
-      relevant.reverse!
+      relevant.reverse!.uniq!
+      optimize_order! relevant
       relevant
+    end
+
+    # Optimizes the order of the rules, so that rules with the :all subject are evaluated first.
+    def optimize_order!(rules)
+      first_can_in_group = -1
+      rules.each_with_index do |rule, i|
+        (first_can_in_group = -1) and next unless rule.base_behavior
+        (first_can_in_group = i) and next if first_can_in_group == -1
+        if rule.subjects == [:all]
+          rules[i] = rules[first_can_in_group]
+          rules[first_can_in_group] = rule
+          first_can_in_group += 1
+        end
+      end
+    end
+
+    def possible_relevant_rules(subject)
+      if subject.is_a?(Hash)
+        rules
+      else
+        positions = @rules_index.values_at(subject, *alternative_subjects(subject))
+        positions.flatten!.sort!
+        positions.map { |i| @rules[i] }
+      end
     end
 
     def relevant_rules_for_match(action, subject)

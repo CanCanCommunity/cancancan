@@ -1,13 +1,13 @@
 # CanCanCan
 
 [![Gem Version](https://badge.fury.io/rb/cancancan.svg)](http://badge.fury.io/rb/cancancan)
-[![Travis badge](https://travis-ci.org/CanCanCommunity/cancancan.png?branch=master)](https://travis-ci.org/CanCanCommunity/cancancan)
-[![Code Climate Badge](https://codeclimate.com/github/CanCanCommunity/cancancan.png)](https://codeclimate.com/github/CanCanCommunity/cancancan)
-[![Inch CI](http://inch-ci.org/github/CanCanCommunity/cancancan.png)](http://inch-ci.org/github/CanCanCommunity/cancancan)
+[![Travis badge](https://travis-ci.org/CanCanCommunity/cancancan.svg?branch=develop)](https://travis-ci.org/CanCanCommunity/cancancan)
+[![Code Climate Badge](https://codeclimate.com/github/CanCanCommunity/cancancan.svg)](https://codeclimate.com/github/CanCanCommunity/cancancan)
+[![Inch CI](http://inch-ci.org/github/CanCanCommunity/cancancan.svg)](http://inch-ci.org/github/CanCanCommunity/cancancan)
 
 [Wiki](https://github.com/CanCanCommunity/cancancan/wiki) | [RDocs](http://rdoc.info/projects/CanCanCommunity/cancancan) | [Screencast](http://railscasts.com/episodes/192-authorization-with-cancan) | [IRC: #cancancan (freenode)](http://webchat.freenode.net/?channels=cancancan)
 
-CanCan is an authorization library for Ruby on Rails which restricts what resources a given user is allowed to access. All permissions are defined in a single location (the `Ability` class) and not duplicated across controllers, views, and database queries.
+CanCan is an authorization library for Ruby 2.0+ and Ruby on Rails 3+ which restricts what resources a given user is allowed to access. All permissions are defined in a single location (the `Ability` class) and not duplicated across controllers, views, and database queries.
 
 ## This is the master branch!
 This branch represents work towards version 2.0. Please checkout the 1.x branch for the stable release. Use master at your own risk.
@@ -23,9 +23,15 @@ Any help is greatly appreciated, feel free to submit pull-requests or open issue
 
 ## Installation
 
-In **Rails 3 and 4**, add this to your Gemfile and run the `bundle install` command.
+Add this to your Gemfile: 
 
-    gem 'cancancan', '~> 1.10'
+    gem 'cancancan'
+    
+and run the `bundle install` command.
+
+For Rails < 4.2 use:
+
+   gem 'cancancan', '~> 1.10'
 
 ## Getting Started
 
@@ -40,20 +46,9 @@ end
 
 ### 1. Define Abilities
 
-User permissions are defined in an `Ability` class. CanCan 1.5 includes a Rails 3 and 4 generator for creating this class.
+User permissions are defined in an `Ability` class. CanCan 1.5 includes a Rails 4.2 and 5 generator for creating this class.
 
     rails g cancan:ability
-
-In Rails 2.3, just add a new class in `app/models/ability.rb` with the following contents:
-
-```ruby
-class Ability
-  include CanCan::Ability
-
-  def initialize(user)
-  end
-end
-```
 
 See [Defining Abilities](https://github.com/CanCanCommunity/cancancan/wiki/defining-abilities) for details.
 
@@ -79,7 +74,7 @@ def show
 end
 ```
 
-Setting this for every action can be tedious, therefore the `load_and_authorize_resource` method is provided to automatically authorize all actions in a RESTful style resource controller. It will use a before filter to load the resource into an instance variable and authorize it for every action.
+Setting this for every action can be tedious, therefore the `load_and_authorize_resource` method is provided to automatically authorize all actions in a RESTful style resource controller. It will use a before action to load the resource into an instance variable and authorize it for every action.
 
 ```ruby
 class ArticlesController < ApplicationController
@@ -96,7 +91,7 @@ See [Authorizing Controller Actions](https://github.com/CanCanCommunity/cancanca
 
 #### Strong Parameters
 
-When using `strong_parameters` or Rails 4+, you have to sanitize inputs before saving the record, in actions such as `:create` and `:update`.
+You have to sanitize inputs before saving the record, in actions such as `:create` and `:update`.
 
 For the `:update` action, CanCan will load and authorize the resource but *not* change it automatically, so the typical usage would be something like:
 
@@ -162,8 +157,12 @@ If the user authorization fails, a `CanCan::AccessDenied` exception will be rais
 ```ruby
 class ApplicationController < ActionController::Base
   rescue_from CanCan::AccessDenied do |exception|
-    redirect_to root_url, :alert => exception.message
-  end
+      respond_to do |format|
+        format.json { head :forbidden, content_type: 'text/html' }
+        format.html { redirect_to main_app.root_url, notice: exception.message }
+        format.js   { head :forbidden, content_type: 'text/html' }
+      end
+    end
 end
 ```
 
@@ -193,9 +192,12 @@ This will raise an exception if authorization is not performed in an action. If 
 * [Changing Defaults](https://github.com/CanCanCommunity/cancancan/wiki/Changing-Defaults)
 * [See more](https://github.com/CanCanCommunity/cancancan/wiki)
 
-## Questions or Problems?
+## Questions?
+If you have any question or doubt regarding CanCanCan which you cannot find the solution to in the [documentation](https://github.com/CanCanCommunity/cancancan/wiki) or our [mailing list](http://groups.google.com/group/cancancan), please [open a question on Stackoverflow](http://stackoverflow.com/questions/ask?tags=cancancan) with tag [cancancan](http://stackoverflow.com/questions/tagged/cancancan)
 
-If you have any issues with CanCan which you cannot find the solution to in the [documentation](https://github.com/CanCanCommunity/cancancan/wiki) or our mailing list: http://groups.google.com/group/cancancan, please add an [issue on GitHub](https://github.com/CanCanCommunity/cancancan/issues) or fork the project and send a pull request.
+## Bugs?
+
+If you find a bug please add an [issue on GitHub](https://github.com/CanCanCommunity/cancancan/issues) or fork the project and send a pull request.
 
 
 ## Development
