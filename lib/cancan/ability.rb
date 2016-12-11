@@ -30,10 +30,10 @@ module CanCan
     #   can? :create, @category => Project
     #
     # You can also pass multiple objects to check. You only need to pass a hash
-    # following the pattern { :any => [many subjects] }. The behaviour is check if
+    # following the pattern { any: [many subjects] }. The behaviour is check if
     # there is a permission on any of the given objects.
     #
-    #   can? :create, {:any => [Project, Rule]}
+    #   can? :create, {any: [Project, Rule]}
     #
     #
     # Any additional arguments will be passed into the "can" block definition. This
@@ -55,7 +55,7 @@ module CanCan
     #   def test "user can only destroy projects which he owns"
     #     user = User.new
     #     ability = Ability.new(user)
-    #     assert ability.can?(:destroy, Project.new(:user => user))
+    #     assert ability.can?(:destroy, Project.new(user: user))
     #     assert ability.cannot?(:destroy, Project.new)
     #   end
     #
@@ -94,7 +94,7 @@ module CanCan
     #
     # You can pass a hash of conditions as the third argument. Here the user can only see active projects which he owns.
     #
-    #   can :read, Project, :active => true, :user_id => user.id
+    #   can :read, Project, active: true, user_id: user.id
     #
     # See ActiveRecordAdditions#accessible_by for how to use this in database queries. These conditions
     # are also used for initial attributes when building a record in ControllerAdditions#load_resource.
@@ -118,7 +118,7 @@ module CanCan
     #
     # IMPORTANT: Neither a hash of conditions nor a block will be used when checking permission on a class.
     #
-    #   can :update, Project, :priority => 3
+    #   can :update, Project, priority: 3
     #   can? :update, Project # => true
     #
     # If you pass no arguments to +can+, the action, class, and object will be passed to the block and the
@@ -151,7 +151,7 @@ module CanCan
 
     # Alias one or more actions into another one.
     #
-    #   alias_action :update, :destroy, :to => :modify
+    #   alias_action :update, :destroy, to: :modify
     #   can :modify, Comment
     #
     # Then :modify permission will apply to both :update and :destroy requests.
@@ -162,7 +162,7 @@ module CanCan
     # This only works in one direction. Passing the aliased action into the "can?" call
     # will not work because aliases are meant to generate more generic actions.
     #
-    #   alias_action :update, :destroy, :to => :modify
+    #   alias_action :update, :destroy, to: :modify
     #   can :update, Comment
     #   can? :modify, Comment # => false
     #
@@ -173,9 +173,9 @@ module CanCan
     #
     # The following aliases are added by default for conveniently mapping common controller actions.
     #
-    #   alias_action :index, :show, :to => :read
-    #   alias_action :new, :to => :create
-    #   alias_action :edit, :to => :update
+    #   alias_action :index, :show, to: :read
+    #   alias_action :new, to: :create
+    #   alias_action :edit, to: :update
     #
     # This way one can use params[:action] in the controller to determine the permission.
     def alias_action(*args)
@@ -207,22 +207,25 @@ module CanCan
 
     # See ControllerAdditions#authorize! for documentation.
     def authorize!(action, subject, *args)
-      message = nil
-      if args.last.kind_of?(Hash) && args.last.has_key?(:message)
-        message = args.pop[:message]
+      message, error = nil
+      if args.last.is_a?(Hash)
+        args_hash = args.pop
+        message = args_hash[:message]
+        error = args_hash[:error]
       end
       if cannot?(action, subject, *args)
         message ||= unauthorized_message(action, subject)
-        raise AccessDenied.new(message, action, subject)
+        error ||= AccessDenied
+        raise error.new(message, action, subject)
       end
       subject
     end
 
     def unauthorized_message(action, subject)
       keys = unauthorized_message_keys(action, subject)
-      variables = {:action => action.to_s}
+      variables = {action: action.to_s}
       variables[:subject] = (subject.class == Class ? subject : subject.class).to_s.underscore.humanize.downcase
-      message = I18n.translate(nil, variables.merge(:scope => :unauthorized, :default => keys + [""]))
+      message = I18n.translate(nil, variables.merge(scope: :unauthorized, default: keys + [""]))
       message.blank? ? nil : message
     end
 
@@ -260,7 +263,7 @@ module CanCan
     #     action: array_of_objects
     #   }
     def permissions
-      permissions_list = {:can => {}, :cannot => {}}
+      permissions_list = {can: {}, cannot: {}}
 
       rules.each do |rule|
         subjects = rule.subjects
@@ -412,9 +415,9 @@ module CanCan
 
     def default_alias_actions
       {
-        :read => [:index, :show],
-        :create => [:new],
-        :update => [:edit],
+        read: [:index, :show],
+        create: [:new],
+        update: [:edit],
       }
     end
   end
