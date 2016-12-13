@@ -1,11 +1,11 @@
-require "spec_helper"
+require 'spec_helper'
 
 if defined? CanCan::ModelAdapters::ActiveRecordAdapter
 
   describe CanCan::ModelAdapters::ActiveRecordAdapter do
 
     before :each do
-      ActiveRecord::Base.establish_connection(:adapter => "sqlite3", :database => ":memory:")
+      ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => ':memory:')
       ActiveRecord::Migration.verbose = false
       ActiveRecord::Schema.define do
         create_table(:categories) do |t|
@@ -80,9 +80,9 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       @comment_table = Comment.table_name
     end
 
-    it "is for only active record classes" do
+    it 'is for only active record classes' do
       if ActiveRecord.respond_to?(:version) &&
-          ActiveRecord.version > Gem::Version.new("4")
+          ActiveRecord.version > Gem::Version.new('4')
         expect(CanCan::ModelAdapters::ActiveRecord4Adapter).to_not be_for_class(Object)
         expect(CanCan::ModelAdapters::ActiveRecord4Adapter).to be_for_class(Article)
         expect(CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article)).to eq(CanCan::ModelAdapters::ActiveRecord4Adapter)
@@ -93,31 +93,31 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       end
     end
 
-    it "finds record" do
+    it 'finds record' do
       article = Article.create!
       adapter = CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article)
       expect(adapter.find(Article, article.id)).to eq(article)
     end
 
-    it "does not fetch any records when no abilities are defined" do
+    it 'does not fetch any records when no abilities are defined' do
       Article.create!
       expect(Article.accessible_by(@ability)).to be_empty
     end
 
-    it "fetches all articles when one can read all" do
+    it 'fetches all articles when one can read all' do
       @ability.can :read, Article
       article = Article.create!
       expect(Article.accessible_by(@ability)).to eq([article])
     end
 
-    it "fetches only the articles that are published" do
+    it 'fetches only the articles that are published' do
       @ability.can :read, Article, :published => true
       article1 = Article.create!(:published => true)
       article2 = Article.create!(:published => false)
       expect(Article.accessible_by(@ability)).to eq([article1])
     end
 
-    it "fetches any articles which are published or secret" do
+    it 'fetches any articles which are published or secret' do
       @ability.can :read, Article, :published => true
       @ability.can :read, Article, :secret => true
       article1 = Article.create!(:published => true, :secret => false)
@@ -127,7 +127,7 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       expect(Article.accessible_by(@ability)).to eq([article1, article2, article3])
     end
 
-    it "fetches any articles which we are cited in" do
+    it 'fetches any articles which we are cited in' do
       user = User.create!
       cited = Article.create!
       not_cited = Article.create!
@@ -137,7 +137,7 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       expect(Article.accessible_by(@ability)).to eq([cited])
     end
 
-    it "fetches only the articles that are published and not secret" do
+    it 'fetches only the articles that are published and not secret' do
       @ability.can :read, Article, :published => true
       @ability.cannot :read, Article, :secret => true
       article1 = Article.create!(:published => true, :secret => false)
@@ -147,14 +147,14 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       expect(Article.accessible_by(@ability)).to eq([article1])
     end
 
-    it "only reads comments for articles which are published" do
+    it 'only reads comments for articles which are published' do
       @ability.can :read, Comment, :article => { :published => true }
       comment1 = Comment.create!(:article => Article.create!(:published => true))
       comment2 = Comment.create!(:article => Article.create!(:published => false))
       expect(Comment.accessible_by(@ability)).to eq([comment1])
     end
 
-    it "should only read articles which are published or in visible categories" do
+    it 'should only read articles which are published or in visible categories' do
       @ability.can :read, Article, :category => { :visible => true }
       @ability.can :read, Article, :published => true
       article1 = Article.create!(:published => true)
@@ -163,7 +163,7 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       expect(Article.accessible_by(@ability)).to eq([article1, article3])
     end
 
-    it "should only read categories once even if they have multiple articles" do
+    it 'should only read categories once even if they have multiple articles' do
       @ability.can :read, Category, :articles => { :published => true }
       @ability.can :read, Article, :published => true
       category = Category.create!
@@ -172,16 +172,16 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       expect(Category.accessible_by(@ability)).to eq([category])
     end
 
-    it "only reads comments for visible categories through articles" do
+    it 'only reads comments for visible categories through articles' do
       @ability.can :read, Comment, :article => { :category => { :visible => true } }
       comment1 = Comment.create!(:article => Article.create!(:category => Category.create!(:visible => true)))
       comment2 = Comment.create!(:article => Article.create!(:category => Category.create!(:visible => false)))
       expect(Comment.accessible_by(@ability)).to eq([comment1])
     end
 
-    it "allows conditions in SQL and merge with hash conditions" do
+    it 'allows conditions in SQL and merge with hash conditions' do
       @ability.can :read, Article, :published => true
-      @ability.can :read, Article, ["secret=?", true]
+      @ability.can :read, Article, ['secret=?', true]
       article1 = Article.create!(:published => true, :secret => false)
       article2 = Article.create!(:published => true, :secret => true)
       article3 = Article.create!(:published => false, :secret => true)
@@ -189,14 +189,14 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       expect(Article.accessible_by(@ability)).to eq([article1, article2, article3])
     end
 
-    it "allows a scope for conditions" do
+    it 'allows a scope for conditions' do
       @ability.can :read, Article, Article.where(:secret => true)
       article1 = Article.create!(:secret => true)
       article2 = Article.create!(:secret => false)
       expect(Article.accessible_by(@ability)).to eq([article1])
     end
 
-    it "fetches only associated records when using with a scope for conditions" do
+    it 'fetches only associated records when using with a scope for conditions' do
       @ability.can :read, Article, Article.where(:secret => true)
       category1 = Category.create!(:visible => false)
       category2 = Category.create!(:visible => true)
@@ -205,20 +205,20 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       expect(category1.articles.accessible_by(@ability)).to eq([article1])
     end
 
-    it "raises an exception when trying to merge scope with other conditions" do
+    it 'raises an exception when trying to merge scope with other conditions' do
       @ability.can :read, Article, :published => true
       @ability.can :read, Article, Article.where(:secret => true)
-      expect(lambda { Article.accessible_by(@ability) }).to raise_error(CanCan::Error, "Unable to merge an Active Record scope with other conditions. Instead use a hash or SQL for read Article ability.")
+      expect(lambda { Article.accessible_by(@ability) }).to raise_error(CanCan::Error, 'Unable to merge an Active Record scope with other conditions. Instead use a hash or SQL for read Article ability.')
     end
 
-    it "does not allow to fetch records when ability with just block present" do
+    it 'does not allow to fetch records when ability with just block present' do
       @ability.can :read, Article do
         false
       end
       expect(lambda { Article.accessible_by(@ability) }).to raise_error(CanCan::Error)
     end
 
-    it "should support more than one deeply nested conditions" do
+    it 'should support more than one deeply nested conditions' do
       @ability.can :read, Comment, :article => {
         :category => {
           :name => 'foo', :visible => true
@@ -227,45 +227,45 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       expect { Comment.accessible_by(@ability) }.to_not raise_error
     end
 
-    it "does not allow to check ability on object against SQL conditions without block" do
-      @ability.can :read, Article, ["secret=?", true]
+    it 'does not allow to check ability on object against SQL conditions without block' do
+      @ability.can :read, Article, ['secret=?', true]
       expect(lambda { @ability.can? :read, Article.new }).to raise_error(CanCan::Error)
     end
 
-    it "has false conditions if no abilities match" do
+    it 'has false conditions if no abilities match' do
       expect(@ability.model_adapter(Article, :read).conditions).to eq("'t'='f'")
     end
 
-    it "returns false conditions for cannot clause" do
+    it 'returns false conditions for cannot clause' do
       @ability.cannot :read, Article
       expect(@ability.model_adapter(Article, :read).conditions).to eq("'t'='f'")
     end
 
-    it "returns SQL for single `can` definition in front of default `cannot` condition" do
+    it 'returns SQL for single `can` definition in front of default `cannot` condition' do
       @ability.cannot :read, Article
       @ability.can :read, Article, :published => false, :secret => true
       expect(@ability.model_adapter(Article, :read).conditions).to orderlessly_match(%Q["#{@article_table}"."published" = 'f' AND "#{@article_table}"."secret" = 't'])
     end
 
-    it "returns true condition for single `can` definition in front of default `can` condition" do
+    it 'returns true condition for single `can` definition in front of default `can` condition' do
       @ability.can :read, Article
       @ability.can :read, Article, :published => false, :secret => true
       expect(@ability.model_adapter(Article, :read).conditions).to eq("'t'='t'")
     end
 
-    it "returns `false condition` for single `cannot` definition in front of default `cannot` condition" do
+    it 'returns `false condition` for single `cannot` definition in front of default `cannot` condition' do
       @ability.cannot :read, Article
       @ability.cannot :read, Article, :published => false, :secret => true
       expect(@ability.model_adapter(Article, :read).conditions).to eq("'t'='f'")
     end
 
-    it "returns `not (sql)` for single `cannot` definition in front of default `can` condition" do
+    it 'returns `not (sql)` for single `cannot` definition in front of default `can` condition' do
       @ability.can :read, Article
       @ability.cannot :read, Article, :published => false, :secret => true
       expect(@ability.model_adapter(Article, :read).conditions).to orderlessly_match(%Q["not (#{@article_table}"."published" = 'f' AND "#{@article_table}"."secret" = 't')])
     end
 
-    it "returns appropriate sql conditions in complex case" do
+    it 'returns appropriate sql conditions in complex case' do
       @ability.can :read, Article
       @ability.can :manage, Article, :id => 1
       @ability.can :update, Article, :published => true
@@ -275,17 +275,17 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       expect(@ability.model_adapter(Article, :read).conditions).to eq("'t'='t'")
     end
 
-    it "returns appropriate sql conditions in complex case with nested joins" do
+    it 'returns appropriate sql conditions in complex case with nested joins' do
       @ability.can :read, Comment, :article => { :category => { :visible => true } }
       expect(@ability.model_adapter(Comment, :read).conditions).to eq({ Category.table_name.to_sym => { :visible => true } })
     end
 
-    it "returns appropriate sql conditions in complex case with nested joins of different depth" do
+    it 'returns appropriate sql conditions in complex case with nested joins of different depth' do
       @ability.can :read, Comment, :article => { :published => true, :category => { :visible => true } }
       expect(@ability.model_adapter(Comment, :read).conditions).to eq({ Article.table_name.to_sym => { :published => true }, Category.table_name.to_sym => { :visible => true } })
     end
 
-    it "does not forget conditions when calling with SQL string" do
+    it 'does not forget conditions when calling with SQL string' do
       @ability.can :read, Article, :published => true
       @ability.can :read, Article, ['secret=?', false]
       adapter = @ability.model_adapter(Article, :read)
@@ -294,35 +294,35 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       end
     end
 
-    it "has nil joins if no rules" do
+    it 'has nil joins if no rules' do
       expect(@ability.model_adapter(Article, :read).joins).to be_nil
     end
 
-    it "has nil joins if no nested hashes specified in conditions" do
+    it 'has nil joins if no nested hashes specified in conditions' do
       @ability.can :read, Article, :published => false
       @ability.can :read, Article, :secret => true
       expect(@ability.model_adapter(Article, :read).joins).to be_nil
     end
 
-    it "merges separate joins into a single array" do
+    it 'merges separate joins into a single array' do
       @ability.can :read, Article, :project => { :blocked => false }
       @ability.can :read, Article, :company => { :admin => true }
       expect(@ability.model_adapter(Article, :read).joins.inspect).to orderlessly_match([:company, :project].inspect)
     end
 
-    it "merges same joins into a single array" do
+    it 'merges same joins into a single array' do
       @ability.can :read, Article, :project => { :blocked => false }
       @ability.can :read, Article, :project => { :admin => true }
       expect(@ability.model_adapter(Article, :read).joins).to eq([:project])
     end
 
-    it "merges nested and non-nested joins" do
+    it 'merges nested and non-nested joins' do
       @ability.can :read, Article, :project => { :blocked => false }
       @ability.can :read, Article, :project => { :comments => { :spam => true } }
       expect(@ability.model_adapter(Article, :read).joins).to eq([{:project=>[:comments]}])
     end
 
-    it "merges :all conditions with other conditions" do
+    it 'merges :all conditions with other conditions' do
       user = User.create!
       article = Article.create!(:user => user)
       ability = Ability.new(user)
@@ -342,7 +342,7 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       expect { @ability.can? :read, Article }.not_to raise_error
     end
 
-    context "with namespaced models" do
+    context 'with namespaced models' do
       before :each do
         ActiveRecord::Schema.define do
           create_table( :table_xes ) do |t|
@@ -369,7 +369,7 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
         end
       end
 
-      it "fetches all namespace::table_x when one is related by table_y" do
+      it 'fetches all namespace::table_x when one is related by table_y' do
         user = User.create!
 
         ability = Ability.new(user)

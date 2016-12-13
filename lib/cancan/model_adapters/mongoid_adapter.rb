@@ -59,7 +59,7 @@ module CanCan
               v = simplify_relations(relation_class_name.constantize, v)
               relation_ids = relation_class_name.constantize.where(v).only(:id).map(&:id)
               k = "#{k}_id"
-              v = { "$in" => relation_ids }
+              v = { '$in' => relation_ids }
             end
             [k,v]
           }
