@@ -5,6 +5,7 @@ Unreleased
 2.0.0 (TBD)
 
 * Drop support for Rails < 4.2 (oliverklee)
+* Drop support for InheritedResource (coorasse)
 
 1.15.0 (June 13th, 2016)
 
