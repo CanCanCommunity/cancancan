@@ -5,7 +5,10 @@
 [![Code Climate Badge](https://codeclimate.com/github/CanCanCommunity/cancancan.svg)](https://codeclimate.com/github/CanCanCommunity/cancancan)
 [![Inch CI](http://inch-ci.org/github/CanCanCommunity/cancancan.svg)](http://inch-ci.org/github/CanCanCommunity/cancancan)
 
-[Wiki](https://github.com/CanCanCommunity/cancancan/wiki) | [RDocs](http://rdoc.info/projects/CanCanCommunity/cancancan) | [Screencast](http://railscasts.com/episodes/192-authorization-with-cancan) | [Gitter](https://gitter.im/CanCanCommunity/cancancan)
+[Wiki](https://github.com/CanCanCommunity/cancancan/wiki) | 
+[RDocs](http://rdoc.info/projects/CanCanCommunity/cancancan) | 
+[Screencast](http://railscasts.com/episodes/192-authorization-with-cancan) | 
+[Gitter](https://gitter.im/CanCanCommunity/cancancan)
 
 CanCanCan is an authorization library for Ruby 2.0+ and Ruby on Rails 3+ which restricts what resources a given user is allowed to access. 
 
@@ -63,7 +66,8 @@ def show
 end
 ```
 
-Setting this for every action can be tedious, therefore the `load_and_authorize_resource` method is provided to automatically authorize all actions in a RESTful style resource controller. 
+Setting this for every action can be tedious, therefore the `load_and_authorize_resource` method is provided to 
+automatically authorize all actions in a RESTful style resource controller. 
 It will use a before action to load the resource into an instance variable and authorize it for every action.
 
 ```ruby
@@ -100,7 +104,8 @@ def update_params
 end
 ```
 
-For the `:create` action, CanCan will try to initialize a new instance with sanitized input by seeing if your controller will respond to the following methods (in order):
+For the `:create` action, CanCan will try to initialize a new instance with sanitized input by seeing if your 
+controller will respond to the following methods (in order):
 
 1. `create_params`
 2. `<model_name>_params` such as `article_params` (this is the default convention in rails for naming your param method)
@@ -142,7 +147,8 @@ See [Strong Parameters](https://github.com/CanCanCommunity/cancancan/wiki/Strong
 
 ### 3. Handle Unauthorized Access
 
-If the user authorization fails, a `CanCan::AccessDenied` exception will be raised. You can catch this and modify its behavior in the `ApplicationController`.
+If the user authorization fails, a `CanCan::AccessDenied` exception will be raised. 
+You can catch this and modify its behavior in the `ApplicationController`.
 
 ```ruby
 class ApplicationController < ActionController::Base
@@ -169,7 +175,9 @@ class ApplicationController < ActionController::Base
 end
 ```
 
-This will raise an exception if authorization is not performed in an action. If you want to skip this, add `skip_authorization_check` to a controller subclass. See [Ensure Authorization](https://github.com/CanCanCommunity/cancancan/wiki/Ensure-Authorization) for more information.
+This will raise an exception if authorization is not performed in an action. 
+If you want to skip this, add `skip_authorization_check` to a controller subclass. 
+See [Ensure Authorization](https://github.com/CanCanCommunity/cancancan/wiki/Ensure-Authorization) for more information.
 
 
 ## Wiki Docs
@@ -193,7 +201,11 @@ Any help is greatly appreciated, feel free to submit pull-requests or open issue
 
 ## Questions?
 
-If you have any question or doubt regarding CanCanCan which you cannot find the solution to in the [documentation](https://github.com/CanCanCommunity/cancancan/wiki) or our [mailing list](http://groups.google.com/group/cancancan), please [open a question on Stackoverflow](http://stackoverflow.com/questions/ask?tags=cancancan) with tag [cancancan](http://stackoverflow.com/questions/tagged/cancancan)
+If you have any question or doubt regarding CanCanCan which you cannot find the solution to in the 
+[documentation](https://github.com/CanCanCommunity/cancancan/wiki) or our 
+[mailing list](http://groups.google.com/group/cancancan), please 
+[open a question on Stackoverflow](http://stackoverflow.com/questions/ask?tags=cancancan) with tag 
+[cancancan](http://stackoverflow.com/questions/tagged/cancancan)
 
 ## Bugs?
 
@@ -202,18 +214,21 @@ If you find a bug please add an [issue on GitHub](https://github.com/CanCanCommu
 
 ## Development
 
-Cancancan uses [appraisals](https://github.com/thoughtbot/appraisal) to test the code base against multiple versions of Rails, as well as the different model adapters.
+CanCanCan uses [appraisals](https://github.com/thoughtbot/appraisal) to test the code base against multiple versions 
+of Rails, as well as the different model adapters.
 
 When first developing, you may need to run `bundle install` and then `appraisal install`, to install the different sets.
 
 You can then run all appraisal files (like CI does), with `appraisal rake` or just run a specific set `appraisal activerecord_3.0 rake`.
 
-See the [CONTRIBUTING](https://github.com/CanCanCommunity/cancancan/blob/develop/CONTRIBUTING.md) and [spec/README](https://github.com/CanCanCommunity/cancancan/blob/master/spec/README.rdoc) for more information.
+See the [CONTRIBUTING](https://github.com/CanCanCommunity/cancancan/blob/develop/CONTRIBUTING.md) and 
+[spec/README](https://github.com/CanCanCommunity/cancancan/blob/master/spec/README.rdoc) for more information.
 
 
 ## Special Thanks
 
-CanCan was inspired by [declarative_authorization](https://github.com/stffn/declarative_authorization/) and [aegis](https://github.com/makandra/aegis). 
+CanCanCan was inspired by [declarative_authorization](https://github.com/stffn/declarative_authorization/) and 
+[aegis](https://github.com/makandra/aegis). 
 
-Also many thanks to the [CanCan contributors](https://github.com/CanCanCommunity/cancancan/contributors). 
+Also many thanks to the [CanCanCan contributors](https://github.com/CanCanCommunity/cancancan/contributors). 
 See the [CHANGELOG](https://github.com/CanCanCommunity/cancancan/blob/master/CHANGELOG.rdoc) for the full list.
