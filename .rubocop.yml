@@ -19,6 +19,9 @@ Style/VariableNumber:
 
 AllCops:
   TargetRubyVersion: 2.0
+  Exclude:
+    - 'gemfiles/vendor/bundle/**/*'
+
 
 
 inherit_from: .rubocop_todo.yml
