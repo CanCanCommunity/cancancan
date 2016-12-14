@@ -1,7 +1,3 @@
-# TODO: wanted. needs fix
-# Metrics/LineLength:
-#  Max: 120
-
 Style/Documentation:
   Enabled: false
 
