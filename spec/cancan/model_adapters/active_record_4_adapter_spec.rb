@@ -1,10 +1,10 @@
-require "spec_helper"
+require 'spec_helper'
 
 if defined? CanCan::ModelAdapters::ActiveRecord4Adapter
   describe CanCan::ModelAdapters::ActiveRecord4Adapter do
     context 'with sqlite3' do
       before :each do
-        ActiveRecord::Base.establish_connection(:adapter => "sqlite3", :database => ":memory:")
+        ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => ':memory:')
         ActiveRecord::Migration.verbose = false
         ActiveRecord::Schema.define do
           create_table(:parents) do |t|
@@ -28,7 +28,7 @@ if defined? CanCan::ModelAdapters::ActiveRecord4Adapter
         (@ability = double).extend(CanCan::Ability)
       end
 
-      it "respects scope on included associations" do
+      it 'respects scope on included associations' do
         @ability.can :read, [Parent, Child]
 
         parent = Parent.create!
@@ -39,7 +39,7 @@ if defined? CanCan::ModelAdapters::ActiveRecord4Adapter
       end
 
       if ActiveRecord::VERSION::MINOR >= 1
-        it "allows filters on enums" do
+        it 'allows filters on enums' do
           ActiveRecord::Schema.define do
             create_table(:shapes) do |t|
               t.integer :color, default: 0, null: false
@@ -76,7 +76,7 @@ if defined? CanCan::ModelAdapters::ActiveRecord4Adapter
           expect(accessible).to contain_exactly(red, blue)
         end
 
-        it "allows dual filter on enums" do
+        it 'allows dual filter on enums' do
           ActiveRecord::Schema.define do
             create_table(:discs) do |t|
               t.integer :color, default: 0, null: false
@@ -111,10 +111,10 @@ if defined? CanCan::ModelAdapters::ActiveRecord4Adapter
     if Gem::Specification.find_all_by_name('pg').any?
       context 'with postgresql' do
         before :each do
-          ActiveRecord::Base.establish_connection(:adapter => "postgresql", :database => "postgres", :schema_search_path => 'public')
+          ActiveRecord::Base.establish_connection(:adapter => 'postgresql', :database => 'postgres', :schema_search_path => 'public')
           ActiveRecord::Base.connection.drop_database('cancan_postgresql_spec')
           ActiveRecord::Base.connection.create_database 'cancan_postgresql_spec', 'encoding' => 'utf-8', 'adapter' => 'postgresql'
-          ActiveRecord::Base.establish_connection(:adapter => "postgresql", :database => "cancan_postgresql_spec")
+          ActiveRecord::Base.establish_connection(:adapter => 'postgresql', :database => 'cancan_postgresql_spec')
           ActiveRecord::Migration.verbose = false
           ActiveRecord::Schema.define do
             create_table(:parents) do |t|
@@ -138,7 +138,7 @@ if defined? CanCan::ModelAdapters::ActiveRecord4Adapter
           (@ability = double).extend(CanCan::Ability)
         end
 
-        it "allows overlapping conditions in SQL and merge with hash conditions" do
+        it 'allows overlapping conditions in SQL and merge with hash conditions' do
           @ability.can :read, Parent, :children => {:parent_id => 1}
           @ability.can :read, Parent, :children => {:parent_id => 1}
 
