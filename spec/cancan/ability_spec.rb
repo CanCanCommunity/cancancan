@@ -96,21 +96,21 @@ describe CanCan::Ability do
   end
 
   it 'makes alias for update or destroy actions to modify action' do
-    @ability.alias_action :update, :destroy, :to => :modify
+    @ability.alias_action :update, :destroy, to: :modify
     @ability.can :modify, :all
     expect(@ability.can?(:update, 123)).to be(true)
     expect(@ability.can?(:destroy, 123)).to be(true)
   end
 
   it 'allows deeply nested aliased actions' do
-    @ability.alias_action :increment, :to => :sort
-    @ability.alias_action :sort, :to => :modify
+    @ability.alias_action :increment, to: :sort
+    @ability.alias_action :sort, to: :modify
     @ability.can :modify, :all
     expect(@ability.can?(:increment, 123)).to be(true)
   end
 
   it 'raises an Error if alias target is an exist action' do
-    expect { @ability.alias_action :show, :to => :show }.to raise_error(CanCan::Error, "You can't specify target (show) as alias because it is real action name")
+    expect { @ability.alias_action :show, to: :show }.to raise_error(CanCan::Error, "You can't specify target (show) as alias because it is real action name")
   end
 
   it 'always calls block with arguments when passing no arguments to can' do
@@ -172,10 +172,10 @@ describe CanCan::Ability do
 
   it 'checks if there is a permission for any of given subjects' do
     @ability.can :update, [String, Range]
-    expect(@ability.can?(:update, {:any => ['foo', 1..3]})).to be(true)
-    expect(@ability.can?(:update, {:any => [1..3, 'foo']})).to be(true)
-    expect(@ability.can?(:update, {:any => [123, 'foo']})).to be(true)
-    expect(@ability.can?(:update, {:any => [123, 1.0]})).to be(false)
+    expect(@ability.can?(:update, {any: ['foo', 1..3]})).to be(true)
+    expect(@ability.can?(:update, {any: [1..3, 'foo']})).to be(true)
+    expect(@ability.can?(:update, {any: [123, 'foo']})).to be(true)
+    expect(@ability.can?(:update, {any: [123, 1.0]})).to be(false)
   end
 
   it 'lists all permissions' do
@@ -185,13 +185,13 @@ describe CanCan::Ability do
     @ability.cannot :read, Hash
     @ability.cannot :preview, Array
 
-    expected_list = {:can => {:manage => ['all'],
-                              :learn => ['Range']
+    expected_list = {can: {manage: ['all'],
+                              learn: ['Range']
                              },
-                     :cannot => {:read => ['String', 'Hash'],
-                                 :index => ['String', 'Hash'],
-                                 :show => ['String', 'Hash'],
-                                 :preview => ['Array']
+                     cannot: {read: ['String', 'Hash'],
+                                 index: ['String', 'Hash'],
+                                 show: ['String', 'Hash'],
+                                 preview: ['Array']
                                 }
                     }
 
@@ -203,8 +203,8 @@ describe CanCan::Ability do
     expect(@ability.can?(:read, :stats)).to be(true)
     expect(@ability.can?(:update, :stats)).to be(false)
     expect(@ability.can?(:read, :nonstats)).to be(false)
-    expect(@ability.can?(:read, {:any => [:stats, :nonstats]})).to be(true)
-    expect(@ability.can?(:read, {:any => [:nonstats, :neitherstats]})).to be(false)
+    expect(@ability.can?(:read, {any: [:stats, :nonstats]})).to be(true)
+    expect(@ability.can?(:read, {any: [:nonstats, :neitherstats]})).to be(false)
   end
 
   it 'checks ancestors of class' do
@@ -212,7 +212,7 @@ describe CanCan::Ability do
     expect(@ability.can?(:read, Integer)).to be(true)
     expect(@ability.can?(:read, 1.23)).to be(true)
     expect(@ability.can?(:read, 'foo')).to be(false)
-    expect(@ability.can?(:read, {:any => [Integer, String]})).to be(true)
+    expect(@ability.can?(:read, {any: [Integer, String]})).to be(true)
   end
 
   it "supports 'cannot' method to define what user cannot do" do
@@ -220,9 +220,9 @@ describe CanCan::Ability do
     @ability.cannot :read, Integer
     expect(@ability.can?(:read, 'foo')).to be(true)
     expect(@ability.can?(:read, 123)).to be(false)
-    expect(@ability.can?(:read, {:any => ['foo', 'bar']})).to be(true)
-    expect(@ability.can?(:read, {:any => [123, 'foo']})).to be(false)
-    expect(@ability.can?(:read, {:any => [123, 456]})).to be(false)
+    expect(@ability.can?(:read, {any: ['foo', 'bar']})).to be(true)
+    expect(@ability.can?(:read, {any: [123, 'foo']})).to be(false)
+    expect(@ability.can?(:read, {any: [123, 456]})).to be(false)
   end
 
   it 'passes to previous rule, if block returns false or nil' do
@@ -235,8 +235,8 @@ describe CanCan::Ability do
     expect(@ability.can?(:read, 3)).to be(true)
     expect(@ability.can?(:read, 8)).to be(false)
     expect(@ability.can?(:read, 123)).to be(true)
-    expect(@ability.can?(:read, {:any => [123, 8]})).to be(true)
-    expect(@ability.can?(:read, {:any => [8, 9]})).to be(false)
+    expect(@ability.can?(:read, {any: [123, 8]})).to be(true)
+    expect(@ability.can?(:read, {any: [8, 9]})).to be(false)
   end
 
   it 'always returns `false` for single cannot definition' do
@@ -261,13 +261,13 @@ describe CanCan::Ability do
   end
 
   it 'appends aliased actions' do
-    @ability.alias_action :update, :to => :modify
-    @ability.alias_action :destroy, :to => :modify
+    @ability.alias_action :update, to: :modify
+    @ability.alias_action :destroy, to: :modify
     expect(@ability.aliased_actions[:modify]).to eq([:update, :destroy])
   end
 
   it 'clears aliased actions' do
-    @ability.alias_action :update, :to => :modify
+    @ability.alias_action :update, to: :modify
     @ability.clear_aliased_actions
     expect(@ability.aliased_actions[:modify]).to be_nil
   end
@@ -279,80 +279,80 @@ describe CanCan::Ability do
 
     expect(@ability.can?(:read, 2, 1)).to be(true)
     expect(@ability.can?(:read, 2, 3)).to be(false)
-    expect(@ability.can?(:read, {:any => [4, 5]}, 3)).to be(true)
-    expect(@ability.can?(:read, {:any => [2, 3]}, 3)).to be(false)
+    expect(@ability.can?(:read, {any: [4, 5]}, 3)).to be(true)
+    expect(@ability.can?(:read, {any: [2, 3]}, 3)).to be(false)
   end
 
   it 'uses conditions as third parameter and determine abilities from it' do
-    @ability.can :read, Range, :begin => 1, :end => 3
+    @ability.can :read, Range, begin: 1, end: 3
 
     expect(@ability.can?(:read, 1..3)).to be(true)
     expect(@ability.can?(:read, 1..4)).to be(false)
     expect(@ability.can?(:read, Range)).to be(true)
-    expect(@ability.can?(:read, {:any => [1..3, 1..4]})).to be(true)
-    expect(@ability.can?(:read, {:any => [1..4, 2..4]})).to be(false)
+    expect(@ability.can?(:read, {any: [1..3, 1..4]})).to be(true)
+    expect(@ability.can?(:read, {any: [1..4, 2..4]})).to be(false)
   end
 
   it 'allows an array of options in conditions hash' do
-    @ability.can :read, Range, :begin => [1, 3, 5]
+    @ability.can :read, Range, begin: [1, 3, 5]
 
     expect(@ability.can?(:read, 1..3)).to be(true)
     expect(@ability.can?(:read, 2..4)).to be(false)
     expect(@ability.can?(:read, 3..5)).to be(true)
-    expect(@ability.can?(:read, {:any => [2..4, 3..5]})).to be(true)
-    expect(@ability.can?(:read, {:any => [2..4, 2..5]})).to be(false)
+    expect(@ability.can?(:read, {any: [2..4, 3..5]})).to be(true)
+    expect(@ability.can?(:read, {any: [2..4, 2..5]})).to be(false)
   end
 
   it 'allows a range of options in conditions hash' do
-    @ability.can :read, Range, :begin => 1..3
+    @ability.can :read, Range, begin: 1..3
     expect(@ability.can?(:read, 1..10)).to be(true)
     expect(@ability.can?(:read, 3..30)).to be(true)
     expect(@ability.can?(:read, 4..40)).to be(false)
   end
 
   it 'allows a range of time in conditions hash' do
-    @ability.can :read, Range, :begin => 1.day.from_now..3.days.from_now
+    @ability.can :read, Range, begin: 1.day.from_now..3.days.from_now
     expect(@ability.can?(:read, 1.day.from_now..10.days.from_now)).to be(true)
     expect(@ability.can?(:read, 2.days.from_now..20.days.from_now)).to be(true)
     expect(@ability.can?(:read, 4.days.from_now..40.days.from_now)).to be(false)
   end
 
   it 'allows nested hashes in conditions hash' do
-    @ability.can :read, Range, :begin => { :to_i => 5 }
+    @ability.can :read, Range, begin: { to_i: 5 }
     expect(@ability.can?(:read, 5..7)).to be(true)
     expect(@ability.can?(:read, 6..8)).to be(false)
   end
 
   it "matches any element passed in to nesting if it's an array (for has_many associations)" do
-    @ability.can :read, Range, :to_a => { :to_i => 3 }
+    @ability.can :read, Range, to_a: { to_i: 3 }
     expect(@ability.can?(:read, 1..5)).to be(true)
     expect(@ability.can?(:read, 4..6)).to be(false)
   end
 
   it 'accepts a set as a condition value' do
-    expect(object_with_foo_2 = double(:foo => 2)).to receive(:foo)
-    expect(object_with_foo_3 = double(:foo => 3)).to receive(:foo)
-    @ability.can :read, Object, :foo => [1, 2, 5].to_set
+    expect(object_with_foo_2 = double(foo: 2)).to receive(:foo)
+    expect(object_with_foo_3 = double(foo: 3)).to receive(:foo)
+    @ability.can :read, Object, foo: [1, 2, 5].to_set
     expect(@ability.can?(:read, object_with_foo_2)).to be(true)
     expect(@ability.can?(:read, object_with_foo_3)).to be(false)
   end
 
   it 'does not match subjects return nil for methods that must match nested a nested conditions hash' do
-    expect(object_with_foo = double(:foo => :bar)).to receive(:foo)
-    @ability.can :read, Array, :first => { :foo => :bar }
+    expect(object_with_foo = double(foo: :bar)).to receive(:foo)
+    @ability.can :read, Array, first: { foo: :bar }
     expect(@ability.can?(:read, [object_with_foo])).to be(true)
     expect(@ability.can?(:read, [])).to be(false)
   end
 
   it 'matches strings but not substrings specified in a conditions hash' do
-    @ability.can :read, String, :presence => 'declassified'
+    @ability.can :read, String, presence: 'declassified'
     expect(@ability.can?(:read, 'declassified')).to be(true)
     expect(@ability.can?(:read, 'classified')).to be(false)
   end
 
   it 'does not stop at cannot definition when comparing class' do
     @ability.can :read, Range
-    @ability.cannot :read, Range, :begin => 1
+    @ability.cannot :read, Range, begin: 1
     expect(@ability.can?(:read, 2..5)).to be(true)
     expect(@ability.can?(:read, 1..5)).to be(false)
     expect(@ability.can?(:read, Range)).to be(true)
@@ -385,24 +385,24 @@ describe CanCan::Ability do
   end
 
   it 'checks permissions through association when passing a hash of subjects' do
-    @ability.can :read, Range, :string => {:length => 3}
+    @ability.can :read, Range, string: {length: 3}
 
     expect(@ability.can?(:read, 'foo' => Range)).to be(true)
     expect(@ability.can?(:read, 'foobar' => Range)).to be(false)
     expect(@ability.can?(:read, 123 => Range)).to be(true)
-    expect(@ability.can?(:read, {:any => [{'foo' => Range}, {'foobar' => Range}]})).to be(true)
-    expect(@ability.can?(:read, {:any => [{'food' => Range}, {'foobar' => Range}]})).to be(false)
+    expect(@ability.can?(:read, {any: [{'foo' => Range}, {'foobar' => Range}]})).to be(true)
+    expect(@ability.can?(:read, {any: [{'food' => Range}, {'foobar' => Range}]})).to be(false)
   end
 
   it 'checks permissions correctly when passing a hash of subjects with multiple definitions' do
-    @ability.can :read, Range, :string => {:length => 4}
-    @ability.can [:create, :read], Range, :string => {:upcase => 'FOO'}
+    @ability.can :read, Range, string: {length: 4}
+    @ability.can [:create, :read], Range, string: {upcase: 'FOO'}
 
     expect(@ability.can?(:read, 'foo' => Range)).to be(true)
     expect(@ability.can?(:read, 'foobar' => Range)).to be(false)
     expect(@ability.can?(:read, 1234 => Range)).to be(true)
-    expect(@ability.can?(:read, {:any => [{'foo' => Range}, {'foobar' => Range}]})).to be(true)
-    expect(@ability.can?(:read, {:any => [{'foo.bar' => Range}, {'foobar' => Range}]})).to be(false)
+    expect(@ability.can?(:read, {any: [{'foo' => Range}, {'foobar' => Range}]})).to be(true)
+    expect(@ability.can?(:read, {any: [{'foo.bar' => Range}, {'foobar' => Range}]})).to be(false)
   end
 
   it 'allows to check ability on Hash-like object' do
@@ -412,16 +412,16 @@ describe CanCan::Ability do
   end
 
   it "has initial attributes based on hash conditions of 'new' action" do
-    @ability.can :manage, Range, :foo => 'foo', :hash => {:skip => 'hashes'}
-    @ability.can :create, Range, :bar => 123, :array => %w[skip arrays]
-    @ability.can :new, Range, :baz => 'baz', :range => 1..3
-    @ability.cannot :new, Range, :ignore => 'me'
-    expect(@ability.attributes_for(:new, Range)).to eq({:foo => 'foo', :bar => 123, :baz => 'baz'})
+    @ability.can :manage, Range, foo: 'foo', hash: {skip: 'hashes'}
+    @ability.can :create, Range, bar: 123, array: %w[skip arrays]
+    @ability.can :new, Range, baz: 'baz', range: 1..3
+    @ability.cannot :new, Range, ignore: 'me'
+    expect(@ability.attributes_for(:new, Range)).to eq({foo: 'foo', bar: 123, baz: 'baz'})
   end
 
   it 'raises access denied exception if ability us unauthorized to perform a certain action' do
     begin
-      @ability.authorize! :read, :foo, 1, 2, 3, :message => 'Access denied!'
+      @ability.authorize! :read, :foo, 1, 2, 3, message: 'Access denied!'
     rescue CanCan::AccessDenied => e
       expect(e.message).to eq('Access denied!')
       expect(e.action).to eq(:read)
@@ -474,7 +474,7 @@ describe CanCan::Ability do
 
   it "raises an error when attempting to use a block with a hash condition since it's not likely what they want" do
     expect {
-      @ability.can :read, Array, :published => true do
+      @ability.can :read, Array, published: true do
         false
       end
     }.to raise_error(CanCan::Error, 'You are not able to supply a block with a hash of conditions in read Array ability. Use either one.')
@@ -486,21 +486,21 @@ describe CanCan::Ability do
     end
 
     it 'uses action/subject in i18n' do
-      I18n.backend.store_translations :en, :unauthorized => {:update => {:array => 'foo'}}
+      I18n.backend.store_translations :en, unauthorized: {update: {array: 'foo'}}
       expect(@ability.unauthorized_message(:update, Array)).to eq('foo')
       expect(@ability.unauthorized_message(:update, [1, 2, 3])).to eq('foo')
       expect(@ability.unauthorized_message(:update, :missing)).to be_nil
     end
 
     it 'uses symbol as subject directly' do
-      I18n.backend.store_translations :en, :unauthorized => {:has => {:cheezburger => 'Nom nom nom. I eated it.'}}
+      I18n.backend.store_translations :en, unauthorized: {has: {cheezburger: 'Nom nom nom. I eated it.'}}
       expect(@ability.unauthorized_message(:has, :cheezburger)).to eq('Nom nom nom. I eated it.')
     end
 
     it "falls back to 'manage' and 'all'" do
-      I18n.backend.store_translations :en, :unauthorized => {
-        :manage => {:all => 'manage all', :array => 'manage array'},
-        :update => {:all => 'update all', :array => 'update array'}
+      I18n.backend.store_translations :en, unauthorized: {
+        manage: {all: 'manage all', array: 'manage array'},
+        update: {all: 'update all', array: 'update array'}
       }
       expect(@ability.unauthorized_message(:update, Array)).to eq('update array')
       expect(@ability.unauthorized_message(:update, Hash)).to eq('update all')
@@ -509,14 +509,14 @@ describe CanCan::Ability do
     end
 
     it 'follows aliased actions' do
-      I18n.backend.store_translations :en, :unauthorized => {:modify => {:array => 'modify array'}}
-      @ability.alias_action :update, :to => :modify
+      I18n.backend.store_translations :en, unauthorized: {modify: {array: 'modify array'}}
+      @ability.alias_action :update, to: :modify
       expect(@ability.unauthorized_message(:update, Array)).to eq('modify array')
       expect(@ability.unauthorized_message(:edit, Array)).to eq('modify array')
     end
 
     it 'has variables for action and subject' do
-      I18n.backend.store_translations :en, :unauthorized => {:manage => {:all => '%{action} %{subject}'}} # old syntax for now in case testing with old I18n
+      I18n.backend.store_translations :en, unauthorized: {manage: {all: '%{action} %{subject}'}} # old syntax for now in case testing with old I18n
       expect(@ability.unauthorized_message(:update, Array)).to eq('update array')
       expect(@ability.unauthorized_message(:update, ArgumentError)).to eq('update argument error')
       expect(@ability.unauthorized_message(:edit, 1..3)).to eq('edit range')
