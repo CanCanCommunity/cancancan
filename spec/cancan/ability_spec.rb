@@ -186,12 +186,12 @@ describe CanCan::Ability do
     @ability.cannot :preview, Array
 
     expected_list = {can: {manage: ['all'],
-                              learn: ['Range']
+                           learn: ['Range']
                              },
                      cannot: {read: ['String', 'Hash'],
-                                 index: ['String', 'Hash'],
-                                 show: ['String', 'Hash'],
-                                 preview: ['Array']
+                              index: ['String', 'Hash'],
+                              show: ['String', 'Hash'],
+                              preview: ['Array']
                                 }
                     }
 
