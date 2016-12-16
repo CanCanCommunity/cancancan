@@ -18,19 +18,19 @@ describe CanCan::Rule do
   end
 
   it 'returns single association for joins' do
-    @conditions[:foo] = {:bar => 1}
-    expect(@rule.associations_hash).to eq({:foo => {}})
+    @conditions[:foo] = {bar: 1}
+    expect(@rule.associations_hash).to eq({foo: {}})
   end
 
   it 'returns multiple associations for joins' do
-    @conditions[:foo] = {:bar => 1}
+    @conditions[:foo] = {bar: 1}
     @conditions[:test] = {1 => 2}
-    expect(@rule.associations_hash).to eq({:foo => {}, :test => {}})
+    expect(@rule.associations_hash).to eq({foo: {}, test: {}})
   end
 
   it 'returns nested associations for joins' do
-    @conditions[:foo] = {:bar => {1 => 2}}
-    expect(@rule.associations_hash).to eq({:foo => {:bar => {}}})
+    @conditions[:foo] = {bar: {1 => 2}}
+    expect(@rule.associations_hash).to eq({foo: {bar: {}}})
   end
 
   it 'returns no association joins if conditions is nil' do
@@ -39,7 +39,7 @@ describe CanCan::Rule do
   end
 
   it 'is not mergeable if conditions are not simple hashes' do
-    meta_where = OpenStruct.new(:name => 'metawhere', :column => 'test')
+    meta_where = OpenStruct.new(name: 'metawhere', column: 'test')
     @conditions[meta_where] = :bar
 
     expect(@rule).to be_unmergeable

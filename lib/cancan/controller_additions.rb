@@ -292,7 +292,7 @@ module CanCan
       end
 
       def cancan_skipper
-        @_cancan_skipper ||= {:authorize => {}, :load => {}}
+        @_cancan_skipper ||= {authorize: {}, load: {}}
       end
     end
 
