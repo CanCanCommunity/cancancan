@@ -104,11 +104,6 @@ describe CanCan::ControllerAdditions do
     expect(@controller.class.cancan_resource_class).to eq(CanCan::ControllerResource)
   end
 
-  it 'cancan_resource_class is InheritedResource when class includes InheritedResources::Actions' do
-    allow(@controller.class).to receive(:ancestors) { ['InheritedResources::Actions'] }
-    expect(@controller.class.cancan_resource_class).to eq(CanCan::InheritedResource)
-  end
-
   it 'cancan_skipper is an empty hash with :authorize and :load options and remember changes' do
     expect(@controller_class.cancan_skipper).to eq({authorize: {}, load: {}})
     @controller_class.cancan_skipper[:load] = true
