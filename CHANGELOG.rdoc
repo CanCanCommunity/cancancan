@@ -6,6 +6,7 @@ Unreleased
 
 * Drop support for Rails < 4.2 (oliverklee)
 * Drop support for InheritedResource (coorasse)
+* Add ability to rspec matcher to take array of abilities (gingray)
 
 1.15.0 (June 13th, 2016)
 
