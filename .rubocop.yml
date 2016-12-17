@@ -13,6 +13,11 @@ Style/EmptyMethod:
 Style/VariableNumber:
   Enabled: false
 
+Metrics/BlockLength:
+  Exclude:
+    - 'lib/cancan/matchers.rb'
+    - '**/*_spec.rb'
+
 AllCops:
   TargetRubyVersion: 2.0
   Exclude:
