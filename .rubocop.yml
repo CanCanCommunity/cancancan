@@ -1,0 +1,21 @@
+Style/Documentation:
+  Enabled: false
+
+Style/NonNilCheck:
+  IncludeSemanticChanges: true
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Style/EmptyMethod:
+  Enabled: false
+
+Style/VariableNumber:
+  Enabled: false
+
+AllCops:
+  TargetRubyVersion: 2.0
+  Exclude:
+    - 'gemfiles/vendor/bundle/**/*'
+
+inherit_from: .rubocop_todo.yml

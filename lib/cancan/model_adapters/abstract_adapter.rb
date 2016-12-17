@@ -28,7 +28,7 @@ module CanCan
 
       # Override if override_conditions_hash_matching? returns true
       def self.matches_conditions_hash?(subject, conditions)
-        raise NotImplemented, "This model adapter does not support matching on a conditions hash."
+        raise NotImplemented, 'This model adapter does not support matching on a conditions hash.'
       end
 
       # Used to determine if this model adapter will override the matching behavior for a specific condition.
@@ -39,7 +39,7 @@ module CanCan
 
       # Override if override_condition_matching? returns true
       def self.matches_condition?(subject, name, value)
-        raise NotImplemented, "This model adapter does not support matching on a specific condition."
+        raise NotImplemented, 'This model adapter does not support matching on a specific condition.'
       end
 
       def initialize(model_class, rules)
@@ -49,7 +49,7 @@ module CanCan
 
       def database_records
         # This should be overridden in a subclass to return records which match @rules
-        raise NotImplemented, "This model adapter does not support fetching records from the database."
+        raise NotImplemented, 'This model adapter does not support fetching records from the database.'
       end
     end
   end

@@ -70,7 +70,7 @@ module CanCan
             build_relation(*(@rules.map(&:conditions)))
           end
         else
-          @model_class.all(:conditions => conditions, :joins => joins)
+          @model_class.all(conditions: conditions, joins: joins)
         end
       end
 

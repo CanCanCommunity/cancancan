@@ -254,13 +254,13 @@ module CanCan
       #     check_authorization :unless => :devise_controller?
       #
       def check_authorization(options = {})
-        method_name = ActiveSupport.respond_to?(:version) && ActiveSupport.version >= Gem::Version.new("4") ? :after_action : :after_filter
+        method_name = ActiveSupport.respond_to?(:version) && ActiveSupport.version >= Gem::Version.new('4') ? :after_action : :after_filter
 
         block = Proc.new do |controller|
           next if controller.instance_variable_defined?(:@_authorized)
           next if options[:if] && !controller.send(options[:if])
           next if options[:unless] && controller.send(options[:unless])
-          raise AuthorizationNotPerformed, "This action failed the check_authorization because it does not authorize_resource. Add skip_authorization_check to bypass this check."
+          raise AuthorizationNotPerformed, 'This action failed the check_authorization because it does not authorize_resource. Add skip_authorization_check to bypass this check.'
         end
 
         self.send(method_name, options.slice(:only, :except), &block)
@@ -274,17 +274,17 @@ module CanCan
       #
       # Any arguments are passed to the +before_action+ it triggers.
       def skip_authorization_check(*args)
-        method_name = ActiveSupport.respond_to?(:version) && ActiveSupport.version >= Gem::Version.new("4") ? :before_action : :before_filter
+        method_name = ActiveSupport.respond_to?(:version) && ActiveSupport.version >= Gem::Version.new('4') ? :before_action : :before_filter
         block = Proc.new{ |controller| controller.instance_variable_set(:@_authorized, true) }
         self.send(method_name, *args, &block)
       end
 
       def skip_authorization(*args)
-        raise ImplementationRemoved, "The CanCan skip_authorization method has been renamed to skip_authorization_check. Please update your code."
+        raise ImplementationRemoved, 'The CanCan skip_authorization method has been renamed to skip_authorization_check. Please update your code.'
       end
 
       def cancan_resource_class
-        if ancestors.map(&:to_s).include? "InheritedResources::Actions"
+        if ancestors.map(&:to_s).include? 'InheritedResources::Actions'
           InheritedResource
         else
           ControllerResource
@@ -292,7 +292,7 @@ module CanCan
       end
 
       def cancan_skipper
-        @_cancan_skipper ||= {:authorize => {}, :load => {}}
+        @_cancan_skipper ||= {authorize: {}, load: {}}
       end
     end
 
@@ -343,7 +343,7 @@ module CanCan
     end
 
     def unauthorized!(message = nil)
-      raise ImplementationRemoved, "The unauthorized! method has been removed from CanCan, use authorize! instead."
+      raise ImplementationRemoved, 'The unauthorized! method has been removed from CanCan, use authorize! instead.'
     end
 
     # Creates and returns the current user's ability and caches it. If you
