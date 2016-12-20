@@ -132,8 +132,8 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       cited = Article.create!
       not_cited = Article.create!
       cited.mentioned_users << user
-      @ability.can :read, Article, { mentioned_users: { id: user.id } }
-      @ability.can :read, Article, { mentions: { user_id: user.id } }
+      @ability.can :read, Article, mentioned_users: { id: user.id }
+      @ability.can :read, Article, mentions: { user_id: user.id }
       expect(Article.accessible_by(@ability)).to eq([cited])
     end
 
@@ -271,18 +271,18 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       @ability.can :update, Article, published: true
       @ability.cannot :update, Article, secret: true
       expect(@ability.model_adapter(Article, :update).conditions).to eq(%Q[not ("#{@article_table}"."secret" = 't') AND (("#{@article_table}"."published" = 't') OR ("#{@article_table}"."id" = 1))])
-      expect(@ability.model_adapter(Article, :manage).conditions).to eq({id: 1})
+      expect(@ability.model_adapter(Article, :manage).conditions).to eq(id: 1)
       expect(@ability.model_adapter(Article, :read).conditions).to eq("'t'='t'")
     end
 
     it 'returns appropriate sql conditions in complex case with nested joins' do
       @ability.can :read, Comment, article: { category: { visible: true } }
-      expect(@ability.model_adapter(Comment, :read).conditions).to eq({ Category.table_name.to_sym => { visible: true } })
+      expect(@ability.model_adapter(Comment, :read).conditions).to eq(Category.table_name.to_sym => { visible: true })
     end
 
     it 'returns appropriate sql conditions in complex case with nested joins of different depth' do
       @ability.can :read, Comment, article: { published: true, category: { visible: true } }
-      expect(@ability.model_adapter(Comment, :read).conditions).to eq({ Article.table_name.to_sym => { published: true }, Category.table_name.to_sym => { visible: true } })
+      expect(@ability.model_adapter(Comment, :read).conditions).to eq(Article.table_name.to_sym => { published: true }, Category.table_name.to_sym => { visible: true })
     end
 
     it 'does not forget conditions when calling with SQL string' do
