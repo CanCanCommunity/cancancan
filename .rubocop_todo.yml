@@ -36,17 +36,6 @@ Lint/ShadowingOuterLocalVariable:
 
 # Offense count: 16
 # Cop supports --auto-correct.
-# Configuration parameters: IgnoreEmptyBlocks, AllowUnusedKeywordArguments.
-Lint/UnusedBlockArgument:
-  Exclude:
-    - 'lib/cancan/controller_resource.rb'
-    - 'lib/cancan/model_adapters/mongoid_adapter.rb'
-    - 'spec/cancan/ability_spec.rb'
-    - 'spec/cancan/controller_additions_spec.rb'
-    - 'spec/cancan/controller_resource_spec.rb'
-
-# Offense count: 16
-# Cop supports --auto-correct.
 # Configuration parameters: AllowUnusedKeywordArguments, IgnoreEmptyMethods.
 Lint/UnusedMethodArgument:
   Exclude:
