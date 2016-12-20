@@ -229,10 +229,13 @@ module CanCan
     def resource_params
       if parameters_require_sanitizing? && params_method.present?
         return case params_method
-          when Symbol then @controller.send(params_method)
-          when String then @controller.instance_eval(params_method)
-          when Proc then params_method.call(@controller)
-        end
+                 when Symbol then
+                   @controller.send(params_method)
+                 when String then
+                   @controller.instance_eval(params_method)
+                 when Proc then
+                   params_method.call(@controller)
+               end
       else
         resource_params_by_namespaced_name
       end

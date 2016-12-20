@@ -15,15 +15,6 @@ Lint/AssignmentInCondition:
     - 'lib/cancan/model_adapters/mongoid_adapter.rb'
 
 # Offense count: 2
-# Cop supports --auto-correct.
-# Configuration parameters: AlignWith, SupportedStyles, AutoCorrect.
-# SupportedStyles: keyword, variable, start_of_line
-Lint/EndAlignment:
-  Exclude:
-    - 'lib/cancan/controller_resource.rb'
-    - 'spec/cancan/model_adapters/sequel_adapter_spec.rb'
-
-# Offense count: 2
 Lint/IneffectiveAccessModifier:
   Exclude:
     - 'lib/cancan/model_adapters/active_record_4_adapter.rb'
@@ -75,7 +66,7 @@ Metrics/BlockLength:
 # Offense count: 2
 # Configuration parameters: CountComments.
 Metrics/ClassLength:
-  Max: 242
+  Max: 245
 
 # Offense count: 5
 Metrics/CyclomaticComplexity:
