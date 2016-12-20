@@ -162,7 +162,7 @@ module CanCan
     end
 
     def resource_class_with_parent
-      parent_resource ? {parent_resource => resource_class} : resource_class
+      parent_resource ? { parent_resource => resource_class } : resource_class
     end
 
     def resource_instance=(instance)

@@ -135,7 +135,7 @@ module CanCan
       def clean_joins(joins_hash)
         joins = []
         joins_hash.each do |name, nested|
-          joins << (nested.empty? ? name : {name => clean_joins(nested)})
+          joins << (nested.empty? ? name : { name => clean_joins(nested) })
         end
         joins
       end

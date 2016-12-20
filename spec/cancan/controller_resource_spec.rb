@@ -19,7 +19,7 @@ describe CanCan::ControllerResource do
 
     allow(controller).to receive(:params) { params }
     allow(controller).to receive(:current_ability) { ability }
-    allow(controller_class).to receive(:cancan_skipper) { {authorize: {}, load: {}} }
+    allow(controller_class).to receive(:cancan_skipper) { { authorize: {}, load: {} } }
   end
 
   context 'on build actions' do
@@ -35,7 +35,7 @@ describe CanCan::ControllerResource do
     end
 
     it 'overrides initial attributes with params' do
-      params.merge!(model: {name: 'from params'})
+      params.merge!(model: { name: 'from params' })
       ability.can(:create, Model, name: 'from conditions')
       resource = CanCan::ControllerResource.new(controller)
       resource.load_resource
@@ -72,14 +72,14 @@ describe CanCan::ControllerResource do
         class Model < ::Model; end
       end
 
-      params.merge!(controller: 'my_engine/models', my_engine_model: {name: 'foobar'})
+      params.merge!(controller: 'my_engine/models', my_engine_model: { name: 'foobar' })
       resource = CanCan::ControllerResource.new(controller)
       resource.load_resource
       expect(controller.instance_variable_get(:@model).name).to eq('foobar')
     end
 
     it 'builds a new resource with hash if params[:id] is not specified' do
-      params.merge!(model: {name: 'foobar'})
+      params.merge!(model: { name: 'foobar' })
       resource = CanCan::ControllerResource.new(controller)
       resource.load_resource
       expect(controller.instance_variable_get(:@model).name).to eq('foobar')
@@ -90,14 +90,14 @@ describe CanCan::ControllerResource do
         class Model < ::Model; end
       end
 
-      params.merge!('sub_model' => {name: 'foobar'})
+      params.merge!('sub_model' => { name: 'foobar' })
       resource = CanCan::ControllerResource.new(controller, class: ::Sub::Model)
       resource.load_resource
       expect(controller.instance_variable_get(:@model).name).to eq('foobar')
     end
 
     it 'builds a new resource for namespaced controller and namespaced model with hash if params[:id] is not specified' do
-      params.merge!(:controller => 'admin/sub_models', 'sub_model' => {name: 'foobar'})
+      params.merge!(:controller => 'admin/sub_models', 'sub_model' => { name: 'foobar' })
       resource = CanCan::ControllerResource.new(controller, class: Model)
       resource.load_resource
       expect(controller.instance_variable_get(:@sub_model).name).to eq('foobar')
@@ -119,7 +119,7 @@ describe CanCan::ControllerResource do
       allow_any_instance_of(Model).to receive('category=').with(category)
       allow_any_instance_of(Model).to receive('category') { category }
 
-      params.merge!(model: {name: 'foobar'})
+      params.merge!(model: { name: 'foobar' })
 
       controller.instance_variable_set(:@category, category)
       resource = CanCan::ControllerResource.new(controller, through: :category, singleton: true)
@@ -129,7 +129,7 @@ describe CanCan::ControllerResource do
     end
 
     it 'builds record through has_one association with :singleton and :shallow options' do
-      params.merge!(model: {name: 'foobar'})
+      params.merge!(model: { name: 'foobar' })
       resource = CanCan::ControllerResource.new(controller, through: :category, singleton: true, shallow: true)
       resource.load_resource
       expect(controller.instance_variable_get(:@model).name).to eq('foobar')
@@ -137,7 +137,7 @@ describe CanCan::ControllerResource do
 
     context 'with a strong parameters method' do
       before :each do
-        params.merge!(controller: 'model', model: { name: 'test'})
+        params.merge!(controller: 'model', model: { name: 'test' })
       end
 
       it 'accepts and uses the specified symbol for santitizing input' do
@@ -145,17 +145,17 @@ describe CanCan::ControllerResource do
         allow(controller).to receive(:model_params).and_return(model: 'params')
         allow(controller).to receive(:create_params).and_return(create: 'params')
         allow(controller).to receive(:custom_params).and_return(custom: 'params')
-        resource = CanCan::ControllerResource.new(controller, {param_method: :custom_params})
+        resource = CanCan::ControllerResource.new(controller, { param_method: :custom_params })
         expect(resource.send('resource_params')).to eq(custom: 'params')
       end
 
       it 'accepts the specified string for sanitizing input' do
-        resource = CanCan::ControllerResource.new(controller, {param_method: "{:custom => 'params'}"})
+        resource = CanCan::ControllerResource.new(controller, { param_method: "{:custom => 'params'}" })
         expect(resource.send('resource_params')).to eq(custom: 'params')
       end
 
       it 'accepts the specified proc for sanitizing input' do
-        resource = CanCan::ControllerResource.new(controller, {param_method: Proc.new { |c| {custom: 'params'}}})
+        resource = CanCan::ControllerResource.new(controller, { param_method: Proc.new { |c| { custom: 'params' }} })
         expect(resource.send('resource_params')).to eq(custom: 'params')
       end
 
@@ -522,7 +522,7 @@ describe CanCan::ControllerResource do
   end
 
   it 'santitizes correctly when the instance name is overriden' do
-    params.merge!(action: 'create', custom_name: {name: 'foobar'})
+    params.merge!(action: 'create', custom_name: { name: 'foobar' })
     allow(controller).to receive(:create_params).and_return({})
 
     resource = CanCan::ControllerResource.new(controller, instance_name: :custom_name)
@@ -560,12 +560,12 @@ describe CanCan::ControllerResource do
   end
 
   it 'is parent if specified in options' do
-    resource = CanCan::ControllerResource.new(controller, :model, {parent: true})
+    resource = CanCan::ControllerResource.new(controller, :model, { parent: true })
     expect(resource).to be_parent
   end
 
   it 'does not be parent if specified in options' do
-    resource = CanCan::ControllerResource.new(controller, :category, {parent: false})
+    resource = CanCan::ControllerResource.new(controller, :category, { parent: false })
     expect(resource).to_not be_parent
   end
 
@@ -594,7 +594,7 @@ describe CanCan::ControllerResource do
   end
 
   it 'skips resource behavior for :only actions in array' do
-    allow(controller_class).to receive(:cancan_skipper) { {load: {nil => {only: [:index, :show]}}} }
+    allow(controller_class).to receive(:cancan_skipper) { { load: { nil => { only: [:index, :show] } } } }
     params.merge!(action: 'index')
     expect(CanCan::ControllerResource.new(controller).skip?(:load)).to be(true)
     expect(CanCan::ControllerResource.new(controller, :some_resource).skip?(:load)).to be(false)
@@ -605,7 +605,7 @@ describe CanCan::ControllerResource do
   end
 
   it 'skips resource behavior for :only one action on resource' do
-    allow(controller_class).to receive(:cancan_skipper) { {authorize: {model: {only: :index}}} }
+    allow(controller_class).to receive(:cancan_skipper) { { authorize: { model: { only: :index } } } }
     params.merge!(action: 'index')
     expect(CanCan::ControllerResource.new(controller).skip?(:authorize)).to be(false)
     expect(CanCan::ControllerResource.new(controller, :model).skip?(:authorize)).to be(true)
@@ -614,7 +614,7 @@ describe CanCan::ControllerResource do
   end
 
   it 'skips resource behavior :except actions in array' do
-    allow(controller_class).to receive(:cancan_skipper) { {load: {nil => {except: [:index, :show]}}} }
+    allow(controller_class).to receive(:cancan_skipper) { { load: { nil => { except: [:index, :show] } } } }
     params.merge!(action: 'index')
     expect(CanCan::ControllerResource.new(controller).skip?(:load)).to be_falsey
     params.merge!(action: 'show')
@@ -625,7 +625,7 @@ describe CanCan::ControllerResource do
   end
 
   it 'skips resource behavior :except one action on resource' do
-    allow(controller_class).to receive(:cancan_skipper) { {authorize: {model: {except: :index}}} }
+    allow(controller_class).to receive(:cancan_skipper) { { authorize: { model: { except: :index } } } }
     params.merge!(action: 'index')
     expect(CanCan::ControllerResource.new(controller, :model).skip?(:authorize)).to be_falsey
     params.merge!(action: 'other_action')
@@ -634,7 +634,7 @@ describe CanCan::ControllerResource do
   end
 
   it 'skips loading and authorization' do
-    allow(controller_class).to receive(:cancan_skipper) { {authorize: {nil => {}}, load: {nil => {}}} }
+    allow(controller_class).to receive(:cancan_skipper) { { authorize: { nil => {} }, load: { nil => {} } } }
     params.merge!(action: 'new')
     resource = CanCan::ControllerResource.new(controller)
     expect { resource.load_and_authorize_resource }.not_to raise_error

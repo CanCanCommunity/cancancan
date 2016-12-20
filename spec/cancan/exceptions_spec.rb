@@ -39,7 +39,7 @@ describe CanCan::AccessDenied do
     end
 
     it 'uses i18n for the default message' do
-      I18n.backend.store_translations :en, unauthorized: {default: 'This is a different message'}
+      I18n.backend.store_translations :en, unauthorized: { default: 'This is a different message' }
       @exception = CanCan::AccessDenied.new
       expect(@exception.message).to eq('This is a different message')
     end

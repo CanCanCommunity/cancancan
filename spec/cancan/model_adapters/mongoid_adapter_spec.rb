@@ -132,14 +132,14 @@ if defined? CanCan::ModelAdapters::MongoidAdapter
         describe 'activates only when there are Criteria in the hash' do
           it 'Calls where on the model class when there are criteria' do
             obj = MongoidProject.create(title: 'Bird')
-            @conditions = {:title.nin => ['Fork', 'Spoon']}
+            @conditions = { :title.nin => ['Fork', 'Spoon'] }
 
             @ability.can :read, MongoidProject, @conditions
             expect(@ability).to be_able_to(:read, obj)
           end
           it 'Calls the base version if there are no mongoid criteria' do
             obj = MongoidProject.new(title: 'Bird')
-            @conditions = {id: obj.id}
+            @conditions = { id: obj.id }
             @ability.can :read, MongoidProject, @conditions
             expect(@ability).to be_able_to(:read, obj)
           end
@@ -199,8 +199,8 @@ if defined? CanCan::ModelAdapters::MongoidAdapter
       end
 
       it 'calls where with matching ability conditions' do
-        obj = MongoidProject.create(foo: {bar: 1})
-        @ability.can :read, MongoidProject, foo: {bar: 1}
+        obj = MongoidProject.create(foo: { bar: 1 })
+        @ability.can :read, MongoidProject, foo: { bar: 1 }
         expect(MongoidProject.accessible_by(@ability, :read).entries.first).to eq(obj)
       end
 
@@ -231,7 +231,7 @@ if defined? CanCan::ModelAdapters::MongoidAdapter
       end
 
       it 'can handle nested queries for accessible_by' do
-        @ability.can :read, MongoidSubProject, {mongoid_project: {mongoid_category: { name: 'Authorization'}}}
+        @ability.can :read, MongoidSubProject, { mongoid_project: { mongoid_category: { name: 'Authorization' } } }
         cat1 = MongoidCategory.create name: 'Authentication'
         cat2 = MongoidCategory.create name: 'Authorization'
         proj1 = cat1.mongoid_projects.create name: 'Proj1'

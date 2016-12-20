@@ -271,7 +271,7 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       @ability.can :update, Article, published: true
       @ability.cannot :update, Article, secret: true
       expect(@ability.model_adapter(Article, :update).conditions).to eq(%Q[not ("#{@article_table}"."secret" = 't') AND (("#{@article_table}"."published" = 't') OR ("#{@article_table}"."id" = 1))])
-      expect(@ability.model_adapter(Article, :manage).conditions).to eq({id: 1})
+      expect(@ability.model_adapter(Article, :manage).conditions).to eq({ id: 1 })
       expect(@ability.model_adapter(Article, :read).conditions).to eq("'t'='t'")
     end
 
@@ -319,7 +319,7 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
     it 'merges nested and non-nested joins' do
       @ability.can :read, Article, project: { blocked: false }
       @ability.can :read, Article, project: { comments: { spam: true } }
-      expect(@ability.model_adapter(Article, :read).joins).to eq([{project: [:comments]}])
+      expect(@ability.model_adapter(Article, :read).joins).to eq([{ project: [:comments] }])
     end
 
     it 'merges :all conditions with other conditions' do
