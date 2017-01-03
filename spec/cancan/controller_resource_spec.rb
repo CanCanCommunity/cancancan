@@ -155,7 +155,7 @@ describe CanCan::ControllerResource do
       end
 
       it 'accepts the specified proc for sanitizing input' do
-        resource = CanCan::ControllerResource.new(controller, param_method: Proc.new { |c| {custom: 'params'}})
+        resource = CanCan::ControllerResource.new(controller, param_method: Proc.new { |_c| {custom: 'params'}})
         expect(resource.send('resource_params')).to eq(custom: 'params')
       end
 
@@ -209,7 +209,7 @@ describe CanCan::ControllerResource do
     it 'does not use accessible_by when defining abilities through a block' do
       allow(Model).to receive(:accessible_by).with(ability) { :found_models }
 
-      ability.can(:read, Model) { |p| false }
+      ability.can(:read, Model) { |_p| false }
       resource = CanCan::ControllerResource.new(controller)
       resource.load_resource
       expect(controller.instance_variable_get(:@model)).to be_nil

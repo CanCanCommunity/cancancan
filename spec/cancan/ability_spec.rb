@@ -17,7 +17,7 @@ describe CanCan::Ability do
 
   it 'passes true to `can?` when non false/nil is returned in block' do
     @ability.can :read, :all
-    @ability.can :read, Symbol do |sym|
+    @ability.can :read, Symbol do |_sym|
       'foo' # TODO test that sym is nil when no instance is passed
     end
     expect(@ability.can?(:read, :some_symbol)).to be(true)
@@ -79,7 +79,7 @@ describe CanCan::Ability do
 
   it 'does not call block when only class is passed, only return true' do
     @block_called = false
-    @ability.can :preview, :all do |object|
+    @ability.can :preview, :all do |_object|
       @block_called = true
     end
     expect(@ability.can?(:preview, Hash)).to be(true)
@@ -441,7 +441,7 @@ describe CanCan::Ability do
   it 'knows when block is used in conditions' do
     @ability.can :read, :foo
     expect(@ability).to_not have_block(:read, :foo)
-    @ability.can :read, :foo do |foo|
+    @ability.can :read, :foo do |_foo|
       false
     end
     expect(@ability).to have_block(:read, :foo)
