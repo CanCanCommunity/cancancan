@@ -360,7 +360,7 @@ module CanCan
     # Returns an array of Rule instances which match the action and subject
     # This does not take into consideration any hash conditions or block statements
     def relevant_rules(action, subject)
-      return [] unless @rules
+      return [] if rules.empty?
       relevant = possible_relevant_rules(subject).select do |rule|
         rule.expanded_actions = expand_actions(rule.actions)
         rule.relevant? action, subject
