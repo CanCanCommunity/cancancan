@@ -6,7 +6,7 @@ module CanCan
       end
 
       def self.override_conditions_hash_matching?(subject, conditions)
-        conditions.any? do |k,v|
+        conditions.any? do |k,_v|
           key_is_not_symbol = lambda { !k.kind_of?(Symbol) }
           subject_value_is_array = lambda do
             subject.respond_to?(k) && subject.send(k).is_a?(Array)
