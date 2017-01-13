@@ -18,7 +18,7 @@ module CanCan
         relation
       end
 
-      def self.override_condition_matching?(subject, name, value)
+      def self.override_condition_matching?(subject, name, _value)
         # ActiveRecord introduced enums in version 4.1.
         (ActiveRecord::VERSION::MAJOR > 4 || ActiveRecord::VERSION::MINOR >= 1) &&
           subject.class.defined_enums.include?(name.to_s)
