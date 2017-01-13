@@ -9,7 +9,7 @@ module CanCan
         model_class[id]
       end
 
-      def self.override_condition_matching?(subject, name, value)
+      def self.override_condition_matching?(_subject, _name, value)
         value.kind_of?(Hash)
       end
 
