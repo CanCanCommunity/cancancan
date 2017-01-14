@@ -110,33 +110,33 @@ describe CanCan::ControllerAdditions do
   end
 
   it 'cancan_skipper is an empty hash with :authorize and :load options and remember changes' do
-    expect(@controller_class.cancan_skipper).to eq({authorize: {}, load: {}})
+    expect(@controller_class.cancan_skipper).to eq(authorize: {}, load: {})
     @controller_class.cancan_skipper[:load] = true
     expect(@controller_class.cancan_skipper[:load]).to be(true)
   end
 
   it 'skip_authorize_resource adds itself to the cancan skipper with given model name and options' do
     @controller_class.skip_authorize_resource(:project, only: [:index, :show])
-    expect(@controller_class.cancan_skipper[:authorize][:project]).to eq({only: [:index, :show]})
+    expect(@controller_class.cancan_skipper[:authorize][:project]).to eq(only: [:index, :show])
     @controller_class.skip_authorize_resource(only: [:index, :show])
-    expect(@controller_class.cancan_skipper[:authorize][nil]).to eq({only: [:index, :show]})
+    expect(@controller_class.cancan_skipper[:authorize][nil]).to eq(only: [:index, :show])
     @controller_class.skip_authorize_resource(:article)
     expect(@controller_class.cancan_skipper[:authorize][:article]).to eq({})
   end
 
   it 'skip_load_resource adds itself to the cancan skipper with given model name and options' do
     @controller_class.skip_load_resource(:project, only: [:index, :show])
-    expect(@controller_class.cancan_skipper[:load][:project]).to eq({only: [:index, :show]})
+    expect(@controller_class.cancan_skipper[:load][:project]).to eq(only: [:index, :show])
     @controller_class.skip_load_resource(only: [:index, :show])
-    expect(@controller_class.cancan_skipper[:load][nil]).to eq({only: [:index, :show]})
+    expect(@controller_class.cancan_skipper[:load][nil]).to eq(only: [:index, :show])
     @controller_class.skip_load_resource(:article)
     expect(@controller_class.cancan_skipper[:load][:article]).to eq({})
   end
 
   it 'skip_load_and_authore_resource adds itself to the cancan skipper with given model name and options' do
     @controller_class.skip_load_and_authorize_resource(:project, only: [:index, :show])
-    expect(@controller_class.cancan_skipper[:load][:project]).to eq({only: [:index, :show]})
-    expect(@controller_class.cancan_skipper[:authorize][:project]).to eq({only: [:index, :show]})
+    expect(@controller_class.cancan_skipper[:load][:project]).to eq(only: [:index, :show])
+    expect(@controller_class.cancan_skipper[:authorize][:project]).to eq(only: [:index, :show])
   end
 
   private
