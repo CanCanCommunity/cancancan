@@ -34,14 +34,6 @@ Lint/ShadowingOuterLocalVariable:
     - 'lib/cancan/model_adapters/active_record_adapter.rb'
     - 'lib/cancan/model_adapters/sequel_adapter.rb'
 
-# Offense count: 36
-Lint/UselessAssignment:
-  Exclude:
-    - 'spec/cancan/model_adapters/active_record_4_adapter_spec.rb'
-    - 'spec/cancan/model_adapters/active_record_adapter_spec.rb'
-    - 'spec/cancan/model_adapters/mongoid_adapter_spec.rb'
-    - 'spec/cancan/model_adapters/sequel_adapter_spec.rb'
-
 # Offense count: 14
 Metrics/AbcSize:
   Max: 31
