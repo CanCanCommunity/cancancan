@@ -34,14 +34,6 @@ Lint/ShadowingOuterLocalVariable:
     - 'lib/cancan/model_adapters/active_record_adapter.rb'
     - 'lib/cancan/model_adapters/sequel_adapter.rb'
 
-# Offense count: 36
-Lint/UselessAssignment:
-  Exclude:
-    - 'spec/cancan/model_adapters/active_record_4_adapter_spec.rb'
-    - 'spec/cancan/model_adapters/active_record_adapter_spec.rb'
-    - 'spec/cancan/model_adapters/mongoid_adapter_spec.rb'
-    - 'spec/cancan/model_adapters/sequel_adapter_spec.rb'
-
 # Offense count: 14
 Metrics/AbcSize:
   Max: 31
@@ -137,20 +129,6 @@ Style/BlockDelimiters:
     - 'spec/cancan/controller_resource_spec.rb'
     - 'spec/cancan/matchers_spec.rb'
     - 'spec/cancan/model_adapters/mongoid_adapter_spec.rb'
-
-# Offense count: 43
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-# SupportedStyles: braces, no_braces, context_dependent
-Style/BracesAroundHashParameters:
-  Exclude:
-    - 'lib/cancan/controller_resource.rb'
-    - 'spec/cancan/ability_spec.rb'
-    - 'spec/cancan/controller_additions_spec.rb'
-    - 'spec/cancan/controller_resource_spec.rb'
-    - 'spec/cancan/model_adapters/active_record_adapter_spec.rb'
-    - 'spec/cancan/model_adapters/mongoid_adapter_spec.rb'
-    - 'spec/cancan/rule_spec.rb'
 
 # Offense count: 2
 Style/CaseEquality:

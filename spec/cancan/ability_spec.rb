@@ -172,10 +172,10 @@ describe CanCan::Ability do
 
   it 'checks if there is a permission for any of given subjects' do
     @ability.can :update, [String, Range]
-    expect(@ability.can?(:update, { any: ['foo', 1..3] })).to be(true)
-    expect(@ability.can?(:update, { any: [1..3, 'foo'] })).to be(true)
-    expect(@ability.can?(:update, { any: [123, 'foo'] })).to be(true)
-    expect(@ability.can?(:update, { any: [123, 1.0] })).to be(false)
+    expect(@ability.can?(:update, any: ['foo', 1..3])).to be(true)
+    expect(@ability.can?(:update, any: [1..3, 'foo'])).to be(true)
+    expect(@ability.can?(:update, any: [123, 'foo'])).to be(true)
+    expect(@ability.can?(:update, any: [123, 1.0])).to be(false)
   end
 
   it 'lists all permissions' do
@@ -203,8 +203,8 @@ describe CanCan::Ability do
     expect(@ability.can?(:read, :stats)).to be(true)
     expect(@ability.can?(:update, :stats)).to be(false)
     expect(@ability.can?(:read, :nonstats)).to be(false)
-    expect(@ability.can?(:read, { any: [:stats, :nonstats] })).to be(true)
-    expect(@ability.can?(:read, { any: [:nonstats, :neitherstats] })).to be(false)
+    expect(@ability.can?(:read, any: [:stats, :nonstats])).to be(true)
+    expect(@ability.can?(:read, any: [:nonstats, :neitherstats])).to be(false)
   end
 
   it 'checks ancestors of class' do
@@ -212,7 +212,7 @@ describe CanCan::Ability do
     expect(@ability.can?(:read, Integer)).to be(true)
     expect(@ability.can?(:read, 1.23)).to be(true)
     expect(@ability.can?(:read, 'foo')).to be(false)
-    expect(@ability.can?(:read, { any: [Integer, String] })).to be(true)
+    expect(@ability.can?(:read, any: [Integer, String])).to be(true)
   end
 
   it "supports 'cannot' method to define what user cannot do" do
@@ -220,9 +220,9 @@ describe CanCan::Ability do
     @ability.cannot :read, Integer
     expect(@ability.can?(:read, 'foo')).to be(true)
     expect(@ability.can?(:read, 123)).to be(false)
-    expect(@ability.can?(:read, { any: ['foo', 'bar'] })).to be(true)
-    expect(@ability.can?(:read, { any: [123, 'foo'] })).to be(false)
-    expect(@ability.can?(:read, { any: [123, 456] })).to be(false)
+    expect(@ability.can?(:read, any: ['foo', 'bar'])).to be(true)
+    expect(@ability.can?(:read, any: [123, 'foo'])).to be(false)
+    expect(@ability.can?(:read, any: [123, 456])).to be(false)
   end
 
   it 'passes to previous rule, if block returns false or nil' do
@@ -235,8 +235,8 @@ describe CanCan::Ability do
     expect(@ability.can?(:read, 3)).to be(true)
     expect(@ability.can?(:read, 8)).to be(false)
     expect(@ability.can?(:read, 123)).to be(true)
-    expect(@ability.can?(:read, { any: [123, 8] })).to be(true)
-    expect(@ability.can?(:read, { any: [8, 9] })).to be(false)
+    expect(@ability.can?(:read, any: [123, 8])).to be(true)
+    expect(@ability.can?(:read, any: [8, 9])).to be(false)
   end
 
   it 'always returns `false` for single cannot definition' do
@@ -289,8 +289,8 @@ describe CanCan::Ability do
     expect(@ability.can?(:read, 1..3)).to be(true)
     expect(@ability.can?(:read, 1..4)).to be(false)
     expect(@ability.can?(:read, Range)).to be(true)
-    expect(@ability.can?(:read, { any: [1..3, 1..4] })).to be(true)
-    expect(@ability.can?(:read, { any: [1..4, 2..4] })).to be(false)
+    expect(@ability.can?(:read, any: [1..3, 1..4])).to be(true)
+    expect(@ability.can?(:read, any: [1..4, 2..4])).to be(false)
   end
 
   it 'allows an array of options in conditions hash' do
@@ -299,8 +299,8 @@ describe CanCan::Ability do
     expect(@ability.can?(:read, 1..3)).to be(true)
     expect(@ability.can?(:read, 2..4)).to be(false)
     expect(@ability.can?(:read, 3..5)).to be(true)
-    expect(@ability.can?(:read, { any: [2..4, 3..5] })).to be(true)
-    expect(@ability.can?(:read, { any: [2..4, 2..5] })).to be(false)
+    expect(@ability.can?(:read, any: [2..4, 3..5])).to be(true)
+    expect(@ability.can?(:read, any: [2..4, 2..5])).to be(false)
   end
 
   it 'allows a range of options in conditions hash' do
@@ -390,8 +390,8 @@ describe CanCan::Ability do
     expect(@ability.can?(:read, 'foo' => Range)).to be(true)
     expect(@ability.can?(:read, 'foobar' => Range)).to be(false)
     expect(@ability.can?(:read, 123 => Range)).to be(true)
-    expect(@ability.can?(:read, { any: [{ 'foo' => Range }, { 'foobar' => Range }] })).to be(true)
-    expect(@ability.can?(:read, { any: [{ 'food' => Range }, { 'foobar' => Range }] })).to be(false)
+    expect(@ability.can?(:read, any: [{ 'foo' => Range }, { 'foobar' => Range }])).to be(true)
+    expect(@ability.can?(:read, any: [{ 'food' => Range }, { 'foobar' => Range }])).to be(false)
   end
 
   it 'checks permissions correctly when passing a hash of subjects with multiple definitions' do
@@ -401,8 +401,8 @@ describe CanCan::Ability do
     expect(@ability.can?(:read, 'foo' => Range)).to be(true)
     expect(@ability.can?(:read, 'foobar' => Range)).to be(false)
     expect(@ability.can?(:read, 1234 => Range)).to be(true)
-    expect(@ability.can?(:read, { any: [{ 'foo' => Range }, { 'foobar' => Range }] })).to be(true)
-    expect(@ability.can?(:read, { any: [{ 'foo.bar' => Range }, { 'foobar' => Range }] })).to be(false)
+    expect(@ability.can?(:read, any: [{ 'foo' => Range }, { 'foobar' => Range }])).to be(true)
+    expect(@ability.can?(:read, any: [{ 'foo.bar' => Range }, { 'foobar' => Range }])).to be(false)
   end
 
   it 'allows to check ability on Hash-like object' do
@@ -416,7 +416,7 @@ describe CanCan::Ability do
     @ability.can :create, Range, bar: 123, array: %w[skip arrays]
     @ability.can :new, Range, baz: 'baz', range: 1..3
     @ability.cannot :new, Range, ignore: 'me'
-    expect(@ability.attributes_for(:new, Range)).to eq({ foo: 'foo', bar: 123, baz: 'baz' })
+    expect(@ability.attributes_for(:new, Range)).to eq(foo: 'foo', bar: 123, baz: 'baz')
   end
 
   it 'raises access denied exception if ability us unauthorized to perform a certain action' do

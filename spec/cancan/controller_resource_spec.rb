@@ -143,17 +143,17 @@ describe CanCan::ControllerResource do
         allow(controller).to receive(:model_params).and_return(model: 'params')
         allow(controller).to receive(:create_params).and_return(create: 'params')
         allow(controller).to receive(:custom_params).and_return(custom: 'params')
-        resource = CanCan::ControllerResource.new(controller, { param_method: :custom_params })
+        resource = CanCan::ControllerResource.new(controller, param_method: :custom_params)
         expect(resource.send('resource_params')).to eq(custom: 'params')
       end
 
       it 'accepts the specified string for sanitizing input' do
-        resource = CanCan::ControllerResource.new(controller, { param_method: "{:custom => 'params'}" })
+        resource = CanCan::ControllerResource.new(controller, param_method: "{:custom => 'params'}")
         expect(resource.send('resource_params')).to eq(custom: 'params')
       end
 
       it 'accepts the specified proc for sanitizing input' do
-        resource = CanCan::ControllerResource.new(controller, { param_method: Proc.new { |_c| { custom: 'params' }} })
+        resource = CanCan::ControllerResource.new(controller, param_method: Proc.new { |_c| {custom: 'params'}})
         expect(resource.send('resource_params')).to eq(custom: 'params')
       end
 
@@ -558,12 +558,12 @@ describe CanCan::ControllerResource do
   end
 
   it 'is parent if specified in options' do
-    resource = CanCan::ControllerResource.new(controller, :model, { parent: true })
+    resource = CanCan::ControllerResource.new(controller, :model, parent: true)
     expect(resource).to be_parent
   end
 
   it 'does not be parent if specified in options' do
-    resource = CanCan::ControllerResource.new(controller, :category, { parent: false })
+    resource = CanCan::ControllerResource.new(controller, :category, parent: false)
     expect(resource).to_not be_parent
   end
 
