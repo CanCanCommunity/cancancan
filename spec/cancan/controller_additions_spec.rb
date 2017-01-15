@@ -39,7 +39,7 @@ describe CanCan::ControllerAdditions do
 
   it 'load_and_authorize_resource properly passes first argument as the resource name' do
     expect(cancan_resource_class = double).to receive(:load_and_authorize_resource)
-    allow(CanCan::ControllerResource).to receive(:new).with(@controller, :project, foo: :bar) { cancan_resource_class}
+    allow(CanCan::ControllerResource).to receive(:new).with(@controller, :project, foo: :bar) { cancan_resource_class }
     expect(@controller_class).to receive(callback_action(:before_action)).with({}) { |_options, &block| block.call(@controller) }
     @controller_class.load_and_authorize_resource :project, foo: :bar
   end
