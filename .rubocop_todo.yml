@@ -445,17 +445,6 @@ Style/SpaceBeforeBlockBraces:
     - 'cancancan.gemspec'
     - 'lib/cancan/controller_additions.rb'
 
-# Offense count: 10
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles, EnforcedStyleForEmptyBraces, SpaceBeforeBlockParameters.
-# SupportedStyles: space, no_space
-Style/SpaceInsideBlockBraces:
-  Exclude:
-    - 'lib/cancan/model_adapters/active_record_adapter.rb'
-    - 'lib/cancan/model_adapters/mongoid_adapter.rb'
-    - 'spec/cancan/controller_additions_spec.rb'
-    - 'spec/cancan/controller_resource_spec.rb'
-
 # Offense count: 18
 # Cop supports --auto-correct.
 Style/SpaceInsideParens:
