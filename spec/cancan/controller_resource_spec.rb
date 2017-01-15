@@ -153,7 +153,7 @@ describe CanCan::ControllerResource do
       end
 
       it 'accepts the specified proc for sanitizing input' do
-        resource = CanCan::ControllerResource.new(controller, param_method: Proc.new { |_c| {custom: 'params'}})
+        resource = CanCan::ControllerResource.new(controller, param_method: Proc.new { |_c| { custom: 'params' }})
         expect(resource.send('resource_params')).to eq(custom: 'params')
       end
 
