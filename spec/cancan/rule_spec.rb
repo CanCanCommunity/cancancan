@@ -30,7 +30,7 @@ describe CanCan::Rule do
 
   it 'returns nested associations for joins' do
     @conditions[:foo] = { bar: { 1 => 2 } }
-    expect(@rule.associations_hash).to eq(foo: {bar: {}})
+    expect(@rule.associations_hash).to eq(foo: { bar: {} })
   end
 
   it 'returns no association joins if conditions is nil' do
