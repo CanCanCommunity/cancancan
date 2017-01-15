@@ -319,7 +319,7 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
     it 'merges nested and non-nested joins' do
       @ability.can :read, Article, project: { blocked: false }
       @ability.can :read, Article, project: { comments: { spam: true } }
-      expect(@ability.model_adapter(Article, :read).joins).to eq([{project: [:comments]}])
+      expect(@ability.model_adapter(Article, :read).joins).to eq([{ project: [:comments] }])
     end
 
     it 'merges :all conditions with other conditions' do

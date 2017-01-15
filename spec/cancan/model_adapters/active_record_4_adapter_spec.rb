@@ -139,8 +139,8 @@ if defined? CanCan::ModelAdapters::ActiveRecord4Adapter
         end
 
         it 'allows overlapping conditions in SQL and merge with hash conditions' do
-          @ability.can :read, Parent, children: {parent_id: 1}
-          @ability.can :read, Parent, children: {parent_id: 1}
+          @ability.can :read, Parent, children: { parent_id: 1 }
+          @ability.can :read, Parent, children: { parent_id: 1 }
 
           parent = Parent.create!
           Child.create!(parent: parent, created_at: 1.hours.ago)

@@ -220,7 +220,7 @@ module CanCan
 
     def unauthorized_message(action, subject)
       keys = unauthorized_message_keys(action, subject)
-      variables = {action: action.to_s}
+      variables = { action: action.to_s }
       variables[:subject] = (subject.class == Class ? subject : subject.class).to_s.underscore.humanize.downcase
       message = I18n.translate(nil, variables.merge(scope: :unauthorized, default: keys + ['']))
       message.blank? ? nil : message
@@ -260,7 +260,7 @@ module CanCan
     #     action: array_of_objects
     #   }
     def permissions
-      permissions_list = {can: {}, cannot: {}}
+      permissions_list = { can: {}, cannot: {} }
 
       rules.each do |rule|
         subjects = rule.subjects
