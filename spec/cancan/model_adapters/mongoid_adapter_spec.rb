@@ -231,7 +231,7 @@ if defined? CanCan::ModelAdapters::MongoidAdapter
       end
 
       it 'can handle nested queries for accessible_by' do
-        @ability.can :read, MongoidSubProject, mongoid_project: { mongoid_category: { name: 'Authorization'} }
+        @ability.can :read, MongoidSubProject, mongoid_project: { mongoid_category: { name: 'Authorization' } }
         cat1 = MongoidCategory.create name: 'Authentication'
         cat2 = MongoidCategory.create name: 'Authorization'
         proj1 = cat1.mongoid_projects.create name: 'Proj1'
