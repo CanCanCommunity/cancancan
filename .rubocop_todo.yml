@@ -38,11 +38,6 @@ Lint/ShadowingOuterLocalVariable:
 Metrics/AbcSize:
   Max: 31
 
-# Offense count: 1
-# Configuration parameters: CountComments.
-Metrics/BlockLength:
-  Max: 28
-
 # Offense count: 2
 # Configuration parameters: CountComments.
 Metrics/ClassLength:
@@ -63,10 +58,15 @@ Metrics/LineLength:
 Metrics/MethodLength:
   Max: 21
 
-# Offense count: 2
-# Configuration parameters: CountComments.
 Metrics/ModuleLength:
   Max: 200
+  Exclude:
+    - "**/*_spec.rb"
+
+Metrics/BlockLength:
+  Max: 28
+  Exclude:
+    - "**/*_spec.rb"
 
 # Offense count: 7
 Metrics/PerceivedComplexity:
