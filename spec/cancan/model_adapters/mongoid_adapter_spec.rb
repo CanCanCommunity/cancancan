@@ -73,9 +73,9 @@ if defined? CanCan::ModelAdapters::MongoidAdapter
 
       it 'returns the correct records based on the defined ability' do
         @ability.can :read, MongoidProject, title: 'Sir'
-        sir   = MongoidProject.create(title: 'Sir')
-        lord  = MongoidProject.create(title: 'Lord')
-        dude  = MongoidProject.create(title: 'Dude')
+        sir = MongoidProject.create(title: 'Sir')
+        MongoidProject.create(title: 'Lord')
+        MongoidProject.create(title: 'Dude')
 
         expect(MongoidProject.accessible_by(@ability, :read).entries).to eq([sir])
       end
@@ -84,9 +84,9 @@ if defined? CanCan::ModelAdapters::MongoidAdapter
         @ability.can :manage, MongoidProject, title: 'Sir'
         @ability.cannot :destroy, MongoidProject
 
-        sir   = MongoidProject.create(title: 'Sir')
-        lord  = MongoidProject.create(title: 'Lord')
-        dude  = MongoidProject.create(title: 'Dude')
+        sir = MongoidProject.create(title: 'Sir')
+        MongoidProject.create(title: 'Lord')
+        MongoidProject.create(title: 'Dude')
 
         expect(MongoidProject.accessible_by(@ability, :destroy).entries).to eq([sir])
       end
@@ -94,8 +94,8 @@ if defined? CanCan::ModelAdapters::MongoidAdapter
       it 'is able to mix empty conditions and hashes' do
         @ability.can :read, MongoidProject
         @ability.can :read, MongoidProject, title: 'Sir'
-        sir  = MongoidProject.create(title: 'Sir')
-        lord = MongoidProject.create(title: 'Lord')
+        MongoidProject.create(title: 'Sir')
+        MongoidProject.create(title: 'Lord')
 
         expect(MongoidProject.accessible_by(@ability, :read).count).to eq(2)
       end
@@ -111,9 +111,9 @@ if defined? CanCan::ModelAdapters::MongoidAdapter
 
       it 'allows a scope for conditions' do
         @ability.can :read, MongoidProject, MongoidProject.where(title: 'Sir')
-        sir   = MongoidProject.create(title: 'Sir')
-        lord  = MongoidProject.create(title: 'Lord')
-        dude  = MongoidProject.create(title: 'Dude')
+        sir = MongoidProject.create(title: 'Sir')
+        MongoidProject.create(title: 'Lord')
+        MongoidProject.create(title: 'Dude')
 
         expect(MongoidProject.accessible_by(@ability, :read).entries).to eq([sir])
       end
@@ -132,14 +132,14 @@ if defined? CanCan::ModelAdapters::MongoidAdapter
         describe 'activates only when there are Criteria in the hash' do
           it 'Calls where on the model class when there are criteria' do
             obj = MongoidProject.create(title: 'Bird')
-            @conditions = {:title.nin => ['Fork', 'Spoon']}
+            @conditions = { :title.nin => ['Fork', 'Spoon'] }
 
             @ability.can :read, MongoidProject, @conditions
             expect(@ability).to be_able_to(:read, obj)
           end
           it 'Calls the base version if there are no mongoid criteria' do
             obj = MongoidProject.new(title: 'Bird')
-            @conditions = {id: obj.id}
+            @conditions = { id: obj.id }
             @ability.can :read, MongoidProject, @conditions
             expect(@ability).to be_able_to(:read, obj)
           end
@@ -199,14 +199,14 @@ if defined? CanCan::ModelAdapters::MongoidAdapter
       end
 
       it 'calls where with matching ability conditions' do
-        obj = MongoidProject.create(foo: {bar: 1})
-        @ability.can :read, MongoidProject, foo: {bar: 1}
+        obj = MongoidProject.create(foo: { bar: 1 })
+        @ability.can :read, MongoidProject, foo: { bar: 1 }
         expect(MongoidProject.accessible_by(@ability, :read).entries.first).to eq(obj)
       end
 
       it 'excludes from the result if set to cannot' do
         obj = MongoidProject.create(bar: 1)
-        obj2 = MongoidProject.create(bar: 2)
+        MongoidProject.create(bar: 2)
         @ability.can :read, MongoidProject
         @ability.cannot :read, MongoidProject, bar: 2
         expect(MongoidProject.accessible_by(@ability, :read).entries).to eq([obj])
@@ -215,7 +215,7 @@ if defined? CanCan::ModelAdapters::MongoidAdapter
       it 'combines the rules' do
         obj = MongoidProject.create(bar: 1)
         obj2 = MongoidProject.create(bar: 2)
-        obj3 = MongoidProject.create(bar: 3)
+        MongoidProject.create(bar: 3)
         @ability.can :read, MongoidProject, bar: 1
         @ability.can :read, MongoidProject, bar: 2
         expect(MongoidProject.accessible_by(@ability, :read).entries).to match_array([obj, obj2])
@@ -231,13 +231,13 @@ if defined? CanCan::ModelAdapters::MongoidAdapter
       end
 
       it 'can handle nested queries for accessible_by' do
-        @ability.can :read, MongoidSubProject, {mongoid_project: {mongoid_category: { name: 'Authorization'}}}
+        @ability.can :read, MongoidSubProject, mongoid_project: { mongoid_category: { name: 'Authorization' } }
         cat1 = MongoidCategory.create name: 'Authentication'
         cat2 = MongoidCategory.create name: 'Authorization'
         proj1 = cat1.mongoid_projects.create name: 'Proj1'
         proj2 = cat2.mongoid_projects.create name: 'Proj2'
         sub1 = proj1.mongoid_sub_projects.create name: 'Sub1'
-        sub2 = proj2.mongoid_sub_projects.create name: 'Sub2'
+        proj2.mongoid_sub_projects.create name: 'Sub2'
         expect(MongoidSubProject.accessible_by(@ability)).to match_array([sub1])
       end
 

@@ -25,35 +25,6 @@ Lint/ShadowingOuterLocalVariable:
     - 'lib/cancan/model_adapters/active_record_adapter.rb'
     - 'lib/cancan/model_adapters/sequel_adapter.rb'
 
-# Offense count: 16
-# Cop supports --auto-correct.
-# Configuration parameters: IgnoreEmptyBlocks, AllowUnusedKeywordArguments.
-Lint/UnusedBlockArgument:
-  Exclude:
-    - 'lib/cancan/controller_resource.rb'
-    - 'lib/cancan/model_adapters/mongoid_adapter.rb'
-    - 'spec/cancan/ability_spec.rb'
-    - 'spec/cancan/controller_additions_spec.rb'
-    - 'spec/cancan/controller_resource_spec.rb'
-
-# Offense count: 16
-# Cop supports --auto-correct.
-# Configuration parameters: AllowUnusedKeywordArguments, IgnoreEmptyMethods.
-Lint/UnusedMethodArgument:
-  Exclude:
-    - 'lib/cancan/controller_additions.rb'
-    - 'lib/cancan/model_adapters/abstract_adapter.rb'
-    - 'lib/cancan/model_adapters/active_record_4_adapter.rb'
-    - 'lib/cancan/model_adapters/sequel_adapter.rb'
-
-# Offense count: 36
-Lint/UselessAssignment:
-  Exclude:
-    - 'spec/cancan/model_adapters/active_record_4_adapter_spec.rb'
-    - 'spec/cancan/model_adapters/active_record_adapter_spec.rb'
-    - 'spec/cancan/model_adapters/mongoid_adapter_spec.rb'
-    - 'spec/cancan/model_adapters/sequel_adapter_spec.rb'
-
 # Offense count: 14
 Metrics/AbcSize:
   Max: 31
@@ -96,13 +67,6 @@ Metrics/PerceivedComplexity:
 Performance/FixedSize:
   Exclude:
     - 'spec/cancan/model_adapters/mongoid_adapter_spec.rb'
-
-# Offense count: 25
-# Cop supports --auto-correct.
-# Configuration parameters: MaxKeyValuePairs.
-Performance/RedundantMerge:
-  Exclude:
-    - 'spec/cancan/controller_resource_spec.rb'
 
 # Offense count: 1
 # Cop supports --auto-correct.
@@ -156,20 +120,6 @@ Style/BlockDelimiters:
     - 'spec/cancan/controller_resource_spec.rb'
     - 'spec/cancan/matchers_spec.rb'
     - 'spec/cancan/model_adapters/mongoid_adapter_spec.rb'
-
-# Offense count: 43
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-# SupportedStyles: braces, no_braces, context_dependent
-Style/BracesAroundHashParameters:
-  Exclude:
-    - 'lib/cancan/controller_resource.rb'
-    - 'spec/cancan/ability_spec.rb'
-    - 'spec/cancan/controller_additions_spec.rb'
-    - 'spec/cancan/controller_resource_spec.rb'
-    - 'spec/cancan/model_adapters/active_record_adapter_spec.rb'
-    - 'spec/cancan/model_adapters/mongoid_adapter_spec.rb'
-    - 'spec/cancan/rule_spec.rb'
 
 # Offense count: 2
 Style/CaseEquality:
@@ -485,38 +435,6 @@ Style/SpaceBeforeBlockBraces:
   Exclude:
     - 'cancancan.gemspec'
     - 'lib/cancan/controller_additions.rb'
-
-# Offense count: 10
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles, EnforcedStyleForEmptyBraces, SpaceBeforeBlockParameters.
-# SupportedStyles: space, no_space
-Style/SpaceInsideBlockBraces:
-  Exclude:
-    - 'lib/cancan/model_adapters/active_record_adapter.rb'
-    - 'lib/cancan/model_adapters/mongoid_adapter.rb'
-    - 'spec/cancan/controller_additions_spec.rb'
-    - 'spec/cancan/controller_resource_spec.rb'
-
-# Offense count: 225
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, EnforcedStyleForEmptyBraces, SupportedStyles.
-# SupportedStyles: space, no_space, compact
-Style/SpaceInsideHashLiteralBraces:
-  Exclude:
-    - 'lib/cancan/ability.rb'
-    - 'lib/cancan/controller_additions.rb'
-    - 'lib/cancan/controller_resource.rb'
-    - 'lib/cancan/model_adapters/active_record_adapter.rb'
-    - 'lib/cancan/model_adapters/mongoid_adapter.rb'
-    - 'spec/cancan/ability_spec.rb'
-    - 'spec/cancan/controller_additions_spec.rb'
-    - 'spec/cancan/controller_resource_spec.rb'
-    - 'spec/cancan/exceptions_spec.rb'
-    - 'spec/cancan/inherited_resource_spec.rb'
-    - 'spec/cancan/model_adapters/active_record_4_adapter_spec.rb'
-    - 'spec/cancan/model_adapters/active_record_adapter_spec.rb'
-    - 'spec/cancan/model_adapters/mongoid_adapter_spec.rb'
-    - 'spec/cancan/rule_spec.rb'
 
 # Offense count: 18
 # Cop supports --auto-correct.

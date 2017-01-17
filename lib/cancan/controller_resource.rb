@@ -98,7 +98,7 @@ module CanCan
     end
 
     def initial_attributes
-      current_ability.attributes_for(@params[:action].to_sym, resource_class).delete_if do |key, value|
+      current_ability.attributes_for(@params[:action].to_sym, resource_class).delete_if do |key, _value|
         resource_params && resource_params.include?(key)
       end
     end
@@ -111,7 +111,7 @@ module CanCan
           if resource_base.respond_to? "find_by_#{@options[:find_by]}!"
             resource_base.send("find_by_#{@options[:find_by]}!", id_param)
           elsif resource_base.respond_to? 'find_by'
-            resource_base.send('find_by', { @options[:find_by].to_sym => id_param })
+            resource_base.send('find_by', @options[:find_by].to_sym => id_param)
           else
             resource_base.send(@options[:find_by], id_param)
           end
@@ -162,7 +162,7 @@ module CanCan
     end
 
     def resource_class_with_parent
-      parent_resource ? {parent_resource => resource_class} : resource_class
+      parent_resource ? { parent_resource => resource_class } : resource_class
     end
 
     def resource_instance=(instance)

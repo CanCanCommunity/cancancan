@@ -47,6 +47,7 @@ appraise "activerecord_4.2" do
   gem "activerecord", "~> 4.2.0", :require => "active_record"
   gem 'activesupport', '~> 4.2.0', :require => 'active_support/all'
   gem "actionpack", "~> 4.2.0", :require => "action_pack"
+  gem "nokogiri", "~> 1.6.8", :require => "nokogiri"    # TODO: fix for ruby 2.0.0
 
   gemfile.platforms :jruby do
     gem "activerecord-jdbcsqlite3-adapter"

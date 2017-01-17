@@ -77,7 +77,7 @@ module CanCan
       private
 
       def mergeable_conditions?
-        @rules.find {|rule| rule.unmergeable? }.blank?
+        @rules.find { |rule| rule.unmergeable? }.blank?
       end
 
       def override_scope
@@ -135,7 +135,7 @@ module CanCan
       def clean_joins(joins_hash)
         joins = []
         joins_hash.each do |name, nested|
-          joins << (nested.empty? ? name : {name => clean_joins(nested)})
+          joins << (nested.empty? ? name : { name => clean_joins(nested) })
         end
         joins
       end

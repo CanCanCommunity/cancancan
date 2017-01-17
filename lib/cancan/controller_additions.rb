@@ -279,7 +279,7 @@ module CanCan
         self.send(method_name, *args, &block)
       end
 
-      def skip_authorization(*args)
+      def skip_authorization(*_args)
         raise ImplementationRemoved, 'The CanCan skip_authorization method has been renamed to skip_authorization_check. Please update your code.'
       end
 
@@ -292,7 +292,7 @@ module CanCan
       end
 
       def cancan_skipper
-        @_cancan_skipper ||= {authorize: {}, load: {}}
+        @_cancan_skipper ||= { authorize: {}, load: {} }
       end
     end
 
@@ -342,7 +342,7 @@ module CanCan
       current_ability.authorize!(*args)
     end
 
-    def unauthorized!(message = nil)
+    def unauthorized!(_message = nil)
       raise ImplementationRemoved, 'The unauthorized! method has been removed from CanCan, use authorize! instead.'
     end
 
