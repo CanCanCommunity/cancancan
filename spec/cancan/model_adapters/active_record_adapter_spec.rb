@@ -244,7 +244,7 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
     it 'returns SQL for single `can` definition in front of default `cannot` condition' do
       @ability.cannot :read, Article
       @ability.can :read, Article, published: false, secret: true
-      expect(@ability.model_adapter(Article, :read).conditions).to orderlessly_match(%Q["#{@article_table}"."published" = 'f' AND "#{@article_table}"."secret" = 't'])
+      expect(@ability.model_adapter(Article, :read).conditions).to orderlessly_match(%["#{@article_table}"."published" = 'f' AND "#{@article_table}"."secret" = 't'])
     end
 
     it 'returns true condition for single `can` definition in front of default `can` condition' do
@@ -262,7 +262,7 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
     it 'returns `not (sql)` for single `cannot` definition in front of default `can` condition' do
       @ability.can :read, Article
       @ability.cannot :read, Article, published: false, secret: true
-      expect(@ability.model_adapter(Article, :read).conditions).to orderlessly_match(%Q["not (#{@article_table}"."published" = 'f' AND "#{@article_table}"."secret" = 't')])
+      expect(@ability.model_adapter(Article, :read).conditions).to orderlessly_match(%["not (#{@article_table}"."published" = 'f' AND "#{@article_table}"."secret" = 't')])
     end
 
     it 'returns appropriate sql conditions in complex case' do
@@ -270,7 +270,7 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       @ability.can :manage, Article, id: 1
       @ability.can :update, Article, published: true
       @ability.cannot :update, Article, secret: true
-      expect(@ability.model_adapter(Article, :update).conditions).to eq(%Q[not ("#{@article_table}"."secret" = 't') AND (("#{@article_table}"."published" = 't') OR ("#{@article_table}"."id" = 1))])
+      expect(@ability.model_adapter(Article, :update).conditions).to eq(%[not ("#{@article_table}"."secret" = 't') AND (("#{@article_table}"."published" = 't') OR ("#{@article_table}"."id" = 1))])
       expect(@ability.model_adapter(Article, :manage).conditions).to eq(id: 1)
       expect(@ability.model_adapter(Article, :read).conditions).to eq("'t'='t'")
     end
@@ -290,7 +290,7 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       @ability.can :read, Article, ['secret=?', false]
       adapter = @ability.model_adapter(Article, :read)
       2.times do
-        expect(adapter.conditions).to eq(%Q[(secret='f') OR ("#{@article_table}"."published" = 't')])
+        expect(adapter.conditions).to eq(%[(secret='f') OR ("#{@article_table}"."published" = 't')])
       end
     end
 
