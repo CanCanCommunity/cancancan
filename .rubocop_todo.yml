@@ -38,11 +38,6 @@ Lint/ShadowingOuterLocalVariable:
 Metrics/AbcSize:
   Max: 31
 
-# Offense count: 1
-# Configuration parameters: CountComments.
-Metrics/BlockLength:
-  Max: 28
-
 # Offense count: 2
 # Configuration parameters: CountComments.
 Metrics/ClassLength:
@@ -63,10 +58,15 @@ Metrics/LineLength:
 Metrics/MethodLength:
   Max: 21
 
-# Offense count: 2
-# Configuration parameters: CountComments.
 Metrics/ModuleLength:
   Max: 200
+  Exclude:
+    - "**/*_spec.rb"
+
+Metrics/BlockLength:
+  Max: 28
+  Exclude:
+    - "**/*_spec.rb"
 
 # Offense count: 7
 Metrics/PerceivedComplexity:
@@ -76,42 +76,6 @@ Metrics/PerceivedComplexity:
 Performance/FixedSize:
   Exclude:
     - 'spec/cancan/model_adapters/mongoid_adapter_spec.rb'
-
-# Offense count: 1
-# Cop supports --auto-correct.
-Performance/StringReplacement:
-  Exclude:
-    - 'lib/cancan/controller_resource.rb'
-
-# Offense count: 2
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-# SupportedStyles: prefer_alias, prefer_alias_method
-Style/Alias:
-  Exclude:
-    - 'lib/cancan/matchers.rb'
-
-# Offense count: 2
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-# SupportedStyles: always, conditionals
-Style/AndOr:
-  Exclude:
-    - 'lib/cancan/ability.rb'
-
-# Offense count: 1
-# Cop supports --auto-correct.
-Style/ArrayJoin:
-  Exclude:
-    - 'lib/cancan/controller_resource.rb'
-
-# Offense count: 4
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-# SupportedStyles: percent_q, bare_percent
-Style/BarePercentLiterals:
-  Exclude:
-    - 'spec/cancan/model_adapters/active_record_adapter_spec.rb'
 
 # Offense count: 18
 # Cop supports --auto-correct.
@@ -184,13 +148,6 @@ Style/EachWithObject:
 Style/ElseAlignment:
   Exclude:
     - 'spec/cancan/model_adapters/sequel_adapter_spec.rb'
-
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: AllowAdjacentOneLineDefs.
-Style/EmptyLineBetweenDefs:
-  Exclude:
-    - 'lib/cancan/ability.rb'
 
 # Offense count: 1
 # Cop supports --auto-correct.

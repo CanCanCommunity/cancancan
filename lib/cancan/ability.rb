@@ -68,6 +68,7 @@ module CanCan
       end.reject(&:nil?).first
       match ? match.base_behavior : false
     end
+
     # Convenience method which works the same as "can?" but returns the opposite value.
     #
     #   cannot? :destroy, @project
@@ -374,8 +375,8 @@ module CanCan
     def optimize_order!(rules)
       first_can_in_group = -1
       rules.each_with_index do |rule, i|
-        (first_can_in_group = -1) and next unless rule.base_behavior
-        (first_can_in_group = i) and next if first_can_in_group == -1
+        (first_can_in_group = -1) && next unless rule.base_behavior
+        (first_can_in_group = i) && next if first_can_in_group == -1
         if rule.subjects == [:all]
           rules[i] = rules[first_can_in_group]
           rules[first_can_in_group] = rule

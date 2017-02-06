@@ -270,7 +270,7 @@ module CanCan
     end
 
     def namespaced_name
-      ([namespace, name] * '/').singularize.camelize.safe_constantize || name
+      [namespace, name].join('/').singularize.camelize.safe_constantize || name
     end
 
     def name_from_controller
@@ -300,7 +300,7 @@ module CanCan
     end
 
     def extract_key(value)
-       value.to_s.underscore.gsub('/', '_')
+       value.to_s.underscore.tr('/', '_')
     end
   end
 end
