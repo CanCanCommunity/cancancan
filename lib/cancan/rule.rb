@@ -114,7 +114,7 @@ module CanCan
         if adapter.override_condition_matching?(subject, name, value)
           adapter.matches_condition?(subject, name, value)
         else
-          condition_match?(subject.send(name), value)
+          condition_match?(adapter, subject.send(name), value)
         end
       end
     end
@@ -136,9 +136,9 @@ module CanCan
       CanCan::ModelAdapters::AbstractAdapter.adapter_class(subject_class?(subject) ? subject : subject.class)
     end
 
-    def condition_match?(attribute, value)
+    def condition_match?(adapter, attribute, value)
       case value
-      when Hash       then hash_condition_match?(attribute, value)
+      when Hash       then hash_condition_match?(adapter, attribute, value)
       when String     then attribute == value
       when Range      then value.cover?(attribute)
       when Enumerable then value.include?(attribute)
@@ -146,9 +146,11 @@ module CanCan
       end
     end
 
-    def hash_condition_match?(attribute, value)
-      if attribute.kind_of?(Array) || (defined?(ActiveRecord) && attribute.kind_of?(ActiveRecord::Relation))
-        attribute.any? { |element| matches_conditions_hash?(element, value) }
+    def hash_condition_match?(adapter, attribute, value)
+      if adapter.override_association_matching?(attribute, value)
+        adapter.matches_association?(attribute, value)
+      elsif attribute.kind_of?(Array) || attribute.respond_to?(:to_a)
+        attribute.to_a.any? { |element| matches_conditions_hash?(element, value) }
       else
         !attribute.nil? && matches_conditions_hash?(attribute, value)
       end
