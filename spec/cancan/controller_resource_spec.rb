@@ -10,7 +10,7 @@ describe CanCan::ControllerResource do
     class Model
       attr_accessor :name
 
-      def initialize(attributes={})
+      def initialize(attributes = {})
         attributes.each do |attribute, value|
           send("#{attribute}=", value)
         end
@@ -153,7 +153,7 @@ describe CanCan::ControllerResource do
       end
 
       it 'accepts the specified proc for sanitizing input' do
-        resource = CanCan::ControllerResource.new(controller, param_method: Proc.new { |_c| { custom: 'params' } })
+        resource = CanCan::ControllerResource.new(controller, param_method: proc { |_c| { custom: 'params' } })
         expect(resource.send('resource_params')).to eq(custom: 'params')
       end
 
@@ -233,7 +233,7 @@ describe CanCan::ControllerResource do
       controller.instance_variable_set(:@category, :some_category)
       allow(controller).to receive(:authorize!).with(:custom_action, :some_category) { raise CanCan::AccessDenied }
 
-      resource = CanCan::ControllerResource.new(controller, :category, parent: true, parent_action: :custom_action )
+      resource = CanCan::ControllerResource.new(controller, :category, parent: true, parent_action: :custom_action)
       expect { resource.authorize_resource }.to raise_error(CanCan::AccessDenied)
     end
 
@@ -502,7 +502,7 @@ describe CanCan::ControllerResource do
   context 'when @name passed as symbol' do
     it 'returns namespaced #resource_class' do
       module Admin; end
-      class Admin::Dashboard; end;
+      class Admin::Dashboard; end
       params[:controller] = 'admin/dashboard'
       resource = CanCan::ControllerResource.new(controller, :dashboard)
 

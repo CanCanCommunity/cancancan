@@ -33,7 +33,7 @@ module CanCan
           if value.kind_of? Hash
             value = value.dup
             association_class = model_class.reflect_on_association(name).klass.name.constantize
-            nested = value.inject({}) do |nested,(k,v)|
+            nested = value.inject({}) do |nested, (k, v)|
               if v.kind_of? Hash
                 value.delete(k)
                 nested[k] = v
@@ -42,7 +42,7 @@ module CanCan
               end
               nested
             end
-            result_hash.merge!(tableized_conditions(nested,association_class))
+            result_hash.merge!(tableized_conditions(nested, association_class))
           else
             result_hash[name] = value
           end
@@ -67,7 +67,7 @@ module CanCan
           if mergeable_conditions?
             build_relation(conditions)
           else
-            build_relation(*(@rules.map(&:conditions)))
+            build_relation(*@rules.map(&:conditions))
           end
         else
           @model_class.all(conditions: conditions, joins: joins)

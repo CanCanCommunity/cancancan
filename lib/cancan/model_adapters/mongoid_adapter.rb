@@ -6,7 +6,7 @@ module CanCan
       end
 
       def self.override_conditions_hash_matching?(subject, conditions)
-        conditions.any? do |k,_v|
+        conditions.any? do |k, _v|
           key_is_not_symbol = lambda { !k.kind_of?(Symbol) }
           subject_value_is_array = lambda do
             subject.respond_to?(k) && subject.send(k).is_a?(Array)
@@ -19,7 +19,7 @@ module CanCan
       def self.matches_conditions_hash?(subject, conditions)
         # To avoid hitting the db, retrieve the raw Mongo selector from
         # the Mongoid Criteria and use Mongoid::Matchers#matches?
-        subject.matches?( subject.class.where(conditions).selector )
+        subject.matches?(subject.class.where(conditions).selector)
       end
 
       def database_records
@@ -53,7 +53,7 @@ module CanCan
       def simplify_relations model_class, conditions
         model_relations = model_class.relations.with_indifferent_access
         Hash[
-          conditions.map { |k,v|
+          conditions.map { |k, v|
             if relation = model_relations[k]
               relation_class_name = relation[:class_name].blank? ? k.to_s.classify : relation[:class_name]
               v = simplify_relations(relation_class_name.constantize, v)
@@ -61,7 +61,7 @@ module CanCan
               k = "#{k}_id"
               v = { '$in' => relation_ids }
             end
-            [k,v]
+            [k, v]
           }
         ]
       end

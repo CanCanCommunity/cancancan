@@ -209,7 +209,7 @@ module CanCan
     # See ControllerAdditions#authorize! for documentation.
     def authorize!(action, subject, *args)
       message = nil
-      if args.last.kind_of?(Hash) && args.last.has_key?(:message)
+      if args.last.kind_of?(Hash) && args.last.key?(:message)
         message = args.pop[:message]
       end
       if cannot?(action, subject, *args)
@@ -266,7 +266,7 @@ module CanCan
       rules.each do |rule|
         subjects = rule.subjects
         expand_actions(rule.actions).each do |action|
-          if(rule.base_behavior)
+          if rule.base_behavior
             permissions_list[:can][action] ||= []
             permissions_list[:can][action] += subjects.map(&:to_s)
           else

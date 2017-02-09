@@ -55,14 +55,14 @@ describe CanCan::Ability do
   it 'performs can(_, :all) before other checks when can(_, :all) is defined before' do
     @ability.can :manage, :all
     @ability.can :edit, String do |_string|
-      fail 'Performed a check for :edit before the check for :all'
+      raise 'Performed a check for :edit before the check for :all'
     end
     expect { @ability.can? :edit, 'a' }.to_not raise_exception
   end
 
   it 'performs can(_, :all) before other checks when can(_, :all) is defined after' do
     @ability.can :edit, String do |_string|
-      fail 'Performed a check for :edit before the check for :all'
+      raise 'Performed a check for :edit before the check for :all'
     end
     @ability.can :manage, :all
     expect { @ability.can? :edit, 'a' }.to_not raise_exception
@@ -228,7 +228,7 @@ describe CanCan::Ability do
   it 'passes to previous rule, if block returns false or nil' do
     @ability.can :read, :all
     @ability.cannot :read, Integer do |int|
-      int > 10 ? nil : ( int > 5 )
+      int > 10 ? nil : (int > 5)
     end
 
     expect(@ability.can?(:read, 'foo')).to be(true)
@@ -241,7 +241,7 @@ describe CanCan::Ability do
 
   it 'always returns `false` for single cannot definition' do
     @ability.cannot :read, Integer do |int|
-      int > 10 ? nil : ( int > 5 )
+      int > 10 ? nil : (int > 5)
     end
     expect(@ability.can?(:read, 'foo')).to be(false)
     expect(@ability.can?(:read, 3)).to be(false)
@@ -252,7 +252,7 @@ describe CanCan::Ability do
   it 'passes to previous cannot definition, if block returns false or nil' do
     @ability.cannot :read, :all
     @ability.can :read, Integer do |int|
-      int > 10 ? nil : ( int > 5 )
+      int > 10 ? nil : (int > 5)
     end
     expect(@ability.can?(:read, 'foo')).to be(false)
     expect(@ability.can?(:read, 3)).to be(false)
@@ -413,7 +413,7 @@ describe CanCan::Ability do
 
   it "has initial attributes based on hash conditions of 'new' action" do
     @ability.can :manage, Range, foo: 'foo', hash: { skip: 'hashes' }
-    @ability.can :create, Range, bar: 123, array: %w[skip arrays]
+    @ability.can :create, Range, bar: 123, array: %w(skip arrays)
     @ability.can :new, Range, baz: 'baz', range: 1..3
     @ability.cannot :new, Range, ignore: 'me'
     expect(@ability.attributes_for(:new, Range)).to eq(foo: 'foo', bar: 123, baz: 'baz')
@@ -427,7 +427,7 @@ describe CanCan::Ability do
       expect(e.action).to eq(:read)
       expect(e.subject).to eq(:foo)
     else
-      fail 'Expected CanCan::AccessDenied exception to be raised'
+      raise 'Expected CanCan::AccessDenied exception to be raised'
     end
   end
 
@@ -461,12 +461,13 @@ describe CanCan::Ability do
       e.default_message = 'Access denied!'
       expect(e.message).to eq('Access denied!')
     else
-      fail 'Expected CanCan::AccessDenied exception to be raised'
+      raise 'Expected CanCan::AccessDenied exception to be raised'
     end
   end
 
   it 'determines model adapterO class by asking AbstractAdapter' do
-    adapter_class, model_class = double, double
+    adapter_class = double
+    model_class = double
     allow(CanCan::ModelAdapters::AbstractAdapter).to receive(:adapter_class).with(model_class) { adapter_class }
     allow(adapter_class).to receive(:new).with(model_class, []) { :adapter_instance }
     expect(@ability.model_adapter(model_class, :read)).to eq(:adapter_instance)
