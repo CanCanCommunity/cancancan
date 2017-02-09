@@ -61,7 +61,7 @@ module CanCan
           if value.is_a? Hash
             value = value.dup
             association_class = model_class.association_reflection(name).associated_class
-            nested = value.each_with_object({}) do |(k, v), nested|
+            nested_resulted = value.each_with_object({}) do |(k, v), nested|
               if v.is_a?(Hash)
                 value.delete(k)
                 nested_class = association_class.association_reflection(k).associated_class
@@ -71,7 +71,7 @@ module CanCan
               end
               nested
             end
-            result_hash[name] = association_class.where(nested)
+            result_hash[name] = association_class.where(nested_resulted)
           else
             result_hash[name] = value
           end

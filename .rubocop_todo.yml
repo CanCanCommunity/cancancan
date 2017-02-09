@@ -14,17 +14,6 @@ Lint/AssignmentInCondition:
     - 'lib/cancan/controller_resource.rb'
     - 'lib/cancan/model_adapters/mongoid_adapter.rb'
 
-# Offense count: 2
-Lint/IneffectiveAccessModifier:
-  Exclude:
-    - 'lib/cancan/model_adapters/active_record_4_adapter.rb'
-
-# Offense count: 3
-Lint/ShadowingOuterLocalVariable:
-  Exclude:
-    - 'lib/cancan/model_adapters/active_record_adapter.rb'
-    - 'lib/cancan/model_adapters/sequel_adapter.rb'
-
 # Offense count: 14
 Metrics/AbcSize:
   Max: 31
@@ -63,43 +52,14 @@ Metrics/BlockLength:
 Metrics/PerceivedComplexity:
   Max: 11
 
+# TODO: due to mongoid. can't be fixed
 # Offense count: 1
 Performance/FixedSize:
   Exclude:
     - 'spec/cancan/model_adapters/mongoid_adapter_spec.rb'
 
-# Offense count: 2
-Style/CaseEquality:
-  Exclude:
-    - 'lib/cancan/model_adapters/active_record_4_adapter.rb'
 
-# Offense count: 4
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-# SupportedStyles: nested, compact
-Style/ClassAndModuleChildren:
-  Exclude:
-    - 'lib/cancan/model_adapters/mongoid_adapter.rb'
-    - 'spec/cancan/controller_resource_spec.rb'
-    - 'spec/cancan/model_adapters/active_record_adapter_spec.rb'
-
-# Offense count: 3
-# Configuration parameters: MinBodyLength.
-Style/GuardClause:
-  Exclude:
-    - 'lib/cancan/controller_resource.rb'
-    - 'lib/cancan/model_adapters/active_record_adapter.rb'
-
-# Offense count: 1
-Style/IfInsideElse:
-  Exclude:
-    - 'lib/cancan/controller_resource.rb'
-
-# Offense count: 1
-Style/MultilineTernaryOperator:
-  Exclude:
-    - 'lib/cancan/model_adapters/active_record_4_adapter.rb'
-
-
+# TODO: fixing this would change the APIs
 # Offense count: 2
 # Configuration parameters: NamePrefix, NamePrefixBlacklist, NameWhitelist.
 # NamePrefix: is_, has_, have_

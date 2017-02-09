@@ -33,7 +33,7 @@ module CanCan
           if value.is_a? Hash
             value = value.dup
             association_class = model_class.reflect_on_association(name).klass.name.constantize
-            nested = value.each_with_object({}) do |(k, v), nested|
+            nested_resulted = value.each_with_object({}) do |(k, v), nested|
               if v.is_a? Hash
                 value.delete(k)
                 nested[k] = v
@@ -42,7 +42,7 @@ module CanCan
               end
               nested
             end
-            result_hash.merge!(tableized_conditions(nested, association_class))
+            result_hash.merge!(tableized_conditions(nested_resulted, association_class))
           else
             result_hash[name] = value
           end
@@ -82,13 +82,12 @@ module CanCan
 
       def override_scope
         conditions = @rules.map(&:conditions).compact
-        if defined?(ActiveRecord::Relation) && conditions.any? { |c| c.is_a?(ActiveRecord::Relation) }
-          if conditions.size == 1
-            conditions.first
-          else
-            rule = @rules.detect { |rule| rule.conditions.is_a?(ActiveRecord::Relation) }
-            raise Error, "Unable to merge an Active Record scope with other conditions. Instead use a hash or SQL for #{rule.actions.first} #{rule.subjects.first} ability."
-          end
+        return unless defined?(ActiveRecord::Relation) && conditions.any? { |c| c.is_a?(ActiveRecord::Relation) }
+        if conditions.size == 1
+          conditions.first
+        else
+          rule_found = @rules.detect { |rule| rule.conditions.is_a?(ActiveRecord::Relation) }
+          raise Error, "Unable to merge an Active Record scope with other conditions. Instead use a hash or SQL for #{rule_found.actions.first} #{rule_found.subjects.first} ability."
         end
       end
 
