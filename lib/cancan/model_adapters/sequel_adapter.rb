@@ -20,7 +20,7 @@ module CanCan
         else
           value.each do |k, v|
             if v.kind_of?(Hash)
-              return false unless self.matches_condition?(obj, k, v)
+              return false unless matches_condition?(obj, k, v)
             elsif obj.send(k) != v
               return false
             end

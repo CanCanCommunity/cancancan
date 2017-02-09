@@ -51,7 +51,7 @@ module CanCan
     end
 
     def parent?
-      @options.has_key?(:parent) ? @options[:parent] : @name && @name != name_from_controller.to_sym
+      @options.key?(:parent) ? @options[:parent] : @name && @name != name_from_controller.to_sym
     end
 
     def skip?(behavior)
@@ -146,7 +146,7 @@ module CanCan
     end
 
     def member_action?
-      new_actions.include?(@params[:action].to_sym) || @options[:singleton] || ( (@params[:id] || @params[@options[:id_param]]) && !collection_actions.include?(@params[:action].to_sym))
+      new_actions.include?(@params[:action].to_sym) || @options[:singleton] || ((@params[:id] || @params[@options[:id_param]]) && !collection_actions.include?(@params[:action].to_sym))
     end
 
     # Returns the class used for this resource. This can be overriden by the :class option.
@@ -228,7 +228,7 @@ module CanCan
 
     def resource_params
       if parameters_require_sanitizing? && params_method.present?
-        return case params_method
+        case params_method
           when Symbol then @controller.send(params_method)
           when String then @controller.instance_eval(params_method)
           when Proc then params_method.call(@controller)
@@ -243,9 +243,9 @@ module CanCan
     end
 
     def resource_params_by_namespaced_name
-      if @options[:instance_name] && @params.has_key?(extract_key(@options[:instance_name]))
+      if @options[:instance_name] && @params.key?(extract_key(@options[:instance_name]))
         @params[extract_key(@options[:instance_name])]
-      elsif @options[:class] && @params.has_key?(extract_key(@options[:class]))
+      elsif @options[:class] && @params.key?(extract_key(@options[:class]))
         @params[extract_key(@options[:class])]
       else
         @params[extract_key(namespaced_name)]

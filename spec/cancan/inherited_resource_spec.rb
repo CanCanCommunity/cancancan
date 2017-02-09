@@ -10,7 +10,7 @@ describe CanCan::InheritedResource do
     class Model
       attr_accessor :name
 
-      def initialize(attributes={})
+      def initialize(attributes = {})
         attributes.each do |attribute, value|
           send("#{attribute}=", value)
         end

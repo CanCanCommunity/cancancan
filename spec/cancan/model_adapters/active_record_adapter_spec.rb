@@ -244,7 +244,7 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
     it 'returns SQL for single `can` definition in front of default `cannot` condition' do
       @ability.cannot :read, Article
       @ability.can :read, Article, published: false, secret: true
-      expect(@ability.model_adapter(Article, :read).conditions).to orderlessly_match(%["#{@article_table}"."published" = 'f' AND "#{@article_table}"."secret" = 't'])
+      expect(@ability.model_adapter(Article, :read).conditions).to orderlessly_match(%("#{@article_table}"."published" = 'f' AND "#{@article_table}"."secret" = 't'))
     end
 
     it 'returns true condition for single `can` definition in front of default `can` condition' do
@@ -345,11 +345,11 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
     context 'with namespaced models' do
       before :each do
         ActiveRecord::Schema.define do
-          create_table( :table_xes ) do |t|
+          create_table(:table_xes) do |t|
             t.timestamps null: false
           end
 
-          create_table( :table_zs ) do |t|
+          create_table(:table_zs) do |t|
             t.integer :table_x_id
             t.integer :user_id
             t.timestamps null: false
@@ -376,7 +376,7 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
         ability.can :read, Namespace::TableX, table_zs: { user_id: user.id }
 
         table_x = Namespace::TableX.create!
-        table_x.table_zs.create( user: user )
+        table_x.table_zs.create(user: user)
         expect(Namespace::TableX.accessible_by(ability)).to eq([table_x])
       end
     end
@@ -384,7 +384,7 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
     context 'when conditions are non iterable ranges' do
       before :each do
         ActiveRecord::Schema.define do
-          create_table( :courses ) do |t|
+          create_table(:courses) do |t|
             t.datetime :start_at
           end
         end
