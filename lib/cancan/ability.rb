@@ -1,5 +1,4 @@
 module CanCan
-
   # This module is designed to be included into an Ability class. This will
   # provide the "can" methods for defining and checking abilities.
   #
@@ -209,7 +208,7 @@ module CanCan
     # See ControllerAdditions#authorize! for documentation.
     def authorize!(action, subject, *args)
       message = nil
-      if args.last.kind_of?(Hash) && args.last.key?(:message)
+      if args.last.is_a?(Hash) && args.last.key?(:message)
         message = args.pop[:message]
       end
       if cannot?(action, subject, *args)
@@ -290,7 +289,7 @@ module CanCan
     private
 
     def unauthorized_message_keys(action, subject)
-      subject = (subject.class == Class ? subject : subject.class).name.underscore unless subject.kind_of? Symbol
+      subject = (subject.class == Class ? subject : subject.class).name.underscore unless subject.is_a? Symbol
       [subject, :all].map do |try_subject|
         [aliases_for_action(action), :manage].flatten.map do |try_action|
           :"#{try_action}.#{try_subject}"
@@ -320,7 +319,7 @@ module CanCan
 
     # It translates to an array the subject or the hash with multiple subjects given to can?.
     def extract_subjects(subject)
-      if subject.kind_of?(Hash) && subject.key?(:any)
+      if subject.is_a?(Hash) && subject.key?(:any)
         subject[:any]
       else
         [subject]
@@ -377,11 +376,10 @@ module CanCan
       rules.each_with_index do |rule, i|
         (first_can_in_group = -1) && next unless rule.base_behavior
         (first_can_in_group = i) && next if first_can_in_group == -1
-        if rule.subjects == [:all]
-          rules[i] = rules[first_can_in_group]
-          rules[first_can_in_group] = rule
-          first_can_in_group += 1
-        end
+        next unless rule.subjects == [:all]
+        rules[i] = rules[first_can_in_group]
+        rules[first_can_in_group] = rule
+        first_can_in_group += 1
       end
     end
 
@@ -415,7 +413,7 @@ module CanCan
       {
         read: [:index, :show],
         create: [:new],
-        update: [:edit],
+        update: [:edit]
       }
     end
   end

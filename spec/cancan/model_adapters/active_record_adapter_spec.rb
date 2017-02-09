@@ -3,7 +3,6 @@ require 'spec_helper'
 if defined? CanCan::ModelAdapters::ActiveRecordAdapter
 
   describe CanCan::ModelAdapters::ActiveRecordAdapter do
-
     before :each do
       ActiveRecord::Base.establish_connection(adapter: 'sqlite3', database: ':memory:')
       ActiveRecord::Migration.verbose = false
@@ -82,7 +81,7 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
 
     it 'is for only active record classes' do
       if ActiveRecord.respond_to?(:version) &&
-          ActiveRecord.version > Gem::Version.new('4')
+         ActiveRecord.version > Gem::Version.new('4')
         expect(CanCan::ModelAdapters::ActiveRecord4Adapter).to_not be_for_class(Object)
         expect(CanCan::ModelAdapters::ActiveRecord4Adapter).to be_for_class(Article)
         expect(CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article)).to eq(CanCan::ModelAdapters::ActiveRecord4Adapter)
@@ -208,14 +207,14 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
     it 'raises an exception when trying to merge scope with other conditions' do
       @ability.can :read, Article, published: true
       @ability.can :read, Article, Article.where(secret: true)
-      expect(lambda { Article.accessible_by(@ability) }).to raise_error(CanCan::Error, 'Unable to merge an Active Record scope with other conditions. Instead use a hash or SQL for read Article ability.')
+      expect(-> { Article.accessible_by(@ability) }).to raise_error(CanCan::Error, 'Unable to merge an Active Record scope with other conditions. Instead use a hash or SQL for read Article ability.')
     end
 
     it 'does not allow to fetch records when ability with just block present' do
       @ability.can :read, Article do
         false
       end
-      expect(lambda { Article.accessible_by(@ability) }).to raise_error(CanCan::Error)
+      expect(-> { Article.accessible_by(@ability) }).to raise_error(CanCan::Error)
     end
 
     it 'should support more than one deeply nested conditions' do
@@ -229,7 +228,7 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
 
     it 'does not allow to check ability on object against SQL conditions without block' do
       @ability.can :read, Article, ['secret=?', true]
-      expect(lambda { @ability.can? :read, Article.new }).to raise_error(CanCan::Error)
+      expect(-> { @ability.can? :read, Article.new }).to raise_error(CanCan::Error)
     end
 
     it 'has false conditions if no abilities match' do

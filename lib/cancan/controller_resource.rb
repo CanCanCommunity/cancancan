@@ -58,8 +58,8 @@ module CanCan
       return false unless options = @controller.class.cancan_skipper[behavior][@name]
 
       options == {} ||
-      options[:except] && !action_exists_in?(options[:except]) ||
-      action_exists_in?(options[:only])
+        options[:except] && !action_exists_in?(options[:except]) ||
+        action_exists_in?(options[:only])
     end
 
     protected
@@ -229,9 +229,9 @@ module CanCan
     def resource_params
       if parameters_require_sanitizing? && params_method.present?
         case params_method
-          when Symbol then @controller.send(params_method)
-          when String then @controller.instance_eval(params_method)
-          when Proc then params_method.call(@controller)
+        when Symbol then @controller.send(params_method)
+        when String then @controller.instance_eval(params_method)
+        when Proc then params_method.call(@controller)
         end
       else
         resource_params_by_namespaced_name
@@ -300,7 +300,7 @@ module CanCan
     end
 
     def extract_key(value)
-       value.to_s.underscore.tr('/', '_')
+      value.to_s.underscore.tr('/', '_')
     end
   end
 end

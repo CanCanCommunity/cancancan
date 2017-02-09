@@ -372,9 +372,9 @@ describe CanCan::ControllerResource do
 
     it 'raises AccessDenied when attempting to load resource through nil' do
       resource = CanCan::ControllerResource.new(controller, through: :category)
-      expect {
+      expect do
         resource.load_resource
-      }.to raise_error(CanCan::AccessDenied) { |exception|
+      end.to raise_error(CanCan::AccessDenied) { |exception|
         expect(exception.action).to eq(:show)
         expect(exception.subject).to eq(Model)
       }
@@ -542,9 +542,9 @@ describe CanCan::ControllerResource do
     allow(controller).to receive(:resource_params).and_raise
 
     resource = CanCan::ControllerResource.new(controller)
-    expect {
+    expect do
       resource.load_resource
-    }.to_not raise_error
+    end.to_not raise_error
   end
 
   it "is a parent resource when name is provided which doesn't match controller" do
@@ -574,21 +574,21 @@ describe CanCan::ControllerResource do
   end
 
   it 'raises ImplementationRemoved when adding :name option' do
-    expect {
+    expect do
       CanCan::ControllerResource.new(controller, name: :foo)
-    }.to raise_error(CanCan::ImplementationRemoved)
+    end.to raise_error(CanCan::ImplementationRemoved)
   end
 
   it 'raises ImplementationRemoved exception when specifying :resource option since it is no longer used' do
-    expect {
+    expect do
       CanCan::ControllerResource.new(controller, resource: Model)
-    }.to raise_error(CanCan::ImplementationRemoved)
+    end.to raise_error(CanCan::ImplementationRemoved)
   end
 
   it 'raises ImplementationRemoved exception when passing :nested option' do
-    expect {
+    expect do
       CanCan::ControllerResource.new(controller, nested: :model)
-    }.to raise_error(CanCan::ImplementationRemoved)
+    end.to raise_error(CanCan::ImplementationRemoved)
   end
 
   it 'skips resource behavior for :only actions in array' do
