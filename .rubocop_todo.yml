@@ -16,7 +16,7 @@ Lint/AssignmentInCondition:
 
 # Offense count: 14
 Metrics/AbcSize:
-  Max: 31
+  Max: 25
 
 # Offense count: 2
 # Configuration parameters: CountComments.

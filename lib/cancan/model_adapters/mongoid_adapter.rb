@@ -30,17 +30,21 @@ module CanCan
         else
           # we only need to process can rules if
           # there are no rules with empty conditions
-          rules = @rules.reject { |rule| rule.conditions.empty? && rule.base_behavior }
-          process_can_rules = @rules.count == rules.count
+          database_records_from_multiple_rules
+        end
+      end
 
-          rules.inject(@model_class.all) do |records, rule|
-            if process_can_rules && rule.base_behavior
-              records.or simplify_relations(@model_class, rule.conditions)
-            elsif !rule.base_behavior
-              records.excludes simplify_relations(@model_class, rule.conditions)
-            else
-              records
-            end
+      def database_records_from_multiple_rules
+        rules = @rules.reject { |rule| rule.conditions.empty? && rule.base_behavior }
+        process_can_rules = @rules.count == rules.count
+
+        rules.inject(@model_class.all) do |records, rule|
+          if process_can_rules && rule.base_behavior
+            records.or simplify_relations(@model_class, rule.conditions)
+          elsif !rule.base_behavior
+            records.excludes simplify_relations(@model_class, rule.conditions)
+          else
+            records
           end
         end
       end
