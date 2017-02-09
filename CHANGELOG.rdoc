@@ -2,6 +2,8 @@ Develop
 
 Unreleased
 
+* Fix bug in ActiveRecord configuration (alexsanford)
+
 1.15.0 (June 13th, 2016)
 
 * Add support for Rails 5 (craig1410)
