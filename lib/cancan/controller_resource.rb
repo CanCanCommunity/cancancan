@@ -104,15 +104,19 @@ module CanCan
       if @options[:singleton] && parent_resource.respond_to?(name)
         parent_resource.send(name)
       elsif @options[:find_by]
-        if resource_base.respond_to? "find_by_#{@options[:find_by]}!"
-          resource_base.send("find_by_#{@options[:find_by]}!", id_param)
-        elsif resource_base.respond_to? 'find_by'
-          resource_base.send('find_by', @options[:find_by].to_sym => id_param)
-        else
-          resource_base.send(@options[:find_by], id_param)
-        end
+        find_resource_using_find_by
       else
         adapter.find(resource_base, id_param)
+      end
+    end
+
+    def find_resource_using_find_by
+      if resource_base.respond_to? "find_by_#{@options[:find_by]}!"
+        resource_base.send("find_by_#{@options[:find_by]}!", id_param)
+      elsif resource_base.respond_to? 'find_by'
+        resource_base.send('find_by', @options[:find_by].to_sym => id_param)
+      else
+        resource_base.send(@options[:find_by], id_param)
       end
     end
 
