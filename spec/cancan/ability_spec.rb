@@ -18,7 +18,7 @@ describe CanCan::Ability do
   it 'passes true to `can?` when non false/nil is returned in block' do
     @ability.can :read, :all
     @ability.can :read, Symbol do |_sym|
-      'foo' # TODO test that sym is nil when no instance is passed
+      'foo' # TODO: test that sym is nil when no instance is passed
     end
     expect(@ability.can?(:read, :some_symbol)).to be(true)
   end
@@ -186,14 +186,11 @@ describe CanCan::Ability do
     @ability.cannot :preview, Array
 
     expected_list = { can: { manage: ['all'],
-                             learn: ['Range']
-                             },
-                      cannot: { read: ['String', 'Hash'],
-                                index: ['String', 'Hash'],
-                                show: ['String', 'Hash'],
-                                preview: ['Array']
-                                }
-                    }
+                             learn: ['Range'] },
+                      cannot: { read: %w(String Hash),
+                                index: %w(String Hash),
+                                show: %w(String Hash),
+                                preview: ['Array'] } }
 
     expect(@ability.permissions).to eq(expected_list)
   end
@@ -220,7 +217,7 @@ describe CanCan::Ability do
     @ability.cannot :read, Integer
     expect(@ability.can?(:read, 'foo')).to be(true)
     expect(@ability.can?(:read, 123)).to be(false)
-    expect(@ability.can?(:read, any: ['foo', 'bar'])).to be(true)
+    expect(@ability.can?(:read, any: %w(foo bar))).to be(true)
     expect(@ability.can?(:read, any: [123, 'foo'])).to be(false)
     expect(@ability.can?(:read, any: [123, 456])).to be(false)
   end
@@ -433,9 +430,9 @@ describe CanCan::Ability do
 
   it 'does not raise access denied exception if ability is authorized to perform an action and return subject' do
     @ability.can :read, :foo
-    expect {
+    expect do
       expect(@ability.authorize!(:read, :foo)).to eq(:foo)
-    }.to_not raise_error
+    end.to_not raise_error
   end
 
   it 'knows when block is used in conditions' do
@@ -474,11 +471,11 @@ describe CanCan::Ability do
   end
 
   it "raises an error when attempting to use a block with a hash condition since it's not likely what they want" do
-    expect {
+    expect do
       @ability.can :read, Array, published: true do
         false
       end
-    }.to raise_error(CanCan::Error, 'You are not able to supply a block with a hash of conditions in read Array ability. Use either one.')
+    end.to raise_error(CanCan::Error, 'You are not able to supply a block with a hash of conditions in read Array ability. Use either one.')
   end
 
   describe 'unauthorized message' do

@@ -35,19 +35,17 @@ module CanCan
     end
 
     def load_resource
-      unless skip?(:load)
-        if load_instance?
-          self.resource_instance ||= load_resource_instance
-        elsif load_collection?
-          self.collection_instance ||= load_collection
-        end
+      return if skip?(:load)
+      if load_instance?
+        self.resource_instance ||= load_resource_instance
+      elsif load_collection?
+        self.collection_instance ||= load_collection
       end
     end
 
     def authorize_resource
-      unless skip?(:authorize)
-        @controller.authorize!(authorization_action, resource_instance || resource_class_with_parent)
-      end
+      return if skip?(:authorize)
+      @controller.authorize!(authorization_action, resource_instance || resource_class_with_parent)
     end
 
     def parent?
@@ -55,11 +53,10 @@ module CanCan
     end
 
     def skip?(behavior)
-      return false unless options = @controller.class.cancan_skipper[behavior][@name]
-
+      return false unless (options = @controller.class.cancan_skipper[behavior][@name])
       options == {} ||
-      options[:except] && !action_exists_in?(options[:except]) ||
-      action_exists_in?(options[:only])
+        options[:except] && !action_exists_in?(options[:except]) ||
+        action_exists_in?(options[:only])
     end
 
     protected
@@ -106,18 +103,16 @@ module CanCan
     def find_resource
       if @options[:singleton] && parent_resource.respond_to?(name)
         parent_resource.send(name)
-      else
-        if @options[:find_by]
-          if resource_base.respond_to? "find_by_#{@options[:find_by]}!"
-            resource_base.send("find_by_#{@options[:find_by]}!", id_param)
-          elsif resource_base.respond_to? 'find_by'
-            resource_base.send('find_by', @options[:find_by].to_sym => id_param)
-          else
-            resource_base.send(@options[:find_by], id_param)
-          end
+      elsif @options[:find_by]
+        if resource_base.respond_to? "find_by_#{@options[:find_by]}!"
+          resource_base.send("find_by_#{@options[:find_by]}!", id_param)
+        elsif resource_base.respond_to? 'find_by'
+          resource_base.send('find_by', @options[:find_by].to_sym => id_param)
         else
-          adapter.find(resource_base, id_param)
+          resource_base.send(@options[:find_by], id_param)
         end
+      else
+        adapter.find(resource_base, id_param)
       end
     end
 
@@ -229,9 +224,9 @@ module CanCan
     def resource_params
       if parameters_require_sanitizing? && params_method.present?
         case params_method
-          when Symbol then @controller.send(params_method)
-          when String then @controller.instance_eval(params_method)
-          when Proc then params_method.call(@controller)
+        when Symbol then @controller.send(params_method)
+        when String then @controller.instance_eval(params_method)
+        when Proc then params_method.call(@controller)
         end
       else
         resource_params_by_namespaced_name
@@ -300,7 +295,7 @@ module CanCan
     end
 
     def extract_key(value)
-       value.to_s.underscore.tr('/', '_')
+      value.to_s.underscore.tr('/', '_')
     end
   end
 end

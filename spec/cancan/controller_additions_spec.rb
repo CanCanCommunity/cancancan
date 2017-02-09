@@ -71,33 +71,33 @@ describe CanCan::ControllerAdditions do
 
   it 'check_authorization triggers AuthorizationNotPerformed in after filter' do
     expect(@controller_class).to receive(callback_action(:after_action)).with(only: [:test]) { |_options, &block| block.call(@controller) }
-    expect {
+    expect do
       @controller_class.check_authorization(only: [:test])
-    }.to raise_error(CanCan::AuthorizationNotPerformed)
+    end.to raise_error(CanCan::AuthorizationNotPerformed)
   end
 
   it 'check_authorization does not trigger AuthorizationNotPerformed when :if is false' do
     allow(@controller).to receive(:check_auth?) { false }
     allow(@controller_class).to receive(callback_action(:after_action)).with({}) { |_options, &block| block.call(@controller) }
-    expect {
+    expect do
       @controller_class.check_authorization(if: :check_auth?)
-    }.not_to raise_error
+    end.not_to raise_error
   end
 
   it 'check_authorization does not trigger AuthorizationNotPerformed when :unless is true' do
     allow(@controller).to receive(:engine_controller?) { true }
     expect(@controller_class).to receive(callback_action(:after_action)).with({}) { |_options, &block| block.call(@controller) }
-    expect {
+    expect do
       @controller_class.check_authorization(unless: :engine_controller?)
-    }.not_to raise_error
+    end.not_to raise_error
   end
 
   it 'check_authorization does not raise error when @_authorized is set' do
     @controller.instance_variable_set(:@_authorized, true)
     expect(@controller_class).to receive(callback_action(:after_action)).with(only: [:test]) { |_options, &block| block.call(@controller) }
-    expect {
+    expect do
       @controller_class.check_authorization(only: [:test])
-    }.not_to raise_error
+    end.not_to raise_error
   end
 
   it 'cancan_resource_class is ControllerResource by default' do

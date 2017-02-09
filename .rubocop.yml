@@ -13,6 +13,9 @@ Style/EmptyMethod:
 Style/VariableNumber:
   Enabled: false
 
+Style/ClassAndModuleChildren:
+  Enabled: false
+
 AllCops:
   TargetRubyVersion: 2.0
   Exclude:

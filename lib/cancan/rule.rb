@@ -11,7 +11,7 @@ module CanCan
     # and subject respectively (such as :read, @project). The third argument is a hash
     # of conditions and the last one is the block passed to the "can" call.
     def initialize(base_behavior, action, subject, conditions, block)
-      raise Error, "You are not able to supply a block with a hash of conditions in #{action} #{subject} ability. Use either one." if conditions.kind_of?(Hash) && !block.nil?
+      raise Error, "You are not able to supply a block with a hash of conditions in #{action} #{subject} ability. Use either one." if conditions.is_a?(Hash) && block
       @match_all = action.nil? && subject.nil?
       @base_behavior = base_behavior
       @actions = [action].flatten
@@ -32,9 +32,9 @@ module CanCan
         call_block_with_all(action, subject, extra_args)
       elsif @block && !subject_class?(subject)
         @block.call(subject, *extra_args)
-      elsif @conditions.kind_of?(Hash) && subject.class == Hash
+      elsif @conditions.is_a?(Hash) && subject.class == Hash
         nested_subject_matches_conditions?(subject)
-      elsif @conditions.kind_of?(Hash) && !subject_class?(subject)
+      elsif @conditions.is_a?(Hash) && !subject_class?(subject)
         matches_conditions_hash?(subject)
       else
         # Don't stop at "cannot" definitions when there are conditions.
@@ -43,11 +43,11 @@ module CanCan
     end
 
     def only_block?
-      conditions_empty? && !@block.nil?
+      conditions_empty? && @block
     end
 
     def only_raw_sql?
-      @block.nil? && !conditions_empty? && !@conditions.kind_of?(Hash)
+      @block.nil? && !conditions_empty? && !@conditions.is_a?(Hash)
     end
 
     def conditions_empty?
@@ -56,29 +56,33 @@ module CanCan
 
     def unmergeable?
       @conditions.respond_to?(:keys) && @conditions.present? &&
-        (!@conditions.keys.first.kind_of? Symbol)
+        (!@conditions.keys.first.is_a? Symbol)
     end
 
     def associations_hash(conditions = @conditions)
       hash = {}
-      conditions.map do |name, value|
-        hash[name] = associations_hash(value) if value.kind_of? Hash
-      end if conditions.kind_of? Hash
+      if conditions.is_a? Hash
+        conditions.map do |name, value|
+          hash[name] = associations_hash(value) if value.is_a? Hash
+        end
+      end
       hash
     end
 
     def attributes_from_conditions
       attributes = {}
-      @conditions.each do |key, value|
-        attributes[key] = value unless [Array, Range, Hash].include? value.class
-      end if @conditions.kind_of? Hash
+      if @conditions.is_a? Hash
+        @conditions.each do |key, value|
+          attributes[key] = value unless [Array, Range, Hash].include? value.class
+        end
+      end
       attributes
     end
 
     private
 
     def subject_class?(subject)
-      klass = (subject.kind_of?(Hash) ? subject.values.first : subject).class
+      klass = (subject.is_a?(Hash) ? subject.values.first : subject).class
       klass == Class || klass == Module
     end
 
@@ -92,9 +96,9 @@ module CanCan
 
     def matches_subject_class?(subject)
       @subjects.any? do |sub|
-        sub.kind_of?(Module) && (subject.kind_of?(sub) ||
+        sub.is_a?(Module) && (subject.is_a?(sub) ||
                                  subject.class.to_s == sub.to_s ||
-                                 (subject.kind_of?(Module) && subject.ancestors.include?(sub)))
+                                 (subject.is_a?(Module) && subject.ancestors.include?(sub)))
       end
     end
 
@@ -147,10 +151,10 @@ module CanCan
     end
 
     def hash_condition_match?(attribute, value)
-      if attribute.kind_of?(Array) || (defined?(ActiveRecord) && attribute.kind_of?(ActiveRecord::Relation))
+      if attribute.is_a?(Array) || (defined?(ActiveRecord) && attribute.is_a?(ActiveRecord::Relation))
         attribute.any? { |element| matches_conditions_hash?(element, value) }
       else
-        !attribute.nil? && matches_conditions_hash?(attribute, value)
+        attribute && matches_conditions_hash?(attribute, value)
       end
     end
   end
