@@ -30,7 +30,7 @@ module CanCan
         # Get the value of the attribute as an integer.
         attribute = enum[subject.send(name)]
         # Check to see if the value matches the condition.
-        value.is_a?(Enumerable) ? 
+        value.is_a?(Enumerable) ?
           (value.include? attribute) :
           attribute == value
       end
@@ -47,18 +47,18 @@ module CanCan
 
           conditions.stringify_keys!
 
-          predicate_builder.build_from_hash(conditions).map { |b|
+          predicate_builder.build_from_hash(conditions).map do |b|
             @model_class.send(:connection).visitor.compile b
-          }.join(' AND ')
+          end.join(' AND ')
         elsif ActiveRecord::VERSION::MINOR >= 2 && Hash === conditions
           table = Arel::Table.new(@model_class.send(:table_name))
 
           conditions = ActiveRecord::PredicateBuilder.resolve_column_aliases @model_class, conditions
           conditions = @model_class.send(:expand_hash_conditions_for_aggregates, conditions)
 
-          ActiveRecord::PredicateBuilder.build_from_hash(@model_class, conditions, table).map { |b|
+          ActiveRecord::PredicateBuilder.build_from_hash(@model_class, conditions, table).map do |b|
             @model_class.send(:connection).visitor.compile b
-          }.join(' AND ')
+          end.join(' AND ')
         else
           @model_class.send(:sanitize_sql, conditions)
         end

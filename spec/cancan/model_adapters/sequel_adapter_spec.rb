@@ -4,9 +4,9 @@ if defined? CanCan::ModelAdapters::SequelAdapter
 
   describe CanCan::ModelAdapters::SequelAdapter do
     DB = if RUBY_PLATFORM == 'java'
-      Sequel.connect('jdbc:sqlite:db.sqlite3')
-    else
-      Sequel.sqlite
+           Sequel.connect('jdbc:sqlite:db.sqlite3')
+         else
+           Sequel.sqlite
     end
 
     DB.create_table :users do
@@ -116,9 +116,7 @@ if defined? CanCan::ModelAdapters::SequelAdapter
 
     it 'should allow conditions in SQL and merge with hash conditions' do
       @ability.can :read, Article, published: true
-      @ability.can :read, Article, ['secret=?', true] do |article|
-        article.secret
-      end
+      @ability.can :read, Article, ['secret=?', true], &:secret
       @ability.cannot :read, Article, 'priority > 1' do |article|
         article.priority > 1
       end

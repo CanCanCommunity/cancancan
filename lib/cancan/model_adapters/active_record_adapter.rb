@@ -28,13 +28,13 @@ module CanCan
       end
 
       def tableized_conditions(conditions, model_class = @model_class)
-        return conditions unless conditions.kind_of? Hash
-        conditions.inject({}) do |result_hash, (name, value)|
-          if value.kind_of? Hash
+        return conditions unless conditions.is_a? Hash
+        conditions.each_with_object({}) do |(name, value), result_hash|
+          if value.is_a? Hash
             value = value.dup
             association_class = model_class.reflect_on_association(name).klass.name.constantize
-            nested = value.inject({}) do |nested, (k, v)|
-              if v.kind_of? Hash
+            nested = value.each_with_object({}) do |(k, v), nested|
+              if v.is_a? Hash
                 value.delete(k)
                 nested[k] = v
               else
@@ -77,16 +77,16 @@ module CanCan
       private
 
       def mergeable_conditions?
-        @rules.find { |rule| rule.unmergeable? }.blank?
+        @rules.find(&:unmergeable?).blank?
       end
 
       def override_scope
         conditions = @rules.map(&:conditions).compact
-        if defined?(ActiveRecord::Relation) && conditions.any? { |c| c.kind_of?(ActiveRecord::Relation) }
+        if defined?(ActiveRecord::Relation) && conditions.any? { |c| c.is_a?(ActiveRecord::Relation) }
           if conditions.size == 1
             conditions.first
           else
-            rule = @rules.detect { |rule| rule.conditions.kind_of?(ActiveRecord::Relation) }
+            rule = @rules.detect { |rule| rule.conditions.is_a?(ActiveRecord::Relation) }
             raise Error, "Unable to merge an Active Record scope with other conditions. Instead use a hash or SQL for #{rule.actions.first} #{rule.subjects.first} ability."
           end
         end

@@ -7,7 +7,7 @@ module CanCan
 
       def self.override_conditions_hash_matching?(subject, conditions)
         conditions.any? do |k, _v|
-          key_is_not_symbol = lambda { !k.kind_of?(Symbol) }
+          key_is_not_symbol = -> { !k.is_a?(Symbol) }
           subject_value_is_array = lambda do
             subject.respond_to?(k) && subject.send(k).is_a?(Array)
           end
@@ -23,7 +23,7 @@ module CanCan
       end
 
       def database_records
-        if @rules.size == 0
+        if @rules.empty?
           @model_class.where(_id: { '$exists' => false, '$type' => 7 }) # return no records in Mongoid
         elsif @rules.size == 1 && @rules[0].conditions.is_a?(Mongoid::Criteria)
           @rules[0].conditions
@@ -46,14 +46,15 @@ module CanCan
       end
 
       private
+
       # Look for criteria on relations and replace with simple id queries
       # eg.
       # {user: {:tags.all => []}} becomes {"user_id" => {"$in" => [__, ..]}}
       # {user: {:session => {:tags.all => []}}} becomes {"user_id" => {"session_id" => {"$in" => [__, ..]} }}
-      def simplify_relations model_class, conditions
+      def simplify_relations(model_class, conditions)
         model_relations = model_class.relations.with_indifferent_access
         Hash[
-          conditions.map { |k, v|
+          conditions.map do |k, v|
             if relation = model_relations[k]
               relation_class_name = relation[:class_name].blank? ? k.to_s.classify : relation[:class_name]
               v = simplify_relations(relation_class_name.constantize, v)
@@ -62,7 +63,7 @@ module CanCan
               v = { '$in' => relation_ids }
             end
             [k, v]
-          }
+          end
         ]
       end
     end

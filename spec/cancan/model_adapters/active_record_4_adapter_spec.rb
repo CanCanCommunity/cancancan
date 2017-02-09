@@ -18,7 +18,7 @@ if defined? CanCan::ModelAdapters::ActiveRecord4Adapter
         end
 
         class Parent < ActiveRecord::Base
-          has_many :children, lambda { order(id: :desc) }
+          has_many :children, -> { order(id: :desc) }
         end
 
         class Child < ActiveRecord::Base
@@ -57,9 +57,9 @@ if defined? CanCan::ModelAdapters::ActiveRecord4Adapter
           # A condition with a single value.
           @ability.can :read, Shape, color: Shape.colors[:green]
 
-          expect(@ability.cannot? :read, red).to be true
-          expect(@ability.can? :read, green).to be true
-          expect(@ability.cannot? :read, blue).to be true
+          expect(@ability.cannot?(:read, red)).to be true
+          expect(@ability.can?(:read, green)).to be true
+          expect(@ability.cannot?(:read, blue)).to be true
 
           accessible = Shape.accessible_by(@ability)
           expect(accessible).to contain_exactly(green)
@@ -68,9 +68,9 @@ if defined? CanCan::ModelAdapters::ActiveRecord4Adapter
           @ability.can :update, Shape, color: [Shape.colors[:red],
                                                Shape.colors[:blue]]
 
-          expect(@ability.can? :update, red).to be true
-          expect(@ability.cannot? :update, green).to be true
-          expect(@ability.can? :update, blue).to be true
+          expect(@ability.can?(:update, red)).to be true
+          expect(@ability.cannot?(:update, green)).to be true
+          expect(@ability.can?(:update, blue)).to be true
 
           accessible = Shape.accessible_by(@ability, :update)
           expect(accessible).to contain_exactly(red, blue)
@@ -97,10 +97,10 @@ if defined? CanCan::ModelAdapters::ActiveRecord4Adapter
           # A condition with a dual filter.
           @ability.can :read, Disc, color: Disc.colors[:green], shape: Disc.shapes[:rectangle]
 
-          expect(@ability.cannot? :read, red_triangle).to be true
-          expect(@ability.cannot? :read, green_triangle).to be true
-          expect(@ability.can? :read, green_rectangle).to be true
-          expect(@ability.cannot? :read, blue_rectangle).to be true
+          expect(@ability.cannot?(:read, red_triangle)).to be true
+          expect(@ability.cannot?(:read, green_triangle)).to be true
+          expect(@ability.can?(:read, green_rectangle)).to be true
+          expect(@ability.cannot?(:read, blue_rectangle)).to be true
 
           accessible = Disc.accessible_by(@ability)
           expect(accessible).to contain_exactly(green_rectangle)
@@ -128,7 +128,7 @@ if defined? CanCan::ModelAdapters::ActiveRecord4Adapter
           end
 
           class Parent < ActiveRecord::Base
-            has_many :children, lambda { order(id: :desc) }
+            has_many :children, -> { order(id: :desc) }
           end
 
           class Child < ActiveRecord::Base

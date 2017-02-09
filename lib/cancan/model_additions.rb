@@ -1,5 +1,4 @@
 module CanCan
-
   # This module adds the accessible_by class method to a model. It is included in the model adapters.
   module ModelAdditions
     module ClassMethods
