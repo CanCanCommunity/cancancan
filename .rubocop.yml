@@ -1,0 +1,38 @@
+Style/Documentation:
+  Enabled: false
+
+Style/NonNilCheck:
+  IncludeSemanticChanges: true
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Style/EmptyMethod:
+  Enabled: false
+
+Style/VariableNumber:
+  Enabled: false
+
+Style/ClassAndModuleChildren:
+  Enabled: false
+
+Metrics/LineLength:
+  Max: 120
+
+Metrics/ClassLength:
+  Exclude:
+    - 'lib/cancan/controller_resource.rb'
+    - 'lib/cancan/rule.rb'
+
+Metrics/ModuleLength:
+  Exclude:
+    - "**/*_spec.rb"
+    - 'lib/cancan/ability.rb'
+    - 'lib/cancan/model_adapters/active_record_adapter.rb'
+
+AllCops:
+  TargetRubyVersion: 2.0
+  Exclude:
+    - 'gemfiles/vendor/bundle/**/*'
+
+inherit_from: .rubocop_todo.yml

@@ -29,5 +29,11 @@ matrix:
     - rvm: jruby-9.0.5.0
       gemfile: gemfiles/activerecord_5.0.gemfile
 notifications:
-  recipients:
-    - bryan@bryanrite.com
+  email:
+    recipients:
+      - alessandro.rodi@renuo.ch
+      - josua.schmid@renuo.ch
+      - zora.fuchs@renuo.ch
+    on_success: change
+    on_failure: change
+

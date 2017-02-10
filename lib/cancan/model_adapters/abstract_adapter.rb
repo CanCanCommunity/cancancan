@@ -11,7 +11,7 @@ module CanCan
       end
 
       # Used to determine if the given adapter should be used for the passed in class.
-      def self.for_class?(member_class)
+      def self.for_class?(_member_class)
         false # override in subclass
       end
 
@@ -22,24 +22,24 @@ module CanCan
 
       # Used to determine if this model adapter will override the matching behavior for a hash of conditions.
       # If this returns true then matches_conditions_hash? will be called. See Rule#matches_conditions_hash
-      def self.override_conditions_hash_matching?(subject, conditions)
+      def self.override_conditions_hash_matching?(_subject, _conditions)
         false
       end
 
       # Override if override_conditions_hash_matching? returns true
-      def self.matches_conditions_hash?(subject, conditions)
-        raise NotImplemented, "This model adapter does not support matching on a conditions hash."
+      def self.matches_conditions_hash?(_subject, _conditions)
+        raise NotImplemented, 'This model adapter does not support matching on a conditions hash.'
       end
 
       # Used to determine if this model adapter will override the matching behavior for a specific condition.
       # If this returns true then matches_condition? will be called. See Rule#matches_conditions_hash
-      def self.override_condition_matching?(subject, name, value)
+      def self.override_condition_matching?(_subject, _name, _value)
         false
       end
 
       # Override if override_condition_matching? returns true
-      def self.matches_condition?(subject, name, value)
-        raise NotImplemented, "This model adapter does not support matching on a specific condition."
+      def self.matches_condition?(_subject, _name, _value)
+        raise NotImplemented, 'This model adapter does not support matching on a specific condition.'
       end
 
       def initialize(model_class, rules)
@@ -49,7 +49,7 @@ module CanCan
 
       def database_records
         # This should be overridden in a subclass to return records which match @rules
-        raise NotImplemented, "This model adapter does not support fetching records from the database."
+        raise NotImplemented, 'This model adapter does not support fetching records from the database.'
       end
     end
   end

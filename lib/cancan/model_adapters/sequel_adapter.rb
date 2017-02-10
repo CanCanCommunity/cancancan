@@ -9,8 +9,8 @@ module CanCan
         model_class[id]
       end
 
-      def self.override_condition_matching?(subject, name, value)
-        value.kind_of?(Hash)
+      def self.override_condition_matching?(_subject, _name, value)
+        value.is_a?(Hash)
       end
 
       def self.matches_condition?(subject, name, value)
@@ -19,8 +19,8 @@ module CanCan
           false
         else
           value.each do |k, v|
-            if v.kind_of?(Hash)
-              return false unless self.matches_condition?(obj, k, v)
+            if v.is_a?(Hash)
+              return false unless matches_condition?(obj, k, v)
             elsif obj.send(k) != v
               return false
             end
@@ -29,12 +29,12 @@ module CanCan
       end
 
       def database_records
-        if @rules.size == 0
+        if @rules.empty?
           @model_class.where('1=0')
         else
           # only need to process can rules if there are no can rule with empty conditions
           rules = @rules.reject { |rule| rule.base_behavior && rule.conditions.empty? }
-          rules.reject! { |rule| rule.base_behavior } if rules.count < @rules.count
+          rules.reject!(&:base_behavior) if rules.count < @rules.count
 
           can_condition_added = false
           rules.reverse.inject(@model_class.dataset) do |records, rule|
@@ -56,13 +56,13 @@ module CanCan
       private
 
       def normalize_conditions(conditions, model_class = @model_class)
-        return conditions unless conditions.kind_of? Hash
-        conditions.inject({}) do |result_hash, (name, value)|
-          if value.kind_of? Hash
+        return conditions unless conditions.is_a? Hash
+        conditions.each_with_object({}) do |(name, value), result_hash|
+          if value.is_a? Hash
             value = value.dup
             association_class = model_class.association_reflection(name).associated_class
-            nested = value.inject({}) do |nested, (k, v)|
-              if v.kind_of?(Hash)
+            nested_resulted = value.each_with_object({}) do |(k, v), nested|
+              if v.is_a?(Hash)
                 value.delete(k)
                 nested_class = association_class.association_reflection(k).associated_class
                 nested[k] = nested_class.where(normalize_conditions(v, association_class))
@@ -71,7 +71,7 @@ module CanCan
               end
               nested
             end
-            result_hash[name] = association_class.where(nested)
+            result_hash[name] = association_class.where(nested_resulted)
           else
             result_hash[name] = value
           end
