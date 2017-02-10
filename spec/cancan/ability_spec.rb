@@ -483,9 +483,9 @@ describe CanCan::Ability do
       @ability.can :read, Array, published: true do
         false
       end
-    end.to
-    raise_error(CanCan::Error,
-                'You are not able to supply a block with a hash of conditions in read Array ability. Use either one.')
+    end.to raise_error(CanCan::Error,
+                       'You are not able to supply a block with a hash of conditions in read Array ability. '\
+                       'Use either one.')
   end
 
   describe 'unauthorized message' do

@@ -277,9 +277,9 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       @ability.can :update, Article, published: true
       @ability.cannot :update, Article, secret: true
       expect(@ability.model_adapter(Article, :update).conditions)
-        .to eq(%[not ("#{@article_table}"."secret" = 't')
-                 AND (("#{@article_table}"."published" = 't')
-                 OR ("#{@article_table}"."id" = 1))])
+        .to eq(%[not ("#{@article_table}"."secret" = 't') ] +
+               %[AND (("#{@article_table}"."published" = 't') ] +
+               %[OR ("#{@article_table}"."id" = 1))])
       expect(@ability.model_adapter(Article, :manage).conditions).to eq(id: 1)
       expect(@ability.model_adapter(Article, :read).conditions).to eq("'t'='t'")
     end

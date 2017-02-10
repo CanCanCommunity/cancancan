@@ -300,6 +300,10 @@ module CanCan
       def cancan_skipper
         @_cancan_skipper ||= { authorize: {}, load: {} }
       end
+
+      def active_support_4?
+        ActiveSupport.respond_to?(:version) && ActiveSupport.version >= Gem::Version.new('4')
+      end
     end
 
     def self.included(base)
@@ -396,10 +400,6 @@ module CanCan
     #
     def cannot?(*args)
       current_ability.cannot?(*args)
-    end
-
-    def active_support_4?
-      ActiveSupport.respond_to?(:version) && ActiveSupport.version >= Gem::Version.new('4')
     end
   end
 end
