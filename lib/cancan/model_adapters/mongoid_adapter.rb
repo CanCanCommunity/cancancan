@@ -59,7 +59,7 @@ module CanCan
         model_relations = model_class.relations.with_indifferent_access
         Hash[
           conditions.map do |k, v|
-            if relation = model_relations[k]
+            if (relation = model_relations[k])
               relation_class_name = relation[:class_name].blank? ? k.to_s.classify : relation[:class_name]
               v = simplify_relations(relation_class_name.constantize, v)
               relation_ids = relation_class_name.constantize.where(v).only(:id).map(&:id)

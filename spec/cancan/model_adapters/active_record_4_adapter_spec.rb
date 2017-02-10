@@ -35,7 +35,8 @@ if defined? CanCan::ModelAdapters::ActiveRecord4Adapter
         child1 = Child.create!(parent: parent, created_at: 1.hours.ago)
         child2 = Child.create!(parent: parent, created_at: 2.hours.ago)
 
-        expect(Parent.accessible_by(@ability).order(created_at: :asc).includes(:children).first.children).to eq [child2, child1]
+        expect(Parent.accessible_by(@ability).order(created_at: :asc).includes(:children).first.children)
+          .to eq [child2, child1]
       end
 
       if ActiveRecord::VERSION::MINOR >= 1
@@ -111,10 +112,15 @@ if defined? CanCan::ModelAdapters::ActiveRecord4Adapter
     if Gem::Specification.find_all_by_name('pg').any?
       context 'with postgresql' do
         before :each do
-          ActiveRecord::Base.establish_connection(adapter: 'postgresql', database: 'postgres', schema_search_path: 'public')
+          ActiveRecord::Base.establish_connection(adapter: 'postgresql',
+                                                  database: 'postgres',
+                                                  schema_search_path: 'public')
           ActiveRecord::Base.connection.drop_database('cancan_postgresql_spec')
-          ActiveRecord::Base.connection.create_database 'cancan_postgresql_spec', 'encoding' => 'utf-8', 'adapter' => 'postgresql'
-          ActiveRecord::Base.establish_connection(adapter: 'postgresql', database: 'cancan_postgresql_spec')
+          ActiveRecord::Base.connection.create_database('cancan_postgresql_spec',
+                                                        'encoding' => 'utf-8',
+                                                        'adapter' => 'postgresql')
+          ActiveRecord::Base.establish_connection(adapter: 'postgresql',
+                                                  database: 'cancan_postgresql_spec')
           ActiveRecord::Migration.verbose = false
           ActiveRecord::Schema.define do
             create_table(:parents) do |t|

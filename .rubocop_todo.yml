@@ -6,42 +6,19 @@
 # Note that changes in the inspected code, or installation of new
 # versions of RuboCop, may require this file to be generated again.
 
-# Offense count: 3
-# Configuration parameters: AllowSafeAssignment.
-Lint/AssignmentInCondition:
-  Exclude:
-    - 'lib/cancan/ability.rb'
-    - 'lib/cancan/controller_resource.rb'
-    - 'lib/cancan/model_adapters/mongoid_adapter.rb'
-
 # Offense count: 14
 Metrics/AbcSize:
   Max: 25
 
-# Offense count: 2
-# Configuration parameters: CountComments.
-Metrics/ClassLength:
-  Max: 242
-
 # Offense count: 5
 Metrics/CyclomaticComplexity:
   Max: 9
-
-# Offense count: 53
-# Configuration parameters: AllowHeredoc, AllowURI, URISchemes, IgnoreCopDirectives.
-# URISchemes: http, https
-Metrics/LineLength:
-  Max: 203
 
 # Offense count: 14
 # Configuration parameters: CountComments.
 Metrics/MethodLength:
   Max: 21
 
-Metrics/ModuleLength:
-  Max: 200
-  Exclude:
-    - "**/*_spec.rb"
 
 Metrics/BlockLength:
   Max: 28
@@ -69,4 +46,3 @@ Style/PredicateName:
   Exclude:
     - 'spec/**/*'
     - 'lib/cancan/ability.rb'
-

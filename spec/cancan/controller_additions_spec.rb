@@ -33,14 +33,16 @@ describe CanCan::ControllerAdditions do
   it 'load_and_authorize_resource setups a before filter which passes call to ControllerResource' do
     expect(cancan_resource_class = double).to receive(:load_and_authorize_resource)
     allow(CanCan::ControllerResource).to receive(:new).with(@controller, nil, foo: :bar) { cancan_resource_class }
-    expect(@controller_class).to receive(callback_action(:before_action)).with({}) { |_options, &block| block.call(@controller) }
+    expect(@controller_class)
+      .to receive(callback_action(:before_action)).with({}) { |_options, &block| block.call(@controller) }
     @controller_class.load_and_authorize_resource foo: :bar
   end
 
   it 'load_and_authorize_resource properly passes first argument as the resource name' do
     expect(cancan_resource_class = double).to receive(:load_and_authorize_resource)
     allow(CanCan::ControllerResource).to receive(:new).with(@controller, :project, foo: :bar) { cancan_resource_class }
-    expect(@controller_class).to receive(callback_action(:before_action)).with({}) { |_options, &block| block.call(@controller) }
+    expect(@controller_class)
+      .to receive(callback_action(:before_action)).with({}) { |_options, &block| block.call(@controller) }
     @controller_class.load_and_authorize_resource :project, foo: :bar
   end
 
@@ -52,25 +54,33 @@ describe CanCan::ControllerAdditions do
   it 'authorize_resource setups a before filter which passes call to ControllerResource' do
     expect(cancan_resource_class = double).to receive(:authorize_resource)
     allow(CanCan::ControllerResource).to receive(:new).with(@controller, nil, foo: :bar) { cancan_resource_class }
-    expect(@controller_class).to receive(callback_action(:before_action)).with(except: :show, if: true) { |_options, &block| block.call(@controller) }
+    expect(@controller_class)
+      .to receive(callback_action(:before_action)).with(except: :show, if: true) do |_options, &block|
+        block.call(@controller)
+      end
     @controller_class.authorize_resource foo: :bar, except: :show, if: true
   end
 
   it 'load_resource setups a before filter which passes call to ControllerResource' do
     expect(cancan_resource_class = double).to receive(:load_resource)
     allow(CanCan::ControllerResource).to receive(:new).with(@controller, nil, foo: :bar) { cancan_resource_class }
-    expect(@controller_class).to receive(callback_action(:before_action)).with(only: [:show, :index], unless: false) { |_options, &block| block.call(@controller) }
+    expect(@controller_class)
+      .to receive(callback_action(:before_action)).with(only: [:show, :index], unless: false) do |_options, &block|
+        block.call(@controller)
+      end
     @controller_class.load_resource foo: :bar, only: [:show, :index], unless: false
   end
 
   it 'skip_authorization_check setups a before filter which sets @_authorized to true' do
-    expect(@controller_class).to receive(callback_action(:before_action)).with(:filter_options) { |_options, &block| block.call(@controller) }
+    expect(@controller_class)
+      .to receive(callback_action(:before_action)).with(:filter_options) { |_options, &block| block.call(@controller) }
     @controller_class.skip_authorization_check(:filter_options)
     expect(@controller.instance_variable_get(:@_authorized)).to be(true)
   end
 
   it 'check_authorization triggers AuthorizationNotPerformed in after filter' do
-    expect(@controller_class).to receive(callback_action(:after_action)).with(only: [:test]) { |_options, &block| block.call(@controller) }
+    expect(@controller_class)
+      .to receive(callback_action(:after_action)).with(only: [:test]) { |_options, &block| block.call(@controller) }
     expect do
       @controller_class.check_authorization(only: [:test])
     end.to raise_error(CanCan::AuthorizationNotPerformed)
@@ -78,7 +88,8 @@ describe CanCan::ControllerAdditions do
 
   it 'check_authorization does not trigger AuthorizationNotPerformed when :if is false' do
     allow(@controller).to receive(:check_auth?) { false }
-    allow(@controller_class).to receive(callback_action(:after_action)).with({}) { |_options, &block| block.call(@controller) }
+    allow(@controller_class)
+      .to receive(callback_action(:after_action)).with({}) { |_options, &block| block.call(@controller) }
     expect do
       @controller_class.check_authorization(if: :check_auth?)
     end.not_to raise_error
@@ -86,7 +97,8 @@ describe CanCan::ControllerAdditions do
 
   it 'check_authorization does not trigger AuthorizationNotPerformed when :unless is true' do
     allow(@controller).to receive(:engine_controller?) { true }
-    expect(@controller_class).to receive(callback_action(:after_action)).with({}) { |_options, &block| block.call(@controller) }
+    expect(@controller_class)
+      .to receive(callback_action(:after_action)).with({}) { |_options, &block| block.call(@controller) }
     expect do
       @controller_class.check_authorization(unless: :engine_controller?)
     end.not_to raise_error
@@ -94,7 +106,8 @@ describe CanCan::ControllerAdditions do
 
   it 'check_authorization does not raise error when @_authorized is set' do
     @controller.instance_variable_set(:@_authorized, true)
-    expect(@controller_class).to receive(callback_action(:after_action)).with(only: [:test]) { |_options, &block| block.call(@controller) }
+    expect(@controller_class)
+      .to receive(callback_action(:after_action)).with(only: [:test]) { |_options, &block| block.call(@controller) }
     expect do
       @controller_class.check_authorization(only: [:test])
     end.not_to raise_error

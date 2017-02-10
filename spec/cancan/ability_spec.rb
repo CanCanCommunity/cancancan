@@ -110,7 +110,8 @@ describe CanCan::Ability do
   end
 
   it 'raises an Error if alias target is an exist action' do
-    expect { @ability.alias_action :show, to: :show }.to raise_error(CanCan::Error, "You can't specify target (show) as alias because it is real action name")
+    expect { @ability.alias_action :show, to: :show }
+      .to raise_error(CanCan::Error, "You can't specify target (show) as alias because it is real action name")
   end
 
   it 'always calls block with arguments when passing no arguments to can' do
@@ -363,16 +364,22 @@ describe CanCan::Ability do
   end
 
   it 'allows to check ability for Module' do
-    module B; end
-    class A; include B; end
+    module B
+    end
+    class A
+      include B
+    end
     @ability.can :read, B
     expect(@ability.can?(:read, A)).to be(true)
     expect(@ability.can?(:read, A.new)).to be(true)
   end
 
   it 'passes nil to a block for ability on Module when no instance is passed' do
-    module B; end
-    class A; include B; end
+    module B
+    end
+    class A
+      include B
+    end
     @ability.can :read, B do |sym|
       expect(sym).to be_nil
       true
@@ -403,7 +410,8 @@ describe CanCan::Ability do
   end
 
   it 'allows to check ability on Hash-like object' do
-    class Container < Hash; end
+    class Container < Hash
+    end
     @ability.can :read, Container
     expect(@ability.can?(:read, Container.new)).to be(true)
   end
@@ -475,7 +483,9 @@ describe CanCan::Ability do
       @ability.can :read, Array, published: true do
         false
       end
-    end.to raise_error(CanCan::Error, 'You are not able to supply a block with a hash of conditions in read Array ability. Use either one.')
+    end.to raise_error(CanCan::Error,
+                       'You are not able to supply a block with a hash of conditions in read Array ability. '\
+                       'Use either one.')
   end
 
   describe 'unauthorized message' do
@@ -514,7 +524,8 @@ describe CanCan::Ability do
     end
 
     it 'has variables for action and subject' do
-      I18n.backend.store_translations :en, unauthorized: { manage: { all: '%{action} %{subject}' } } # old syntax for now in case testing with old I18n
+      # old syntax for now in case testing with old I18n
+      I18n.backend.store_translations :en, unauthorized: { manage: { all: '%{action} %{subject}' } }
       expect(@ability.unauthorized_message(:update, Array)).to eq('update array')
       expect(@ability.unauthorized_message(:update, ArgumentError)).to eq('update argument error')
       expect(@ability.unauthorized_message(:edit, 1..3)).to eq('edit range')

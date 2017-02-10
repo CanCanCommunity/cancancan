@@ -187,7 +187,8 @@ module CanCan
 
     # User shouldn't specify targets with names of real actions or it will cause Seg fault
     def validate_target(target)
-      raise Error, "You can't specify target (#{target}) as alias because it is real action name" if aliased_actions.values.flatten.include? target
+      error_message = "You can't specify target (#{target}) as alias because it is real action name"
+      raise Error, error_message if aliased_actions.values.flatten.include? target
     end
 
     # Returns a hash of aliased actions. The key is the target and the value is an array of actions aliasing the key.
@@ -305,7 +306,7 @@ module CanCan
         expanded = []
         actions.each do |action|
           expanded << action
-          if aliases = aliased_actions[action]
+          if (aliases = aliased_actions[action])
             expanded += expand_actions(aliases)
           end
         end
@@ -395,16 +396,18 @@ module CanCan
 
     def relevant_rules_for_match(action, subject)
       relevant_rules(action, subject).each do |rule|
-        if rule.only_raw_sql?
-          raise Error, "The can? and cannot? call cannot be used with a raw sql 'can' definition. The checking code cannot be determined for #{action.inspect} #{subject.inspect}"
-        end
+        next unless rule.only_raw_sql?
+        raise Error,
+              "The can? and cannot? call cannot be used with a raw sql 'can' definition."\
+              " The checking code cannot be determined for #{action.inspect} #{subject.inspect}"
       end
     end
 
     def relevant_rules_for_query(action, subject)
       relevant_rules(action, subject).each do |rule|
         if rule.only_block?
-          raise Error, "The accessible_by call cannot be used with a block 'can' definition. The SQL cannot be determined for #{action.inspect} #{subject.inspect}"
+          raise Error, "The accessible_by call cannot be used with a block 'can' definition."\
+                       " The SQL cannot be determined for #{action.inspect} #{subject.inspect}"
         end
       end
     end
