@@ -95,11 +95,13 @@ describe CanCan::ControllerResource do
       expect(controller.instance_variable_get(:@model).name).to eq('foobar')
     end
 
-    it 'builds a new resource for namespaced controller and namespaced model with hash if params[:id] is not specified' do
-      params.merge!(:controller => 'admin/sub_models', 'sub_model' => { name: 'foobar' })
-      resource = CanCan::ControllerResource.new(controller, class: Model)
-      resource.load_resource
-      expect(controller.instance_variable_get(:@sub_model).name).to eq('foobar')
+    context 'params[:id] is not specified' do
+      it 'builds a new resource for namespaced controller and namespaced model with hash' do
+        params.merge!(:controller => 'admin/sub_models', 'sub_model' => { name: 'foobar' })
+        resource = CanCan::ControllerResource.new(controller, class: Model)
+        resource.load_resource
+        expect(controller.instance_variable_get(:@sub_model).name).to eq('foobar')
+      end
     end
 
     it 'builds a new resource for namespaced controller given through folder format' do
@@ -113,17 +115,19 @@ describe CanCan::ControllerResource do
       expect { resource.load_resource }.not_to raise_error
     end
 
-    it 'does not build record through has_one association with :singleton option because it can cause it to delete it in the database' do
-      category = Class.new
-      allow_any_instance_of(Model).to receive('category=').with(category)
-      allow_any_instance_of(Model).to receive('category') { category }
+    context 'with :singleton option' do
+      it 'does not build record through has_one association because it can cause it to delete it in the database' do
+        category = Class.new
+        allow_any_instance_of(Model).to receive('category=').with(category)
+        allow_any_instance_of(Model).to receive('category') { category }
 
-      params[:model] = { name: 'foobar' }
-      controller.instance_variable_set(:@category, category)
-      resource = CanCan::ControllerResource.new(controller, through: :category, singleton: true)
-      resource.load_resource
-      expect(controller.instance_variable_get(:@model).name).to eq('foobar')
-      expect(controller.instance_variable_get(:@model).category).to eq(category)
+        params[:model] = { name: 'foobar' }
+        controller.instance_variable_set(:@category, category)
+        resource = CanCan::ControllerResource.new(controller, through: :category, singleton: true)
+        resource.load_resource
+        expect(controller.instance_variable_get(:@model).name).to eq('foobar')
+        expect(controller.instance_variable_get(:@model).category).to eq(category)
+      end
     end
 
     it 'builds record through has_one association with :singleton and :shallow options' do

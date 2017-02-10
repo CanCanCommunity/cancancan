@@ -87,7 +87,9 @@ module CanCan
           conditions.first
         else
           rule_found = @rules.detect { |rule| rule.conditions.is_a?(ActiveRecord::Relation) }
-          raise Error, "Unable to merge an Active Record scope with other conditions. Instead use a hash or SQL for #{rule_found.actions.first} #{rule_found.subjects.first} ability."
+          raise Error,
+                'Unable to merge an Active Record scope with other conditions. '\
+                "Instead use a hash or SQL for #{rule_found.actions.first} #{rule_found.subjects.first} ability."
         end
       end
 

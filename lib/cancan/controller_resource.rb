@@ -1,5 +1,6 @@
 module CanCan
-  # Handle the load and authorization controller logic so we don't clutter up all controllers with non-interface methods.
+  # Handle the load and authorization controller logic
+  # so we don't clutter up all controllers with non-interface methods.
   # This class is used internally, so you do not need to call methods directly on it.
   class ControllerResource # :nodoc:
     def self.add_before_action(controller_class, method, *args)
@@ -7,7 +8,8 @@ module CanCan
       resource_name = args.first
       before_action_method = before_callback_name(options)
       controller_class.send(before_action_method, options.slice(:only, :except, :if, :unless)) do |controller|
-        controller.class.cancan_resource_class.new(controller, resource_name, options.except(:only, :except, :if, :unless)).send(method)
+        controller.class.cancan_resource_class
+                  .new(controller, resource_name, options.except(:only, :except, :if, :unless)).send(method)
       end
     end
 
@@ -24,9 +26,12 @@ module CanCan
       @params = controller.params
       @options = args.extract_options!
       @name = args.first
-      raise CanCan::ImplementationRemoved, 'The :nested option is no longer supported, instead use :through with separate load/authorize call.' if @options[:nested]
-      raise CanCan::ImplementationRemoved, 'The :name option is no longer supported, instead pass the name as the first argument.' if @options[:name]
-      raise CanCan::ImplementationRemoved, 'The :resource option has been renamed back to :class, use false if no class.' if @options[:resource]
+      nested_err = 'The :nested option is no longer supported, instead use :through with separate load/authorize call.'
+      raise CanCan::ImplementationRemoved, nested_err if @options[:nested]
+      name_err = 'The :name option is no longer supported, instead pass the name as the first argument.'
+      raise CanCan::ImplementationRemoved, name_err if @options[:name]
+      resource_err = 'The :resource option has been renamed back to :class, use false if no class.'
+      raise CanCan::ImplementationRemoved, resource_err if @options[:resource]
     end
 
     def load_and_authorize_resource
@@ -145,7 +150,9 @@ module CanCan
     end
 
     def member_action?
-      new_actions.include?(@params[:action].to_sym) || @options[:singleton] || ((@params[:id] || @params[@options[:id_param]]) && !collection_actions.include?(@params[:action].to_sym))
+      new_actions.include?(@params[:action].to_sym) || @options[:singleton] ||
+        ((@params[:id] || @params[@options[:id_param]]) &&
+          !collection_actions.include?(@params[:action].to_sym))
     end
 
     # Returns the class used for this resource. This can be overriden by the :class option.
@@ -153,10 +160,14 @@ module CanCan
     # only be used for authorization, not loading since there's no class to load through.
     def resource_class
       case @options[:class]
-      when false  then name.to_sym
-      when nil    then namespaced_name.to_s.camelize.constantize
-      when String then @options[:class].constantize
-      else @options[:class]
+      when false then
+        name.to_sym
+      when nil then
+        namespaced_name.to_s.camelize.constantize
+      when String then
+        @options[:class].constantize
+      else
+        @options[:class]
       end
     end
 
@@ -186,18 +197,31 @@ module CanCan
     # If the :singleton option is passed it won't use the association because it needs to be handled later.
     def resource_base
       if @options[:through]
-        if parent_resource
-          base = @options[:singleton] ? resource_class : parent_resource.send(@options[:through_association] || name.to_s.pluralize)
-          base = base.scoped if base.respond_to?(:scoped) && defined?(ActiveRecord) && ActiveRecord::VERSION::MAJOR == 3
-          base
-        elsif @options[:shallow]
-          resource_class
-        else
-          raise AccessDenied.new(nil, authorization_action, resource_class) # maybe this should be a record not found error instead?
-        end
+        resource_base_through
       else
         resource_class
       end
+    end
+
+    def resource_base_through
+      if parent_resource
+        base = if @options[:singleton]
+                 resource_class
+               else
+                 parent_resource.send(@options[:through_association] || name.to_s.pluralize)
+               end
+        base = base.scoped if base.respond_to?(:scoped) && active_record_3?
+        base
+      elsif @options[:shallow]
+        resource_class
+      else
+        # maybe this should be a record not found error instead?
+        raise AccessDenied.new(nil, authorization_action, resource_class)
+      end
+    end
+
+    def active_record_3?
+      defined?(ActiveRecord) && ActiveRecord::VERSION::MAJOR == 3
     end
 
     def parent_name
@@ -228,9 +252,12 @@ module CanCan
     def resource_params
       if parameters_require_sanitizing? && params_method.present?
         case params_method
-        when Symbol then @controller.send(params_method)
-        when String then @controller.instance_eval(params_method)
-        when Proc then params_method.call(@controller)
+        when Symbol then
+          @controller.send(params_method)
+        when String then
+          @controller.instance_eval(params_method)
+        when Proc then
+          params_method.call(@controller)
         end
       else
         resource_params_by_namespaced_name
@@ -253,7 +280,8 @@ module CanCan
 
     def params_method
       params_methods.each do |method|
-        return method if (method.is_a?(Symbol) && @controller.respond_to?(method, true)) || method.is_a?(String) || method.is_a?(Proc)
+        return method if (method.is_a?(Symbol) && @controller.respond_to?(method, true)) ||
+                         method.is_a?(String) || method.is_a?(Proc)
       end
       nil
     end

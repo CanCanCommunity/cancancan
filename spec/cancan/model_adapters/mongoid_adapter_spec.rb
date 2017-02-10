@@ -40,7 +40,8 @@ if defined? CanCan::ModelAdapters::MongoidAdapter
       it 'is for only Mongoid classes' do
         expect(CanCan::ModelAdapters::MongoidAdapter).not_to be_for_class(Object)
         expect(CanCan::ModelAdapters::MongoidAdapter).to be_for_class(MongoidProject)
-        expect(CanCan::ModelAdapters::AbstractAdapter.adapter_class(MongoidProject)).to eq(CanCan::ModelAdapters::MongoidAdapter)
+        expect(CanCan::ModelAdapters::AbstractAdapter.adapter_class(MongoidProject))
+          .to eq(CanCan::ModelAdapters::MongoidAdapter)
       end
 
       it 'finds record' do

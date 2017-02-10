@@ -84,11 +84,13 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
          ActiveRecord.version > Gem::Version.new('4')
         expect(CanCan::ModelAdapters::ActiveRecord4Adapter).to_not be_for_class(Object)
         expect(CanCan::ModelAdapters::ActiveRecord4Adapter).to be_for_class(Article)
-        expect(CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article)).to eq(CanCan::ModelAdapters::ActiveRecord4Adapter)
+        expect(CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article))
+          .to eq(CanCan::ModelAdapters::ActiveRecord4Adapter)
       else
         expect(CanCan::ModelAdapters::ActiveRecord3Adapter).to_not be_for_class(Object)
         expect(CanCan::ModelAdapters::ActiveRecord3Adapter).to be_for_class(Article)
-        expect(CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article)).to eq(CanCan::ModelAdapters::ActiveRecord3Adapter)
+        expect(CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article))
+          .to eq(CanCan::ModelAdapters::ActiveRecord3Adapter)
       end
     end
 
@@ -207,7 +209,10 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
     it 'raises an exception when trying to merge scope with other conditions' do
       @ability.can :read, Article, published: true
       @ability.can :read, Article, Article.where(secret: true)
-      expect(-> { Article.accessible_by(@ability) }).to raise_error(CanCan::Error, 'Unable to merge an Active Record scope with other conditions. Instead use a hash or SQL for read Article ability.')
+      expect(-> { Article.accessible_by(@ability) })
+        .to raise_error(CanCan::Error,
+                        'Unable to merge an Active Record scope with other conditions. '\
+                        'Instead use a hash or SQL for read Article ability.')
     end
 
     it 'does not allow to fetch records when ability with just block present' do
@@ -243,7 +248,8 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
     it 'returns SQL for single `can` definition in front of default `cannot` condition' do
       @ability.cannot :read, Article
       @ability.can :read, Article, published: false, secret: true
-      expect(@ability.model_adapter(Article, :read).conditions).to orderlessly_match(%("#{@article_table}"."published" = 'f' AND "#{@article_table}"."secret" = 't'))
+      expect(@ability.model_adapter(Article, :read).conditions)
+        .to orderlessly_match(%("#{@article_table}"."published" = 'f' AND "#{@article_table}"."secret" = 't'))
     end
 
     it 'returns true condition for single `can` definition in front of default `can` condition' do
@@ -261,7 +267,8 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
     it 'returns `not (sql)` for single `cannot` definition in front of default `can` condition' do
       @ability.can :read, Article
       @ability.cannot :read, Article, published: false, secret: true
-      expect(@ability.model_adapter(Article, :read).conditions).to orderlessly_match(%["not (#{@article_table}"."published" = 'f' AND "#{@article_table}"."secret" = 't')])
+      expect(@ability.model_adapter(Article, :read).conditions)
+        .to orderlessly_match(%["not (#{@article_table}"."published" = 'f' AND "#{@article_table}"."secret" = 't')])
     end
 
     it 'returns appropriate sql conditions in complex case' do
@@ -269,7 +276,10 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       @ability.can :manage, Article, id: 1
       @ability.can :update, Article, published: true
       @ability.cannot :update, Article, secret: true
-      expect(@ability.model_adapter(Article, :update).conditions).to eq(%[not ("#{@article_table}"."secret" = 't') AND (("#{@article_table}"."published" = 't') OR ("#{@article_table}"."id" = 1))])
+      expect(@ability.model_adapter(Article, :update).conditions)
+        .to eq(%[not ("#{@article_table}"."secret" = 't')
+                 AND (("#{@article_table}"."published" = 't')
+                 OR ("#{@article_table}"."id" = 1))])
       expect(@ability.model_adapter(Article, :manage).conditions).to eq(id: 1)
       expect(@ability.model_adapter(Article, :read).conditions).to eq("'t'='t'")
     end
@@ -281,7 +291,8 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
 
     it 'returns appropriate sql conditions in complex case with nested joins of different depth' do
       @ability.can :read, Comment, article: { published: true, category: { visible: true } }
-      expect(@ability.model_adapter(Comment, :read).conditions).to eq(Article.table_name.to_sym => { published: true }, Category.table_name.to_sym => { visible: true })
+      expect(@ability.model_adapter(Comment, :read).conditions)
+        .to eq(Article.table_name.to_sym => { published: true }, Category.table_name.to_sym => { visible: true })
     end
 
     it 'does not forget conditions when calling with SQL string' do

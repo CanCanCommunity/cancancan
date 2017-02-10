@@ -11,7 +11,9 @@ module CanCan
     # and subject respectively (such as :read, @project). The third argument is a hash
     # of conditions and the last one is the block passed to the "can" call.
     def initialize(base_behavior, action, subject, conditions, block)
-      raise Error, "You are not able to supply a block with a hash of conditions in #{action} #{subject} ability. Use either one." if conditions.is_a?(Hash) && block
+      both_block_and_hash_error = 'You are not able to supply a block with a hash of conditions in '\
+                                  "#{action} #{subject} ability. Use either one."
+      raise Error, both_block_and_hash_error if conditions.is_a?(Hash) && block
       @match_all = action.nil? && subject.nil?
       @base_behavior = base_behavior
       @actions = [action].flatten
