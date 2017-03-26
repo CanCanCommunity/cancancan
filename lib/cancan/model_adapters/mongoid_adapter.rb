@@ -62,7 +62,7 @@ module CanCan
             if (relation = model_relations[k])
               relation_class_name = relation[:class_name].blank? ? k.to_s.classify : relation[:class_name]
               v = simplify_relations(relation_class_name.constantize, v)
-              relation_ids = relation_class_name.constantize.where(v).only(:id).map(&:id)
+              relation_ids = relation_class_name.constantize.where(v).distinct(:_id)
               k = "#{k}_id"
               v = { '$in' => relation_ids }
             end
