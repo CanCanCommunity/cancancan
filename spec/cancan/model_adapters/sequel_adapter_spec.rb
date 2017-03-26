@@ -1,13 +1,12 @@
 require 'spec_helper'
 
 if defined? CanCan::ModelAdapters::SequelAdapter
-
   describe CanCan::ModelAdapters::SequelAdapter do
     DB = if RUBY_PLATFORM == 'java'
-      Sequel.connect('jdbc:sqlite:db.sqlite3')
-    else
-      Sequel.sqlite
-    end
+           Sequel.connect('jdbc:sqlite:db.sqlite3')
+         else
+           Sequel.sqlite
+         end
 
     DB.create_table :users do
       primary_key :id
@@ -74,7 +73,7 @@ if defined? CanCan::ModelAdapters::SequelAdapter
     it 'should fetch only the articles that are published' do
       @ability.can :read, Article, published: true
       article1 = Article.create(published: true)
-      article2 = Article.create(published: false)
+      Article.create(published: false)
       expect(Article.accessible_by(@ability).all).to eq [article1]
     end
 
@@ -84,7 +83,7 @@ if defined? CanCan::ModelAdapters::SequelAdapter
       article1 = Article.create(published: true, secret: false)
       article2 = Article.create(published: true, secret: true)
       article3 = Article.create(published: false, secret: true)
-      article4 = Article.create(published: false, secret: false)
+      Article.create(published: false, secret: false)
       expect(Article.accessible_by(@ability).all).to eq([article1, article2, article3])
     end
 
@@ -92,16 +91,16 @@ if defined? CanCan::ModelAdapters::SequelAdapter
       @ability.can :read, Article, published: true
       @ability.cannot :read, Article, secret: true
       article1 = Article.create(published: true, secret: false)
-      article2 = Article.create(published: true, secret: true)
-      article3 = Article.create(published: false, secret: true)
-      article4 = Article.create(published: false, secret: false)
+      Article.create(published: true, secret: true)
+      Article.create(published: false, secret: true)
+      Article.create(published: false, secret: false)
       expect(Article.accessible_by(@ability).all).to eq [article1]
     end
 
     it 'should only read comments for articles which are published' do
       @ability.can :read, Comment, article: { published: true }
       comment1 = Comment.create(article: Article.create(published: true))
-      comment2 = Comment.create(article: Article.create(published: false))
+      Comment.create(article: Article.create(published: false))
       expect(Comment.accessible_by(@ability).all).to eq [comment1]
     end
 
@@ -109,23 +108,21 @@ if defined? CanCan::ModelAdapters::SequelAdapter
       @ability.can :read, Comment, article: { user: { name: 'me' }, published: true }
       user1 = User.create(name: 'me')
       comment1 = Comment.create(article: Article.create(published: true, user: user1))
-      comment2 = Comment.create(article: Article.create(published: true))
-      comment3 = Comment.create(article: Article.create(published: false, user: user1))
+      Comment.create(article: Article.create(published: true))
+      Comment.create(article: Article.create(published: false, user: user1))
       expect(Comment.accessible_by(@ability).all).to eq [comment1]
     end
 
     it 'should allow conditions in SQL and merge with hash conditions' do
       @ability.can :read, Article, published: true
-      @ability.can :read, Article, ['secret=?', true] do |article|
-        article.secret
-      end
+      @ability.can :read, Article, ['secret=?', true], &:secret
       @ability.cannot :read, Article, 'priority > 1' do |article|
         article.priority > 1
       end
       article1 = Article.create(published: true, secret: false, priority: 1)
       article2 = Article.create(published: true, secret: true, priority: 1)
-      article3 = Article.create(published: true, secret: true, priority: 2)
-      article4 = Article.create(published: false, secret: false, priority: 2)
+      Article.create(published: true, secret: true, priority: 2)
+      Article.create(published: false, secret: false, priority: 2)
       expect(Article.accessible_by(@ability).all).to eq [article1, article2]
     end
   end

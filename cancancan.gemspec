@@ -6,17 +6,17 @@ require 'cancan/version'
 Gem::Specification.new do |s|
   s.name        = 'cancancan'
   s.version     = CanCan::VERSION
-  s.authors     = ['Bryan Rite', 'Ryan Bates', 'Richard Wilson']
-  s.email       = 'r.crawfordwilson@gmail.com'
+  s.authors     = ['Alessandro Rodi (Renuo AG)', 'Bryan Rite', 'Ryan Bates', 'Richard Wilson']
+  s.email       = 'alessandro.rodi@renuo.ch'
   s.homepage    = 'https://github.com/CanCanCommunity/cancancan'
   s.summary     = 'Simple authorization solution for Rails.'
-  s.description = 'Continuation of the simple authorization solution for Rails which is decoupled from user roles. All permissions are stored in a single location.'
+  s.description = 'Simple authorization solution for Rails. All permissions are stored in a single location.'
   s.platform    = Gem::Platform::RUBY
   s.license     = 'MIT'
 
-  s.files       = `git ls-files`.split($/)
-  s.test_files  = `git ls-files -- Appraisals {spec,features,gemfiles}/*`.split($/)
-  s.executables = `git ls-files -- bin/*`.split($/).map{ |f| File.basename(f) }
+  s.files       = `git ls-files`.split($INPUT_RECORD_SEPARATOR)
+  s.test_files  = `git ls-files -- Appraisals {spec,features,gemfiles}/*`.split($INPUT_RECORD_SEPARATOR)
+  s.executables = `git ls-files -- bin/*`.split($INPUT_RECORD_SEPARATOR).map { |f| File.basename(f) }
   s.require_paths = ['lib']
 
   s.required_ruby_version = '>= 2.0.0'

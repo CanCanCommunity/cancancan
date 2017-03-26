@@ -4,4 +4,3 @@ class Ability
   def initialize(user)
   end
 end
-

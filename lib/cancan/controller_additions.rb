@@ -1,5 +1,4 @@
 module CanCan
-
   # This module is automatically included into all controllers.
   # It also makes the "can?" and "cannot?" methods available to all views.
   module ControllerAdditions
@@ -72,8 +71,8 @@ module CanCan
       #   Load this resource through another one. This should match the name of the parent instance variable or method.
       #
       # [:+through_association+]
-      #   The name of the association to fetch the child records through the parent resource. This is normally not needed
-      #   because it defaults to the pluralized resource name.
+      #   The name of the association to fetch the child records through the parent resource.
+      #   This is normally not needed because it defaults to the pluralized resource name.
       #
       # [:+shallow+]
       #   Pass +true+ to allow this resource to be loaded directly when parent is +nil+. Defaults to +false+.
@@ -82,8 +81,8 @@ module CanCan
       #   Pass +true+ if this is a singleton resource through a +has_one+ association.
       #
       # [:+parent+]
-      #   True or false depending on if the resource is considered a parent resource. This defaults to +true+ if a resource
-      #   name is given which does not match the controller.
+      #   True or false depending on if the resource is considered a parent resource.
+      #   This defaults to +true+ if a resource name is given which does not match the controller.
       #
       # [:+class+]
       #   The class to use for the model (string or constant).
@@ -160,8 +159,8 @@ module CanCan
       #   Pass +true+ if this is a singleton resource through a +has_one+ association.
       #
       # [:+parent+]
-      #   True or false depending on if the resource is considered a parent resource. This defaults to +true+ if a resource
-      #   name is given which does not match the controller.
+      #   True or false depending on if the resource is considered a parent resource.
+      #   This defaults to +true+ if a resource name is given which does not match the controller.
       #
       # [:+class+]
       #   The class to use for the model (string or constant). This passed in when the instance variable is not set.
@@ -227,7 +226,8 @@ module CanCan
       end
 
       # Add this to a controller to ensure it performs authorization through +authorized+! or +authorize_resource+ call.
-      # If neither of these authorization methods are called, a CanCan::AuthorizationNotPerformed exception will be raised.
+      # If neither of these authorization methods are called,
+      # a CanCan::AuthorizationNotPerformed exception will be raised.
       # This is normally added to the ApplicationController to ensure all controller actions do authorization.
       #
       #   class ApplicationController < ActionController::Base
@@ -244,26 +244,28 @@ module CanCan
       #   Does not apply to given actions.
       #
       # [:+if+]
-      #   Supply the name of a controller method to be called. The authorization check only takes place if this returns true.
+      #   Supply the name of a controller method to be called.
+      #   The authorization check only takes place if this returns true.
       #
       #     check_authorization :if => :admin_controller?
       #
       # [:+unless+]
-      #   Supply the name of a controller method to be called. The authorization check only takes place if this returns false.
+      #   Supply the name of a controller method to be called.
+      #   The authorization check only takes place if this returns false.
       #
       #     check_authorization :unless => :devise_controller?
       #
       def check_authorization(options = {})
-        method_name = ActiveSupport.respond_to?(:version) && ActiveSupport.version >= Gem::Version.new('4') ? :after_action : :after_filter
-
-        block = Proc.new do |controller|
+        block = proc do |controller|
           next if controller.instance_variable_defined?(:@_authorized)
           next if options[:if] && !controller.send(options[:if])
           next if options[:unless] && controller.send(options[:unless])
-          raise AuthorizationNotPerformed, 'This action failed the check_authorization because it does not authorize_resource. Add skip_authorization_check to bypass this check.'
+          raise AuthorizationNotPerformed,
+                'This action failed the check_authorization because it does not authorize_resource. '\
+                'Add skip_authorization_check to bypass this check.'
         end
 
-        self.send(method_name, options.slice(:only, :except), &block)
+        send(:after_action, options.slice(:only, :except), &block)
       end
 
       # Call this in the class of a controller to skip the check_authorization behavior on the actions.
@@ -274,13 +276,14 @@ module CanCan
       #
       # Any arguments are passed to the +before_action+ it triggers.
       def skip_authorization_check(*args)
-        method_name = ActiveSupport.respond_to?(:version) && ActiveSupport.version >= Gem::Version.new('4') ? :before_action : :before_filter
-        block = Proc.new{ |controller| controller.instance_variable_set(:@_authorized, true) }
-        self.send(method_name, *args, &block)
+        block = proc { |controller| controller.instance_variable_set(:@_authorized, true) }
+        send(:before_action, *args, &block)
       end
 
-      def skip_authorization(*args)
-        raise ImplementationRemoved, 'The CanCan skip_authorization method has been renamed to skip_authorization_check. Please update your code.'
+      def skip_authorization(*_args)
+        raise ImplementationRemoved,
+              'The CanCan skip_authorization method has been renamed to skip_authorization_check. '\
+              'Please update your code.'
       end
 
       def cancan_resource_class
@@ -288,7 +291,7 @@ module CanCan
       end
 
       def cancan_skipper
-        @_cancan_skipper ||= {authorize: {}, load: {}}
+        @_cancan_skipper ||= { authorize: {}, load: {} }
       end
     end
 
@@ -338,7 +341,7 @@ module CanCan
       current_ability.authorize!(*args)
     end
 
-    def unauthorized!(message = nil)
+    def unauthorized!(_message = nil)
       raise ImplementationRemoved, 'The unauthorized! method has been removed from CanCan, use authorize! instead.'
     end
 

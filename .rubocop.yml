@@ -13,6 +13,23 @@ Style/EmptyMethod:
 Style/VariableNumber:
   Enabled: false
 
+Style/ClassAndModuleChildren:
+  Enabled: false
+
+Metrics/LineLength:
+  Max: 120
+
+Metrics/ClassLength:
+  Exclude:
+    - 'lib/cancan/controller_resource.rb'
+    - 'lib/cancan/rule.rb'
+
+Metrics/ModuleLength:
+  Exclude:
+    - "**/*_spec.rb"
+    - 'lib/cancan/ability.rb'
+    - 'lib/cancan/model_adapters/active_record_adapter.rb'
+
 Metrics/BlockLength:
   Exclude:
     - 'lib/cancan/matchers.rb'
