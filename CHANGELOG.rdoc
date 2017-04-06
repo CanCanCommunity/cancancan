@@ -11,6 +11,10 @@ Unreleased
 * Drop support for Mongoid (coorasse)
 * Add ability to rspec matcher to take array of abilities (gingray)
 
+1.17.0 (March 26th, 2017)
+
+* Improve performance for the Mongoid Adapter
+
 
 1.16.0 (February 2nd, 2017)
 

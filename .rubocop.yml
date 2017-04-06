@@ -39,5 +39,6 @@ AllCops:
   TargetRubyVersion: 2.0
   Exclude:
     - 'gemfiles/vendor/bundle/**/*'
+    - 'Appraisals'
 
 inherit_from: .rubocop_todo.yml
