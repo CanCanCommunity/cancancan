@@ -28,13 +28,13 @@ module CanCan
       end
 
       def tableized_conditions(conditions, model_class = @model_class)
-        return conditions unless conditions.kind_of? Hash
-        conditions.inject({}) do |result_hash, (name, value)|
-          if value.kind_of? Hash
+        return conditions unless conditions.is_a? Hash
+        conditions.each_with_object({}) do |(name, value), result_hash|
+          if value.is_a? Hash
             value = value.dup
             association_class = model_class.reflect_on_association(name).klass.name.constantize
-            nested = value.inject({}) do |nested,(k,v)|
-              if v.kind_of? Hash
+            nested_resulted = value.each_with_object({}) do |(k, v), nested|
+              if v.is_a? Hash
                 value.delete(k)
                 nested[k] = v
               else
@@ -42,7 +42,7 @@ module CanCan
               end
               nested
             end
-            result_hash.merge!(tableized_conditions(nested,association_class))
+            result_hash.merge!(tableized_conditions(nested_resulted, association_class))
           else
             result_hash[name] = value
           end
@@ -67,28 +67,29 @@ module CanCan
           if mergeable_conditions?
             build_relation(conditions)
           else
-            build_relation(*(@rules.map(&:conditions)))
+            build_relation(*@rules.map(&:conditions))
           end
         else
-          @model_class.all(:conditions => conditions, :joins => joins)
+          @model_class.all(conditions: conditions, joins: joins)
         end
       end
 
       private
 
       def mergeable_conditions?
-        @rules.find {|rule| rule.unmergeable? }.blank?
+        @rules.find(&:unmergeable?).blank?
       end
 
       def override_scope
         conditions = @rules.map(&:conditions).compact
-        if defined?(ActiveRecord::Relation) && conditions.any? { |c| c.kind_of?(ActiveRecord::Relation) }
-          if conditions.size == 1
-            conditions.first
-          else
-            rule = @rules.detect { |rule| rule.conditions.kind_of?(ActiveRecord::Relation) }
-            raise Error, "Unable to merge an Active Record scope with other conditions. Instead use a hash or SQL for #{rule.actions.first} #{rule.subjects.first} ability."
-          end
+        return unless defined?(ActiveRecord::Relation) && conditions.any? { |c| c.is_a?(ActiveRecord::Relation) }
+        if conditions.size == 1
+          conditions.first
+        else
+          rule_found = @rules.detect { |rule| rule.conditions.is_a?(ActiveRecord::Relation) }
+          raise Error,
+                'Unable to merge an Active Record scope with other conditions. '\
+                "Instead use a hash or SQL for #{rule_found.actions.first} #{rule_found.subjects.first} ability."
         end
       end
 
@@ -135,7 +136,7 @@ module CanCan
       def clean_joins(joins_hash)
         joins = []
         joins_hash.each do |name, nested|
-          joins << (nested.empty? ? name : {name => clean_joins(nested)})
+          joins << (nested.empty? ? name : { name => clean_joins(nested) })
         end
         joins
       end
@@ -143,6 +144,6 @@ module CanCan
   end
 end
 
-ActiveRecord::Base.class_eval do
-  include CanCan::ModelAdditions
+ActiveSupport.on_load(:active_record) do
+  send :include, CanCan::ModelAdditions
 end

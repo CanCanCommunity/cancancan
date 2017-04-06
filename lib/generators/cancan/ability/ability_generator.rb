@@ -4,7 +4,7 @@ module Cancan
       source_root File.expand_path('../templates', __FILE__)
 
       def generate_ability
-        copy_file "ability.rb", "app/models/ability.rb"
+        copy_file 'ability.rb', 'app/models/ability.rb'
       end
     end
   end
