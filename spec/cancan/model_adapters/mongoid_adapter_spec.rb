@@ -56,8 +56,8 @@ if defined? CanCan::ModelAdapters::MongoidAdapter
       end
 
       it 'is able to read hashes when field is array' do
-        one_to_three = MongoidProject.create(numbers: %w(one two three))
-        two_to_five  = MongoidProject.create(numbers: %w(two three four five))
+        one_to_three = MongoidProject.create(numbers: %w[one two three])
+        two_to_five  = MongoidProject.create(numbers: %w[two three four five])
 
         @ability.can :foo, MongoidProject, numbers: 'one'
         expect(@ability).to be_able_to(:foo, one_to_three)
@@ -122,7 +122,7 @@ if defined? CanCan::ModelAdapters::MongoidAdapter
       describe 'Mongoid::Criteria where clause Symbol extensions using MongoDB expressions' do
         it 'handles :field.in' do
           obj = MongoidProject.create(title: 'Sir')
-          @ability.can :read, MongoidProject, :title.in => %w(Sir Madam)
+          @ability.can :read, MongoidProject, :title.in => %w[Sir Madam]
           expect(@ability.can?(:read, obj)).to eq(true)
           expect(MongoidProject.accessible_by(@ability, :read)).to eq([obj])
 
@@ -133,7 +133,7 @@ if defined? CanCan::ModelAdapters::MongoidAdapter
         describe 'activates only when there are Criteria in the hash' do
           it 'Calls where on the model class when there are criteria' do
             obj = MongoidProject.create(title: 'Bird')
-            @conditions = { :title.nin => %w(Fork Spoon) }
+            @conditions = { :title.nin => %w[Fork Spoon] }
 
             @ability.can :read, MongoidProject, @conditions
             expect(@ability).to be_able_to(:read, obj)
@@ -148,7 +148,7 @@ if defined? CanCan::ModelAdapters::MongoidAdapter
 
         it 'handles :field.nin' do
           obj = MongoidProject.create(title: 'Sir')
-          @ability.can :read, MongoidProject, :title.nin => %w(Lord Madam)
+          @ability.can :read, MongoidProject, :title.nin => %w[Lord Madam]
           expect(@ability.can?(:read, obj)).to eq(true)
           expect(MongoidProject.accessible_by(@ability, :read)).to eq([obj])
 
@@ -157,17 +157,17 @@ if defined? CanCan::ModelAdapters::MongoidAdapter
         end
 
         it 'handles :field.size' do
-          obj = MongoidProject.create(titles: %w(Palatin Margrave))
+          obj = MongoidProject.create(titles: %w[Palatin Margrave])
           @ability.can :read, MongoidProject, :titles.size => 2
           expect(@ability.can?(:read, obj)).to eq(true)
           expect(MongoidProject.accessible_by(@ability, :read)).to eq([obj])
 
-          obj2 = MongoidProject.create(titles: %w(Palatin Margrave Marquis))
+          obj2 = MongoidProject.create(titles: %w[Palatin Margrave Marquis])
           expect(@ability.can?(:read, obj2)).to be(false)
         end
 
         it 'handles :field.exists' do
-          obj = MongoidProject.create(titles: %w(Palatin Margrave))
+          obj = MongoidProject.create(titles: %w[Palatin Margrave])
           @ability.can :read, MongoidProject, :titles.exists => true
           expect(@ability.can?(:read, obj)).to eq(true)
           expect(MongoidProject.accessible_by(@ability, :read)).to eq([obj])
@@ -188,7 +188,7 @@ if defined? CanCan::ModelAdapters::MongoidAdapter
 
         it 'handles instance not saved to database' do
           obj = MongoidProject.new(title: 'Sir')
-          @ability.can :read, MongoidProject, :title.in => %w(Sir Madam)
+          @ability.can :read, MongoidProject, :title.in => %w[Sir Madam]
           expect(@ability.can?(:read, obj)).to eq(true)
 
           # accessible_by only returns saved records

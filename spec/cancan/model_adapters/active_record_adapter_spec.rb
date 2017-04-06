@@ -317,7 +317,7 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
     it 'merges separate joins into a single array' do
       @ability.can :read, Article, project: { blocked: false }
       @ability.can :read, Article, company: { admin: true }
-      expect(@ability.model_adapter(Article, :read).joins.inspect).to orderlessly_match(%i(company project).inspect)
+      expect(@ability.model_adapter(Article, :read).joins.inspect).to orderlessly_match(%i[company project].inspect)
     end
 
     it 'merges same joins into a single array' do

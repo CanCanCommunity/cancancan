@@ -48,7 +48,7 @@ if defined? CanCan::ModelAdapters::ActiveRecord4Adapter
           end
 
           class Shape < ActiveRecord::Base
-            enum color: %i(red green blue)
+            enum color: %i[red green blue]
           end
 
           red = Shape.create!(color: :red)
@@ -86,7 +86,7 @@ if defined? CanCan::ModelAdapters::ActiveRecord4Adapter
           end
 
           class Disc < ActiveRecord::Base
-            enum color: %i(red green blue)
+            enum color: %i[red green blue]
             enum shape: { triangle: 3, rectangle: 4 }
           end
 

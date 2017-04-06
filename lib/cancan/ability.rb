@@ -414,7 +414,7 @@ module CanCan
 
     def default_alias_actions
       {
-        read: %i(index show),
+        read: %i[index show],
         create: [:new],
         update: [:edit]
       }

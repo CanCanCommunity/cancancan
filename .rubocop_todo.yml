@@ -90,3 +90,7 @@ Style/TrailingWhitespace:
 Style/FileName:
   Exclude:
     - 'Appraisals'
+
+# disagree
+Lint/AmbiguousBlockAssociation:
+  Enabled: false
