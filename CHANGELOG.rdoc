@@ -10,6 +10,7 @@ Unreleased
 * Drop support for Sequel (coorasse)
 * Drop support for Mongoid (coorasse)
 * Add ability to rspec matcher to take array of abilities (gingray)
+* Increase Performance (timraymond) (https://github.com/CanCanCommunity/cancancan/pull/204)
 
 1.17.0 (March 26th, 2017)
 
