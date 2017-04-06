@@ -28,11 +28,6 @@ Metrics/MethodLength:
 Metrics/PerceivedComplexity:
   Max: 10
 
-# Offense count: 1
-Performance/FixedSize:
-  Exclude:
-    - 'spec/cancan/model_adapters/mongoid_adapter_spec.rb'
-
 # Offense count: 3
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, SupportedStyles, ProceduralMethods, FunctionalMethods, IgnoredMethods.

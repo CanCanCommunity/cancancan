@@ -5,7 +5,10 @@ Unreleased
 2.0.0 (TBD)
 
 * Drop support for Rails < 4.2 (oliverklee)
+* Drop support for ruby < 2.2 (coorasse)
 * Drop support for InheritedResource (coorasse)
+* Drop support for Sequel (coorasse)
+* Drop support for Mongoid (coorasse)
 * Add ability to rspec matcher to take array of abilities (gingray)
 
 

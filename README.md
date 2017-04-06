@@ -26,6 +26,16 @@ and run the `bundle install` command.
 For Rails < 4.2 use:
 
    gem 'cancancan', '~> 1.10'
+   
+## Version 2.0
+
+Version 2.0 drops support for Mongoid and Sequel. 
+
+Please use `gem 'cancancan', '~> 1.10'` for them.
+
+If you are interested in supporting them, contribute to the sibling gems `cancancan-sequel` and `cancancan-mongoid`.
+
+Version 2.0 drops also support for Rails < 4.2 and ruby < 2.2 so again use the version 1 of the Gem for these.
 
 ## Getting Started
 

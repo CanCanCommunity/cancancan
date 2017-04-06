@@ -13,6 +13,3 @@ if defined? ActiveRecord
   require 'cancan/model_adapters/active_record_adapter'  
   require 'cancan/model_adapters/active_record_4_adapter'
 end
-
-require 'cancan/model_adapters/mongoid_adapter' if defined?(Mongoid) && defined?(Mongoid::Document)
-require 'cancan/model_adapters/sequel_adapter' if defined? Sequel
