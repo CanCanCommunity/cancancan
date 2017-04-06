@@ -2,11 +2,12 @@ language: ruby
 cache: bundler
 sudo: false
 rvm:
-  - 2.0.0
-  - 2.1.0
   - 2.2.0
-  - 2.2.2
+  - 2.2.7
+  - 2.3.4
+  - 2.4.1
   - jruby-9.0.5.0
+  - jruby-9.1.8.0
 gemfile:
   - gemfiles/activerecord_4.2.gemfile
   - gemfiles/activerecord_5.0.gemfile
@@ -17,11 +18,9 @@ services:
 matrix:
   fast_finish: true
   exclude:
-    - rvm: 2.0.0
-      gemfile: gemfiles/activerecord_5.0.gemfile
-    - rvm: 2.1.0
-      gemfile: gemfiles/activerecord_5.0.gemfile
     - rvm: 2.2.0
+      gemfile: gemfiles/activerecord_5.0.gemfile
+    - rvm: 2.2.7
       gemfile: gemfiles/activerecord_5.0.gemfile
     - rvm: jruby-9.0.5.0
       gemfile: gemfiles/activerecord_5.0.gemfile
