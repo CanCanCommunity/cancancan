@@ -10,7 +10,7 @@
 [Screencast](http://railscasts.com/episodes/192-authorization-with-cancan) | 
 [Gitter](https://gitter.im/CanCanCommunity/cancancan)
 
-CanCanCan is an authorization library for Ruby 2.0+ and Ruby on Rails 3+ which restricts what resources a given user is allowed to access. 
+CanCanCan is an authorization library for Ruby >= 2.2.0 and Ruby on Rails >= 4.2 which restricts what resources a given user is allowed to access. 
 
 All permissions are defined in a single location (the `Ability` class) and not duplicated across controllers, views, and database queries.
 
