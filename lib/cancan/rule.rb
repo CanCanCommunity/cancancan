@@ -16,8 +16,8 @@ module CanCan
       raise Error, both_block_and_hash_error if conditions.is_a?(Hash) && block
       @match_all = action.nil? && subject.nil?
       @base_behavior = base_behavior
-      @actions = [action].flatten
-      @subjects = [subject].flatten
+      @actions = Array(action)
+      @subjects = Array(subject)
       @conditions = conditions || {}
       @block = block
     end
