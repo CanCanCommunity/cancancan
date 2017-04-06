@@ -32,8 +32,8 @@ if defined? CanCan::ModelAdapters::MongoidAdapter
       end
 
       after(:each) do
-        Mongoid.master.collections.select do |collection|
-          collection.name !~ /system/
+        Mongoid.master.collections.reject do |collection|
+          collection.name =~ /system/
         end.each(&:drop)
       end
 

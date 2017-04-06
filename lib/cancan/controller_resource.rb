@@ -303,11 +303,11 @@ module CanCan
     end
 
     def new_actions
-      [:new, :create] + Array(@options[:new])
+      %i(new create) + Array(@options[:new])
     end
 
     def save_actions
-      [:create, :update]
+      %i(create update)
     end
 
     private

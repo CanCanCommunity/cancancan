@@ -158,7 +158,7 @@ describe CanCan::Ability do
   end
 
   it 'is able to specify multiple actions and match any' do
-    @ability.can [:read, :update], :all
+    @ability.can %i(read update), :all
     expect(@ability.can?(:read, 123)).to be(true)
     expect(@ability.can?(:update, 123)).to be(true)
     expect(@ability.can?(:count, 123)).to be(false)
@@ -201,8 +201,8 @@ describe CanCan::Ability do
     expect(@ability.can?(:read, :stats)).to be(true)
     expect(@ability.can?(:update, :stats)).to be(false)
     expect(@ability.can?(:read, :nonstats)).to be(false)
-    expect(@ability.can?(:read, any: [:stats, :nonstats])).to be(true)
-    expect(@ability.can?(:read, any: [:nonstats, :neitherstats])).to be(false)
+    expect(@ability.can?(:read, any: %i(stats nonstats))).to be(true)
+    expect(@ability.can?(:read, any: %i(nonstats neitherstats))).to be(false)
   end
 
   it 'checks ancestors of class' do
@@ -261,7 +261,7 @@ describe CanCan::Ability do
   it 'appends aliased actions' do
     @ability.alias_action :update, to: :modify
     @ability.alias_action :destroy, to: :modify
-    expect(@ability.aliased_actions[:modify]).to eq([:update, :destroy])
+    expect(@ability.aliased_actions[:modify]).to eq(%i(update destroy))
   end
 
   it 'clears aliased actions' do
@@ -400,7 +400,7 @@ describe CanCan::Ability do
 
   it 'checks permissions correctly when passing a hash of subjects with multiple definitions' do
     @ability.can :read, Range, string: { length: 4 }
-    @ability.can [:create, :read], Range, string: { upcase: 'FOO' }
+    @ability.can %i(create read), Range, string: { upcase: 'FOO' }
 
     expect(@ability.can?(:read, 'foo' => Range)).to be(true)
     expect(@ability.can?(:read, 'foobar' => Range)).to be(false)

@@ -254,7 +254,7 @@ describe CanCan::ControllerResource do
     it 'does not build a single resource when on custom collection action even with id' do
       params.merge!(action: 'sort', id: '123')
 
-      resource = CanCan::ControllerResource.new(controller, collection: [:sort, :list])
+      resource = CanCan::ControllerResource.new(controller, collection: %i(sort list))
       resource.load_resource
       expect(controller.instance_variable_get(:@model)).to be_nil
     end
@@ -390,7 +390,7 @@ describe CanCan::ControllerResource do
       controller.instance_variable_set(:@category, category)
       allow(category.models).to receive(:find).with('123') { :some_model }
 
-      resource = CanCan::ControllerResource.new(controller, through: [:category, :user])
+      resource = CanCan::ControllerResource.new(controller, through: %i(category user))
       resource.load_resource
       expect(controller.instance_variable_get(:@model)).to eq(:some_model)
     end
@@ -596,7 +596,7 @@ describe CanCan::ControllerResource do
   end
 
   it 'skips resource behavior for :only actions in array' do
-    allow(controller_class).to receive(:cancan_skipper) { { load: { nil => { only: [:index, :show] } } } }
+    allow(controller_class).to receive(:cancan_skipper) { { load: { nil => { only: %i(index show) } } } }
     params[:action] = 'index'
     expect(CanCan::ControllerResource.new(controller).skip?(:load)).to be(true)
     expect(CanCan::ControllerResource.new(controller, :some_resource).skip?(:load)).to be(false)
@@ -616,7 +616,7 @@ describe CanCan::ControllerResource do
   end
 
   it 'skips resource behavior :except actions in array' do
-    allow(controller_class).to receive(:cancan_skipper) { { load: { nil => { except: [:index, :show] } } } }
+    allow(controller_class).to receive(:cancan_skipper) { { load: { nil => { except: %i(index show) } } } }
     params[:action] = 'index'
     expect(CanCan::ControllerResource.new(controller).skip?(:load)).to be_falsey
     params[:action] = 'show'

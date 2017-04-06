@@ -40,7 +40,7 @@ describe 'be_able_to' do
     it 'delegates to can? with array of abilities with multiple actions' do
       is_expected.to receive(:can?).with(:read, 123) { true }
       is_expected.to receive(:can?).with(:update, 123) { true }
-      is_expected.to be_able_to([:read, :update], 123)
+      is_expected.to be_able_to(%i(read update), 123)
     end
 
     it 'delegates to can? with array of abilities with empty array' do
@@ -50,7 +50,7 @@ describe 'be_able_to' do
     it 'delegates to can? with array of abilities with only one eligable ability' do
       is_expected.to receive(:can?).with(:read, 123) { true }
       is_expected.to receive(:can?).with(:update, 123) { false }
-      is_expected.not_to be_able_to([:read, :update], 123)
+      is_expected.not_to be_able_to(%i(read update), 123)
     end
   end
 end

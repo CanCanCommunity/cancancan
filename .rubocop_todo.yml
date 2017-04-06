@@ -84,3 +84,9 @@ Style/SpaceInsideHashLiteralBraces:
 Style/TrailingWhitespace:
   Exclude:
     - 'lib/cancan.rb'
+
+
+# has a bug
+Style/FileName:
+  Exclude:
+    - 'Appraisals'
