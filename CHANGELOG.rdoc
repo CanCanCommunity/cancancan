@@ -9,7 +9,8 @@ Unreleased
 * Drop support for InheritedResource (coorasse)
 * Drop support for Sequel (coorasse)
 * Drop support for Mongoid (coorasse)
-* Add ability to rspec matcher to take array of abilities (gingray)
+* Add ability to rspec matcher to take array of abilities (gingray) (https://github.com/CanCanCommunity/cancancan/pull/364)
+* Reduce unnecessary allocations in Rule creation (timraymond) (https://github.com/CanCanCommunity/cancancan/pull/204)
 
 1.17.0 (March 26th, 2017)
 
