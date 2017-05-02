@@ -10,10 +10,6 @@ describe CanCan::ControllerAdditions do
     @controller_class.send(:include, CanCan::ControllerAdditions)
   end
 
-  it "raises ImplementationRemoved when attempting to call 'unauthorized!' on a controller" do
-    expect { @controller.unauthorized! }.to raise_error(CanCan::ImplementationRemoved)
-  end
-
   it 'authorize! assigns @_authorized instance variable and pass args to current ability' do
     allow(@controller.current_ability).to receive(:authorize!).with(:foo, :bar)
     @controller.authorize!(:foo, :bar)
