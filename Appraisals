@@ -31,10 +31,10 @@ appraise 'activerecord_5.0.2' do
   end
 end
 
-appraise 'activerecord_5.1.0.rc1' do
-  gem 'activerecord', '~> 5.1.0.rc1', require: 'active_record'
-  gem 'activesupport', '~> 5.1.0.rc1', require: 'active_support/all'
-  gem 'actionpack', '~> 5.1.0.rc1', require: 'action_pack'
+appraise 'activerecord_5.1.0' do
+  gem 'activerecord', '~> 5.1.0', require: 'active_record'
+  gem 'activesupport', '~> 5.1.0', require: 'active_support/all'
+  gem 'actionpack', '~> 5.1.0', require: 'action_pack'
 
   gemfile.platforms :jruby do
     gem 'activerecord-jdbcsqlite3-adapter'
