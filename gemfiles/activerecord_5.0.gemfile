@@ -2,8 +2,9 @@
 
 source "https://rubygems.org"
 
-gem "activerecord", "~> 3.2.0", :require => "active_record"
-gem "actionpack", "~> 3.2.0", :require => "action_pack"
+gem "activerecord", "~> 5.0.0.rc1", :require => "active_record"
+gem "activesupport", "~> 5.0.0.rc1", :require => "active_support/all"
+gem "actionpack", "~> 5.0.0.rc1", :require => "action_pack"
 gem "rubocop", "0.48.0"
 
 platforms :jruby do
@@ -13,6 +14,7 @@ end
 
 platforms :ruby, :mswin, :mingw do
   gem "sqlite3"
+  gem "pg"
 end
 
 gemspec :path => "../"

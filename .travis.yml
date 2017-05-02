@@ -1,24 +1,39 @@
+language: ruby
+cache: bundler
+sudo: false
 rvm:
-  - 1.8.7
-  - 1.9.2
-  - 1.9.3
   - 2.0.0
   - 2.1.0
-  - ree
-  - jruby
-  - rbx
+  - 2.2.0
+  - 2.2.2
+  - jruby-9.0.5.0
 gemfile:
-  - gemfiles/activerecord_3.0.gemfile
-  - gemfiles/activerecord_3.1.gemfile
   - gemfiles/activerecord_3.2.gemfile
-  - gemfiles/datamapper_1.x.gemfile
+  - gemfiles/activerecord_4.0.gemfile
+  - gemfiles/activerecord_4.1.gemfile
+  - gemfiles/activerecord_4.2.gemfile
+  - gemfiles/activerecord_5.0.gemfile
   - gemfiles/mongoid_2.x.gemfile
   - gemfiles/sequel_3.x.gemfile
 services:
   - mongodb
 matrix:
-  allow_failures:
-    - rvm: rbx
+  fast_finish: true
+  exclude:
+    - rvm: 2.0.0
+      gemfile: gemfiles/activerecord_5.0.gemfile
+    - rvm: 2.1.0
+      gemfile: gemfiles/activerecord_5.0.gemfile
+    - rvm: 2.2.0
+      gemfile: gemfiles/activerecord_5.0.gemfile
+    - rvm: jruby-9.0.5.0
+      gemfile: gemfiles/activerecord_5.0.gemfile
 notifications:
-  recipients:
-    - bryan@bryanrite.com
+  email:
+    recipients:
+      - alessandro.rodi@renuo.ch
+      - josua.schmid@renuo.ch
+      - zora.fuchs@renuo.ch
+    on_success: change
+    on_failure: change
+

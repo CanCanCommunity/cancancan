@@ -1,41 +1,6 @@
 module CanCan
   module ModelAdapters
-    class ActiveRecordAdapter < AbstractAdapter
-      def self.for_class?(model_class)
-        model_class <= ActiveRecord::Base
-      end
-
-      def self.override_condition_matching?(subject, name, value)
-        name.kind_of?(MetaWhere::Column) if defined? MetaWhere
-      end
-
-      def self.matches_condition?(subject, name, value)
-        subject_value = subject.send(name.column)
-        if name.method.to_s.ends_with? "_any"
-          value.any? { |v| meta_where_match? subject_value, name.method.to_s.sub("_any", ""), v }
-        elsif name.method.to_s.ends_with? "_all"
-          value.all? { |v| meta_where_match? subject_value, name.method.to_s.sub("_all", ""), v }
-        else
-          meta_where_match? subject_value, name.method, value
-        end
-      end
-
-      def self.meta_where_match?(subject_value, method, value)
-        case method.to_sym
-        when :eq      then subject_value == value
-        when :not_eq  then subject_value != value
-        when :in      then value.include?(subject_value)
-        when :not_in  then !value.include?(subject_value)
-        when :lt      then subject_value < value
-        when :lteq    then subject_value <= value
-        when :gt      then subject_value > value
-        when :gteq    then subject_value >= value
-        when :matches then subject_value =~ Regexp.new("^" + Regexp.escape(value).gsub("%", ".*") + "$", true)
-        when :does_not_match then !meta_where_match?(subject_value, :matches, value)
-        else raise NotImplemented, "The #{method} MetaWhere condition is not supported."
-        end
-      end
-
+    module ActiveRecordAdapter
       # Returns conditions intended to be used inside a database query. Normally you will not call this
       # method directly, but instead go through ModelAdditions#accessible_by.
       #
@@ -63,13 +28,13 @@ module CanCan
       end
 
       def tableized_conditions(conditions, model_class = @model_class)
-        return conditions unless conditions.kind_of? Hash
-        conditions.inject({}) do |result_hash, (name, value)|
-          if value.kind_of? Hash
+        return conditions unless conditions.is_a? Hash
+        conditions.each_with_object({}) do |(name, value), result_hash|
+          if value.is_a? Hash
             value = value.dup
-            association_class = model_class.reflect_on_association(name).class_name.constantize
-            nested = value.inject({}) do |nested,(k,v)|
-              if v.kind_of? Hash
+            association_class = model_class.reflect_on_association(name).klass.name.constantize
+            nested_resulted = value.each_with_object({}) do |(k, v), nested|
+              if v.is_a? Hash
                 value.delete(k)
                 nested[k] = v
               else
@@ -77,7 +42,7 @@ module CanCan
               end
               nested
             end
-            result_hash.merge!(tableized_conditions(nested,association_class))
+            result_hash.merge!(tableized_conditions(nested_resulted, association_class))
           else
             result_hash[name] = value
           end
@@ -99,28 +64,32 @@ module CanCan
         if override_scope
           @model_class.where(nil).merge(override_scope)
         elsif @model_class.respond_to?(:where) && @model_class.respond_to?(:joins)
-          mergeable_conditions = @rules.select {|rule| rule.unmergeable? }.blank?
-          if mergeable_conditions
-            @model_class.where(conditions).includes(joins)
+          if mergeable_conditions?
+            build_relation(conditions)
           else
-            @model_class.where(*(@rules.map(&:conditions))).includes(joins)
+            build_relation(*@rules.map(&:conditions))
           end
         else
-          @model_class.all(:conditions => conditions, :joins => joins)
+          @model_class.all(conditions: conditions, joins: joins)
         end
       end
 
       private
 
+      def mergeable_conditions?
+        @rules.find(&:unmergeable?).blank?
+      end
+
       def override_scope
         conditions = @rules.map(&:conditions).compact
-        if defined?(ActiveRecord::Relation) && conditions.any? { |c| c.kind_of?(ActiveRecord::Relation) }
-          if conditions.size == 1
-            conditions.first
-          else
-            rule = @rules.detect { |rule| rule.conditions.kind_of?(ActiveRecord::Relation) }
-            raise Error, "Unable to merge an Active Record scope with other conditions. Instead use a hash or SQL for #{rule.actions.first} #{rule.subjects.first} ability."
-          end
+        return unless defined?(ActiveRecord::Relation) && conditions.any? { |c| c.is_a?(ActiveRecord::Relation) }
+        if conditions.size == 1
+          conditions.first
+        else
+          rule_found = @rules.detect { |rule| rule.conditions.is_a?(ActiveRecord::Relation) }
+          raise Error,
+                'Unable to merge an Active Record scope with other conditions. '\
+                "Instead use a hash or SQL for #{rule_found.actions.first} #{rule_found.subjects.first} ability."
         end
       end
 
@@ -167,7 +136,7 @@ module CanCan
       def clean_joins(joins_hash)
         joins = []
         joins_hash.each do |name, nested|
-          joins << (nested.empty? ? name : {name => clean_joins(nested)})
+          joins << (nested.empty? ? name : { name => clean_joins(nested) })
         end
         joins
       end

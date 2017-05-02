@@ -1,5 +1,74 @@
 Develop
 
+Unreleased
+
+1.17.0 (March 26th, 2017)
+
+* Improve performance for the Mongoid Adapter
+
+1.16.0 (February 2nd, 2017)
+
+* Introduce rubocop and fixes most of the issues
+
+1.15.0 (June 13th, 2016)
+
+* Add support for Rails 5 (craig1410)
+
+1.14.0 (May 14th, 2016)
+
+* Use cover for ranges
+* Add support for rails 4 enum's (markpmitchell)
+
+1.13.1 (Oct 8th, 2015)
+
+* Fix #merge with empty Ability (jhawthorn)
+
+1.13.0 (Oct 7th, 2015)
+
+* Significantly improve rule lookup time (amarshall)
+* Removed deprecation warnings for RSpec 3.2 (NekoNova)
+* Drop support for REE and Ruby 1.x and so Rails 2 (Richard Wilson)
+
+1.12.0 (June 28th, 2015)
+
+* Add a permissions method to Ability (devaroop)
+
+1.11.0 (June 15th, 2015)
+
+* Complete cancancan#115 - Specify authorization action for parent resources. (phallguy)
+
+1.10.1 (January 13th, 2015)
+
+* Fix cancancan#168 - A bug with ActiveRecord 4.2 support causing ProtocolViolation due to named parameters not being passed in.
+
+
+1.10.0 (January 7th, 2015)
+
+* Fix i18n issue for Ruby < 1.9.3 (bryanrite)
+
+* Fix cancancan#149 - Fix an issue loading namespaced models (darthjee)
+
+* Fix cancancan#160 - Support for Rails 4.2 (marshall-lee)
+
+* Fix cancancan#153 - More useful output in ability spec matchers (jondkinney)
+
+
+1.9.2 (August 8th, 2014)
+
+* Fix cancancan#77, 78 - Fix an issue with associations for namespaced models. (jjp)
+
+
+1.9.1 (July 21st, 2014)
+
+* Fix cancancan#101 - Fixes an issue where overjealous use of references would cause issues with scopes when loading associations. (bryanrite)
+
+
+1.9.0 (July 20th, 2014)
+
+* Fix cancancan#59 - Parameters are automatically detected and santitized for all actions, not just create and update. (bryanrite)
+
+* Fix cancancan#97, 72, 40, 39, 26 - Support Active Record 4 properly with references on nested permissions. (scpike, tdg5, Crystark)
+
 
 1.8.4 (June 24th, 2014)
 

@@ -1,5 +1,4 @@
 module CanCan
-
   # This module is automatically included into all controllers.
   # It also makes the "can?" and "cannot?" methods available to all views.
   module ControllerAdditions
@@ -12,7 +11,7 @@ module CanCan
       #   end
       #
       def load_and_authorize_resource(*args)
-        cancan_resource_class.add_before_filter(self, :load_and_authorize_resource, *args)
+        cancan_resource_class.add_before_action(self, :load_and_authorize_resource, *args)
       end
 
       # Sets up a before filter which loads the model resource into an instance variable.
@@ -32,10 +31,10 @@ module CanCan
       #   end
       #
       # A resource is not loaded if the instance variable is already set. This makes it easy to override
-      # the behavior through a before_filter on certain actions.
+      # the behavior through a before_action on certain actions.
       #
       #   class BooksController < ApplicationController
-      #     before_filter :find_book_by_permalink, :only => :show
+      #     before_action :find_book_by_permalink, :only => :show
       #     load_resource
       #
       #     private
@@ -72,8 +71,8 @@ module CanCan
       #   Load this resource through another one. This should match the name of the parent instance variable or method.
       #
       # [:+through_association+]
-      #   The name of the association to fetch the child records through the parent resource. This is normally not needed
-      #   because it defaults to the pluralized resource name.
+      #   The name of the association to fetch the child records through the parent resource.
+      #   This is normally not needed because it defaults to the pluralized resource name.
       #
       # [:+shallow+]
       #   Pass +true+ to allow this resource to be loaded directly when parent is +nil+. Defaults to +false+.
@@ -82,8 +81,8 @@ module CanCan
       #   Pass +true+ if this is a singleton resource through a +has_one+ association.
       #
       # [:+parent+]
-      #   True or false depending on if the resource is considered a parent resource. This defaults to +true+ if a resource
-      #   name is given which does not match the controller.
+      #   True or false depending on if the resource is considered a parent resource.
+      #   This defaults to +true+ if a resource name is given which does not match the controller.
       #
       # [:+class+]
       #   The class to use for the model (string or constant).
@@ -115,10 +114,10 @@ module CanCan
       #     load_resource :new => :build
       #
       # [:+prepend+]
-      #   Passing +true+ will use prepend_before_filter instead of a normal before_filter.
+      #   Passing +true+ will use prepend_before_action instead of a normal before_action.
       #
       def load_resource(*args)
-        cancan_resource_class.add_before_filter(self, :load_resource, *args)
+        cancan_resource_class.add_before_action(self, :load_resource, *args)
       end
 
       # Sets up a before filter which authorizes the resource using the instance variable.
@@ -160,8 +159,8 @@ module CanCan
       #   Pass +true+ if this is a singleton resource through a +has_one+ association.
       #
       # [:+parent+]
-      #   True or false depending on if the resource is considered a parent resource. This defaults to +true+ if a resource
-      #   name is given which does not match the controller.
+      #   True or false depending on if the resource is considered a parent resource.
+      #   This defaults to +true+ if a resource name is given which does not match the controller.
       #
       # [:+class+]
       #   The class to use for the model (string or constant). This passed in when the instance variable is not set.
@@ -174,10 +173,10 @@ module CanCan
       #   Authorize conditions on this parent resource when instance isn't available.
       #
       # [:+prepend+]
-      #   Passing +true+ will use prepend_before_filter instead of a normal before_filter.
+      #   Passing +true+ will use prepend_before_action instead of a normal before_action.
       #
       def authorize_resource(*args)
-        cancan_resource_class.add_before_filter(self, :authorize_resource, *args)
+        cancan_resource_class.add_before_action(self, :authorize_resource, *args)
       end
 
       # Skip both the loading and authorization behavior of CanCan for this given controller. This is primarily
@@ -227,7 +226,8 @@ module CanCan
       end
 
       # Add this to a controller to ensure it performs authorization through +authorized+! or +authorize_resource+ call.
-      # If neither of these authorization methods are called, a CanCan::AuthorizationNotPerformed exception will be raised.
+      # If neither of these authorization methods are called,
+      # a CanCan::AuthorizationNotPerformed exception will be raised.
       # This is normally added to the ApplicationController to ensure all controller actions do authorization.
       #
       #   class ApplicationController < ActionController::Base
@@ -244,22 +244,30 @@ module CanCan
       #   Does not apply to given actions.
       #
       # [:+if+]
-      #   Supply the name of a controller method to be called. The authorization check only takes place if this returns true.
+      #   Supply the name of a controller method to be called.
+      #   The authorization check only takes place if this returns true.
       #
       #     check_authorization :if => :admin_controller?
       #
       # [:+unless+]
-      #   Supply the name of a controller method to be called. The authorization check only takes place if this returns false.
+      #   Supply the name of a controller method to be called.
+      #   The authorization check only takes place if this returns false.
       #
       #     check_authorization :unless => :devise_controller?
       #
       def check_authorization(options = {})
-        self.after_filter(options.slice(:only, :except)) do |controller|
+        method_name = active_support_4? ? :after_action : :after_filter
+
+        block = proc do |controller|
           next if controller.instance_variable_defined?(:@_authorized)
           next if options[:if] && !controller.send(options[:if])
           next if options[:unless] && controller.send(options[:unless])
-          raise AuthorizationNotPerformed, "This action failed the check_authorization because it does not authorize_resource. Add skip_authorization_check to bypass this check."
+          raise AuthorizationNotPerformed,
+                'This action failed the check_authorization because it does not authorize_resource. '\
+                'Add skip_authorization_check to bypass this check.'
         end
+
+        send(method_name, options.slice(:only, :except), &block)
       end
 
       # Call this in the class of a controller to skip the check_authorization behavior on the actions.
@@ -268,19 +276,21 @@ module CanCan
       #     skip_authorization_check :only => :index
       #   end
       #
-      # Any arguments are passed to the +before_filter+ it triggers.
+      # Any arguments are passed to the +before_action+ it triggers.
       def skip_authorization_check(*args)
-        self.before_filter(*args) do |controller|
-          controller.instance_variable_set(:@_authorized, true)
-        end
+        method_name = active_support_4? ? :before_action : :before_filter
+        block = proc { |controller| controller.instance_variable_set(:@_authorized, true) }
+        send(method_name, *args, &block)
       end
 
-      def skip_authorization(*args)
-        raise ImplementationRemoved, "The CanCan skip_authorization method has been renamed to skip_authorization_check. Please update your code."
+      def skip_authorization(*_args)
+        raise ImplementationRemoved,
+              'The CanCan skip_authorization method has been renamed to skip_authorization_check. '\
+              'Please update your code.'
       end
 
       def cancan_resource_class
-        if ancestors.map(&:to_s).include? "InheritedResources::Actions"
+        if ancestors.map(&:to_s).include? 'InheritedResources::Actions'
           InheritedResource
         else
           ControllerResource
@@ -288,13 +298,17 @@ module CanCan
       end
 
       def cancan_skipper
-        @_cancan_skipper ||= {:authorize => {}, :load => {}}
+        @_cancan_skipper ||= { authorize: {}, load: {} }
+      end
+
+      def active_support_4?
+        ActiveSupport.respond_to?(:version) && ActiveSupport.version >= Gem::Version.new('4')
       end
     end
 
     def self.included(base)
       base.extend ClassMethods
-      base.helper_method :can?, :cannot?, :current_ability
+      base.helper_method :can?, :cannot?, :current_ability if base.respond_to? :helper_method
     end
 
     # Raises a CanCan::AccessDenied exception if the current_ability cannot
@@ -338,8 +352,8 @@ module CanCan
       current_ability.authorize!(*args)
     end
 
-    def unauthorized!(message = nil)
-      raise ImplementationRemoved, "The unauthorized! method has been removed from CanCan, use authorize! instead."
+    def unauthorized!(_message = nil)
+      raise ImplementationRemoved, 'The unauthorized! method has been removed from CanCan, use authorize! instead.'
     end
 
     # Creates and returns the current user's ability and caches it. If you

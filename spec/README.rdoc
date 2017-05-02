@@ -6,7 +6,7 @@ To run the specs first run the +bundle+ command to install the necessary gems an
 
   bundle
 
-Then run the appraisal command to install all the necssary test sets:
+Then run the appraisal command to install all the necessary test sets:
 
   appraisal install
 
@@ -16,7 +16,7 @@ You can then run all test sets:
 
 Or individual ones:
 
-  appraisal rails_3.0 rake
+  appraisal activerecord_3.2 rake
 
 A list of the tests is in the +Appraisal+ file.
 
