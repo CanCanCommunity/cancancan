@@ -41,4 +41,5 @@ notifications:
       - zora.fuchs@renuo.ch
     on_success: change
     on_failure: change
-
+script:
+  - bundle exec rubocop && bundle exec rake
