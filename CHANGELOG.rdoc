@@ -11,6 +11,8 @@ Unreleased
 * Drop support for Mongoid (coorasse)
 * Add ability to rspec matcher to take array of abilities (gingray)
 * Increase Performance (timraymond) (https://github.com/CanCanCommunity/cancancan/pull/204)
+* Removed controller methods: skip_authorization, unauthorized! (coorasse)
+* Removed options: nested, name, resource (coorasse)
 
 1.17.0 (March 26th, 2017)
 
