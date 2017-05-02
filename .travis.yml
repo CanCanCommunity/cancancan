@@ -22,9 +22,9 @@ matrix:
     - rvm: 2.2.7
       gemfile: gemfiles/activerecord_5.0.2.gemfile
     - rvm: 2.2.0
-      gemfile: gemfiles/activerecord_5.1.0.rc1.gemfile
+      gemfile: gemfiles/activerecord_5.1.0.gemfile
     - rvm: 2.2.7
-      gemfile: gemfiles/activerecord_5.1.0.rc1.gemfile
+      gemfile: gemfiles/activerecord_5.1.0.gemfile
     - rvm: jruby-9.0.5.0
       gemfile: gemfiles/activerecord_5.0.2.gemfile
     - rvm: jruby-9.1.8.0
