@@ -412,6 +412,13 @@ describe CanCan::ControllerResource do
       expect(controller.instance_variable_get(:@model)).to be_nil
     end
 
+    it 'does not try to load resource for other action if params[:id] is blank' do
+      params.merge!(action: 'list', id: '')
+      resource = CanCan::ControllerResource.new(controller)
+      resource.load_resource
+      expect(controller.instance_variable_get(:@model)).to be_nil
+    end
+
     it 'finds record through has_one association with :singleton and :shallow options' do
       model = Model.new
       allow(Model).to receive(:find).with('123') { model }
