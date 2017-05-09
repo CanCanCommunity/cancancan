@@ -104,7 +104,7 @@ def update_params
 end
 ```
 
-For the `:create` action, CanCan will try to initialize a new instance with sanitized input by seeing if your 
+For the `:create` action, CanCanCan will try to initialize a new instance with sanitized input by seeing if your 
 controller will respond to the following methods (in order):
 
 1. `create_params`
