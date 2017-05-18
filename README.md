@@ -1,5 +1,7 @@
 # CanCanCan
 
+![CanCanCan Logo](/logo/cancancan.jpg)
+
 [![Gem Version](https://badge.fury.io/rb/cancancan.svg)](http://badge.fury.io/rb/cancancan)
 [![Travis badge](https://travis-ci.org/CanCanCommunity/cancancan.svg?branch=develop)](https://travis-ci.org/CanCanCommunity/cancancan)
 [![Code Climate Badge](https://codeclimate.com/github/CanCanCommunity/cancancan.svg)](https://codeclimate.com/github/CanCanCommunity/cancancan)
@@ -10,7 +12,7 @@
 [Screencast](http://railscasts.com/episodes/192-authorization-with-cancan) | 
 [Gitter](https://gitter.im/CanCanCommunity/cancancan)
 
-CanCanCan is an authorization library for Ruby 2.0+ and Ruby on Rails 3+ which restricts what resources a given user is allowed to access. 
+CanCanCan is an authorization library for Ruby >= 2.2.0 and Ruby on Rails >= 4.2 which restricts what resources a given user is allowed to access. 
 
 All permissions are defined in a single location (the `Ability` class) and not duplicated across controllers, views, and database queries.
 
@@ -22,6 +24,20 @@ Add this to your Gemfile:
     gem 'cancancan', '~> 1.10'
     
 and run the `bundle install` command.
+
+For Rails < 4.2 use:
+
+    gem 'cancancan', '~> 1.10'
+   
+## Version 2.0
+
+Version 2.0 drops support for Mongoid and Sequel. 
+
+Please use `gem 'cancancan', '~> 1.10'` for them.
+
+If you are interested in supporting them, contribute to the sibling gems `cancancan-sequel` and `cancancan-mongoid`.
+
+Version 2.0 drops also support for Rails < 4.2 and ruby < 2.2 so, again, use the version 1 of the Gem for these.
 
 ## Getting Started
 
@@ -85,7 +101,7 @@ See [Authorizing Controller Actions](https://github.com/CanCanCommunity/cancanca
 
 #### Strong Parameters
 
-When using `strong_parameters` or Rails 4+, you have to sanitize inputs before saving the record, in actions such as `:create` and `:update`.
+You have to sanitize inputs before saving the record, in actions such as `:create` and `:update`.
 
 For the `:update` action, CanCanCan will load and authorize the resource but *not* change it automatically, so the typical usage would be something like:
 
@@ -219,7 +235,7 @@ of Rails, as well as the different model adapters.
 
 When first developing, you may need to run `bundle install` and then `appraisal install`, to install the different sets.
 
-You can then run all appraisal files (like CI does), with `appraisal rake` or just run a specific set `appraisal activerecord_3.0 rake`.
+You can then run all appraisal files (like CI does), with `appraisal rake` or just run a specific set `appraisal activerecord_5.0 rake`.
 
 See the [CONTRIBUTING](https://github.com/CanCanCommunity/cancancan/blob/develop/CONTRIBUTING.md) and 
 [spec/README](https://github.com/CanCanCommunity/cancancan/blob/master/spec/README.rdoc) for more information.
@@ -227,8 +243,14 @@ See the [CONTRIBUTING](https://github.com/CanCanCommunity/cancancan/blob/develop
 
 ## Special Thanks
 
-CanCanCan was inspired by [declarative_authorization](https://github.com/stffn/declarative_authorization/) and 
-[aegis](https://github.com/makandra/aegis). 
+[![Renuo AG](/logo/renuo.png)](https://www.renuo.ch)
+
+Thanks to [Renuo](https://www.renuo.ch) for currently maintaining and supporting the project.
 
 Also many thanks to the [CanCanCan contributors](https://github.com/CanCanCommunity/cancancan/contributors). 
 See the [CHANGELOG](https://github.com/CanCanCommunity/cancancan/blob/master/CHANGELOG.rdoc) for the full list.
+
+CanCanCan was inspired by [declarative_authorization](https://github.com/stffn/declarative_authorization/) and 
+[aegis](https://github.com/makandra/aegis). 
+
+

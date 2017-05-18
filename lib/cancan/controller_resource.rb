@@ -14,11 +14,7 @@ module CanCan
     end
 
     def self.before_callback_name(options)
-      if ActiveSupport.respond_to?(:version) && ActiveSupport.version >= Gem::Version.new('4')
-        options.delete(:prepend) ? :prepend_before_action : :before_action
-      else
-        options.delete(:prepend) ? :prepend_before_filter : :before_filter
-      end
+      options.delete(:prepend) ? :prepend_before_action : :before_action
     end
 
     def initialize(controller, *args)
@@ -26,12 +22,6 @@ module CanCan
       @params = controller.params
       @options = args.extract_options!
       @name = args.first
-      nested_err = 'The :nested option is no longer supported, instead use :through with separate load/authorize call.'
-      raise CanCan::ImplementationRemoved, nested_err if @options[:nested]
-      name_err = 'The :name option is no longer supported, instead pass the name as the first argument.'
-      raise CanCan::ImplementationRemoved, name_err if @options[:name]
-      resource_err = 'The :resource option has been renamed back to :class, use false if no class.'
-      raise CanCan::ImplementationRemoved, resource_err if @options[:resource]
     end
 
     def load_and_authorize_resource
@@ -138,7 +128,7 @@ module CanCan
     end
 
     def id_param
-      @params[id_param_key].to_s if @params[id_param_key]
+      @params[id_param_key].to_s if @params[id_param_key].present?
     end
 
     def id_param_key
@@ -205,23 +195,17 @@ module CanCan
 
     def resource_base_through
       if parent_resource
-        base = if @options[:singleton]
-                 resource_class
-               else
-                 parent_resource.send(@options[:through_association] || name.to_s.pluralize)
-               end
-        base = base.scoped if base.respond_to?(:scoped) && active_record_3?
-        base
+        if @options[:singleton]
+          resource_class
+        else
+          parent_resource.send(@options[:through_association] || name.to_s.pluralize)
+        end
       elsif @options[:shallow]
         resource_class
       else
         # maybe this should be a record not found error instead?
         raise AccessDenied.new(nil, authorization_action, resource_class)
       end
-    end
-
-    def active_record_3?
-      defined?(ActiveRecord) && ActiveRecord::VERSION::MAJOR == 3
     end
 
     def parent_name
@@ -313,11 +297,11 @@ module CanCan
     end
 
     def new_actions
-      [:new, :create] + Array(@options[:new])
+      %i[new create] + Array(@options[:new])
     end
 
     def save_actions
-      [:create, :update]
+      %i[create update]
     end
 
     private
