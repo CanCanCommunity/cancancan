@@ -128,7 +128,7 @@ module CanCan
     end
 
     def id_param
-      @params[id_param_key].to_s if @params[id_param_key]
+      @params[id_param_key].to_s if @params[id_param_key].present?
     end
 
     def id_param_key
