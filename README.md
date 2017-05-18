@@ -243,7 +243,7 @@ See the [CONTRIBUTING](https://github.com/CanCanCommunity/cancancan/blob/develop
 
 ## Special Thanks
 
-![Renuo AG](/logo/renuo.png)
+[![Renuo AG](/logo/renuo.png)](https://www.renuo.ch)
 
 Thanks to [Renuo](https://www.renuo.ch) for currently maintaining and supporting the project.
 
