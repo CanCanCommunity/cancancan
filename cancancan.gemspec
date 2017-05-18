@@ -15,7 +15,6 @@ Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.license     = 'MIT'
 
-  # s.files       = `git ls-files lib init.rb`.split($INPUT_RECORD_SEPARATOR)
   s.files       = `git ls-files lib init.rb cancancan.gemspec`.split($INPUT_RECORD_SEPARATOR)
   s.require_paths = ['lib']
 
