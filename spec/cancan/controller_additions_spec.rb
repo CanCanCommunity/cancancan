@@ -162,7 +162,7 @@ describe CanCan::ControllerAdditions do
     end
   end
 
-  describe "when inheriting" do
+  describe 'when inheriting' do
     before(:each) do
       @super_controller_class = Class.new
       @super_controller = @super_controller_class.new
@@ -172,15 +172,15 @@ describe CanCan::ControllerAdditions do
 
       allow(@super_controller_class).to receive(:helper_method)
       @super_controller_class.send(:include, CanCan::ControllerAdditions)
-      @super_controller_class.skip_load_and_authorize_resource(:only => [:index, :show])
+      @super_controller_class.skip_load_and_authorize_resource(only: [:index, :show])
     end
 
-    it "sub_classes should skip the same behaviors and actions as super_classes" do
-      expect(@super_controller_class.cancan_skipper[:load][nil]).to eq({:only => [:index, :show]})
-      expect(@super_controller_class.cancan_skipper[:authorize][nil]).to eq({:only => [:index, :show]})
+    it 'sub_classes should skip the same behaviors and actions as super_classes' do
+      expect(@super_controller_class.cancan_skipper[:load][nil]).to eq(only: [:index, :show])
+      expect(@super_controller_class.cancan_skipper[:authorize][nil]).to eq(only: [:index, :show])
 
-      expect(@sub_controller_class.cancan_skipper[:load][nil]).to eq({:only => [:index, :show]})
-      expect(@sub_controller_class.cancan_skipper[:authorize][nil]).to eq({:only => [:index, :show]})
+      expect(@sub_controller_class.cancan_skipper[:load][nil]).to eq(only: [:index, :show])
+      expect(@sub_controller_class.cancan_skipper[:authorize][nil]).to eq(only: [:index, :show])
     end
   end
 end
