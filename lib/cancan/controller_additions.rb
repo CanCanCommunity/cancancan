@@ -280,12 +280,6 @@ module CanCan
         send(:before_action, *args, &block)
       end
 
-      def skip_authorization(*_args)
-        raise ImplementationRemoved,
-              'The CanCan skip_authorization method has been renamed to skip_authorization_check. '\
-              'Please update your code.'
-      end
-
       def cancan_resource_class
         ControllerResource
       end
@@ -339,10 +333,6 @@ module CanCan
     def authorize!(*args)
       @_authorized = true
       current_ability.authorize!(*args)
-    end
-
-    def unauthorized!(_message = nil)
-      raise ImplementationRemoved, 'The unauthorized! method has been removed from CanCan, use authorize! instead.'
     end
 
     # Creates and returns the current user's ability and caches it. If you

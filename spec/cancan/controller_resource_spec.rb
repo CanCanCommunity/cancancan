@@ -577,24 +577,6 @@ describe CanCan::ControllerResource do
     expect(resource.send(:resource_class)).to eq(Section)
   end
 
-  it 'raises ImplementationRemoved when adding :name option' do
-    expect do
-      CanCan::ControllerResource.new(controller, name: :foo)
-    end.to raise_error(CanCan::ImplementationRemoved)
-  end
-
-  it 'raises ImplementationRemoved exception when specifying :resource option since it is no longer used' do
-    expect do
-      CanCan::ControllerResource.new(controller, resource: Model)
-    end.to raise_error(CanCan::ImplementationRemoved)
-  end
-
-  it 'raises ImplementationRemoved exception when passing :nested option' do
-    expect do
-      CanCan::ControllerResource.new(controller, nested: :model)
-    end.to raise_error(CanCan::ImplementationRemoved)
-  end
-
   it 'skips resource behavior for :only actions in array' do
     allow(controller_class).to receive(:cancan_skipper) { { load: { nil => { only: %i[index show] } } } }
     params[:action] = 'index'

@@ -22,12 +22,6 @@ module CanCan
       @params = controller.params
       @options = args.extract_options!
       @name = args.first
-      nested_err = 'The :nested option is no longer supported, instead use :through with separate load/authorize call.'
-      raise CanCan::ImplementationRemoved, nested_err if @options[:nested]
-      name_err = 'The :name option is no longer supported, instead pass the name as the first argument.'
-      raise CanCan::ImplementationRemoved, name_err if @options[:name]
-      resource_err = 'The :resource option has been renamed back to :class, use false if no class.'
-      raise CanCan::ImplementationRemoved, resource_err if @options[:resource]
     end
 
     def load_and_authorize_resource
