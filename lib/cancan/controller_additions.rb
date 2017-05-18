@@ -256,8 +256,6 @@ module CanCan
       #     check_authorization :unless => :devise_controller?
       #
       def check_authorization(options = {})
-        method_name = active_support_4? ? :after_action : :after_filter
-
         block = proc do |controller|
           next if controller.instance_variable_defined?(:@_authorized)
           next if options[:if] && !controller.send(options[:if])
@@ -267,7 +265,7 @@ module CanCan
                 'Add skip_authorization_check to bypass this check.'
         end
 
-        send(method_name, options.slice(:only, :except), &block)
+        send(:after_action, options.slice(:only, :except), &block)
       end
 
       # Call this in the class of a controller to skip the check_authorization behavior on the actions.
@@ -278,31 +276,16 @@ module CanCan
       #
       # Any arguments are passed to the +before_action+ it triggers.
       def skip_authorization_check(*args)
-        method_name = active_support_4? ? :before_action : :before_filter
         block = proc { |controller| controller.instance_variable_set(:@_authorized, true) }
-        send(method_name, *args, &block)
-      end
-
-      def skip_authorization(*_args)
-        raise ImplementationRemoved,
-              'The CanCan skip_authorization method has been renamed to skip_authorization_check. '\
-              'Please update your code.'
+        send(:before_action, *args, &block)
       end
 
       def cancan_resource_class
-        if ancestors.map(&:to_s).include? 'InheritedResources::Actions'
-          InheritedResource
-        else
-          ControllerResource
-        end
+        ControllerResource
       end
 
       def cancan_skipper
         @_cancan_skipper ||= { authorize: {}, load: {} }
-      end
-
-      def active_support_4?
-        ActiveSupport.respond_to?(:version) && ActiveSupport.version >= Gem::Version.new('4')
       end
     end
 
@@ -350,10 +333,6 @@ module CanCan
     def authorize!(*args)
       @_authorized = true
       current_ability.authorize!(*args)
-    end
-
-    def unauthorized!(_message = nil)
-      raise ImplementationRemoved, 'The unauthorized! method has been removed from CanCan, use authorize! instead.'
     end
 
     # Creates and returns the current user's ability and caches it. If you

@@ -10,10 +10,6 @@ describe CanCan::ControllerAdditions do
     @controller_class.send(:include, CanCan::ControllerAdditions)
   end
 
-  it "raises ImplementationRemoved when attempting to call 'unauthorized!' on a controller" do
-    expect { @controller.unauthorized! }.to raise_error(CanCan::ImplementationRemoved)
-  end
-
   it 'authorize! assigns @_authorized instance variable and pass args to current ability' do
     allow(@controller.current_ability).to receive(:authorize!).with(:foo, :bar)
     @controller.authorize!(:foo, :bar)
@@ -65,10 +61,10 @@ describe CanCan::ControllerAdditions do
     expect(cancan_resource_class = double).to receive(:load_resource)
     allow(CanCan::ControllerResource).to receive(:new).with(@controller, nil, foo: :bar) { cancan_resource_class }
     expect(@controller_class)
-      .to receive(callback_action(:before_action)).with(only: [:show, :index], unless: false) do |_options, &block|
+      .to receive(callback_action(:before_action)).with(only: %i[show index], unless: false) do |_options, &block|
         block.call(@controller)
       end
-    @controller_class.load_resource foo: :bar, only: [:show, :index], unless: false
+    @controller_class.load_resource foo: :bar, only: %i[show index], unless: false
   end
 
   it 'skip_authorization_check setups a before filter which sets @_authorized to true' do
@@ -117,11 +113,6 @@ describe CanCan::ControllerAdditions do
     expect(@controller.class.cancan_resource_class).to eq(CanCan::ControllerResource)
   end
 
-  it 'cancan_resource_class is InheritedResource when class includes InheritedResources::Actions' do
-    allow(@controller.class).to receive(:ancestors) { ['InheritedResources::Actions'] }
-    expect(@controller.class.cancan_resource_class).to eq(CanCan::InheritedResource)
-  end
-
   it 'cancan_skipper is an empty hash with :authorize and :load options and remember changes' do
     expect(@controller_class.cancan_skipper).to eq(authorize: {}, load: {})
     @controller_class.cancan_skipper[:load] = true
@@ -129,27 +120,27 @@ describe CanCan::ControllerAdditions do
   end
 
   it 'skip_authorize_resource adds itself to the cancan skipper with given model name and options' do
-    @controller_class.skip_authorize_resource(:project, only: [:index, :show])
-    expect(@controller_class.cancan_skipper[:authorize][:project]).to eq(only: [:index, :show])
-    @controller_class.skip_authorize_resource(only: [:index, :show])
-    expect(@controller_class.cancan_skipper[:authorize][nil]).to eq(only: [:index, :show])
+    @controller_class.skip_authorize_resource(:project, only: %i[index show])
+    expect(@controller_class.cancan_skipper[:authorize][:project]).to eq(only: %i[index show])
+    @controller_class.skip_authorize_resource(only: %i[index show])
+    expect(@controller_class.cancan_skipper[:authorize][nil]).to eq(only: %i[index show])
     @controller_class.skip_authorize_resource(:article)
     expect(@controller_class.cancan_skipper[:authorize][:article]).to eq({})
   end
 
   it 'skip_load_resource adds itself to the cancan skipper with given model name and options' do
-    @controller_class.skip_load_resource(:project, only: [:index, :show])
-    expect(@controller_class.cancan_skipper[:load][:project]).to eq(only: [:index, :show])
-    @controller_class.skip_load_resource(only: [:index, :show])
-    expect(@controller_class.cancan_skipper[:load][nil]).to eq(only: [:index, :show])
+    @controller_class.skip_load_resource(:project, only: %i[index show])
+    expect(@controller_class.cancan_skipper[:load][:project]).to eq(only: %i[index show])
+    @controller_class.skip_load_resource(only: %i[index show])
+    expect(@controller_class.cancan_skipper[:load][nil]).to eq(only: %i[index show])
     @controller_class.skip_load_resource(:article)
     expect(@controller_class.cancan_skipper[:load][:article]).to eq({})
   end
 
   it 'skip_load_and_authore_resource adds itself to the cancan skipper with given model name and options' do
-    @controller_class.skip_load_and_authorize_resource(:project, only: [:index, :show])
-    expect(@controller_class.cancan_skipper[:load][:project]).to eq(only: [:index, :show])
-    expect(@controller_class.cancan_skipper[:authorize][:project]).to eq(only: [:index, :show])
+    @controller_class.skip_load_and_authorize_resource(:project, only: %i[index show])
+    expect(@controller_class.cancan_skipper[:load][:project]).to eq(only: %i[index show])
+    expect(@controller_class.cancan_skipper[:authorize][:project]).to eq(only: %i[index show])
   end
 
   private

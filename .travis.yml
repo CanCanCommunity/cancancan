@@ -2,32 +2,37 @@ language: ruby
 cache: bundler
 sudo: false
 rvm:
-  - 2.0.0
-  - 2.1.0
   - 2.2.0
-  - 2.2.2
+  - 2.2.7
+  - 2.3.4
+  - 2.4.1
   - jruby-9.0.5.0
+  - jruby-9.1.8.0
 gemfile:
-  - gemfiles/activerecord_3.2.gemfile
-  - gemfiles/activerecord_4.0.gemfile
-  - gemfiles/activerecord_4.1.gemfile
   - gemfiles/activerecord_4.2.gemfile
-  - gemfiles/activerecord_5.0.gemfile
-  - gemfiles/mongoid_2.x.gemfile
-  - gemfiles/sequel_3.x.gemfile
+  - gemfiles/activerecord_5.0.2.gemfile
+  - gemfiles/activerecord_5.1.0.gemfile
 services:
   - mongodb
 matrix:
   fast_finish: true
   exclude:
-    - rvm: 2.0.0
-      gemfile: gemfiles/activerecord_5.0.gemfile
-    - rvm: 2.1.0
-      gemfile: gemfiles/activerecord_5.0.gemfile
     - rvm: 2.2.0
-      gemfile: gemfiles/activerecord_5.0.gemfile
+      gemfile: gemfiles/activerecord_5.0.2.gemfile
+    - rvm: 2.2.0
+      gemfile: gemfiles/activerecord_5.1.0.gemfile
+    - rvm: 2.2.7
+      gemfile: gemfiles/activerecord_5.0.2.gemfile
+    - rvm: 2.2.7
+      gemfile: gemfiles/activerecord_5.1.0.gemfile
     - rvm: jruby-9.0.5.0
-      gemfile: gemfiles/activerecord_5.0.gemfile
+      gemfile: gemfiles/activerecord_5.0.2.gemfile
+    - rvm: jruby-9.1.8.0
+      gemfile: gemfiles/activerecord_5.0.2.gemfile
+    - rvm: jruby-9.0.5.0
+      gemfile: gemfiles/activerecord_5.1.0.gemfile
+    - rvm: jruby-9.1.8.0
+      gemfile: gemfiles/activerecord_5.1.0.gemfile
 notifications:
   email:
     recipients:
@@ -36,4 +41,5 @@ notifications:
       - zora.fuchs@renuo.ch
     on_success: change
     on_failure: change
-
+script:
+  - bundle exec rubocop && bundle exec rake

@@ -30,9 +30,15 @@ Metrics/ModuleLength:
     - 'lib/cancan/ability.rb'
     - 'lib/cancan/model_adapters/active_record_adapter.rb'
 
+Metrics/BlockLength:
+  Exclude:
+    - 'lib/cancan/matchers.rb'
+    - '**/*_spec.rb'
+
 AllCops:
   TargetRubyVersion: 2.0
   Exclude:
     - 'gemfiles/vendor/bundle/**/*'
+    - 'Appraisals'
 
 inherit_from: .rubocop_todo.yml
