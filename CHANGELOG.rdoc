@@ -1,8 +1,6 @@
-Develop
-
 Unreleased
 
-2.0.0 (TBD)
+2.0.0 (May 18th, 2017)
 
 * Drop support for Rails < 4.2 (oliverklee)
 * Drop support for ruby < 2.2 (coorasse)
