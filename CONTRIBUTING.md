@@ -2,22 +2,26 @@
 
 ### Reporting an Issue
 
-1. If you have any questions about CanCanCan, search the [Wiki](https://github.com/cancancommunity/cancancan/wiki), use [Stack Overflow](http://stackoverflow.com/questions/tagged/cancancan), or [our mailing list](https://groups.google.com/forum/#!forum/cancancan). Do not post questions here.
+1. If you have any questions about CanCanCan, search the [Wiki](https://github.com/cancancommunity/cancancan/wiki) or 
+use [Stack Overflow](http://stackoverflow.com/questions/tagged/cancancan). 
+Do not post questions here.
 
-1. If you find a security bug, **DO NOT** submit an issue here. Please send an e-mail to the current maintainer instead.
+1. If you find a security bug, **DO NOT** submit an issue here. Please send an e-mail to the [current maintainer](https://github.com/coorasse) instead.
 
 1. Do a small search on the issues tracker before submitting your issue to see if it was already reported / fixed.
 
-1. Create your report including Rails and CanCanCan versions. If you are getting exceptions, please include the full backtrace.
+1. Create your report including Rails and CanCanCan versions. If you are getting exceptions, please include the full backtrace. Use the [following gist](https://gist.github.com/coorasse/3f00f536563249125a37e15a1652648c) as a base to reproduce your bug.
 
 That's it! The more information you give, the more easy it becomes for us to track it down and fix it. Ideal scenario would be adding the issue to CanCanCan test suite or to a sample application.
 
 ### Adding new Features or Bugfixes
 
-CanCanCan uses a [git-flow](http://nvie.com/posts/a-successful-git-branching-model/) development model.  The latest "released" version of CanCanCan, the latest gem version, can always be found on `master`, while the next version or nightly is on `develop`.
+CanCanCan uses a [git-flow](http://nvie.com/posts/a-successful-git-branching-model/) development model.
+The latest "released" version of CanCanCan, the latest gem version, can always be found on `master`, 
+while the next version or nightly is on `develop`.
 
 Please make sure you have test coverage for anything you add or fix!
 
 Please add a CHANGELOG entry with any relevant tags for issues, pull-requests, and authors.
 
-Thanks!
+Thanks for you contribution!
