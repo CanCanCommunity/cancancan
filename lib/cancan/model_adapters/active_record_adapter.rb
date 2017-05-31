@@ -144,6 +144,6 @@ module CanCan
   end
 end
 
-ActiveRecord::Base.class_eval do
-  include CanCan::ModelAdditions
+ActiveSupport.on_load(:active_record) do
+  send :include, CanCan::ModelAdditions
 end

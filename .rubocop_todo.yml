@@ -46,3 +46,9 @@ Style/PredicateName:
   Exclude:
     - 'spec/**/*'
     - 'lib/cancan/ability.rb'
+
+Style/SymbolArray:
+  Enabled: false
+
+Style/InverseMethods:
+  Enabled: false

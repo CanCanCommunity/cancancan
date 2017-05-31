@@ -5,6 +5,7 @@ source "https://rubygems.org"
 gem "sequel", "~> 3.48.0"
 gem "activesupport", "~> 3.0", :require => "active_support/all"
 gem "actionpack", "~> 3.0", :require => "action_pack"
+gem "rubocop", "0.48.0"
 
 platforms :jruby do
   gem "jdbc-sqlite3"
