@@ -1,5 +1,7 @@
 Unreleased
 
+* Adds support for Rails Api applications (coorasse & ajgon)
+
 2.0.0 (May 18th, 2017)
 
 * Drop support for Rails < 4.2 (oliverklee)
