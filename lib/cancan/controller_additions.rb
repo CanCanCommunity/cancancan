@@ -285,13 +285,14 @@ module CanCan
       end
 
       def cancan_skipper
-        @_cancan_skipper ||= { authorize: {}, load: {} }
+        self._cancan_skipper ||= { authorize: {}, load: {} }
       end
     end
 
     def self.included(base)
       base.extend ClassMethods
       base.helper_method :can?, :cannot?, :current_ability if base.respond_to? :helper_method
+      base.class_attribute :_cancan_skipper
     end
 
     # Raises a CanCan::AccessDenied exception if the current_ability cannot
