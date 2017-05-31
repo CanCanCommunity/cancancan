@@ -1,6 +1,7 @@
 Unreleased
 
 * Adds support for Rails Api applications (coorasse & ajgon)
+* Controller subclasses inherit skip_load_resource from superclass (jpmckinney)
 
 2.0.0 (May 18th, 2017)
 
