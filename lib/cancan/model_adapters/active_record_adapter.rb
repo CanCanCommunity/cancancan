@@ -145,5 +145,5 @@ module CanCan
 end
 
 ActiveSupport.on_load(:active_record) do
-  self.send :include, CanCan::ModelAdditions
+  send :include, CanCan::ModelAdditions
 end
