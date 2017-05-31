@@ -279,6 +279,21 @@ module CanCan
       permissions_list
     end
 
+    # Return conditions hash for user ability
+    def permissions_hash
+      permissions_list = Hash.new { |h, k| h[k] = [] }
+      rules.each do |rule|
+        rule.subjects.each do |subject|
+          permissions_list[subject.to_s.underscore] << {
+            actions: expand_actions(rule.actions),
+            conditions: rule.conditions
+          }
+        end
+      end
+
+      permissions_list
+    end
+
     protected
 
     # Must be protected as an ability can merge with other abilities.
