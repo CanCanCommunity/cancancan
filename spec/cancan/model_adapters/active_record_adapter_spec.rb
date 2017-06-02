@@ -237,38 +237,48 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
     end
 
     it 'has false conditions if no abilities match' do
-      expect(@ability.model_adapter(Article, :read).conditions).to eq("'t'='f'")
+      expect(normalized_sql(@ability.model_adapter(Article, :read)))
+        .to eq('SELECT "articles".* FROM "articles" WHERE (1 == 0)')
     end
 
     it 'returns false conditions for cannot clause' do
       @ability.cannot :read, Article
-      expect(@ability.model_adapter(Article, :read).conditions).to eq("'t'='f'")
+      expect(normalized_sql(@ability.model_adapter(Article, :read)))
+        .to eq('SELECT "articles".* FROM "articles" WHERE (1 == 0)')
     end
 
     it 'returns SQL for single `can` definition in front of default `cannot` condition' do
       @ability.cannot :read, Article
       @ability.can :read, Article, published: false, secret: true
-      expect(@ability.model_adapter(Article, :read).conditions)
-        .to orderlessly_match(%("#{@article_table}"."published" = 'f' AND "#{@article_table}"."secret" = 't'))
+      # rubocop:disable LineLength
+      expect(normalized_sql(@ability.model_adapter(Article, :read)))
+        .to eq(%q(SELECT DISTINCT articles.* FROM (SELECT "articles".* FROM "articles" WHERE "articles"."published" = 'f' AND "articles"."secret" = 't' EXCEPT SELECT "articles".* FROM "articles") AS articles))
+      # rubocop:enable LineLength
     end
 
     it 'returns true condition for single `can` definition in front of default `can` condition' do
       @ability.can :read, Article
       @ability.can :read, Article, published: false, secret: true
-      expect(@ability.model_adapter(Article, :read).conditions).to eq("'t'='t'")
+      # rubocop:disable LineLength
+      expect(normalized_sql(@ability.model_adapter(Article, :read)))
+        .to eq(%q(SELECT DISTINCT articles.* FROM (SELECT "articles".* FROM "articles" UNION SELECT "articles".* FROM "articles" WHERE "articles"."published" = 'f' AND "articles"."secret" = 't') AS articles))
+      # rubocop:enable LineLength
     end
 
     it 'returns `false condition` for single `cannot` definition in front of default `cannot` condition' do
       @ability.cannot :read, Article
       @ability.cannot :read, Article, published: false, secret: true
-      expect(@ability.model_adapter(Article, :read).conditions).to eq("'t'='f'")
+      expect(normalized_sql(@ability.model_adapter(Article, :read)))
+        .to eq('SELECT "articles".* FROM "articles" WHERE (1 == 0)')
     end
 
     it 'returns `not (sql)` for single `cannot` definition in front of default `can` condition' do
       @ability.can :read, Article
       @ability.cannot :read, Article, published: false, secret: true
-      expect(@ability.model_adapter(Article, :read).conditions)
-        .to orderlessly_match(%["not (#{@article_table}"."published" = 'f' AND "#{@article_table}"."secret" = 't')])
+      # rubocop:disable LineLength
+      expect(normalized_sql(@ability.model_adapter(Article, :read)))
+        .to eq(%q(SELECT DISTINCT articles.* FROM (SELECT "articles".* FROM "articles" EXCEPT SELECT "articles".* FROM "articles" WHERE "articles"."published" = 'f' AND "articles"."secret" = 't') AS articles))
+      # rubocop:enable LineLength
     end
 
     it 'returns appropriate sql conditions in complex case' do
@@ -276,60 +286,51 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       @ability.can :manage, Article, id: 1
       @ability.can :update, Article, published: true
       @ability.cannot :update, Article, secret: true
-      expect(@ability.model_adapter(Article, :update).conditions)
-        .to eq(%[not ("#{@article_table}"."secret" = 't') ] +
-               %[AND (("#{@article_table}"."published" = 't') ] +
-               %[OR ("#{@article_table}"."id" = 1))])
-      expect(@ability.model_adapter(Article, :manage).conditions).to eq(id: 1)
-      expect(@ability.model_adapter(Article, :read).conditions).to eq("'t'='t'")
+      # rubocop:disable LineLength
+      expect(normalized_sql(@ability.model_adapter(Article, :update)))
+        .to eq(%q(SELECT DISTINCT articles.* FROM (SELECT "articles".* FROM "articles" WHERE "articles"."id" = 1 UNION SELECT "articles".* FROM "articles" WHERE "articles"."published" = 't' EXCEPT SELECT "articles".* FROM "articles" WHERE "articles"."secret" = 't') AS articles))
+      expect(normalized_sql(@ability.model_adapter(Article, :manage)))
+        .to eq('SELECT DISTINCT articles.* FROM (SELECT "articles".* FROM "articles" WHERE "articles"."id" = 1) AS articles')
+      expect(normalized_sql(@ability.model_adapter(Article, :read)))
+        .to eq('SELECT DISTINCT articles.* FROM (SELECT "articles".* FROM "articles" UNION SELECT "articles".* FROM "articles" WHERE "articles"."id" = 1) AS articles')
+      # rubocop:enable LineLength
+    end
+
+    it 'returns appropriate sql in cases where rules specify different conditions on a table via distinct joins' do
+      @ability.can :read, Article, user: { id: 1 }
+      @ability.can :read, Article, mentioned_users: { id: 2 }
+      # rubocop:disable LineLength
+      expect(normalized_sql(@ability.model_adapter(Article, :read)))
+        .to eq('SELECT DISTINCT articles.* FROM (SELECT "articles".* FROM "articles" INNER JOIN "users" ON "users"."id" = "articles"."user_id" WHERE "users"."id" = 1 UNION SELECT "articles".* FROM "articles" INNER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id" INNER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id" WHERE "users"."id" = 2) AS articles')
+      # rubocop:enable LineLength
     end
 
     it 'returns appropriate sql conditions in complex case with nested joins' do
       @ability.can :read, Comment, article: { category: { visible: true } }
-      expect(@ability.model_adapter(Comment, :read).conditions).to eq(Category.table_name.to_sym => { visible: true })
+      # rubocop:disable LineLength
+      expect(normalized_sql(@ability.model_adapter(Comment, :read)))
+        .to eq(%q(SELECT DISTINCT comments.* FROM (SELECT "comments".* FROM "comments" INNER JOIN "articles" ON "articles"."id" = "comments"."article_id" INNER JOIN "categories" ON "categories"."id" = "articles"."category_id" WHERE "categories"."visible" = 't') AS comments))
+      # rubocop:enable LineLength
     end
 
     it 'returns appropriate sql conditions in complex case with nested joins of different depth' do
       @ability.can :read, Comment, article: { published: true, category: { visible: true } }
-      expect(@ability.model_adapter(Comment, :read).conditions)
-        .to eq(Article.table_name.to_sym => { published: true }, Category.table_name.to_sym => { visible: true })
+      # rubocop:disable LineLength
+      expect(normalized_sql(@ability.model_adapter(Comment, :read)))
+        .to eq(%q(SELECT DISTINCT comments.* FROM (SELECT "comments".* FROM "comments" INNER JOIN "articles" ON "articles"."id" = "comments"."article_id" INNER JOIN "categories" ON "categories"."id" = "articles"."category_id" WHERE "articles"."published" = 't' AND "categories"."visible" = 't') AS comments))
+      # rubocop:enable LineLength
     end
 
     it 'does not forget conditions when calling with SQL string' do
       @ability.can :read, Article, published: true
       @ability.can :read, Article, ['secret=?', false]
       adapter = @ability.model_adapter(Article, :read)
+      # rubocop:disable LineLength
       2.times do
-        expect(adapter.conditions).to eq(%[(secret='f') OR ("#{@article_table}"."published" = 't')])
+        expect(normalized_sql(adapter))
+          .to eq(%q(SELECT DISTINCT articles.* FROM (SELECT "articles".* FROM "articles" WHERE "articles"."published" = 't' UNION SELECT "articles".* FROM "articles" WHERE (secret='f')) AS articles))
       end
-    end
-
-    it 'has nil joins if no rules' do
-      expect(@ability.model_adapter(Article, :read).joins).to be_nil
-    end
-
-    it 'has nil joins if no nested hashes specified in conditions' do
-      @ability.can :read, Article, published: false
-      @ability.can :read, Article, secret: true
-      expect(@ability.model_adapter(Article, :read).joins).to be_nil
-    end
-
-    it 'merges separate joins into a single array' do
-      @ability.can :read, Article, project: { blocked: false }
-      @ability.can :read, Article, company: { admin: true }
-      expect(@ability.model_adapter(Article, :read).joins.inspect).to orderlessly_match(%i[company project].inspect)
-    end
-
-    it 'merges same joins into a single array' do
-      @ability.can :read, Article, project: { blocked: false }
-      @ability.can :read, Article, project: { admin: true }
-      expect(@ability.model_adapter(Article, :read).joins).to eq([:project])
-    end
-
-    it 'merges nested and non-nested joins' do
-      @ability.can :read, Article, project: { blocked: false }
-      @ability.can :read, Article, project: { comments: { spam: true } }
-      expect(@ability.model_adapter(Article, :read).joins).to eq([{ project: [:comments] }])
+      # rubocop:enable LineLength
     end
 
     it 'merges :all conditions with other conditions' do
