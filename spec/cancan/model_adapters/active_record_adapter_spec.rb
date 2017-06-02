@@ -411,5 +411,28 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
         expect(Course.accessible_by(@ability)).to eq([valid_course])
       end
     end
+
+    context 'when empty conditions' do
+      before :each do
+        ActiveRecord::Schema.define do
+          create_table(:posts) do |t|
+            t.boolean :published
+          end
+        end
+
+        class Post < ActiveRecord::Base
+          scope :not_published, -> { where(published: false) }
+
+          def not_published?
+            false
+          end
+        end
+
+        @ability.cannot :manage, :all
+        @ability.can :read, Post, Post.not_published(&:not_published?)
+      end
+
+      it { expect { @ability.can? :read, Post.new }.not_to raise_error }
+    end
   end
 end
