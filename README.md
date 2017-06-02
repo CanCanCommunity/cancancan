@@ -61,7 +61,7 @@ The `authorize!` method in the controller will raise an exception if the user is
 ```ruby
 def show
   @article = Article.find(params[:id])
-  authorize! :read, @article
+  authorize! :show, @article
 end
 ```
 
