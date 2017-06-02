@@ -411,5 +411,17 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
         expect(Course.accessible_by(@ability)).to eq([valid_course])
       end
     end
+
+    context 'when empty conditions' do
+      let(:not_published) { Article.new(published: false) }
+      before :each do
+        @ability.cannot :manage, :all
+        @ability.can :read, Article do |instance|
+          instance.published?
+        end
+      end
+
+      it { expect(-> { not_published.accessible_by(@ability) }).not_to raise_error(CanCan::Error) }
+    end
   end
 end
