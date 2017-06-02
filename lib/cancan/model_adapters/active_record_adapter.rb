@@ -81,7 +81,7 @@ module CanCan
       end
 
       def override_scope
-        conditions = @rules.map(&:conditions).compact
+        conditions = @rules.map(&:conditions).select(&:present?)
         return unless defined?(ActiveRecord::Relation) && conditions.any? { |c| c.is_a?(ActiveRecord::Relation) }
         if conditions.size == 1
           conditions.first
