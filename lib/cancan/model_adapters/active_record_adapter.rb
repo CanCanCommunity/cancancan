@@ -1,29 +1,6 @@
 module CanCan
   module ModelAdapters
     module ActiveRecordAdapter
-      def tableized_conditions(conditions, model_class = @model_class)
-        return conditions unless conditions.is_a? Hash
-        conditions.each_with_object({}) do |(name, value), result_hash|
-          if value.is_a? Hash
-            value = value.dup
-            association_class = model_class.reflect_on_association(name).klass.name.constantize
-            nested_resulted = value.each_with_object({}) do |(k, v), nested|
-              if v.is_a? Hash
-                value.delete(k)
-                nested[k] = v
-              else
-                result_hash[model_class.reflect_on_association(name).table_name.to_sym] = value
-              end
-              nested
-            end
-            result_hash.merge!(tableized_conditions(nested_resulted, association_class))
-          else
-            result_hash[name] = value
-          end
-          result_hash
-        end
-      end
-
       def database_records
         if override_scope
           @model_class.where(nil).merge(override_scope)
@@ -62,6 +39,29 @@ module CanCan
 
       def relation_for(rule)
         @model_class.where(tableized_conditions(rule.conditions)).joins(joins_for(rule))
+      end
+
+      def tableized_conditions(conditions, model_class = @model_class)
+        return conditions unless conditions.is_a? Hash
+        conditions.each_with_object({}) do |(name, value), result_hash|
+          if value.is_a? Hash
+            value = value.dup
+            association_class = model_class.reflect_on_association(name).klass.name.constantize
+            nested_resulted = value.each_with_object({}) do |(k, v), nested|
+              if v.is_a? Hash
+                value.delete(k)
+                nested[k] = v
+              else
+                result_hash[model_class.reflect_on_association(name).table_name.to_sym] = value
+              end
+              nested
+            end
+            result_hash.merge!(tableized_conditions(nested_resulted, association_class))
+          else
+            result_hash[name] = value
+          end
+          result_hash
+        end
       end
 
       def override_scope
