@@ -10,6 +10,11 @@ Then run the appraisal command to install all the necessary test sets:
 
   appraisal install
 
+Install the mongodb
+
+  brew install mongodb
+  brew services start mongodb
+
 You can then run all test sets:
 
   appraisal rake
