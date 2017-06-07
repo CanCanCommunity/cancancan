@@ -14,6 +14,7 @@ describe CanCan::ControllerResource do
         attributes.each do |attribute, value|
           send("#{attribute}=", value)
         end
+        yield self if block_given?
       end
     end
 

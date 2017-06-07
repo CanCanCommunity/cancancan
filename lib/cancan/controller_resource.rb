@@ -77,8 +77,9 @@ module CanCan
     end
 
     def build_resource
-      resource = resource_base.new(resource_params || {})
-      assign_attributes(resource)
+      resource_base.new(resource_params || {}) do |resource|
+        assign_attributes(resource)
+      end
     end
 
     def assign_attributes(resource)
