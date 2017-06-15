@@ -238,13 +238,13 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
 
     it 'has false conditions if no abilities match' do
       expect(normalized_sql(@ability.model_adapter(Article, :read)))
-        .to eq('SELECT "articles".* FROM "articles" WHERE (1 == 0)')
+        .to eq('SELECT "articles".* FROM "articles" WHERE (1 = 0)')
     end
 
     it 'returns false conditions for cannot clause' do
       @ability.cannot :read, Article
       expect(normalized_sql(@ability.model_adapter(Article, :read)))
-        .to eq('SELECT "articles".* FROM "articles" WHERE (1 == 0)')
+        .to eq('SELECT "articles".* FROM "articles" WHERE (1 = 0)')
     end
 
     it 'returns SQL for single `can` definition in front of default `cannot` condition' do
@@ -269,7 +269,7 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       @ability.cannot :read, Article
       @ability.cannot :read, Article, published: false, secret: true
       expect(normalized_sql(@ability.model_adapter(Article, :read)))
-        .to eq('SELECT "articles".* FROM "articles" WHERE (1 == 0)')
+        .to eq('SELECT "articles".* FROM "articles" WHERE (1 = 0)')
     end
 
     it 'returns `not (sql)` for single `cannot` definition in front of default `can` condition' do

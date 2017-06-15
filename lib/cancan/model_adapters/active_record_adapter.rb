@@ -7,7 +7,7 @@ module CanCan
         else
           positive_relations, negative_relations = build_relations(@rules)
           if positive_relations.empty?
-            @model_class.where('1 == 0')
+            @model_class.where('1 = 0')
           else
             positive_sql = positive_relations.map(&:to_sql).join(' UNION ')
             if negative_relations.empty?
