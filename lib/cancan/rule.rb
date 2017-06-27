@@ -3,6 +3,9 @@ module CanCan
   # it holds the information about a "can" call made on Ability and provides
   # helpful methods to determine permission checking and conditions hash generation.
   class Rule # :nodoc:
+    E_NO_REGEX_SUPPORT = 'cancancan does not support regexes in ability ' \
+      'definitions. Contributions welcome.'.freeze
+
     attr_reader :base_behavior, :subjects, :actions, :conditions
     attr_writer :expanded_actions
 
@@ -144,6 +147,7 @@ module CanCan
 
     def condition_match?(attribute, value)
       case value
+      when Regexp     then raise(E_NO_REGEX_SUPPORT)
       when Hash       then hash_condition_match?(attribute, value)
       when String     then attribute == value
       when Range      then value.cover?(attribute)
