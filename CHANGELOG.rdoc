@@ -1,5 +1,7 @@
 Unreleased
 
+* Raise error when an ability definition includes a regex. Previously, regexes
+  silently failed to do what you'd expect.
 * Adds support for Rails Api applications (coorasse & ajgon)
 * Controller subclasses inherit skip_load_resource from superclass (jpmckinney)
 
