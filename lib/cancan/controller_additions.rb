@@ -40,7 +40,7 @@ module CanCan
       #     private
       #
       #     def find_book_by_permalink
-      #       @book = Book.find_by_permalink!(params[:id)
+      #       @book = Book.find_by_permalink!(params[:id])
       #     end
       #   end
       #
