@@ -171,7 +171,7 @@ module CanCan
 
     def resource_instance
       return unless load_instance? && @controller.instance_variable_defined?("@#{instance_name}")
-      @controller.instance_variable_get(resource_name)
+      @controller.instance_variable_get("@#{instance_name}")
     end
 
     def collection_instance=(instance)
