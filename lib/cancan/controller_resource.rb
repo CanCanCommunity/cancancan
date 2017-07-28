@@ -180,7 +180,7 @@ module CanCan
 
     def collection_instance
       return unless @controller.instance_variable_defined?("@#{instance_name.to_s.pluralize}")
-      @controller.instance_variable_get(collection_name)
+      @controller.instance_variable_get("@#{instance_name.to_s.pluralize}")
     end
 
     # The object that methods (such as "find", "new" or "build") are called on.
