@@ -170,9 +170,8 @@ module CanCan
     end
 
     def resource_instance
-      if load_instance? && @controller.instance_variable_defined?("@#{instance_name}")
-        @controller.instance_variable_get("@#{instance_name}")
-      end
+      return unless load_instance? && @controller.instance_variable_defined?("@#{instance_name}")
+      @controller.instance_variable_get(resource_name)
     end
 
     def collection_instance=(instance)
@@ -180,9 +179,8 @@ module CanCan
     end
 
     def collection_instance
-      if @controller.instance_variable_defined?("@#{instance_name.to_s.pluralize}")
-        @controller.instance_variable_get("@#{instance_name.to_s.pluralize}")
-      end
+      return unless @controller.instance_variable_defined?("@#{instance_name.to_s.pluralize}")
+      @controller.instance_variable_get(collection_name)
     end
 
     # The object that methods (such as "find", "new" or "build") are called on.
