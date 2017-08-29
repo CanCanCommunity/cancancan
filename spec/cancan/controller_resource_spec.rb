@@ -188,7 +188,7 @@ describe CanCan::ControllerResource do
 
     context 'with a build parameters method' do
       it 'prefers to use the new_params method for initializing instances' do
-        params.merge!(action: 'new')
+        params[:action] = 'new'
         allow(controller).to receive(:resource_params).and_return(resource: 'params')
         allow(controller).to receive(:model_params).and_return(model: 'params')
         allow(controller).to receive(:custom_params).and_return(custom: 'params')
@@ -201,7 +201,7 @@ describe CanCan::ControllerResource do
       end
 
       it 'prefers to use the new_params method for initializing instances' do
-        params.merge!(action: 'create')
+        params[:action] = 'create'
         allow(controller).to receive(:resource_params).and_return(resource: 'params')
         allow(controller).to receive(:model_params).and_return(model: 'params')
         allow(controller).to receive(:custom_params).and_return(custom: 'params')
