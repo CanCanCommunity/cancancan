@@ -1,7 +1,8 @@
 Unreleased
 
-* Adds support for Rails Api applications (coorasse & ajgon)
+* Adds support for Rails API applications (coorasse & ajgon)
 * Controller subclasses inherit skip_load_resource from superclass (jpmckinney)
+* Adds support for `new_params` for instantiating instances with custom params (joelvh)
 
 2.0.0 (May 18th, 2017)
 

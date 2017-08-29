@@ -185,6 +185,34 @@ describe CanCan::ControllerResource do
         expect(resource.send('resource_params')).to eq(resource: 'params')
       end
     end
+
+    context 'with a build parameters method' do
+      it 'prefers to use the new_params method for initializing instances' do
+        params.merge!(action: 'new')
+        allow(controller).to receive(:resource_params).and_return(resource: 'params')
+        allow(controller).to receive(:model_params).and_return(model: 'params')
+        allow(controller).to receive(:custom_params).and_return(custom: 'params')
+        allow(controller).to receive(:new_params).and_return(name: 'new')
+        allow(controller).to receive(:create_params).and_return(name: 'create')
+        resource = CanCan::ControllerResource.new(controller)
+        resource.load_resource
+        expect(resource.send(:build_params_method)).to eq :new_params
+        expect(resource.send(:resource_instance).name).to eq 'new'
+      end
+
+      it 'prefers to use the new_params method for initializing instances' do
+        params.merge!(action: 'create')
+        allow(controller).to receive(:resource_params).and_return(resource: 'params')
+        allow(controller).to receive(:model_params).and_return(model: 'params')
+        allow(controller).to receive(:custom_params).and_return(custom: 'params')
+        allow(controller).to receive(:new_params).and_return(name: 'new')
+        allow(controller).to receive(:create_params).and_return(name: 'create')
+        resource = CanCan::ControllerResource.new(controller)
+        resource.load_resource
+        expect(resource.send(:build_params_method)).to eq :create_params
+        expect(resource.send(:resource_instance).name).to eq 'create'
+      end
+    end
   end
 
   context 'on collection actions' do

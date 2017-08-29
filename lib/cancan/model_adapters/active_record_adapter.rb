@@ -77,7 +77,7 @@ module CanCan
       private
 
       def mergeable_conditions?
-        @rules.find(&:unmergeable?).blank?
+        @rules.none?(&:unmergeable?)
       end
 
       def override_scope

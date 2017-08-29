@@ -2,8 +2,8 @@
 
 ### Reporting an Issue
 
-1. If you have any questions about CanCanCan, search the [Wiki](https://github.com/cancancommunity/cancancan/wiki) or 
-use [Stack Overflow](http://stackoverflow.com/questions/tagged/cancancan). 
+1. If you have any questions about CanCanCan, search the [Wiki](https://github.com/cancancommunity/cancancan/wiki) or
+use [Stack Overflow](http://stackoverflow.com/questions/tagged/cancancan).
 Do not post questions here.
 
 1. If you find a security bug, **DO NOT** submit an issue here. Please send an e-mail to the [current maintainer](https://github.com/coorasse) instead.
@@ -17,11 +17,11 @@ That's it! The more information you give, the more easy it becomes for us to tra
 ### Adding new Features or Bugfixes
 
 CanCanCan uses a [git-flow](http://nvie.com/posts/a-successful-git-branching-model/) development model.
-The latest "released" version of CanCanCan, the latest gem version, can always be found on `master`, 
+The latest "released" version of CanCanCan, the latest gem version, can always be found on `master`,
 while the next version or nightly is on `develop`.
 
 Please make sure you have test coverage for anything you add or fix!
 
-Please add a CHANGELOG entry with any relevant tags for issues, pull-requests, and authors.
+Please add a [CHANGELOG](https://github.com/cancancommunity/cancancan/CHANGELOG.rdoc) entry with any relevant tags for issues, pull-requests, and authors.
 
 Thanks for you contribution!

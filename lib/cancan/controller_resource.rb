@@ -243,9 +243,21 @@ module CanCan
         when Proc then
           params_method.call(@controller)
         end
+      elsif build_params_method
+        @controller.send(build_params_method)
       else
         resource_params_by_namespaced_name
       end
+    end
+
+    def build_params_method
+      return unless new_actions.include?(@params[:action].to_sym)
+
+      method_name = "#{@params[:action]}_params".to_sym
+
+      return unless @controller.respond_to?(method_name, true)
+
+      method_name
     end
 
     def parameters_require_sanitizing?
