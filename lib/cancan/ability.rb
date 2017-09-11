@@ -243,6 +243,28 @@ module CanCan
       relevant_rules(action, subject).any?(&:only_raw_sql?)
     end
 
+    # Copies all rules of the given +CanCan::Ability+ and adds them to +self+.
+    #   class ReadAbility
+    #     include CanCan::Ability
+    #
+    #     def initialize
+    #       can :read, User
+    #     end
+    #   end
+    #
+    #   class WritingAbility
+    #     include CanCan::Ability
+    #
+    #     def initialize
+    #       can :edit, User
+    #     end
+    #   end
+    #
+    #   read_ability = ReadAbility.new
+    #   read_ability.can? :edit, User.new #=> false
+    #   read_ability.merge(WritingAbility.new)
+    #   read_ability.can? :edit, User.new #=> true
+    #
     def merge(ability)
       ability.rules.each do |rule|
         add_rule(rule.dup)
