@@ -3,7 +3,7 @@ module CanCan
     class ActiveRecord4Adapter < AbstractAdapter
       include ActiveRecordAdapter
       def self.for_class?(model_class)
-        model_class <= ActiveRecord::Base
+        ActiveRecord::VERSION::MAJOR == 4 && model_class <= ActiveRecord::Base
       end
 
       # TODO: this should be private

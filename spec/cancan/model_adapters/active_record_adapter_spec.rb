@@ -81,7 +81,13 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
 
     it 'is for only active record classes' do
       if ActiveRecord.respond_to?(:version) &&
-         ActiveRecord.version > Gem::Version.new('4')
+         ActiveRecord.version > Gem::Version.new('5')
+        expect(CanCan::ModelAdapters::ActiveRecord5Adapter).to_not be_for_class(Object)
+        expect(CanCan::ModelAdapters::ActiveRecord5Adapter).to be_for_class(Article)
+        expect(CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article))
+          .to eq(CanCan::ModelAdapters::ActiveRecord5Adapter)
+      elsif ActiveRecord.respond_to?(:version) &&
+            ActiveRecord.version > Gem::Version.new('4')
         expect(CanCan::ModelAdapters::ActiveRecord4Adapter).to_not be_for_class(Object)
         expect(CanCan::ModelAdapters::ActiveRecord4Adapter).to be_for_class(Article)
         expect(CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article))
