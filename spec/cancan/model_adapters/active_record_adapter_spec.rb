@@ -363,7 +363,7 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       article2 = Article.create!(user: user2)
 
       expect(ability.can?(:read, article1)).to eq true
-      expect(ability.can?(:read, article2)).to eq true
+      expect(ability.can?(:read, article2)).to eq false
       expect(Article.accessible_by(ability)).to eq [article1]
     end
 
