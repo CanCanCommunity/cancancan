@@ -147,6 +147,7 @@ module CanCan
       when Hash       then hash_condition_match?(attribute, value)
       when String     then attribute == value
       when Range      then value.cover?(attribute)
+      when ActiveRecord::Relation then defined?(ActiveRecord) && value.where(id: attribute).any?
       when Enumerable then value.include?(attribute)
       else attribute == value
       end
