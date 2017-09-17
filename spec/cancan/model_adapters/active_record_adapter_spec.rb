@@ -356,7 +356,7 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       user1 = User.create!
       user2 = User.create!
 
-      ability = Ability.new(user)
+      ability = Ability.new(user1)
       ability.can :read, Article, user_id: User.where(id: user1.id)
 
       article1 = Article.create!(user: user1)
