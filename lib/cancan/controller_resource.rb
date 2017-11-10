@@ -260,7 +260,8 @@ module CanCan
       elsif @options[:class] && @params.key?(extract_key(@options[:class]))
         @params[extract_key(@options[:class])]
       else
-        @params[extract_key(namespaced_name)]
+        params = @params[extract_key(namespaced_name)]
+        params.is_a?(Hash) ? params : nil
       end
     end
 
