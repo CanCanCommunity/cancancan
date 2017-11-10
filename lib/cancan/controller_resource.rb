@@ -170,7 +170,8 @@ module CanCan
     end
 
     def resource_instance
-      @controller.instance_variable_get("@#{instance_name}") if load_instance?
+      return unless load_instance? && @controller.instance_variable_defined?("@#{instance_name}")
+      @controller.instance_variable_get("@#{instance_name}")
     end
 
     def collection_instance=(instance)
@@ -178,6 +179,7 @@ module CanCan
     end
 
     def collection_instance
+      return unless @controller.instance_variable_defined?("@#{instance_name.to_s.pluralize}")
       @controller.instance_variable_get("@#{instance_name.to_s.pluralize}")
     end
 
