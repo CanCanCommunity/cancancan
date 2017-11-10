@@ -120,7 +120,7 @@ module CanCan
         if adapter.override_condition_matching?(subject, name, value)
           adapter.matches_condition?(subject, name, value)
         else
-          condition_match?(subject.send(name), value)
+          condition_match?(subject, name, value)
         end
       end
     end
@@ -142,7 +142,11 @@ module CanCan
       CanCan::ModelAdapters::AbstractAdapter.adapter_class(subject_class?(subject) ? subject : subject.class)
     end
 
-    def condition_match?(attribute, value)
+    def condition_match?(subject, name, value)
+      attribute = subject.send(name)
+
+      return value.where(name => attribute).any? if defined?(ActiveRecord) && value.is_a?(ActiveRecord::Relation)
+
       case value
       when Hash       then hash_condition_match?(attribute, value)
       when String     then attribute == value

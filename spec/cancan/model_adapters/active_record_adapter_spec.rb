@@ -352,6 +352,21 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       expect { @ability.can? :read, Article }.not_to raise_error
     end
 
+    it 'allows scope usage on can?' do
+      user1 = User.create!
+      user2 = User.create!
+
+      ability = Ability.new(user1)
+      ability.can :read, Article, user_id: User.where(id: user1.id)
+
+      article1 = Article.create!(user: user1)
+      article2 = Article.create!(user: user2)
+
+      expect(ability.can?(:read, article1)).to eq true
+      expect(ability.can?(:read, article2)).to eq false
+      expect(Article.accessible_by(ability)).to eq [article1]
+    end
+
     context 'with namespaced models' do
       before :each do
         ActiveRecord::Schema.define do
