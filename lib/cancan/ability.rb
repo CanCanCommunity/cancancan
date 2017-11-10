@@ -291,11 +291,10 @@ module CanCan
 
     def unauthorized_message_keys(action, subject)
       subject = (subject.class == Class ? subject : subject.class).name.underscore unless subject.is_a? Symbol
-      [subject, :all].map do |try_subject|
-        [aliases_for_action(action), :manage].flatten.map do |try_action|
-          :"#{try_action}.#{try_subject}"
-        end
-      end.flatten
+      aliases = aliases_for_action(action)
+      [subject, :all].product([*aliases, :manage]).map do |try_subject, try_action|
+        :"#{try_action}.#{try_subject}"
+      end
     end
 
     # Accepts an array of actions and returns an array of actions which match.
