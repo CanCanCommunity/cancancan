@@ -8,7 +8,7 @@
 
 # Offense count: 12
 Metrics/AbcSize:
-  Max: 21
+  Max: 18
 
 # Offense count: 3
 # Configuration parameters: CountComments.

@@ -106,9 +106,7 @@ module CanCan
     end
 
     def find_resource_using_find_by
-      if resource_base.respond_to? "find_by_#{@options[:find_by]}!"
-        resource_base.send("find_by_#{@options[:find_by]}!", id_param)
-      elsif resource_base.respond_to? 'find_by'
+      if resource_base.respond_to? 'find_by'
         resource_base.send('find_by', @options[:find_by].to_sym => id_param)
       else
         resource_base.send(@options[:find_by], id_param)
@@ -255,10 +253,12 @@ module CanCan
     end
 
     def resource_params_by_namespaced_name
-      if @options[:instance_name] && @params.key?(extract_key(@options[:instance_name]))
-        @params[extract_key(@options[:instance_name])]
-      elsif @options[:class] && @params.key?(extract_key(@options[:class]))
-        @params[extract_key(@options[:class])]
+      instance_name = extract_key(@options[:instance_name])
+      class_key = extract_key(@options[:class])
+      if @options[:instance_name] && @params.key?(instance_name)
+        @params[instance_name]
+      elsif @options[:class] && @params.key?(class_key)
+        @params[class_key]
       else
         params = @params[extract_key(namespaced_name)]
         params.is_a?(Hash) ? params : nil

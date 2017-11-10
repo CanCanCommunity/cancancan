@@ -262,21 +262,16 @@ module CanCan
     #   }
     def permissions
       permissions_list = { can: {}, cannot: {} }
-
-      rules.each do |rule|
-        subjects = rule.subjects
-        expand_actions(rule.actions).each do |action|
-          if rule.base_behavior
-            permissions_list[:can][action] ||= []
-            permissions_list[:can][action] += subjects.map(&:to_s)
-          else
-            permissions_list[:cannot][action] ||= []
-            permissions_list[:cannot][action] += subjects.map(&:to_s)
-          end
-        end
-      end
-
+      rules.each { |rule| extract_rule_in_permissions(permissions_list, rule) }
       permissions_list
+    end
+
+    def extract_rule_in_permissions(permissions_list, rule)
+      expand_actions(rule.actions).each do |action|
+        container = rule.base_behavior ? :can : :cannot
+        permissions_list[container][action] ||= []
+        permissions_list[container][action] += rule.subjects.map(&:to_s)
+      end
     end
 
     protected
@@ -354,7 +349,7 @@ module CanCan
 
     def alternative_subjects(subject)
       subject = subject.class unless subject.is_a?(Module)
-      [:all, *subject.ancestors,  subject.class.to_s]
+      [:all, *subject.ancestors, subject.class.to_s]
     end
 
     # Returns an array of Rule instances which match the action and subject
