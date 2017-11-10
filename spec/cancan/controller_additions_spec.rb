@@ -30,7 +30,7 @@ describe CanCan::ControllerAdditions do
     expect(cancan_resource_class = double).to receive(:load_and_authorize_resource)
     allow(CanCan::ControllerResource).to receive(:new).with(@controller, nil, foo: :bar) { cancan_resource_class }
     expect(@controller_class)
-      .to receive(callback_action(:before_action)).with({}) { |_options, &block| block.call(@controller) }
+      .to receive(:before_action).with({}) { |_options, &block| block.call(@controller) }
     @controller_class.load_and_authorize_resource foo: :bar
   end
 
@@ -38,12 +38,12 @@ describe CanCan::ControllerAdditions do
     expect(cancan_resource_class = double).to receive(:load_and_authorize_resource)
     allow(CanCan::ControllerResource).to receive(:new).with(@controller, :project, foo: :bar) { cancan_resource_class }
     expect(@controller_class)
-      .to receive(callback_action(:before_action)).with({}) { |_options, &block| block.call(@controller) }
+      .to receive(:before_action).with({}) { |_options, &block| block.call(@controller) }
     @controller_class.load_and_authorize_resource :project, foo: :bar
   end
 
   it 'load_and_authorize_resource with :prepend prepends the before filter' do
-    expect(@controller_class).to receive(callback_action(:prepend_before_action)).with({})
+    expect(@controller_class).to receive(:prepend_before_action).with({})
     @controller_class.load_and_authorize_resource foo: :bar, prepend: true
   end
 
@@ -51,7 +51,7 @@ describe CanCan::ControllerAdditions do
     expect(cancan_resource_class = double).to receive(:authorize_resource)
     allow(CanCan::ControllerResource).to receive(:new).with(@controller, nil, foo: :bar) { cancan_resource_class }
     expect(@controller_class)
-      .to receive(callback_action(:before_action)).with(except: :show, if: true) do |_options, &block|
+      .to receive(:before_action).with(except: :show, if: true) do |_options, &block|
         block.call(@controller)
       end
     @controller_class.authorize_resource foo: :bar, except: :show, if: true
@@ -61,7 +61,7 @@ describe CanCan::ControllerAdditions do
     expect(cancan_resource_class = double).to receive(:load_resource)
     allow(CanCan::ControllerResource).to receive(:new).with(@controller, nil, foo: :bar) { cancan_resource_class }
     expect(@controller_class)
-      .to receive(callback_action(:before_action)).with(only: %i[show index], unless: false) do |_options, &block|
+      .to receive(:before_action).with(only: %i[show index], unless: false) do |_options, &block|
         block.call(@controller)
       end
     @controller_class.load_resource foo: :bar, only: %i[show index], unless: false
@@ -69,14 +69,14 @@ describe CanCan::ControllerAdditions do
 
   it 'skip_authorization_check setups a before filter which sets @_authorized to true' do
     expect(@controller_class)
-      .to receive(callback_action(:before_action)).with(:filter_options) { |_options, &block| block.call(@controller) }
+      .to receive(:before_action).with(:filter_options) { |_options, &block| block.call(@controller) }
     @controller_class.skip_authorization_check(:filter_options)
     expect(@controller.instance_variable_get(:@_authorized)).to be(true)
   end
 
   it 'check_authorization triggers AuthorizationNotPerformed in after filter' do
     expect(@controller_class)
-      .to receive(callback_action(:after_action)).with(only: [:test]) { |_options, &block| block.call(@controller) }
+      .to receive(:after_action).with(only: [:test]) { |_options, &block| block.call(@controller) }
     expect do
       @controller_class.check_authorization(only: [:test])
     end.to raise_error(CanCan::AuthorizationNotPerformed)
@@ -85,7 +85,7 @@ describe CanCan::ControllerAdditions do
   it 'check_authorization does not trigger AuthorizationNotPerformed when :if is false' do
     allow(@controller).to receive(:check_auth?) { false }
     allow(@controller_class)
-      .to receive(callback_action(:after_action)).with({}) { |_options, &block| block.call(@controller) }
+      .to receive(:after_action).with({}) { |_options, &block| block.call(@controller) }
     expect do
       @controller_class.check_authorization(if: :check_auth?)
     end.not_to raise_error
@@ -94,7 +94,7 @@ describe CanCan::ControllerAdditions do
   it 'check_authorization does not trigger AuthorizationNotPerformed when :unless is true' do
     allow(@controller).to receive(:engine_controller?) { true }
     expect(@controller_class)
-      .to receive(callback_action(:after_action)).with({}) { |_options, &block| block.call(@controller) }
+      .to receive(:after_action).with({}) { |_options, &block| block.call(@controller) }
     expect do
       @controller_class.check_authorization(unless: :engine_controller?)
     end.not_to raise_error
@@ -103,7 +103,7 @@ describe CanCan::ControllerAdditions do
   it 'check_authorization does not raise error when @_authorized is set' do
     @controller.instance_variable_set(:@_authorized, true)
     expect(@controller_class)
-      .to receive(callback_action(:after_action)).with(only: [:test]) { |_options, &block| block.call(@controller) }
+      .to receive(:after_action).with(only: [:test]) { |_options, &block| block.call(@controller) }
     expect do
       @controller_class.check_authorization(only: [:test])
     end.not_to raise_error
@@ -143,13 +143,25 @@ describe CanCan::ControllerAdditions do
     expect(@controller_class.cancan_skipper[:authorize][:project]).to eq(only: %i[index show])
   end
 
-  private
+  describe 'when inheriting' do
+    before(:each) do
+      @super_controller_class = Class.new
+      @super_controller = @super_controller_class.new
 
-  def callback_action(action)
-    if ActiveSupport.respond_to?(:version) && ActiveSupport.version >= Gem::Version.new('4')
-      action
-    else
-      action.to_s.sub(/_action/, '_filter')
+      @sub_controller_class = Class.new(@super_controller_class)
+      @sub_controller = @sub_controller_class.new
+
+      allow(@super_controller_class).to receive(:helper_method)
+      @super_controller_class.send(:include, CanCan::ControllerAdditions)
+      @super_controller_class.skip_load_and_authorize_resource(only: %i[index show])
+    end
+
+    it 'sub_classes should skip the same behaviors and actions as super_classes' do
+      expect(@super_controller_class.cancan_skipper[:load][nil]).to eq(only: %i[index show])
+      expect(@super_controller_class.cancan_skipper[:authorize][nil]).to eq(only: %i[index show])
+
+      expect(@sub_controller_class.cancan_skipper[:load][nil]).to eq(only: %i[index show])
+      expect(@sub_controller_class.cancan_skipper[:authorize][nil]).to eq(only: %i[index show])
     end
   end
 end

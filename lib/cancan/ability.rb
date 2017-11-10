@@ -223,7 +223,7 @@ module CanCan
       keys = unauthorized_message_keys(action, subject)
       variables = { action: action.to_s }
       variables[:subject] = (subject.class == Class ? subject : subject.class).to_s.underscore.humanize.downcase
-      message = I18n.translate(nil, variables.merge(scope: :unauthorized, default: keys + ['']))
+      message = I18n.translate(keys.shift, variables.merge(scope: :unauthorized, default: keys + ['']))
       message.blank? ? nil : message
     end
 
@@ -291,11 +291,10 @@ module CanCan
 
     def unauthorized_message_keys(action, subject)
       subject = (subject.class == Class ? subject : subject.class).name.underscore unless subject.is_a? Symbol
-      [subject, :all].map do |try_subject|
-        [aliases_for_action(action), :manage].flatten.map do |try_action|
-          :"#{try_action}.#{try_subject}"
-        end
-      end.flatten
+      aliases = aliases_for_action(action)
+      [subject, :all].product([*aliases, :manage]).map do |try_subject, try_action|
+        :"#{try_action}.#{try_subject}"
+      end
     end
 
     # Accepts an array of actions and returns an array of actions which match.

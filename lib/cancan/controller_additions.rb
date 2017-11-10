@@ -40,7 +40,7 @@ module CanCan
       #     private
       #
       #     def find_book_by_permalink
-      #       @book = Book.find_by_permalink!(params[:id)
+      #       @book = Book.find_by_permalink!(params[:id])
       #     end
       #   end
       #
@@ -285,13 +285,14 @@ module CanCan
       end
 
       def cancan_skipper
-        @_cancan_skipper ||= { authorize: {}, load: {} }
+        self._cancan_skipper ||= { authorize: {}, load: {} }
       end
     end
 
     def self.included(base)
       base.extend ClassMethods
       base.helper_method :can?, :cannot?, :current_ability if base.respond_to? :helper_method
+      base.class_attribute :_cancan_skipper
     end
 
     # Raises a CanCan::AccessDenied exception if the current_ability cannot
@@ -383,8 +384,9 @@ module CanCan
   end
 end
 
-if defined? ActionController::Base
-  ActionController::Base.class_eval do
-    include CanCan::ControllerAdditions
+if defined? ActionController
+  %w[Base API].each do |klass|
+    next unless ActionController.const_defined?(klass)
+    ActionController.const_get(klass).class_eval { include CanCan::ControllerAdditions }
   end
 end

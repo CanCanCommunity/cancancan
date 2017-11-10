@@ -21,7 +21,7 @@ All permissions are defined in a single location (the `Ability` class) and not d
 
 Add this to your Gemfile: 
 
-    gem 'cancancan', '~> 1.10'
+    gem 'cancancan', '~> 2.0'
     
 and run the `bundle install` command.
 
@@ -29,28 +29,11 @@ For Rails < 4.2 use:
 
     gem 'cancancan', '~> 1.10'
    
-## Version 2.0
-
-Version 2.0 drops support for Mongoid and Sequel. 
-
-Please use `gem 'cancancan', '~> 1.10'` for them.
-
-If you are interested in supporting them, contribute to the sibling gems `cancancan-sequel` and `cancancan-mongoid`.
-
-Version 2.0 drops also support for Rails < 4.2 and ruby < 2.2 so, again, use the version 1 of the Gem for these.
-
 ## Getting Started
 
 CanCanCan expects a `current_user` method to exist in the controller. 
 First, set up some authentication (such as [Devise](https://github.com/plataformatec/devise) or [Authlogic](https://github.com/binarylogic/authlogic)). 
 See [Changing Defaults](https://github.com/CanCanCommunity/cancancan/wiki/changing-defaults) if you need a different behavior.
-
-When using [rails-api](https://github.com/rails-api/rails-api), you have to manually include the controller methods for CanCanCan:
-```ruby
-class ApplicationController < ActionController::API
-  include CanCan::ControllerAdditions
-end
-```
 
 ### 1. Define Abilities
 
@@ -169,12 +152,12 @@ You can catch this and modify its behavior in the `ApplicationController`.
 ```ruby
 class ApplicationController < ActionController::Base
   rescue_from CanCan::AccessDenied do |exception|
-      respond_to do |format|
-        format.json { head :forbidden, content_type: 'text/html' }
-        format.html { redirect_to main_app.root_url, notice: exception.message }
-        format.js   { head :forbidden, content_type: 'text/html' }
-      end
+    respond_to do |format|
+      format.json { head :forbidden, content_type: 'text/html' }
+      format.html { redirect_to main_app.root_url, notice: exception.message }
+      format.js   { head :forbidden, content_type: 'text/html' }
     end
+  end
 end
 ```
 
@@ -194,6 +177,16 @@ end
 This will raise an exception if authorization is not performed in an action. 
 If you want to skip this, add `skip_authorization_check` to a controller subclass. 
 See [Ensure Authorization](https://github.com/CanCanCommunity/cancancan/wiki/Ensure-Authorization) for more information.
+
+## Version 2.0
+
+Version 2.0 drops support for Mongoid and Sequel. 
+
+Please use `gem 'cancancan', '~> 1.10'` for them.
+
+If you are interested in supporting them, contribute to the sibling gems `cancancan-sequel` and `cancancan-mongoid`.
+
+Version 2.0 drops also support for Rails < 4.2 and ruby < 2.2 so, again, use the version 1 of the Gem for these.
 
 
 ## Wiki Docs
