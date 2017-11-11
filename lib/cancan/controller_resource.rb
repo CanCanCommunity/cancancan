@@ -195,16 +195,20 @@ module CanCan
 
     def resource_base_through
       if parent_resource
-        if @options[:singleton]
-          resource_class
-        else
-          parent_resource.send(@options[:through_association] || name.to_s.pluralize)
-        end
+        resource_base_through_parent_resource
       elsif @options[:shallow]
         resource_class
       else
         # maybe this should be a record not found error instead?
         raise AccessDenied.new(nil, authorization_action, resource_class)
+      end
+    end
+
+    def resource_base_through_parent_resource
+      if @options[:singleton]
+        resource_class
+      else
+        parent_resource.send(@options[:through_association] || name.to_s.pluralize)
       end
     end
 
@@ -235,16 +239,20 @@ module CanCan
 
     def resource_params
       if parameters_require_sanitizing? && params_method.present?
-        case params_method
-        when Symbol then
-          @controller.send(params_method)
-        when String then
-          @controller.instance_eval(params_method)
-        when Proc then
-          params_method.call(@controller)
-        end
+        sanitize_parameters
       else
         resource_params_by_namespaced_name
+      end
+    end
+
+    def sanitize_parameters
+      case params_method
+      when Symbol
+        @controller.send(params_method)
+      when String
+        @controller.instance_eval(params_method)
+      when Proc
+        params_method.call(@controller)
       end
     end
 
@@ -253,16 +261,14 @@ module CanCan
     end
 
     def resource_params_by_namespaced_name
-      instance_name = extract_key(@options[:instance_name])
-      class_key = extract_key(@options[:class])
-      if @options[:instance_name] && @params.key?(instance_name)
-        @params[instance_name]
-      elsif @options[:class] && @params.key?(class_key)
-        @params[class_key]
-      else
+      resource_params_by_key(:instance_name) || resource_params_by_key(:class) || (
         params = @params[extract_key(namespaced_name)]
-        params.is_a?(Hash) ? params : nil
-      end
+        params.is_a?(Hash) ? params : nil)
+    end
+
+    def resource_params_by_key(key)
+      return unless @options[key] && @params.key?(extract_key(@options[key]))
+      @params[extract_key(@options[key])]
     end
 
     def params_method

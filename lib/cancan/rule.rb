@@ -30,18 +30,18 @@ module CanCan
 
     # Matches the block or conditions hash
     def matches_conditions?(action, subject, extra_args)
-      if @match_all
-        call_block_with_all(action, subject, extra_args)
-      elsif @block && !subject_class?(subject)
-        @block.call(subject, *extra_args)
-      elsif @conditions.is_a?(Hash) && subject.class == Hash
-        nested_subject_matches_conditions?(subject)
-      elsif @conditions.is_a?(Hash) && !subject_class?(subject)
-        matches_conditions_hash?(subject)
-      else
-        # Don't stop at "cannot" definitions when there are conditions.
-        conditions_empty? ? true : @base_behavior
+      return call_block_with_all(action, subject, extra_args) if @match_all
+      return @block.call(subject, *extra_args) if @block && !subject_class?(subject)
+      matches_non_block_conditions(subject)
+    end
+
+    def matches_non_block_conditions(subject)
+      if @conditions.is_a?(Hash)
+        return nested_subject_matches_conditions?(subject) if subject.class == Hash
+        return matches_conditions_hash?(subject) unless subject_class?(subject)
       end
+      # Don't stop at "cannot" definitions when there are conditions.
+      conditions_empty? ? true : @base_behavior
     end
 
     def only_block?
@@ -99,8 +99,8 @@ module CanCan
     def matches_subject_class?(subject)
       @subjects.any? do |sub|
         sub.is_a?(Module) && (subject.is_a?(sub) ||
-                                 subject.class.to_s == sub.to_s ||
-                                 (subject.is_a?(Module) && subject.ancestors.include?(sub)))
+          subject.class.to_s == sub.to_s ||
+          (subject.is_a?(Module) && subject.ancestors.include?(sub)))
       end
     end
 
@@ -116,6 +116,10 @@ module CanCan
         return adapter.matches_conditions_hash?(subject, conditions)
       end
 
+      matches_all_conditions?(adapter, conditions, subject)
+    end
+
+    def matches_all_conditions?(adapter, conditions, subject)
       conditions.all? do |name, value|
         if adapter.override_condition_matching?(subject, name, value)
           adapter.matches_condition?(subject, name, value)
@@ -144,11 +148,14 @@ module CanCan
 
     def condition_match?(attribute, value)
       case value
-      when Hash       then hash_condition_match?(attribute, value)
-      when String     then attribute == value
-      when Range      then value.cover?(attribute)
-      when Enumerable then value.include?(attribute)
-      else attribute == value
+      when Hash
+        hash_condition_match?(attribute, value)
+      when Range
+        value.cover?(attribute)
+      when Enumerable
+        value.include?(attribute)
+      else
+        attribute == value
       end
     end
 
