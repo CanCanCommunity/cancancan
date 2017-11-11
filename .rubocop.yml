@@ -16,11 +16,9 @@ Style/ClassAndModuleChildren:
 Metrics/LineLength:
   Max: 120
 
-# TODO
 Metrics/ClassLength:
   Exclude:
     - 'lib/cancan/controller_resource.rb'
-    - 'lib/cancan/rule.rb'
 
 # TODO
 Metrics/ModuleLength:
