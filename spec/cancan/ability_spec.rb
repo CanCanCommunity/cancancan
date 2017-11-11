@@ -328,11 +328,11 @@ describe CanCan::Ability do
   end
 
   it 'accepts a set as a condition value' do
-    expect(object_with_foo_2 = double(foo: 2)).to receive(:foo)
-    expect(object_with_foo_3 = double(foo: 3)).to receive(:foo)
+    expect(object_with_foo_two = double(foo: 2)).to receive(:foo)
+    expect(object_with_foo_three = double(foo: 3)).to receive(:foo)
     @ability.can :read, Object, foo: [1, 2, 5].to_set
-    expect(@ability.can?(:read, object_with_foo_2)).to be(true)
-    expect(@ability.can?(:read, object_with_foo_3)).to be(false)
+    expect(@ability.can?(:read, object_with_foo_two)).to be(true)
+    expect(@ability.can?(:read, object_with_foo_three)).to be(false)
   end
 
   it 'does not match subjects return nil for methods that must match nested a nested conditions hash' do
