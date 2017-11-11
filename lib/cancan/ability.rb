@@ -1,3 +1,5 @@
+require_relative 'ability/rules.rb'
+require_relative 'ability/actions.rb'
 module CanCan
   # This module is designed to be included into an Ability class. This will
   # provide the "can" methods for defining and checking abilities.
@@ -15,6 +17,9 @@ module CanCan
   #   end
   #
   module Ability
+    include CanCan::Ability::Rules
+    include CanCan::Ability::Actions
+
     # Check if the user has permission to perform a given action on an object.
     #
     #   can? :destroy, @project
@@ -149,56 +154,10 @@ module CanCan
       add_rule(Rule.new(false, action, subject, conditions, block))
     end
 
-    # Alias one or more actions into another one.
-    #
-    #   alias_action :update, :destroy, :to => :modify
-    #   can :modify, Comment
-    #
-    # Then :modify permission will apply to both :update and :destroy requests.
-    #
-    #   can? :update, Comment # => true
-    #   can? :destroy, Comment # => true
-    #
-    # This only works in one direction. Passing the aliased action into the "can?" call
-    # will not work because aliases are meant to generate more generic actions.
-    #
-    #   alias_action :update, :destroy, :to => :modify
-    #   can :update, Comment
-    #   can? :modify, Comment # => false
-    #
-    # Unless that exact alias is used.
-    #
-    #   can :modify, Comment
-    #   can? :modify, Comment # => true
-    #
-    # The following aliases are added by default for conveniently mapping common controller actions.
-    #
-    #   alias_action :index, :show, :to => :read
-    #   alias_action :new, :to => :create
-    #   alias_action :edit, :to => :update
-    #
-    # This way one can use params[:action] in the controller to determine the permission.
-    def alias_action(*args)
-      target = args.pop[:to]
-      validate_target(target)
-      aliased_actions[target] ||= []
-      aliased_actions[target] += args
-    end
-
     # User shouldn't specify targets with names of real actions or it will cause Seg fault
     def validate_target(target)
       error_message = "You can't specify target (#{target}) as alias because it is real action name"
       raise Error, error_message if aliased_actions.values.flatten.include? target
-    end
-
-    # Returns a hash of aliased actions. The key is the target and the value is an array of actions aliasing the key.
-    def aliased_actions
-      @aliased_actions ||= default_alias_actions
-    end
-
-    # Removes previously aliased actions including the defaults.
-    def clear_aliased_actions
-      @aliased_actions = {}
     end
 
     def model_adapter(model_class, action)
@@ -274,14 +233,6 @@ module CanCan
       end
     end
 
-    protected
-
-    # Must be protected as an ability can merge with other abilities.
-    # This means that an ability must expose their rules with another ability.
-    def rules
-      @rules ||= []
-    end
-
     private
 
     def unauthorized_message_keys(action, subject)
@@ -290,26 +241,6 @@ module CanCan
       [subject, :all].product([*aliases, :manage]).map do |try_subject, try_action|
         :"#{try_action}.#{try_subject}"
       end
-    end
-
-    # Accepts an array of actions and returns an array of actions which match.
-    # This should be called before "matches?" and other checking methods since they
-    # rely on the actions to be expanded.
-    def expand_actions(actions)
-      expanded_actions[actions] ||= begin
-        expanded = []
-        actions.each do |action|
-          expanded << action
-          if (aliases = aliased_actions[action])
-            expanded += expand_actions(aliases)
-          end
-        end
-        expanded
-      end
-    end
-
-    def expanded_actions
-      @expanded_actions ||= {}
     end
 
     # It translates to an array the subject or the hash with multiple subjects given to can?.
@@ -321,97 +252,9 @@ module CanCan
       end
     end
 
-    # Given an action, it will try to find all of the actions which are aliased to it.
-    # This does the opposite kind of lookup as expand_actions.
-    def aliases_for_action(action)
-      results = [action]
-      aliased_actions.each do |aliased_action, actions|
-        results += aliases_for_action(aliased_action) if actions.include? action
-      end
-      results
-    end
-
-    def add_rule(rule)
-      rules << rule
-      add_rule_to_index(rule, rules.size - 1)
-    end
-
-    def add_rule_to_index(rule, position)
-      @rules_index ||= Hash.new { |h, k| h[k] = [] }
-
-      subjects = rule.subjects.compact
-      subjects << :all if subjects.empty?
-
-      subjects.each do |subject|
-        @rules_index[subject] << position
-      end
-    end
-
     def alternative_subjects(subject)
       subject = subject.class unless subject.is_a?(Module)
       [:all, *subject.ancestors, subject.class.to_s]
-    end
-
-    # Returns an array of Rule instances which match the action and subject
-    # This does not take into consideration any hash conditions or block statements
-    def relevant_rules(action, subject)
-      return [] unless @rules
-      relevant = possible_relevant_rules(subject).select do |rule|
-        rule.expanded_actions = expand_actions(rule.actions)
-        rule.relevant? action, subject
-      end
-      relevant.reverse!.uniq!
-      optimize_order! relevant
-      relevant
-    end
-
-    # Optimizes the order of the rules, so that rules with the :all subject are evaluated first.
-    def optimize_order!(rules)
-      first_can_in_group = -1
-      rules.each_with_index do |rule, i|
-        (first_can_in_group = -1) && next unless rule.base_behavior
-        (first_can_in_group = i) && next if first_can_in_group == -1
-        next unless rule.subjects == [:all]
-        rules[i] = rules[first_can_in_group]
-        rules[first_can_in_group] = rule
-        first_can_in_group += 1
-      end
-    end
-
-    def possible_relevant_rules(subject)
-      if subject.is_a?(Hash)
-        rules
-      else
-        positions = @rules_index.values_at(subject, *alternative_subjects(subject))
-        positions.flatten!.sort!
-        positions.map { |i| @rules[i] }
-      end
-    end
-
-    def relevant_rules_for_match(action, subject)
-      relevant_rules(action, subject).each do |rule|
-        next unless rule.only_raw_sql?
-        raise Error,
-              "The can? and cannot? call cannot be used with a raw sql 'can' definition."\
-              " The checking code cannot be determined for #{action.inspect} #{subject.inspect}"
-      end
-    end
-
-    def relevant_rules_for_query(action, subject)
-      relevant_rules(action, subject).each do |rule|
-        if rule.only_block?
-          raise Error, "The accessible_by call cannot be used with a block 'can' definition."\
-                       " The SQL cannot be determined for #{action.inspect} #{subject.inspect}"
-        end
-      end
-    end
-
-    def default_alias_actions
-      {
-        read: %i[index show],
-        create: [:new],
-        update: [:edit]
-      }
     end
   end
 end

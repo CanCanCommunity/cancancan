@@ -16,18 +16,6 @@ Style/ClassAndModuleChildren:
 Metrics/LineLength:
   Max: 120
 
-Metrics/ClassLength:
-  Exclude:
-    - 'lib/cancan/controller_resource.rb'
-
-# TODO
-Metrics/ModuleLength:
-  Exclude:
-    - "**/*_spec.rb"
-    - 'lib/cancan/ability.rb'
-    - 'lib/cancan/model_adapters/active_record_adapter.rb'
-
-# TODO
 Metrics/BlockLength:
   Exclude:
     - 'lib/cancan/matchers.rb'
