@@ -1,6 +1,6 @@
 Unreleased
 
-* ...
+* Removed support for dynamic finders (coorasse)
 
 2.1.0 (Nov 10th, 2017)
 
