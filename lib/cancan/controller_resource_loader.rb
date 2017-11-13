@@ -32,7 +32,7 @@ module CanCan
     def resource_params_by_namespaced_name
       resource_params_by_key(:instance_name) || resource_params_by_key(:class) || (
       params = @params[extract_key(namespaced_name)]
-      params.is_a?(Hash) ? params : nil)
+      params.respond_to?(:to_h) ? params : nil)
     end
 
     def resource_params
