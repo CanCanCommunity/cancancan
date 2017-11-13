@@ -1,7 +1,15 @@
 Unreleased
 
+* Removed support for dynamic finders (coorasse)
+
+2.1.0 (Nov 10th, 2017)
+
 * Adds support for Rails Api applications (coorasse & ajgon)
 * Controller subclasses inherit skip_load_resource from superclass (jpmckinney)
+* Fix instance variable not initialized warnings (sethcharles)
+* Fix build_resource when model name is Action (anilmaurya)
+* Smaller performance improvements (DNNX)
+* Fix i18n lookup for unauthorized message (clemens)
 
 2.0.0 (May 18th, 2017)
 
