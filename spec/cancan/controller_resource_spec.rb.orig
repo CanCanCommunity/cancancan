@@ -142,6 +142,7 @@ describe CanCan::ControllerResource do
         params.merge!(controller: 'model', model: { name: 'test' })
       end
 
+<<<<<<< HEAD
       it 'accepts and uses the specified symbol for santitizing input' do
         allow(controller).to receive(:resource_params).and_return(resource: 'params')
         allow(controller).to receive(:model_params).and_return(model: 'params')
@@ -159,6 +160,25 @@ describe CanCan::ControllerResource do
       it 'accepts the specified proc for sanitizing input' do
         resource = CanCan::ControllerResource.new(controller, param_method: proc { |_c| { custom: 'params' } })
         expect(resource.send('resource_params')).to eq(custom: 'params')
+=======
+      it "accepts and uses the specified symbol for santitizing input" do
+        allow(controller).to receive(:resource_params).and_return(:resource => 'params')
+        allow(controller).to receive(:model_params).and_return(:model => 'params')
+        allow(controller).to receive(:create_params).and_return(:create => 'params')
+        allow(controller).to receive(:custom_params).and_return(:custom => 'params')
+        resource = CanCan::ControllerResource.new(controller, {:param_method => :custom_params})
+        expect(resource.loader.send("resource_params")).to eq(:custom => 'params')
+      end
+
+      it "accepts the specified string for sanitizing input" do
+        resource = CanCan::ControllerResource.new(controller, {:param_method => "{:custom => 'params'}"})
+        expect(resource.loader.send("resource_params")).to eq(:custom => 'params')
+      end
+
+      it "accepts the specified proc for sanitizing input" do
+        resource = CanCan::ControllerResource.new(controller, {:param_method => Proc.new { |c| {:custom => 'params'}}})
+        expect(resource.loader.send("resource_params")).to eq(:custom => 'params')
+>>>>>>> 4f8832441806c95f2720417feb73bf8d66e44e3a
       end
 
       it 'prefers to use the create_params method for santitizing input' do
@@ -167,7 +187,11 @@ describe CanCan::ControllerResource do
         allow(controller).to receive(:create_params).and_return(create: 'params')
         allow(controller).to receive(:custom_params).and_return(custom: 'params')
         resource = CanCan::ControllerResource.new(controller)
+<<<<<<< HEAD
         expect(resource.send('resource_params')).to eq(create: 'params')
+=======
+        expect(resource.loader.send("resource_params")).to eq(:create => 'params')
+>>>>>>> 4f8832441806c95f2720417feb73bf8d66e44e3a
       end
 
       it 'prefers to use the <model_name>_params method for santitizing input if create is not found' do
@@ -175,14 +199,22 @@ describe CanCan::ControllerResource do
         allow(controller).to receive(:model_params).and_return(model: 'params')
         allow(controller).to receive(:custom_params).and_return(custom: 'params')
         resource = CanCan::ControllerResource.new(controller)
+<<<<<<< HEAD
         expect(resource.send('resource_params')).to eq(model: 'params')
+=======
+        expect(resource.loader.send("resource_params")).to eq(:model => 'params')
+>>>>>>> 4f8832441806c95f2720417feb73bf8d66e44e3a
       end
 
       it 'prefers to use the resource_params method for santitizing input if create or model is not found' do
         allow(controller).to receive(:resource_params).and_return(resource: 'params')
         allow(controller).to receive(:custom_params).and_return(custom: 'params')
         resource = CanCan::ControllerResource.new(controller)
+<<<<<<< HEAD
         expect(resource.send('resource_params')).to eq(resource: 'params')
+=======
+        expect(resource.loader.send("resource_params")).to eq(:resource => 'params')
+>>>>>>> 4f8832441806c95f2720417feb73bf8d66e44e3a
       end
     end
   end
@@ -477,6 +509,7 @@ describe CanCan::ControllerResource do
     end
 
     # CVE-2012-5664
+<<<<<<< HEAD
     it 'always converts id param to string' do
       params[:the_model] = { malicious: 'I am' }
       resource = CanCan::ControllerResource.new(controller, id_param: :the_model)
@@ -487,6 +520,18 @@ describe CanCan::ControllerResource do
       params[:the_model] = nil
       resource = CanCan::ControllerResource.new(controller, id_param: :the_model)
       expect(resource.send(:id_param)).to be_nil
+=======
+    it "always converts id param to string" do
+      params.merge!(:the_model => { :malicious => "I am" })
+      resource = CanCan::ControllerResource.new(controller, :id_param => :the_model)
+      expect(resource.loader.send(:id_param).class).to eq(String)
+    end
+
+    it "should id param return nil if param is nil" do
+      params.merge!(:the_model => nil)
+      resource = CanCan::ControllerResource.new(controller, :id_param => :the_model)
+      expect(resource.loader.send(:id_param)).to be_nil
+>>>>>>> 4f8832441806c95f2720417feb73bf8d66e44e3a
     end
 
     it 'loads resource using custom find_by attribute' do
