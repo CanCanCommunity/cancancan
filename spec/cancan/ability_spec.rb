@@ -488,6 +488,11 @@ describe CanCan::Ability do
                        'Use either one.')
   end
 
+  it 'dashboard is working' do
+    @ability.can :dashboard
+    expect(@ability.can?(:dashboard, nil)).to be(true)
+  end
+
   describe 'unauthorized message' do
     after(:each) do
       I18n.backend = nil
