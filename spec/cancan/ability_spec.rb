@@ -488,6 +488,12 @@ describe CanCan::Ability do
                        'Use either one.')
   end
 
+  it 'raises an error when attempting to use action without subject' do
+    expect do
+      @ability.can :dashboard
+    end.to raise_error(CanCan::Error, 'Subject is required for action')
+  end
+
   describe 'unauthorized message' do
     after(:each) do
       I18n.backend = nil

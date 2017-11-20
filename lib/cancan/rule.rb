@@ -17,6 +17,7 @@ module CanCan
                                   "#{action} #{subject} ability. Use either one."
       raise Error, both_block_and_hash_error if conditions.is_a?(Hash) && block
       @match_all = action.nil? && subject.nil?
+      raise Error, 'Subject is required for action' if !action.nil? && subject.nil?
       @base_behavior = base_behavior
       @actions = Array(action)
       @subjects = Array(subject)
