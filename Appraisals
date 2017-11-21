@@ -5,7 +5,7 @@ appraise 'activerecord_4.2' do
   gem 'nokogiri', '~> 1.6.8', require: 'nokogiri' # TODO: fix for ruby 2.0.0
 
   gemfile.platforms :jruby do
-    gem 'activerecord-jdbcsqlite3-adapter'
+    gem 'activerecord-jdbcsqlite3-adapter', '~> 1.3.24'
     gem 'jdbc-sqlite3'
   end
 
