@@ -491,7 +491,7 @@ describe CanCan::Ability do
   it 'raises an error when attempting to use action without subject' do
     expect do
       @ability.can :dashboard
-    end.to raise_error(CanCan::Error, 'Subject is required for action')
+    end.to raise_error(CanCan::Error, 'Subject is required for dashboard')
   end
 
   describe 'unauthorized message' do
