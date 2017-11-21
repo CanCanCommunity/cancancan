@@ -491,6 +491,7 @@ describe CanCan::Ability do
   describe 'unauthorized message' do
     after(:each) do
       I18n.backend = nil
+      I18n.default_locale = :en
     end
 
     it 'uses action/subject in i18n' do
@@ -498,6 +499,19 @@ describe CanCan::Ability do
       expect(@ability.unauthorized_message(:update, Array)).to eq('foo')
       expect(@ability.unauthorized_message(:update, [1, 2, 3])).to eq('foo')
       expect(@ability.unauthorized_message(:update, :missing)).to be_nil
+    end
+
+    it "uses model's name in i18n" do
+      class Account
+        include ActiveModel::Model
+      end
+
+      I18n.default_locale = :ja
+      I18n.backend.store_translations :ja,
+                                      activemodel: { models: { account: 'アカウント' } },
+                                      unauthorized: { update: { all: '%{subject}の更新権限がありません' } }
+      expect(@ability.unauthorized_message(:update, Account)).to eq('アカウントの更新権限がありません')
+      # rubocop:enable Style/FormatString
     end
 
     it 'uses symbol as subject directly' do
