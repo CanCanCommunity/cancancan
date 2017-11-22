@@ -489,7 +489,17 @@ describe CanCan::ControllerResource do
       expect(resource.send(:id_param)).to be_nil
     end
 
-    it 'loads resource using custom find_by attribute' do
+    it 'loads resource using custom find_by attribute when resource has find_by! method' do
+      model = Model.new
+      allow(Model).to receive(:find_by!).with({ name: 'foo' }) { model }
+
+      params.merge!(action: 'show', id: 'foo')
+      resource = CanCan::ControllerResource.new(controller, find_by: :name)
+      resource.load_resource
+      expect(controller.instance_variable_get(:@model)).to eq(model)
+    end
+
+    it 'loads resource using custom find_by attribute when resource has find_by method' do
       model = Model.new
       allow(Model).to receive(:find_by).with({ name: 'foo' }) { model }
 
