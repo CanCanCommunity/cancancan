@@ -506,12 +506,18 @@ describe CanCan::Ability do
         include ActiveModel::Model
       end
 
-      I18n.default_locale = :ja
+      I18n.backend.store_translations :en,
+                                      activemodel: { models: { account: 'english name' } },
+                                      unauthorized: { update: { all: '%{subject}' } }
       I18n.backend.store_translations :ja,
-                                      activemodel: { models: { account: 'アカウント' } },
-                                      unauthorized: { update: { all: '%{subject}の更新権限がありません' } }
-      expect(@ability.unauthorized_message(:update, Account)).to eq('アカウントの更新権限がありません')
-      # rubocop:enable Style/FormatString
+                                      activemodel: { models: { account: 'japanese name' } },
+                                      unauthorized: { update: { all: '%{subject}' } }
+
+      I18n.default_locale = :en
+      expect(@ability.unauthorized_message(:update, Account)).to eq('english name')
+
+      I18n.default_locale = :ja
+      expect(@ability.unauthorized_message(:update, Account)).to eq('japanese name')
     end
 
     it 'uses symbol as subject directly' do
