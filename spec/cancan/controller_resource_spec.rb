@@ -491,7 +491,7 @@ describe CanCan::ControllerResource do
 
     it 'loads resource using custom find_by attribute' do
       model = Model.new
-      allow(Model).to receive(:name).with('foo') { model }
+      allow(Model).to receive(:find_by).with({ name: 'foo' }) { model }
 
       params.merge!(action: 'show', id: 'foo')
       resource = CanCan::ControllerResource.new(controller, find_by: :name)
