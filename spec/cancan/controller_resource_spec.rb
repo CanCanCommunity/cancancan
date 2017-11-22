@@ -499,6 +499,15 @@ describe CanCan::ControllerResource do
       expect(controller.instance_variable_get(:@model)).to eq(model)
     end
 
+    it 'loads resource using dynamic finder method' do
+      model = Model.new
+      allow(Model).to receive(:find_by_name!).with('foo') { model }
+      params.merge!(action: 'show', id: 'foo')
+      resource = CanCan::ControllerResource.new(controller, find_by: :name)
+      resource.load_resource
+      expect(controller.instance_variable_get(:@model)).to eq(model)
+    end
+
     it 'allows full find method to be passed into find_by option' do
       model = Model.new
       allow(Model).to receive(:find_by_name).with('foo') { model }
