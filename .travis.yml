@@ -3,11 +3,11 @@ cache: bundler
 sudo: false
 rvm:
   - 2.2.0
-  - 2.2.7
-  - 2.3.4
-  - 2.4.1
+  - 2.2.8
+  - 2.3.5
+  - 2.4.2
   - jruby-9.0.5.0
-  - jruby-9.1.8.0
+  - jruby-9.1.9.0
 gemfile:
   - gemfiles/activerecord_4.2.gemfile
   - gemfiles/activerecord_5.0.2.gemfile
@@ -27,11 +27,11 @@ matrix:
       gemfile: gemfiles/activerecord_5.1.0.gemfile
     - rvm: jruby-9.0.5.0
       gemfile: gemfiles/activerecord_5.0.2.gemfile
-    - rvm: jruby-9.1.8.0
+    - rvm: jruby-9.1.9.0
       gemfile: gemfiles/activerecord_5.0.2.gemfile
     - rvm: jruby-9.0.5.0
       gemfile: gemfiles/activerecord_5.1.0.gemfile
-    - rvm: jruby-9.1.8.0
+    - rvm: jruby-9.1.9.0
       gemfile: gemfiles/activerecord_5.1.0.gemfile
 notifications:
   email:
