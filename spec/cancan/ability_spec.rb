@@ -491,7 +491,6 @@ describe CanCan::Ability do
   describe 'unauthorized message' do
     after(:each) do
       I18n.backend = nil
-      I18n.default_locale = :en
     end
 
     it 'uses action/subject in i18n' do
@@ -513,11 +512,13 @@ describe CanCan::Ability do
                                       activemodel: { models: { account: 'japanese name' } },
                                       unauthorized: { update: { all: '%{subject}' } }
 
-      I18n.default_locale = :en
-      expect(@ability.unauthorized_message(:update, Account)).to eq('english name')
+      I18n.with_locale(:en) do
+        expect(@ability.unauthorized_message(:update, Account)).to eq('english name')
+      end
 
-      I18n.default_locale = :ja
-      expect(@ability.unauthorized_message(:update, Account)).to eq('japanese name')
+      I18n.with_locale(:ja) do
+        expect(@ability.unauthorized_message(:update, Account)).to eq('japanese name')
+      end
     end
 
     it 'uses symbol as subject directly' do
