@@ -5,7 +5,7 @@ require 'ostruct' # for OpenStruct below
 describe CanCan::Rule do
   before(:each) do
     @conditions = {}
-    @rule = CanCan::Rule.new(true, :read, Integer, @conditions, nil)
+    @rule = CanCan::Rule.new(true, :read, Integer, @conditions)
   end
 
   it 'returns no association joins if none exist' do
@@ -34,7 +34,7 @@ describe CanCan::Rule do
   end
 
   it 'returns no association joins if conditions is nil' do
-    rule = CanCan::Rule.new(true, :read, Integer, nil, nil)
+    rule = CanCan::Rule.new(true, :read, Integer, nil)
     expect(rule.associations_hash).to eq({})
   end
 

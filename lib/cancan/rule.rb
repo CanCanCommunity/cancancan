@@ -12,7 +12,7 @@ module CanCan
     # value. True for "can" and false for "cannot". The next two arguments are the action
     # and subject respectively (such as :read, @project). The third argument is a hash
     # of conditions and the last one is the block passed to the "can" call.
-    def initialize(base_behavior, action, subject, conditions, block)
+    def initialize(base_behavior, action, subject, conditions, &block)
       both_block_and_hash_error = 'You are not able to supply a block with a hash of conditions in '\
                                   "#{action} #{subject} ability. Use either one."
       raise Error, both_block_and_hash_error if conditions.is_a?(Hash) && block

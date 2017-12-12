@@ -135,7 +135,7 @@ module CanCan
     #   end
     #
     def can(action = nil, subject = nil, conditions = nil, &block)
-      add_rule(Rule.new(true, action, subject, conditions, block))
+      add_rule(Rule.new(true, action, subject, conditions, &block))
     end
 
     # Defines an ability which cannot be done. Accepts the same arguments as "can".
@@ -151,7 +151,7 @@ module CanCan
     #   end
     #
     def cannot(action = nil, subject = nil, conditions = nil, &block)
-      add_rule(Rule.new(false, action, subject, conditions, block))
+      add_rule(Rule.new(false, action, subject, conditions, &block))
     end
 
     # User shouldn't specify targets with names of real actions or it will cause Seg fault
