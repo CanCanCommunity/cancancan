@@ -181,23 +181,30 @@ describe CanCan::Ability do
 
   it 'lists all permissions' do
     @ability.can :manage, :all
-    @ability.can :learn, Range
+    @ability.can :sql, Integer, 'false'
+    @ability.can :learn, Range, begin: [1, 3, 5]
     @ability.can :interpret, Symbol, %i[size to_s]
-    @ability.cannot :read, [String, Hash]
-    @ability.cannot :preview, Array
+    @ability.cannot :read, [Range, Symbol]
+    @ability.cannot :read, Integer do |int|
+      int > 10 ? nil : (int > 5)
+    end
 
     expected_list = {
-      can: {
-        manage: { 'all' => [] },
-        learn: { 'Range' => [] },
-        interpret: { 'Symbol' => %i[size to_s] }
-      },
-      cannot: {
-        read: { 'String' => [], 'Hash' => [] },
-        index: { 'String' => [], 'Hash' => [] },
-        show: { 'String' => [], 'Hash' => [] },
-        preview: { 'Array' => [] }
-      }
+      Integer => [
+        { can: false, actions: [:read, :index, :show], attributes: [], conditions: {}, block: true, raw_sql: false },
+        { can: true, actions: [:sql], attributes: [], conditions: 'false', block: false, raw_sql: true },
+      ],
+      Range =>[
+        { can: false, actions: [:read, :index, :show], attributes: [], conditions: {}, block: false, raw_sql: false },
+        { can: true, actions: [:learn], attributes: [], conditions: { begin: [1, 3, 5] }, block: false, raw_sql: false },
+      ],
+      Symbol => [
+        {can: false, actions: [:read, :index, :show], attributes: [], conditions: {}, block: false, raw_sql: false },
+        {can: true, actions: [:interpret], attributes: [:size, :to_s], conditions: {}, block: false, raw_sql: false },
+      ],
+      :all => [
+        {can: true, actions: [:manage], attributes: [], conditions: {}, block: false, raw_sql: false}
+      ]
     }
     expect(@ability.permissions).to eq(expected_list)
   end

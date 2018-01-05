@@ -233,30 +233,25 @@ module CanCan
 
     # Return a hash of permissions for the user in the format of:
     #   {
-    #     can: can_hash,
-    #     cannot: cannot_hash
+    #     Subject: [{rule hash}, {rule hash}...]
+    #     ...
     #   }
+    # where the array is ordered by rule priority
     #
-    # Where can_hash and cannot_hash are formatted thusly:
-    #   {
-    #     action: { subject: [attributes] }
-    #   }
+    # Access:
+    #   ability.permissions[Subject] => relevant rules
+    #
     def permissions
-      permissions_list = {
-        can:    Hash.new { |actions, k1| actions[k1] = Hash.new { |subjects, k2| subjects[k2] = [] } },
-        cannot: Hash.new { |actions, k1| actions[k1] = Hash.new { |subjects, k2| subjects[k2] = [] } }
-      }
-      rules.each { |rule| extract_rule_in_permissions(permissions_list, rule) }
-      permissions_list
-    end
-
-    def extract_rule_in_permissions(permissions_list, rule)
-      expand_actions(rule.actions).each do |action|
-        container = rule.base_behavior ? :can : :cannot
+      permissions_list = Hash.new { |h, k| h[k] = [] }
+      rules.reverse_each do |rule|
         rule.subjects.each do |subject|
-          permissions_list[container][action][subject.to_s] += rule.attributes
+          permissions_list[subject] << {
+            can: rule.base_behavior, actions: expand_actions(rule.actions), attributes: rule.attributes,
+            conditions: rule.conditions, block: !!rule.only_block?, raw_sql: !!rule.only_raw_sql?
+          }
         end
       end
+      permissions_list
     end
 
     private
