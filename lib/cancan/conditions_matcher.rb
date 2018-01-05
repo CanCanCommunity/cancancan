@@ -1,9 +1,12 @@
 module CanCan
   module ConditionsMatcher
     # Matches the block or conditions hash
-    def matches_conditions?(action, subject, extra_args)
-      return call_block_with_all(action, subject, extra_args) if @match_all
-      return @block.call(subject, *extra_args) if @block && !subject_class?(subject)
+    def matches_conditions?(action, subject, attribute, *extra_args)
+      return call_block_with_all(action, subject, *extra_args) if @match_all
+      if @block && !subject_class?(subject)
+        return @block.call(subject, attribute, *extra_args) if attribute
+        return @block.call(subject, *extra_args)
+      end
       matches_non_block_conditions(subject)
     end
 
@@ -74,7 +77,7 @@ module CanCan
       end
     end
 
-    def call_block_with_all(action, subject, extra_args)
+    def call_block_with_all(action, subject, *extra_args)
       if subject.class == Class
         @block.call(action, subject, nil, *extra_args)
       else

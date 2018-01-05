@@ -38,7 +38,7 @@ Lint/AmbiguousBlockAssociation:
 
 
 AllCops:
-  TargetRubyVersion: 2.0
+  TargetRubyVersion: 2.2.0
   Exclude:
     - 'gemfiles/vendor/bundle/**/*'
     - 'Appraisals'

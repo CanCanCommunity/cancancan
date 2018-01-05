@@ -5,29 +5,31 @@ module CanCan
   # helpful methods to determine permission checking and conditions hash generation.
   class Rule # :nodoc:
     include ConditionsMatcher
-    attr_reader :base_behavior, :subjects, :actions, :conditions
+    attr_reader :base_behavior, :subjects, :actions, :conditions, :attributes
     attr_writer :expanded_actions
 
     # The first argument when initializing is the base_behavior which is a true/false
     # value. True for "can" and false for "cannot". The next two arguments are the action
     # and subject respectively (such as :read, @project). The third argument is a hash
     # of conditions and the last one is the block passed to the "can" call.
-    def initialize(base_behavior, action, subject, conditions, block)
-      both_block_and_hash_error = 'You are not able to supply a block with a hash of conditions in '\
-                                  "#{action} #{subject} ability. Use either one."
-      raise Error, both_block_and_hash_error if conditions.is_a?(Hash) && block
+    def initialize(base_behavior, action, subject, *extra_args, &block)
+      # for backwards compatibility, attributes are an optional parameter. Check if
+      # attributes were passed or are actually conditions
+      attributes, conditions = parse_attributes_from_conditions(extra_args)
+      condition_and_block_check(conditions, block, action, subject)
       @match_all = action.nil? && subject.nil?
       @base_behavior = base_behavior
       @actions = Array(action)
       @subjects = Array(subject)
+      @attributes = Array(attributes)
       @conditions = conditions || {}
       @block = block
     end
 
-    # Matches both the subject and action, not necessarily the conditions
-    def relevant?(action, subject)
+    # Matches the action, subject, and attribute; not necessarily the conditions
+    def relevant?(action, subject, attribute = nil)
       subject = subject.values.first if subject.class == Hash
-      @match_all || (matches_action?(action) && matches_subject?(subject))
+      @match_all || (matches_action?(action) && matches_subject?(subject) && matches_attribute?(attribute))
     end
 
     def only_block?
@@ -73,12 +75,32 @@ module CanCan
       @subjects.include?(:all) || @subjects.include?(subject) || matches_subject_class?(subject)
     end
 
+    def matches_attribute?(attribute)
+      return true if @attributes.empty?
+      return @base_behavior if attribute.nil?
+      @attributes.include?(attribute.to_sym)
+    end
+
     def matches_subject_class?(subject)
       @subjects.any? do |sub|
         sub.is_a?(Module) && (subject.is_a?(sub) ||
           subject.class.to_s == sub.to_s ||
           (subject.is_a?(Module) && subject.ancestors.include?(sub)))
       end
+    end
+
+    def parse_attributes_from_conditions(args)
+      attributes = args.shift if args.first.is_a?(Symbol) || args.first.is_a?(Array)\
+        && args.first.first.is_a?(Symbol)
+      conditions = args.first
+
+      [attributes, conditions]
+    end
+
+    def condition_and_block_check(conditions, block, action, subject)
+      return unless conditions.is_a?(Hash) && block
+      raise BlockAndConditionsError, 'A hash of conditions is mutually exclusive with a block.'\
+        "Check #{action} #{subject} ability."
     end
   end
 end

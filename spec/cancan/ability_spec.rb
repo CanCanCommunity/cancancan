@@ -181,18 +181,31 @@ describe CanCan::Ability do
 
   it 'lists all permissions' do
     @ability.can :manage, :all
-    @ability.can :learn, Range
-    @ability.cannot :read, String
-    @ability.cannot :read, Hash
-    @ability.cannot :preview, Array
+    @ability.can :sql, Integer, 'false'
+    @ability.can :learn, Range, begin: [1, 3, 5]
+    @ability.can :interpret, Symbol, %i[size to_s]
+    @ability.cannot :read, [Range, Symbol]
+    @ability.cannot :read, Integer do |int|
+      int > 10 ? nil : (int > 5)
+    end
 
-    expected_list = { can: { manage: ['all'],
-                             learn: ['Range'] },
-                      cannot: { read: %w[String Hash],
-                                index: %w[String Hash],
-                                show: %w[String Hash],
-                                preview: ['Array'] } }
-
+    expected_list = {
+      Integer => [
+        { can: false, actions: [:read, :index, :show], attributes: [], conditions: {}, block: true, raw_sql: false },
+        { can: true, actions: [:sql], attributes: [], conditions: 'false', block: false, raw_sql: true },
+      ],
+      Range =>[
+        { can: false, actions: [:read, :index, :show], attributes: [], conditions: {}, block: false, raw_sql: false },
+        { can: true, actions: [:learn], attributes: [], conditions: { begin: [1, 3, 5] }, block: false, raw_sql: false },
+      ],
+      Symbol => [
+        {can: false, actions: [:read, :index, :show], attributes: [], conditions: {}, block: false, raw_sql: false },
+        {can: true, actions: [:interpret], attributes: [:size, :to_s], conditions: {}, block: false, raw_sql: false },
+      ],
+      :all => [
+        {can: true, actions: [:manage], attributes: [], conditions: {}, block: false, raw_sql: false}
+      ]
+    }
     expect(@ability.permissions).to eq(expected_list)
   end
 
@@ -275,10 +288,10 @@ describe CanCan::Ability do
       int > x
     end
 
-    expect(@ability.can?(:read, 2, 1)).to be(true)
-    expect(@ability.can?(:read, 2, 3)).to be(false)
-    expect(@ability.can?(:read, { any: [4, 5] }, 3)).to be(true)
-    expect(@ability.can?(:read, { any: [2, 3] }, 3)).to be(false)
+    expect(@ability.can?(:read, 2, nil, 1)).to be(true)
+    expect(@ability.can?(:read, 2, nil, 3)).to be(false)
+    expect(@ability.can?(:read, { any: [4, 5] }, nil, 3)).to be(true)
+    expect(@ability.can?(:read, { any: [2, 3] }, nil, 3)).to be(false)
   end
 
   it 'uses conditions as third parameter and determine abilities from it' do
@@ -483,9 +496,65 @@ describe CanCan::Ability do
       @ability.can :read, Array, published: true do
         false
       end
-    end.to raise_error(CanCan::Error,
-                       'You are not able to supply a block with a hash of conditions in read Array ability. '\
-                       'Use either one.')
+    end.to raise_error(CanCan::BlockAndConditionsError)
+  end
+
+  it 'allows attribute-level rules' do
+    @ability.can :read, Array, :to_s
+    expect(@ability.can?(:read, Array, :to_s)).to be(true)
+    expect(@ability.can?(:read, Array, :size)).to be(false)
+    expect(@ability.can?(:read, Array)).to be(true)
+  end
+
+  it 'allows an array of attributes in rules' do
+    @ability.can :read, [Array, String], %i[to_s size]
+    expect(@ability.can?(:read, String, :size)).to be(true)
+    expect(@ability.can?(:read, Array, :to_s)).to be(true)
+  end
+
+  it 'allows cannot of rules with attributes' do
+    @ability.can :read, Array
+    @ability.cannot :read, Array, :to_s
+    expect(@ability.can?(:read, Array, :to_s)).to be(false)
+    expect(@ability.can?(:read, Array)).to be(true)
+    expect(@ability.can?(:read, Array, :size)).to be(true)
+  end
+
+  it 'has precedence with attribute-level rules' do
+    @ability.cannot :read, Array
+    @ability.can :read, Array, :to_s
+    expect(@ability.can?(:read, Array, :to_s)).to be(true)
+    expect(@ability.can?(:read, Array, :size)).to be(false)
+    expect(@ability.can?(:read, Array)).to be(true)
+  end
+
+  it 'allows permission on all attributes when none are given' do
+    @ability.can :update, Object
+    expect(@ability.can?(:update, Object, :password)).to be(true)
+  end
+
+  it 'allows strings when checking attributes' do
+    @ability.can :update, Object, :name
+    expect(@ability.can?(:update, Object, 'name')).to be(true)
+  end
+
+  it 'passes attribute to block; nil if no attribute given' do
+    @ability.can :update, Range do |_range, attribute|
+      attribute == :name
+    end
+    expect(@ability.can?(:update, 1..3, :name)).to be(true)
+    expect(@ability.can?(:update, 2..4)).to be(false)
+  end
+
+  it 'combines attribute checks with conditions hash' do
+    @ability.can :update, Range, begin: 1
+    @ability.can :update, Range, :name, begin: 2
+    expect(@ability.can?(:update, 1..3, :notname)).to be(true)
+    expect(@ability.can?(:update, 2..4, :notname)).to be(false)
+    expect(@ability.can?(:update, 2..4, :name)).to be(true)
+    expect(@ability.can?(:update, 3..5, :name)).to be(false)
+    expect(@ability.can?(:update, Range)).to be(true)
+    expect(@ability.can?(:update, Range, :name)).to be(true)
   end
 
   describe 'unauthorized message' do
