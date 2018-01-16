@@ -2,10 +2,10 @@ language: ruby
 cache: bundler
 sudo: false
 rvm:
-  - 2.2.0
   - 2.2.8
   - 2.3.5
   - 2.4.2
+  - 2.5.0
   - jruby-9.0.5.0
   - jruby-9.1.9.0
 gemfile:
@@ -38,8 +38,9 @@ notifications:
     recipients:
       - alessandro.rodi@renuo.ch
       - josua.schmid@renuo.ch
-      - zora.fuchs@renuo.ch
     on_success: change
     on_failure: change
+before_install:
+  - gem update --system
 script:
   - bundle exec rubocop && bundle exec rake
