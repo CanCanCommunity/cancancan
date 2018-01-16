@@ -13,7 +13,7 @@ end
 
 platforms :ruby, :mswin, :mingw do
   gem "sqlite3"
-  gem "pg"
+  gem "pg", "~> 0.21"
 end
 
 gemspec path: "../"

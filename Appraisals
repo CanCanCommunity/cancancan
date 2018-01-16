@@ -5,13 +5,13 @@ appraise 'activerecord_4.2' do
   gem 'nokogiri', '~> 1.6.8', require: 'nokogiri' # TODO: fix for ruby 2.0.0
 
   gemfile.platforms :jruby do
-    gem 'activerecord-jdbcsqlite3-adapter'
+    gem 'activerecord-jdbcsqlite3-adapter', '~> 1.3.24'
     gem 'jdbc-sqlite3'
   end
 
   gemfile.platforms :ruby, :mswin, :mingw do
     gem 'sqlite3'
-    gem 'pg'
+    gem 'pg', '~> 0.21'
   end
 end
 
@@ -27,7 +27,7 @@ appraise 'activerecord_5.0.2' do
 
   gemfile.platforms :ruby, :mswin, :mingw do
     gem 'sqlite3'
-    gem 'pg'
+    gem 'pg', '~> 0.21'
   end
 end
 
@@ -43,6 +43,6 @@ appraise 'activerecord_5.1.0' do
 
   gemfile.platforms :ruby, :mswin, :mingw do
     gem 'sqlite3'
-    gem 'pg'
+    gem 'pg', '~> 0.21'
   end
 end

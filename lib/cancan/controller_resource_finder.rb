@@ -13,11 +13,16 @@ module CanCan
     end
 
     def find_resource_using_find_by
-      if resource_base.respond_to? 'find_by'
-        resource_base.send('find_by', @options[:find_by].to_sym => id_param)
-      else
-        resource_base.send(@options[:find_by], id_param)
-      end
+      find_by_dynamic_finder || find_by_find_by_finder || resource_base.send(@options[:find_by], id_param)
+    end
+
+    def find_by_dynamic_finder
+      method_name = "find_by_#{@options[:find_by]}!"
+      resource_base.send(method_name, id_param) if resource_base.respond_to? method_name
+    end
+
+    def find_by_find_by_finder
+      resource_base.find_by(@options[:find_by].to_sym => id_param) if resource_base.respond_to? :find_by
     end
 
     def id_param

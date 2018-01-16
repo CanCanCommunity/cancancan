@@ -2,6 +2,14 @@ Unreleased
 
 * Removed support for dynamic finders (coorasse)
 
+2.1.3 (Jan 16th, 2018)
+
+* Fix compatibility with Rails 5 API (Eric-Guo)
+
+2.1.2 (Nov 22th, 2017)
+
+* Various bugfixes on version 2.1.0
+
 2.1.0 (Nov 10th, 2017)
 
 * Adds support for Rails Api applications (coorasse & ajgon)
