@@ -281,10 +281,10 @@ describe CanCan::Ability do
       int > x
     end
 
-    expect(@ability.can?(:read, 2, nil, 1)).to be(true)
-    expect(@ability.can?(:read, 2, nil, 3)).to be(false)
-    expect(@ability.can?(:read, { any: [4, 5] }, nil, 3)).to be(true)
-    expect(@ability.can?(:read, { any: [2, 3] }, nil, 3)).to be(false)
+    expect(@ability.can?(:read, 2, 1)).to be(true)
+    expect(@ability.can?(:read, 2, 3)).to be(false)
+    expect(@ability.can?(:read, { any: [4, 5] }, 3)).to be(true)
+    expect(@ability.can?(:read, { any: [2, 3] }, 3)).to be(false)
   end
 
   it 'uses conditions as third parameter and determine abilities from it' do
