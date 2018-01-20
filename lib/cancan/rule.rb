@@ -90,9 +90,13 @@ module CanCan
     end
 
     def parse_attributes_from_conditions(args)
-      attributes = args.shift if args.first.is_a?(Symbol) || args.first.is_a?(Array)\
-        && args.first.first.is_a?(Symbol)
-      conditions = args.first
+      if args.first.is_a?(Symbol) || # use symbols to represent attributes
+         (args.first.is_a?(Array) && args.first.first.is_a?(Symbol)) || # array of attributes
+         args.first.nil? # nil is passed in because conditions needs to be one of the above
+
+        attributes = args.shift
+      end
+      conditions = args.shift
 
       [attributes, conditions]
     end

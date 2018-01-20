@@ -49,4 +49,14 @@ describe CanCan::Rule do
     @conditions = {}
     expect(@rule).to_not be_unmergeable
   end
+
+  it 'allows nil in attribute spot for edge cases', focus: true do
+    rule1 = CanCan::Rule.new(true, :action, :subject, nil, :var)
+    expect(rule1.attributes).to eq []
+    #expect(rule1.conditions).to eq :var
+
+    rule2 = CanCan::Rule.new(true, :action, :subject, nil, %i[foo bar])
+    expect(rule2.attributes).to eq []
+    expect(rule2.conditions).to eq %i[foo bar]
+  end
 end
