@@ -422,7 +422,7 @@ describe CanCan::Ability do
     expect(@ability.can?(:read, Container.new)).to be(true)
   end
 
-  it "has initial attributes based on hash conditions of 'new' action" do
+  it "has initial values based on hash conditions of 'new' action" do
     @ability.can :manage, Range, foo: 'foo', hash: { skip: 'hashes' }
     @ability.can :create, Range, bar: 123, array: %w[skip arrays]
     @ability.can :new, Range, baz: 'baz', range: 1..3
