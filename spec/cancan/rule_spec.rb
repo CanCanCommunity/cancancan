@@ -53,7 +53,7 @@ describe CanCan::Rule do
   it 'allows nil in attribute spot for edge cases', focus: true do
     rule1 = CanCan::Rule.new(true, :action, :subject, nil, :var)
     expect(rule1.attributes).to eq []
-    #expect(rule1.conditions).to eq :var
+    expect(rule1.conditions).to eq :var
 
     rule2 = CanCan::Rule.new(true, :action, :subject, nil, %i[foo bar])
     expect(rule2.attributes).to eq []
