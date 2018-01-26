@@ -71,8 +71,19 @@ module CanCan
         conditions.stringify_keys!
 
         predicate_builder.build_from_hash(conditions).map do |b|
-          @model_class.send(:connection).visitor.compile b
+          visit_nodes(b)
         end.join(' AND ')
+      end
+
+      def visit_nodes(b)
+        # Rails 5.2 adds a BindParam node that prevents the visitor method from properly compiling the SQL query
+        if ActiveRecord::VERSION::MINOR >= 2
+          connection = @model_class.send(:connection)
+          collector = Arel::Collectors::SubstituteBinds.new(connection, Arel::Collectors::SQLString.new)
+          connection.visitor.accept(b, collector).value
+        else
+          @model_class.send(:connection).visitor.compile(b)
+        end
       end
     end
   end

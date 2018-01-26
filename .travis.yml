@@ -12,6 +12,7 @@ gemfile:
   - gemfiles/activerecord_4.2.gemfile
   - gemfiles/activerecord_5.0.2.gemfile
   - gemfiles/activerecord_5.1.0.gemfile
+  - gemfiles/activerecord_5.2.0.beta2.gemfile
 services:
   - mongodb
 matrix:
@@ -33,6 +34,10 @@ matrix:
       gemfile: gemfiles/activerecord_5.1.0.gemfile
     - rvm: jruby-9.1.9.0
       gemfile: gemfiles/activerecord_5.1.0.gemfile
+    - rvm: jruby-9.0.5.0
+      gemfile: gemfiles/activerecord_5.2.0.beta2.gemfile
+    - rvm: jruby-9.1.9.0
+      gemfile: gemfiles/activerecord_5.2.0.beta2.gemfile
 notifications:
   email:
     recipients:
