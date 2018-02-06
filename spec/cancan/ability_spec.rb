@@ -550,6 +550,18 @@ describe CanCan::Ability do
     expect(@ability.can?(:update, Range, :name)).to be(true)
   end
 
+  # it 'can check an array of attributes' do
+  #   @ability.can :foo, :bar, :baz
+  #   @ability.can :foo, :bar, %i[qux corge]
+  #
+  #   expect(@ability.can?(:foo, :bar, :baz)).to be(true)
+  #   expect(@ability.can?(:foo, :bar, %i[qux corge])).to be(true)
+  #   expect(@ability.can?(:foo, :bar, %i[baz qux])).to be(true)
+  #   expect(@ability.can?(:foo, :bar, %i[baz qux corge])).to be(true)
+  #   expect(@ability.can?(:foo, :bar, %i[baz grault])).to be(false)
+  #   expect(@ability.can?(:foo, :bar, %i[qux grault])).to be(false)
+  # end
+
   describe 'unauthorized message' do
     after(:each) do
       I18n.backend = nil

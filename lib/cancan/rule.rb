@@ -5,6 +5,7 @@ module CanCan
   # helpful methods to determine permission checking and conditions hash generation.
   class Rule # :nodoc:
     include ConditionsMatcher
+    include ParameterValidators
     attr_reader :base_behavior, :subjects, :actions, :conditions, :attributes
     attr_writer :expanded_actions
 
@@ -15,14 +16,14 @@ module CanCan
     def initialize(base_behavior, action, subject, *extra_args, &block)
       # for backwards compatibility, attributes are an optional parameter. Check if
       # attributes were passed or are actually conditions
-      attributes, conditions = parse_attributes_from_conditions(extra_args)
-      condition_and_block_check(conditions, block, action, subject)
+      attributes, extra_args = parse_attributes_from_extra_args(extra_args)
+      condition_and_block_check(extra_args, block, action, subject)
       @match_all = action.nil? && subject.nil?
       @base_behavior = base_behavior
       @actions = Array(action)
       @subjects = Array(subject)
       @attributes = Array(attributes)
-      @conditions = conditions || {}
+      @conditions = extra_args || {}
       @block = block
     end
 
@@ -89,16 +90,11 @@ module CanCan
       end
     end
 
-    def parse_attributes_from_conditions(args)
-      if args.first.is_a?(Symbol) || # use symbols to represent attributes
-         (args.first.is_a?(Array) && args.first.first.is_a?(Symbol)) || # array of attributes
-         args.first.nil? # nil is passed in because conditions needs to be one of the above
+    def parse_attributes_from_extra_args(args)
+      attributes = args.shift if valid_attribute_param?(args.first)
+      extra_args = args.shift
 
-        attributes = args.shift
-      end
-      conditions = args.shift
-
-      [attributes, conditions]
+      [attributes, extra_args]
     end
 
     def condition_and_block_check(conditions, block, action, subject)

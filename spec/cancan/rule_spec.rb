@@ -50,7 +50,7 @@ describe CanCan::Rule do
     expect(@rule).to_not be_unmergeable
   end
 
-  it 'allows nil in attribute spot for edge cases', focus: true do
+  it 'allows nil in attribute spot for edge cases' do
     rule1 = CanCan::Rule.new(true, :action, :subject, nil, :var)
     expect(rule1.attributes).to eq []
     expect(rule1.conditions).to eq :var
