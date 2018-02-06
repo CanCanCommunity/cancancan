@@ -550,17 +550,19 @@ describe CanCan::Ability do
     expect(@ability.can?(:update, Range, :name)).to be(true)
   end
 
-  # it 'can check an array of attributes' do
-  #   @ability.can :foo, :bar, :baz
-  #   @ability.can :foo, :bar, %i[qux corge]
-  #
-  #   expect(@ability.can?(:foo, :bar, :baz)).to be(true)
-  #   expect(@ability.can?(:foo, :bar, %i[qux corge])).to be(true)
-  #   expect(@ability.can?(:foo, :bar, %i[baz qux])).to be(true)
-  #   expect(@ability.can?(:foo, :bar, %i[baz qux corge])).to be(true)
-  #   expect(@ability.can?(:foo, :bar, %i[baz grault])).to be(false)
-  #   expect(@ability.can?(:foo, :bar, %i[qux grault])).to be(false)
-  # end
+  it 'returns an array of permitted attributes for a given action and subject' do
+    class MockClass
+      attr_reader :foo, :bar, :baz
+    end
+    @ability.can :read, MockClass
+    @ability.cannot :read, Array
+    @ability.can :read, Array, :special
+    @ability.can :action, :subject, :attribute
+
+    expect(%i[foo bar baz] & @ability.permitted_attributes(:read, MockClass)).to eq(%i[foo bar baz])
+    expect(@ability.permitted_attributes(:read, Array)).to eq([:special])
+    expect(@ability.permitted_attributes(:action, :subject)).to eq([:attribute])
+  end
 
   describe 'unauthorized message' do
     after(:each) do

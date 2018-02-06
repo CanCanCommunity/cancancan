@@ -1,5 +1,7 @@
 require_relative 'ability/rules.rb'
 require_relative 'ability/actions.rb'
+require_relative 'ability/strong_parameter_support'
+
 module CanCan
   # This module is designed to be included into an Ability class. This will
   # provide the "can" methods for defining and checking abilities.
@@ -19,7 +21,7 @@ module CanCan
   module Ability
     include CanCan::Ability::Rules
     include CanCan::Ability::Actions
-    include ParameterValidators
+    include StrongParameterSupport
 
     # Check if the user has permission to perform a given action on an object.
     #
@@ -66,8 +68,6 @@ module CanCan
     #
     # Also see the RSpec Matchers to aid in testing.
     def can?(action, subject, attribute = nil, *extra_args)
-      # raise AttributeArgumentError unless valid_attribute_param?(attribute)
-
       match = extract_subjects(subject).lazy.map do |a_subject|
         relevant_rules_for_match(action, a_subject, attribute).detect do |rule|
           rule.matches_conditions?(action, a_subject, attribute, *extra_args)
