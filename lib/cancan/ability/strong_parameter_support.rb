@@ -10,11 +10,11 @@ module CanCan
       private
 
       def allowed_attributes(action, subject)
-        attributes = relevant_rules(action, subject).reduce([]) do |array, rule|
+        attributes = relevant_rules(action, subject).flat_map do |rule|
           if rule.attributes.empty? && subject.class == Class # empty attributes is an 'all'
-            array + subject.instance_methods.map(&:to_sym)
+            subject.instance_methods.map(&:to_sym)
           else
-            array + rule.attributes
+            rule.attributes
           end
         end
         attributes.uniq!
