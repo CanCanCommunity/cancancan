@@ -11,7 +11,7 @@ appraise 'activerecord_4.2' do
 
   gemfile.platforms :ruby, :mswin, :mingw do
     gem 'sqlite3'
-    gem 'pg', '~> 0.15'
+    gem 'pg', '~> 0.21'
   end
 end
 
@@ -43,6 +43,6 @@ appraise 'activerecord_5.1.0' do
 
   gemfile.platforms :ruby, :mswin, :mingw do
     gem 'sqlite3'
-    gem 'pg', '~> 0.18'
+    gem 'pg', '~> 0.21'
   end
 end
