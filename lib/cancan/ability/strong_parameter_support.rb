@@ -11,8 +11,8 @@ module CanCan
 
       def allowed_attributes(action, subject)
         attributes = relevant_rules(action, subject).flat_map do |rule|
-          if rule.attributes.empty? && subject.class == Class # empty attributes is an 'all'
-            subject.instance_methods.map(&:to_sym)
+          if rule.attributes.empty? && subject < ActiveRecord::Base # empty attributes is an 'all'
+            subject.column_names.map(&:to_sym) - [:id]
           else
             rule.attributes
           end

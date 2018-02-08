@@ -551,15 +551,15 @@ describe CanCan::Ability do
   end
 
   it 'returns an array of permitted attributes for a given action and subject' do
-    class MockClass
-      attr_reader :foo, :bar, :baz
-    end
-    @ability.can :read, MockClass
+    class User < ActiveRecord::Base; end
+    allow(User).to receive(:column_names).and_return(%w[first_name last_name])
+
+    @ability.can :read, User
     @ability.cannot :read, Array
     @ability.can :read, Array, :special
     @ability.can :action, :subject, :attribute
 
-    expect(%i[foo bar baz] & @ability.permitted_attributes(:read, MockClass)).to eq(%i[foo bar baz])
+    expect(@ability.permitted_attributes(:read, User)).to eq(%i[first_name last_name])
     expect(@ability.permitted_attributes(:read, Array)).to eq([:special])
     expect(@ability.permitted_attributes(:action, :subject)).to eq([:attribute])
   end
