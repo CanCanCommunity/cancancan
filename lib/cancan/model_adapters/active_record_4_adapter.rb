@@ -3,7 +3,7 @@ module CanCan
     class ActiveRecord4Adapter < AbstractAdapter
       include ActiveRecordAdapter
       def self.for_class?(model_class)
-        model_class <= ActiveRecord::Base
+        ActiveRecord::VERSION::MAJOR == 4 && model_class <= ActiveRecord::Base
       end
 
       # TODO: this should be private
@@ -39,11 +39,8 @@ module CanCan
 
       # Rails 4.2 deprecates `sanitize_sql_hash_for_conditions`
       def sanitize_sql(conditions)
-        if ActiveRecord::VERSION::MAJOR > 4 && conditions.is_a?(Hash)
-          sanitize_sql_activerecord5(conditions)
-        elsif ActiveRecord::VERSION::MINOR >= 2 && conditions.is_a?(Hash)
+        if ActiveRecord::VERSION::MINOR >= 2 && conditions.is_a?(Hash)
           sanitize_sql_activerecord4(conditions)
-
         else
           @model_class.send(:sanitize_sql, conditions)
         end
@@ -58,32 +55,6 @@ module CanCan
         ActiveRecord::PredicateBuilder.build_from_hash(@model_class, conditions, table).map do |b|
           @model_class.send(:connection).visitor.compile b
         end.join(' AND ')
-      end
-
-      def sanitize_sql_activerecord5(conditions)
-        table = @model_class.send(:arel_table)
-        table_metadata = ActiveRecord::TableMetadata.new(@model_class, table)
-        predicate_builder = ActiveRecord::PredicateBuilder.new(table_metadata)
-
-        conditions = predicate_builder.resolve_column_aliases(conditions)
-        conditions = @model_class.send(:expand_hash_conditions_for_aggregates, conditions)
-
-        conditions.stringify_keys!
-
-        predicate_builder.build_from_hash(conditions).map do |b|
-          visit_nodes(b)
-        end.join(' AND ')
-      end
-
-      def visit_nodes(b)
-        # Rails 5.2 adds a BindParam node that prevents the visitor method from properly compiling the SQL query
-        if ActiveRecord::VERSION::MINOR >= 2
-          connection = @model_class.send(:connection)
-          collector = Arel::Collectors::SubstituteBinds.new(connection, Arel::Collectors::SQLString.new)
-          connection.visitor.accept(b, collector).value
-        else
-          @model_class.send(:connection).visitor.compile(b)
-        end
       end
     end
   end
