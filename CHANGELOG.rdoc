@@ -1,6 +1,7 @@
 Unreleased
 
 * Removed support for dynamic finders (coorasse)
+* Fix regression introduced in version 2.1.3 (arturoherrero)
 
 2.1.3 (Jan 16th, 2018)
 
