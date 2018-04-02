@@ -356,6 +356,13 @@ describe CanCan::Ability do
     expect(@ability.can?(:read, Range)).to be(true)
   end
 
+  it 'does not stop at cannot with block when comparing class' do
+    @ability.can :read, Integer
+    @ability.cannot(:read, Integer) { |int| int > 5 }
+    expect(@ability.can?(:read, 123)).to be(false)
+    expect(@ability.can?(:read, Integer)).to be(true)
+  end
+
   it 'stops at cannot definition when no hash is present' do
     @ability.can :read, :all
     @ability.cannot :read, Range
