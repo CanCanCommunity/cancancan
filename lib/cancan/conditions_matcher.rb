@@ -2,12 +2,10 @@ module CanCan
   module ConditionsMatcher
     # Matches the block or conditions hash
     def matches_conditions?(action, subject, attribute, *extra_args)
-      return call_block_with_all(action, subject, *extra_args) if @match_all
-      if @block && !subject_class?(subject)
-        return @block.call(subject, attribute, *extra_args) if attribute
-        return @block.call(subject, *extra_args)
-      end
-      matches_non_block_conditions(subject)
+      return call_block_with_all(action, subject, extra_args) if @match_all
+      return matches_block_conditions(subject, attribute, *extra_args) if @block
+      return matches_non_block_conditions(subject) unless conditions_empty?
+      true
     end
 
     private
@@ -17,13 +15,20 @@ module CanCan
       klass == Class || klass == Module
     end
 
-    def matches_non_block_conditions(subject)
-      if @conditions.is_a?(Hash)
-        return nested_subject_matches_conditions?(subject) if subject.class == Hash
-        return matches_conditions_hash?(subject) unless subject_class?(subject)
+    def matches_block_conditions(subject, attribute, *extra_args)
+      return @base_behavior if subject_class?(subject)
+      if attribute
+        @block.call(subject, attribute, *extra_args)
+      else
+        @block.call(subject, *extra_args)
       end
+    end
+
+    def matches_non_block_conditions(subject)
+      return nested_subject_matches_conditions?(subject) if subject.class == Hash
+      return matches_conditions_hash?(subject) unless subject_class?(subject)
       # Don't stop at "cannot" definitions when there are conditions.
-      conditions_empty? ? true : @base_behavior
+      @base_behavior
     end
 
     def nested_subject_matches_conditions?(subject_hash)
