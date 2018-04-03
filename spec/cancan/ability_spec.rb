@@ -558,17 +558,27 @@ describe CanCan::Ability do
   end
 
   it 'returns an array of permitted attributes for a given action and subject' do
-    class User < ActiveRecord::Base; end
-    allow(User).to receive(:column_names).and_return(%w[first_name last_name])
+    user_class = Class.new(ActiveRecord::Base)
+    allow(user_class).to receive(:column_names).and_return(%w[first_name last_name])
+    allow(user_class).to receive(:primary_key).and_return('id')
 
-    @ability.can :read, User
-    @ability.cannot :read, Array
+    @ability.can :read, user_class
     @ability.can :read, Array, :special
     @ability.can :action, :subject, :attribute
 
-    expect(@ability.permitted_attributes(:read, User)).to eq(%i[first_name last_name])
+    expect(@ability.permitted_attributes(:read, user_class)).to eq(%i[first_name last_name])
     expect(@ability.permitted_attributes(:read, Array)).to eq([:special])
     expect(@ability.permitted_attributes(:action, :subject)).to eq([:attribute])
+  end
+  # more tests here
+  it 'permitted attributes handles blocks' do
+    user_class = Struct.new(:first_name, :last_name)
+
+    @ability.can :read, user_class, %i[first_name last_name]
+    @ability.cannot(:read, user_class, :first_name) { |u| u.last_name == 'foo' }
+
+    expect(@ability.permitted_attributes(:read, user_class.new('first', 'bar'))).to eq(%i[first_name last_name])
+    expect(@ability.permitted_attributes(:read, user_class.new('first', 'foo'))).to eq(%i[last_name])
   end
 
   describe 'unauthorized message' do

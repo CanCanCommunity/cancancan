@@ -29,11 +29,11 @@ module CanCan
 
       # Returns an array of Rule instances which match the action and subject
       # This does not take into consideration any hash conditions or block statements
-      def relevant_rules(action, subject, attribute = nil)
+      def relevant_rules(action, subject)
         return [] unless @rules
         relevant = possible_relevant_rules(subject).select do |rule|
           rule.expanded_actions = expand_actions(rule.actions)
-          rule.relevant? action, subject, attribute
+          rule.relevant? action, subject
         end
         relevant.reverse!.uniq!
         optimize_order! relevant
@@ -50,8 +50,8 @@ module CanCan
         end
       end
 
-      def relevant_rules_for_match(action, subject, attribute)
-        relevant_rules(action, subject, attribute).each do |rule|
+      def relevant_rules_for_match(action, subject)
+        relevant_rules(action, subject).each do |rule|
           next unless rule.only_raw_sql?
           raise Error,
                 "The can? and cannot? call cannot be used with a raw sql 'can' definition."\

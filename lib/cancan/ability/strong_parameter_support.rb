@@ -1,24 +1,38 @@
 module CanCan
   module Ability
     module StrongParameterSupport
-      # Return an array of attributes suitable for use with strong parameters
+      # Returns an array of attributes suitable for use with strong parameters
+      #
+      # Note: reversing the relevant rules is important. Normal order means that 'cannot'
+      # rules will come before 'can' rules. However, you can't remove attributes before
+      # they are added. The 'reverse' is so that attributes will be added before the
+      # 'cannot' rules remove them.
       def permitted_attributes(action, subject)
-        @permitted_attributes ||= {}
-        @permitted_attributes[[action, subject]] ||= allowed_attributes(action, subject)
+        relevant_rules(action, subject)
+          .reverse
+          .select { |rule| rule.matches_conditions? action, subject }
+          .each_with_object(Set.new) do |rule, set|
+            attributes = get_attributes(rule, subject)
+            # add attributes for 'can', remove them for 'cannot'
+            rule.base_behavior ? set.merge(attributes) : set.subtract(attributes)
+          end.to_a
       end
 
       private
 
-      def allowed_attributes(action, subject)
-        attributes = relevant_rules(action, subject).flat_map do |rule|
-          if rule.attributes.empty? && subject < ActiveRecord::Base # empty attributes is an 'all'
-            subject.column_names.map(&:to_sym) - [:id]
-          else
-            rule.attributes
-          end
+      def subject_class?(subject)
+        klass = (subject.is_a?(Hash) ? subject.values.first : subject).class
+        klass == Class || klass == Module
+      end
+
+      def get_attributes(rule, subject)
+        klass = subject_class?(subject) ? subject : subject.class
+        # empty attributes is an 'all'
+        if rule.attributes.empty? && klass < ActiveRecord::Base
+          klass.column_names.map(&:to_sym) - Array(klass.primary_key)
+        else
+          rule.attributes
         end
-        attributes.uniq!
-        attributes.select { |attribute| can?(action, subject, attribute) }
       end
     end
   end

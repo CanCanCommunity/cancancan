@@ -28,9 +28,9 @@ module CanCan
     end
 
     # Matches the action, subject, and attribute; not necessarily the conditions
-    def relevant?(action, subject, attribute = nil)
+    def relevant?(action, subject)
       subject = subject.values.first if subject.class == Hash
-      @match_all || (matches_action?(action) && matches_subject?(subject) && matches_attribute?(attribute))
+      @match_all || (matches_action?(action) && matches_subject?(subject))
     end
 
     def only_block?
@@ -66,6 +66,12 @@ module CanCan
       attributes
     end
 
+    def matches_attributes?(attribute)
+      return true if @attributes.empty?
+      return @base_behavior if attribute.nil?
+      @attributes.include?(attribute.to_sym)
+    end
+
     private
 
     def matches_action?(action)
@@ -74,12 +80,6 @@ module CanCan
 
     def matches_subject?(subject)
       @subjects.include?(:all) || @subjects.include?(subject) || matches_subject_class?(subject)
-    end
-
-    def matches_attribute?(attribute)
-      return true if @attributes.empty?
-      return @base_behavior if attribute.nil?
-      @attributes.include?(attribute.to_sym)
     end
 
     def matches_subject_class?(subject)

@@ -69,8 +69,8 @@ module CanCan
     # Also see the RSpec Matchers to aid in testing.
     def can?(action, subject, attribute = nil, *extra_args)
       match = extract_subjects(subject).lazy.map do |a_subject|
-        relevant_rules_for_match(action, a_subject, attribute).detect do |rule|
-          rule.matches_conditions?(action, a_subject, attribute, *extra_args)
+        relevant_rules_for_match(action, a_subject).detect do |rule|
+          rule.matches_conditions?(action, a_subject, attribute, *extra_args) && rule.matches_attributes?(attribute)
         end
       end.reject(&:nil?).first
       match ? match.base_behavior : false
