@@ -584,9 +584,11 @@ describe CanCan::Ability do
   it 'returns permitted attributes when using conditions' do
     @ability.can :read, Range, %i[nil? to_s class]
     @ability.cannot :read, Range, %i[nil? to_s], begin: 2
+    @ability.can :read, Range, :to_s, end: 4
 
     expect(@ability.permitted_attributes(:read, 1..3)).to eq(%i[nil? to_s class])
-    expect(@ability.permitted_attributes(:read, 2..4)).to eq([:class])
+    expect(@ability.permitted_attributes(:read, 2..5)).to eq([:class])
+    expect(@ability.permitted_attributes(:read, 2..4)).to eq(%i[class to_s])
   end
 
   it 'respects inheritance when checking permitted attributes' do
