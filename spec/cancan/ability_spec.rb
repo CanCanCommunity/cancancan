@@ -570,15 +570,30 @@ describe CanCan::Ability do
     expect(@ability.permitted_attributes(:read, Array)).to eq([:special])
     expect(@ability.permitted_attributes(:action, :subject)).to eq([:attribute])
   end
-  # more tests here
-  it 'permitted attributes handles blocks' do
+
+  it 'returns permitted attributes when used with blocks' do
     user_class = Struct.new(:first_name, :last_name)
 
     @ability.can :read, user_class, %i[first_name last_name]
-    @ability.cannot(:read, user_class, :first_name) { |u| u.last_name == 'foo' }
+    @ability.cannot(:read, user_class, :first_name) { |u| u.last_name == 'Smith' }
 
-    expect(@ability.permitted_attributes(:read, user_class.new('first', 'bar'))).to eq(%i[first_name last_name])
-    expect(@ability.permitted_attributes(:read, user_class.new('first', 'foo'))).to eq(%i[last_name])
+    expect(@ability.permitted_attributes(:read, user_class.new('John', 'Jones'))).to eq(%i[first_name last_name])
+    expect(@ability.permitted_attributes(:read, user_class.new('John', 'Smith'))).to eq(%i[last_name])
+  end
+
+  it 'returns permitted attributes when using conditions' do
+    @ability.can :read, Range, %i[nil? to_s class]
+    @ability.cannot :read, Range, %i[nil? to_s], begin: 2
+
+    expect(@ability.permitted_attributes(:read, 1..3)).to eq(%i[nil? to_s class])
+    expect(@ability.permitted_attributes(:read, 2..4)).to eq([:class])
+  end
+
+  it 'respects inheritance when checking permitted attributes' do
+    @ability.can :read, Integer, %i[nil? to_s class]
+    @ability.cannot :read, Numeric, %i[nil? class]
+
+    expect(@ability.permitted_attributes(:read, Integer)).to eq([:to_s])
   end
 
   describe 'unauthorized message' do
