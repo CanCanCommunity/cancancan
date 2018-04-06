@@ -352,6 +352,16 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       expect { @ability.can? :read, Article }.not_to raise_error
     end
 
+    it 'should ignore cannot rules with attributes when querying' do
+      user = User.create!
+      Article.create!(user: user)
+      ability = Ability.new(user)
+      ability.can :read, Article
+      ability.cannot :read, Article, :secret
+
+      expect(Article.accessible_by(ability).count).to eq(1)
+    end
+
     context 'with namespaced models' do
       before :each do
         ActiveRecord::Schema.define do
