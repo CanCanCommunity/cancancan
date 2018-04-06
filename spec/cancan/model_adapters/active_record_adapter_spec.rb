@@ -354,12 +354,12 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
 
     it 'should ignore cannot rules with attributes when querying' do
       user = User.create!
-      Article.create!(user: user)
+      article = Article.create!(user: user)
       ability = Ability.new(user)
       ability.can :read, Article
       ability.cannot :read, Article, :secret
 
-      expect(Article.accessible_by(ability).count).to eq(1)
+      expect(Article.accessible_by(ability)).to eq([article])
     end
 
     context 'with namespaced models' do
