@@ -1,7 +1,10 @@
 Unreleased
 
 * Removed support for dynamic finders (coorasse)
-* Fix regression introduced in version 2.1.3 (arturoherrero)
+
+2.1.4 (Apr 09th, 2018)
+
+* Inject cancancan in ActionController::API and ActionController::Base when they are both defined (arturoherrero)
 
 2.1.3 (Jan 16th, 2018)
 
