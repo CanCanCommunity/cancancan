@@ -13,10 +13,9 @@ module CanCan
     # and subject respectively (such as :read, @project). The third argument is a hash
     # of conditions and the last one is the block passed to the "can" call.
     def initialize(base_behavior, action, subject, conditions, block)
-      both_block_and_hash_error = 'You are not able to supply a block with a hash of conditions in '\
-                                  "#{action} #{subject} ability. Use either one."
-      raise Error, both_block_and_hash_error if conditions.is_a?(Hash) && block
+      condition_and_block_check(conditions, block, action, subject)
       @match_all = action.nil? && subject.nil?
+      raise Error, "Subject is required for #{action}" if action && subject.nil?
       @base_behavior = base_behavior
       @actions = Array(action)
       @subjects = Array(subject)
@@ -79,6 +78,12 @@ module CanCan
           subject.class.to_s == sub.to_s ||
           (subject.is_a?(Module) && subject.ancestors.include?(sub)))
       end
+    end
+
+    def condition_and_block_check(conditions, block, action, subject)
+      return unless conditions.is_a?(Hash) && block
+      raise BlockAndConditionsError, 'A hash of conditions is mutually exclusive with a block. '\
+              "Check \":#{action} #{subject}\" ability."
     end
   end
 end

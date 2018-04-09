@@ -483,9 +483,15 @@ describe CanCan::Ability do
       @ability.can :read, Array, published: true do
         false
       end
-    end.to raise_error(CanCan::Error,
-                       'You are not able to supply a block with a hash of conditions in read Array ability. '\
-                       'Use either one.')
+    end.to raise_error(CanCan::BlockAndConditionsError,
+                       'A hash of conditions is mutually exclusive with a block. '\
+                       'Check ":read Array" ability.')
+  end
+
+  it 'raises an error when attempting to use action without subject' do
+    expect do
+      @ability.can :dashboard
+    end.to raise_error(CanCan::Error, 'Subject is required for dashboard')
   end
 
   describe 'unauthorized message' do
