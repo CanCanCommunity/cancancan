@@ -237,7 +237,7 @@ If you find a bug please add an [issue on GitHub](https://github.com/CanCanCommu
 CanCanCan uses [appraisals](https://github.com/thoughtbot/appraisal) to test the code base against multiple versions 
 of Rails, as well as the different model adapters.
 
-When first developing, you may need to run `bundle install` and then `appraisal install`, to install the different sets.
+When first developing, you need to run `bundle install` and then `appraisal install`, to install the different sets.
 
 You can then run all appraisal files (like CI does), with `appraisal rake` or just run a specific set `appraisal activerecord_5.0 rake`.
 
@@ -249,7 +249,7 @@ See the [CONTRIBUTING](https://github.com/CanCanCommunity/cancancan/blob/develop
 
 [![Renuo AG](/logo/renuo.png)](https://www.renuo.ch)
 
-Thanks to [Renuo](https://www.renuo.ch) for currently maintaining and supporting the project.
+Thanks to [Renuo AG](https://www.renuo.ch) for currently maintaining and supporting the project.
 
 Also many thanks to the [CanCanCan contributors](https://github.com/CanCanCommunity/cancancan/contributors). 
 See the [CHANGELOG](https://github.com/CanCanCommunity/cancancan/blob/master/CHANGELOG.rdoc) for the full list.
