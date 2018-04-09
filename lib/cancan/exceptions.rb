@@ -16,7 +16,6 @@ module CanCan
 
   # Raised when an unexpected argument is passed as an attribute
   class AttributeArgumentError < Error; end
-
   # This error is raised when a user isn't allowed to access a given controller action.
   # This usually happens within a call to ControllerAdditions#authorize! but can be
   # raised manually.

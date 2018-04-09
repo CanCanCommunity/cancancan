@@ -598,6 +598,12 @@ describe CanCan::Ability do
     expect(@ability.permitted_attributes(:read, Integer)).to eq([:to_s])
   end
 
+  it 'raises an error when attempting to use action without subject' do
+    expect do
+      @ability.can :dashboard
+    end.to raise_error(CanCan::Error, 'Subject is required for dashboard')
+  end
+
   describe 'unauthorized message' do
     after(:each) do
       I18n.backend = nil
