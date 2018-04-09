@@ -205,6 +205,11 @@ describe CanCan::Ability do
     expect(@ability.can?(:read, any: %i[nonstats neitherstats])).to be(false)
   end
 
+  it 'supports definition of rules without subjects' do
+    @ability.can :dashboard
+    expect(@ability.can?(:dashboard, nil)).to be(true)
+  end
+
   it 'checks ancestors of class' do
     @ability.can :read, Numeric
     expect(@ability.can?(:read, Integer)).to be(true)
