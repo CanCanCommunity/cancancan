@@ -15,6 +15,7 @@ if defined? ActiveRecord
   if ActiveRecord.respond_to?(:version) &&
      ActiveRecord.version >= Gem::Version.new('4')
     require 'cancan/model_adapters/active_record_4_adapter'
+    require 'cancan/model_adapters/active_record_5_adapter'
   else
     require 'cancan/model_adapters/active_record_3_adapter'
   end

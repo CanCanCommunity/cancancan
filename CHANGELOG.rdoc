@@ -2,6 +2,8 @@ Develop
 
 Unreleased
 
+* Fix cancancan#478 - Fixes SQL exception from rails 5.2 upgrade (lizzyaustad & kevintyll)
+
 1.17.0 (March 26th, 2017)
 
 * Improve performance for the Mongoid Adapter

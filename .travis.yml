@@ -12,7 +12,9 @@ gemfile:
   - gemfiles/activerecord_4.0.gemfile
   - gemfiles/activerecord_4.1.gemfile
   - gemfiles/activerecord_4.2.gemfile
-  - gemfiles/activerecord_5.0.gemfile
+  - gemfiles/activerecord_5.0.2.gemfile
+  - gemfiles/activerecord_5.1.0.gemfile
+  - gemfiles/activerecord_5.2.0.gemfile
   - gemfiles/mongoid_2.x.gemfile
   - gemfiles/sequel_3.x.gemfile
 services:
@@ -21,13 +23,29 @@ matrix:
   fast_finish: true
   exclude:
     - rvm: 2.0.0
-      gemfile: gemfiles/activerecord_5.0.gemfile
+      gemfile: gemfiles/activerecord_5.0.2.gemfile
+    - rvm: 2.0.0
+      gemfile: gemfiles/activerecord_5.1.0.gemfile
+    - rvm: 2.0.0
+      gemfile: gemfiles/activerecord_5.2.0.gemfile
     - rvm: 2.1.0
-      gemfile: gemfiles/activerecord_5.0.gemfile
+      gemfile: gemfiles/activerecord_5.0.2.gemfile
+    - rvm: 2.1.0
+      gemfile: gemfiles/activerecord_5.1.0.gemfile
+    - rvm: 2.1.0
+      gemfile: gemfiles/activerecord_5.2.0.gemfile
     - rvm: 2.2.0
-      gemfile: gemfiles/activerecord_5.0.gemfile
+      gemfile: gemfiles/activerecord_5.0.2.gemfile
+    - rvm: 2.2.0
+      gemfile: gemfiles/activerecord_5.1.0.gemfile
+    - rvm: 2.2.0
+      gemfile: gemfiles/activerecord_5.2.0.gemfile
     - rvm: jruby-9.0.5.0
-      gemfile: gemfiles/activerecord_5.0.gemfile
+      gemfile: gemfiles/activerecord_5.0.2.gemfile
+    - rvm: jruby-9.0.5.0
+      gemfile: gemfiles/activerecord_5.1.0.gemfile
+    - rvm: jruby-9.0.5.0
+      gemfile: gemfiles/activerecord_5.2.0.gemfile
 notifications:
   email:
     recipients:
