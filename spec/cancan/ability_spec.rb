@@ -424,23 +424,55 @@ describe CanCan::Ability do
     expect(@ability.attributes_for(:new, Range)).to eq(foo: 'foo', bar: 123, baz: 'baz')
   end
 
-  it 'raises access denied exception if ability us unauthorized to perform a certain action' do
-    begin
-      @ability.authorize! :read, :foo, 1, 2, 3, message: 'Access denied!'
-    rescue CanCan::AccessDenied => e
-      expect(e.message).to eq('Access denied!')
-      expect(e.action).to eq(:read)
-      expect(e.subject).to eq(:foo)
-    else
-      raise 'Expected CanCan::AccessDenied exception to be raised'
-    end
-  end
+  describe '#authorize!' do
+    describe 'when ability is not authorized to perform an action' do
+      it 'raises access denied exception' do
+        begin
+          @ability.authorize! :read, :foo, 1, 2, 3, message: 'Access denied!'
+        rescue CanCan::AccessDenied => e
+          expect(e.message).to eq('Access denied!')
+          expect(e.action).to eq(:read)
+          expect(e.subject).to eq(:foo)
+          expect(e.conditions).to eq([1, 2, 3])
+        else
+          raise 'Expected CanCan::AccessDenied exception to be raised'
+        end
+      end
 
-  it 'does not raise access denied exception if ability is authorized to perform an action and return subject' do
-    @ability.can :read, :foo
-    expect do
-      expect(@ability.authorize!(:read, :foo)).to eq(:foo)
-    end.to_not raise_error
+      describe 'when no extra conditions are specified' do
+        it 'raises access denied exception without conditions' do
+          begin
+            @ability.authorize! :read, :foo, message: 'Access denied!'
+          rescue CanCan::AccessDenied => e
+            expect(e.conditions).to eq([])
+          else
+            raise 'Expected CanCan::AccessDenied exception to be raised'
+          end
+        end
+      end
+
+      describe 'when no message is specified' do
+        it 'raises access denied exception with default message' do
+          begin
+            @ability.authorize! :read, :foo
+          rescue CanCan::AccessDenied => e
+            e.default_message = 'Access denied!'
+            expect(e.message).to eq('Access denied!')
+          else
+            raise 'Expected CanCan::AccessDenied exception to be raised'
+          end
+        end
+      end
+    end
+
+    describe 'when ability is authorized to perform an action' do
+      it 'does not raise access denied exception' do
+        @ability.can :read, :foo
+        expect do
+          expect(@ability.authorize!(:read, :foo)).to eq(:foo)
+        end.to_not raise_error
+      end
+    end
   end
 
   it 'knows when block is used in conditions' do
@@ -457,17 +489,6 @@ describe CanCan::Ability do
     expect(@ability).to_not have_raw_sql(:read, :foo)
     @ability.can :read, :foo, 'false'
     expect(@ability).to have_raw_sql(:read, :foo)
-  end
-
-  it 'raises access denied exception with default message if not specified' do
-    begin
-      @ability.authorize! :read, :foo
-    rescue CanCan::AccessDenied => e
-      e.default_message = 'Access denied!'
-      expect(e.message).to eq('Access denied!')
-    else
-      raise 'Expected CanCan::AccessDenied exception to be raised'
-    end
   end
 
   it 'determines model adapterO class by asking AbstractAdapter' do

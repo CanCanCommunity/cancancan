@@ -173,7 +173,7 @@ module CanCan
       end
       if cannot?(action, subject, *args)
         message ||= unauthorized_message(action, subject)
-        raise AccessDenied.new(message, action, subject)
+        raise AccessDenied.new(message, action, subject, args)
       end
       subject
     end
