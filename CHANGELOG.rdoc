@@ -1,6 +1,11 @@
 Unreleased
 
+2.2.0 (Apr 13th, 2018)
+
+* Include conditions passed to authorize! in AccessDenied exception (kraflab)
 * Removed support for dynamic finders (coorasse)
+* Support Rails 5.2 (lizzyaustad & kevintyll)
+* Use ActiveSupport standard loader (BookOfGreg)
 
 2.1.4 (Apr 09th, 2018)
 
