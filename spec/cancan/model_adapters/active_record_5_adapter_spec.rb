@@ -37,7 +37,7 @@ if defined?(ActiveRecord) && ActiveRecord::VERSION::MAJOR == 5 && defined?(CanCa
 
         class Shape < ActiveRecord::Base
           unless defined_enums.keys.include? 'color'
-            enum color: %i[red green blue]
+            enum color: %i(red green blue)
           end
         end
 
@@ -56,7 +56,7 @@ if defined?(ActiveRecord) && ActiveRecord::VERSION::MAJOR == 5 && defined?(CanCa
         expect(accessible).to contain_exactly(green)
 
         # A condition with multiple values.
-        @ability.can :update, Shape, color: %i[red blue]
+        @ability.can :update, Shape, color: %i(red blue)
 
         expect(@ability.can?(:update, red)).to be true
         expect(@ability.cannot?(:update, green)).to be true
@@ -75,7 +75,7 @@ if defined?(ActiveRecord) && ActiveRecord::VERSION::MAJOR == 5 && defined?(CanCa
         end
 
         class Disc < ActiveRecord::Base
-          enum color: %i[red green blue] unless defined_enums.keys.include? 'color'
+          enum color: %i(red green blue) unless defined_enums.keys.include? 'color'
           enum shape: { triangle: 3, rectangle: 4 } unless defined_enums.keys.include? 'shape'
         end
 
