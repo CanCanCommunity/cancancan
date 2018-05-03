@@ -10,8 +10,4 @@ platforms :ruby, :mswin, :mingw do
   gem "bson_ext", "~> 1.1"
 end
 
-platforms :jruby do
-  gem "mongo", "~> 1.9.2"
-end
-
 gemspec :path => "../"
