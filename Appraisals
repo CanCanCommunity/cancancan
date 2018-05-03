@@ -3,7 +3,7 @@ appraise "activerecord_3.2" do
   gem "actionpack", "~> 3.2.0", :require => "action_pack"
 
   gemfile.platforms :jruby do
-    gem "activerecord-jdbcsqlite3-adapter"
+    gem "activerecord-jdbcsqlite3-adapter", "~> 1.3"
     gem "jdbc-sqlite3"
   end
 
@@ -19,7 +19,7 @@ appraise "activerecord_4.0" do
 
 
   gemfile.platforms :jruby do
-    gem "activerecord-jdbcsqlite3-adapter"
+    gem "activerecord-jdbcsqlite3-adapter", "~> 1.3"
     gem "jdbc-sqlite3"
   end
 
@@ -34,7 +34,7 @@ appraise "activerecord_4.1" do
   gem "actionpack", "~> 4.1.1", :require => "action_pack"
 
   gemfile.platforms :jruby do
-    gem "activerecord-jdbcsqlite3-adapter"
+    gem "activerecord-jdbcsqlite3-adapter", "~> 1.3"
     gem "jdbc-sqlite3"
   end
 
@@ -50,7 +50,7 @@ appraise "activerecord_4.2" do
   gem "nokogiri", "~> 1.6.8", :require => "nokogiri"    # TODO: fix for ruby 2.0.0
 
   gemfile.platforms :jruby do
-    gem "activerecord-jdbcsqlite3-adapter"
+    gem "activerecord-jdbcsqlite3-adapter", "~> 1.3"
     gem "jdbc-sqlite3"
   end
 
@@ -115,10 +115,6 @@ appraise "mongoid_2.x" do
 
   gemfile.platforms :ruby, :mswin, :mingw do
     gem "bson_ext", "~> 1.1"
-  end
-
-  gemfile.platforms :jruby do
-    gem "mongo", "~> 1.9.2"
   end
 end
 
