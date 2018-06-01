@@ -28,7 +28,15 @@ module CanCan
       # in addition to `includes()` to force the outer join.
       def build_relation(*where_conditions)
         relation = @model_class.where(*where_conditions)
-        relation = relation.includes(joins).references(joins) if joins.present?
+
+        if joins.present?
+          if Rails::VERSION::MAJOR >= 5 || Rails::VERSION::MAJOR == 5 && Rails::VERSION::MINOR >= 2
+            relation = relation.left_joins(joins)
+          else
+            relation = relation.includes(joins).references(joins)
+          end
+        end
+
         relation
       end
 
