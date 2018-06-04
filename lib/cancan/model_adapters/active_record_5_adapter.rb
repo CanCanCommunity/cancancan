@@ -7,9 +7,14 @@ module CanCan
         ActiveRecord::VERSION::MAJOR == 5 && model_class <= ActiveRecord::Base
       end
 
+      def self.override_condition_matching?(subject, name, value)
+        value.is_a?(ActiveRecord::Relation)
+      end
+
       # rails 5 is capable of using strings in enum
       # but often people use symbols in rules
       def self.matches_condition?(subject, name, value)
+        return value.pluck(:id).include?(subject.id) if value.is_a?(ActiveRecord::Relation)
         return super if Array.wrap(value).all? { |x| x.is_a? Integer }
 
         attribute = subject.send(name)
