@@ -8,7 +8,9 @@ module CanCan
     end
 
     def assign_attributes(resource)
-      resource.send("#{parent_name}=", parent_resource) if @options[:singleton] && parent_resource
+      parent_method_name = @options[:through_association] || parent_name
+
+      resource.send("#{parent_method_name}=", parent_resource) if @options[:singleton] && parent_resource
       initial_attributes.each do |attr_name, value|
         resource.send("#{attr_name}=", value)
       end
