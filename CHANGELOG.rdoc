@@ -1,6 +1,7 @@
 Unreleased
 
 * Drop support for actions without a subject (andrew-aladev)
+* Allow to add attribute-level rules (phaedryx)
 
 2.2.0 (Apr 13th, 2018)
 
