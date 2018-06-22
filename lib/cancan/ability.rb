@@ -1,5 +1,7 @@
 require_relative 'ability/rules.rb'
 require_relative 'ability/actions.rb'
+require_relative 'ability/strong_parameter_support'
+
 module CanCan
   # This module is designed to be included into an Ability class. This will
   # provide the "can" methods for defining and checking abilities.
@@ -19,6 +21,7 @@ module CanCan
   module Ability
     include CanCan::Ability::Rules
     include CanCan::Ability::Actions
+    include StrongParameterSupport
 
     # Check if the user has permission to perform a given action on an object.
     #
@@ -64,10 +67,10 @@ module CanCan
     #   end
     #
     # Also see the RSpec Matchers to aid in testing.
-    def can?(action, subject, *extra_args)
+    def can?(action, subject, attribute = nil, *extra_args)
       match = extract_subjects(subject).lazy.map do |a_subject|
         relevant_rules_for_match(action, a_subject).detect do |rule|
-          rule.matches_conditions?(action, a_subject, extra_args)
+          rule.matches_conditions?(action, a_subject, attribute, *extra_args) && rule.matches_attributes?(attribute)
         end
       end.reject(&:nil?).first
       match ? match.base_behavior : false
@@ -134,8 +137,8 @@ module CanCan
     #     # check the database and return true/false
     #   end
     #
-    def can(action = nil, subject = nil, conditions = nil, &block)
-      add_rule(Rule.new(true, action, subject, conditions, block))
+    def can(action = nil, subject = nil, *attributes_and_conditions, &block)
+      add_rule(Rule.new(true, action, subject, *attributes_and_conditions, &block))
     end
 
     # Defines an ability which cannot be done. Accepts the same arguments as "can".
@@ -150,8 +153,8 @@ module CanCan
     #     product.invisible?
     #   end
     #
-    def cannot(action = nil, subject = nil, conditions = nil, &block)
-      add_rule(Rule.new(false, action, subject, conditions, block))
+    def cannot(action = nil, subject = nil, *attributes_and_conditions, &block)
+      add_rule(Rule.new(false, action, subject, *attributes_and_conditions, &block))
     end
 
     # User shouldn't specify targets with names of real actions or it will cause Seg fault
@@ -239,10 +242,13 @@ module CanCan
     #
     # Where can_hash and cannot_hash are formatted thusly:
     #   {
-    #     action: array_of_objects
+    #     action: { subject: [attributes] }
     #   }
     def permissions
-      permissions_list = { can: {}, cannot: {} }
+      permissions_list = {
+        can:    Hash.new { |actions, k1| actions[k1] = Hash.new { |subjects, k2| subjects[k2] = [] } },
+        cannot: Hash.new { |actions, k1| actions[k1] = Hash.new { |subjects, k2| subjects[k2] = [] } }
+      }
       rules.each { |rule| extract_rule_in_permissions(permissions_list, rule) }
       permissions_list
     end
@@ -250,8 +256,9 @@ module CanCan
     def extract_rule_in_permissions(permissions_list, rule)
       expand_actions(rule.actions).each do |action|
         container = rule.base_behavior ? :can : :cannot
-        permissions_list[container][action] ||= []
-        permissions_list[container][action] += rule.subjects.map(&:to_s)
+        rule.subjects.each do |subject|
+          permissions_list[container][action][subject.to_s] += rule.attributes
+        end
       end
     end
 
