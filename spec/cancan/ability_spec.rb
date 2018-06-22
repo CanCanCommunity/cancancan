@@ -182,17 +182,23 @@ describe CanCan::Ability do
   it 'lists all permissions' do
     @ability.can :manage, :all
     @ability.can :learn, Range
-    @ability.cannot :read, String
-    @ability.cannot :read, Hash
+    @ability.can :interpret, Symbol, %i[size to_s]
+    @ability.cannot :read, [String, Hash]
     @ability.cannot :preview, Array
 
-    expected_list = { can: { manage: ['all'],
-                             learn: ['Range'] },
-                      cannot: { read: %w[String Hash],
-                                index: %w[String Hash],
-                                show: %w[String Hash],
-                                preview: ['Array'] } }
-
+    expected_list = {
+      can: {
+        manage: { 'all' => [] },
+        learn: { 'Range' => [] },
+        interpret: { 'Symbol' => %i[size to_s] }
+      },
+      cannot: {
+        read: { 'String' => [], 'Hash' => [] },
+        index: { 'String' => [], 'Hash' => [] },
+        show: { 'String' => [], 'Hash' => [] },
+        preview: { 'Array' => [] }
+      }
+    }
     expect(@ability.permissions).to eq(expected_list)
   end
 
@@ -356,6 +362,13 @@ describe CanCan::Ability do
     expect(@ability.can?(:read, Range)).to be(true)
   end
 
+  it 'does not stop at cannot with block when comparing class' do
+    @ability.can :read, Integer
+    @ability.cannot(:read, Integer) { |int| int > 5 }
+    expect(@ability.can?(:read, 123)).to be(false)
+    expect(@ability.can?(:read, Integer)).to be(true)
+  end
+
   it 'stops at cannot definition when no hash is present' do
     @ability.can :read, :all
     @ability.cannot :read, Range
@@ -416,7 +429,7 @@ describe CanCan::Ability do
     expect(@ability.can?(:read, Container.new)).to be(true)
   end
 
-  it "has initial attributes based on hash conditions of 'new' action" do
+  it "has initial values based on hash conditions of 'new' action" do
     @ability.can :manage, Range, foo: 'foo', hash: { skip: 'hashes' }
     @ability.can :create, Range, bar: 123, array: %w[skip arrays]
     @ability.can :new, Range, baz: 'baz', range: 1..3
@@ -504,9 +517,106 @@ describe CanCan::Ability do
       @ability.can :read, Array, published: true do
         false
       end
-    end.to raise_error(CanCan::BlockAndConditionsError,
-                       'A hash of conditions is mutually exclusive with a block. '\
-                       'Check ":read Array" ability.')
+    end.to raise_error(CanCan::BlockAndConditionsError)
+  end
+
+  it 'allows attribute-level rules' do
+    @ability.can :read, Array, :to_s
+    expect(@ability.can?(:read, Array, :to_s)).to be(true)
+    expect(@ability.can?(:read, Array, :size)).to be(false)
+    expect(@ability.can?(:read, Array)).to be(true)
+  end
+
+  it 'allows an array of attributes in rules' do
+    @ability.can :read, [Array, String], %i[to_s size]
+    expect(@ability.can?(:read, String, :size)).to be(true)
+    expect(@ability.can?(:read, Array, :to_s)).to be(true)
+  end
+
+  it 'allows cannot of rules with attributes' do
+    @ability.can :read, Array
+    @ability.cannot :read, Array, :to_s
+    expect(@ability.can?(:read, Array, :to_s)).to be(false)
+    expect(@ability.can?(:read, Array)).to be(true)
+    expect(@ability.can?(:read, Array, :size)).to be(true)
+  end
+
+  it 'has precedence with attribute-level rules' do
+    @ability.cannot :read, Array
+    @ability.can :read, Array, :to_s
+    expect(@ability.can?(:read, Array, :to_s)).to be(true)
+    expect(@ability.can?(:read, Array, :size)).to be(false)
+    expect(@ability.can?(:read, Array)).to be(true)
+  end
+
+  it 'allows permission on all attributes when none are given' do
+    @ability.can :update, Object
+    expect(@ability.can?(:update, Object, :password)).to be(true)
+  end
+
+  it 'allows strings when checking attributes' do
+    @ability.can :update, Object, :name
+    expect(@ability.can?(:update, Object, 'name')).to be(true)
+  end
+
+  it 'passes attribute to block; nil if no attribute given' do
+    @ability.can :update, Range do |_range, attribute|
+      attribute == :name
+    end
+    expect(@ability.can?(:update, 1..3, :name)).to be(true)
+    expect(@ability.can?(:update, 2..4)).to be(false)
+  end
+
+  it 'combines attribute checks with conditions hash' do
+    @ability.can :update, Range, begin: 1
+    @ability.can :update, Range, :name, begin: 2
+    expect(@ability.can?(:update, 1..3, :notname)).to be(true)
+    expect(@ability.can?(:update, 2..4, :notname)).to be(false)
+    expect(@ability.can?(:update, 2..4, :name)).to be(true)
+    expect(@ability.can?(:update, 3..5, :name)).to be(false)
+    expect(@ability.can?(:update, Range)).to be(true)
+    expect(@ability.can?(:update, Range, :name)).to be(true)
+  end
+
+  it 'returns an array of permitted attributes for a given action and subject' do
+    user_class = Class.new(ActiveRecord::Base)
+    allow(user_class).to receive(:column_names).and_return(%w[first_name last_name])
+    allow(user_class).to receive(:primary_key).and_return('id')
+
+    @ability.can :read, user_class
+    @ability.can :read, Array, :special
+    @ability.can :action, :subject, :attribute
+
+    expect(@ability.permitted_attributes(:read, user_class)).to eq(%i[first_name last_name])
+    expect(@ability.permitted_attributes(:read, Array)).to eq([:special])
+    expect(@ability.permitted_attributes(:action, :subject)).to eq([:attribute])
+  end
+
+  it 'returns permitted attributes when used with blocks' do
+    user_class = Struct.new(:first_name, :last_name)
+
+    @ability.can :read, user_class, %i[first_name last_name]
+    @ability.cannot(:read, user_class, :first_name) { |u| u.last_name == 'Smith' }
+
+    expect(@ability.permitted_attributes(:read, user_class.new('John', 'Jones'))).to eq(%i[first_name last_name])
+    expect(@ability.permitted_attributes(:read, user_class.new('John', 'Smith'))).to eq(%i[last_name])
+  end
+
+  it 'returns permitted attributes when using conditions' do
+    @ability.can :read, Range, %i[nil? to_s class]
+    @ability.cannot :read, Range, %i[nil? to_s], begin: 2
+    @ability.can :read, Range, :to_s, end: 4
+
+    expect(@ability.permitted_attributes(:read, 1..3)).to eq(%i[nil? to_s class])
+    expect(@ability.permitted_attributes(:read, 2..5)).to eq([:class])
+    expect(@ability.permitted_attributes(:read, 2..4)).to eq(%i[class to_s])
+  end
+
+  it 'respects inheritance when checking permitted attributes' do
+    @ability.can :read, Integer, %i[nil? to_s class]
+    @ability.cannot :read, Numeric, %i[nil? class]
+
+    expect(@ability.permitted_attributes(:read, Integer)).to eq([:to_s])
   end
 
   it 'raises an error when attempting to use action without subject' do
