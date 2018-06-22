@@ -2,16 +2,17 @@ language: ruby
 cache: bundler
 sudo: false
 rvm:
-  - 2.2.0
-  - 2.2.7
-  - 2.3.4
-  - 2.4.1
+  - 2.2.8
+  - 2.3.5
+  - 2.4.2
+  - 2.5.0
   - jruby-9.0.5.0
-  - jruby-9.1.8.0
+  - jruby-9.1.9.0
 gemfile:
   - gemfiles/activerecord_4.2.gemfile
   - gemfiles/activerecord_5.0.2.gemfile
   - gemfiles/activerecord_5.1.0.gemfile
+  - gemfiles/activerecord_5.2.0.gemfile
 services:
   - mongodb
 matrix:
@@ -27,19 +28,24 @@ matrix:
       gemfile: gemfiles/activerecord_5.1.0.gemfile
     - rvm: jruby-9.0.5.0
       gemfile: gemfiles/activerecord_5.0.2.gemfile
-    - rvm: jruby-9.1.8.0
+    - rvm: jruby-9.1.9.0
       gemfile: gemfiles/activerecord_5.0.2.gemfile
     - rvm: jruby-9.0.5.0
       gemfile: gemfiles/activerecord_5.1.0.gemfile
-    - rvm: jruby-9.1.8.0
+    - rvm: jruby-9.1.9.0
       gemfile: gemfiles/activerecord_5.1.0.gemfile
+    - rvm: jruby-9.0.5.0
+      gemfile: gemfiles/activerecord_5.2.0.gemfile
+    - rvm: jruby-9.1.9.0
+      gemfile: gemfiles/activerecord_5.2.0.gemfile
 notifications:
   email:
     recipients:
       - alessandro.rodi@renuo.ch
       - josua.schmid@renuo.ch
-      - zora.fuchs@renuo.ch
     on_success: change
     on_failure: change
+before_install:
+  - gem update --system
 script:
   - bundle exec rubocop && bundle exec rake
