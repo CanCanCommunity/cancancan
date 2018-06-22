@@ -30,8 +30,8 @@ module CanCan
         relation = @model_class.where(*where_conditions)
 
         if joins.present?
-          relation = if Gem::Version.new(Rails::VERSION::STRING) >= Gem::Version.new('5.2.0')
-                       relation.left_joins(joins)
+          relation = if Gem::Version.new(ActiveRecord::VERSION::STRING) >= Gem::Version.new('5.2.0')
+                       relation.left_joins(joins).distinct
                      else
                        relation.includes(joins).references(joins)
                      end
