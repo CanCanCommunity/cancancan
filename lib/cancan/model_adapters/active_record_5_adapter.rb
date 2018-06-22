@@ -30,11 +30,11 @@ module CanCan
         relation = @model_class.where(*where_conditions)
 
         if joins.present?
-          if Rails::VERSION::MAJOR >= 5 || Rails::VERSION::MAJOR == 5 && Rails::VERSION::MINOR >= 2
-            relation = relation.left_joins(joins)
-          else
-            relation = relation.includes(joins).references(joins)
-          end
+          relation = if Gem::Version.new(Rails::VERSION::STRING) >= Gem::Version.new('5.2.0')
+                       relation.left_joins(joins)
+                     else
+                       relation.includes(joins).references(joins)
+                     end
         end
 
         relation
