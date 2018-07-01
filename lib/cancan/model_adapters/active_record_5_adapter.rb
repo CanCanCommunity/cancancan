@@ -14,6 +14,7 @@ module CanCan
       # rails 5 is capable of using strings in enum
       # but often people use symbols in rules
       def self.matches_condition?(subject, name, value)
+        return value.pluck(value.values[:select]&.first).include?(subject.send(name)) if value.is_a?(ActiveRecord::Relation) && value.values[:select]&.first
         return value.pluck(:id).include?(subject.send(name)) if value.is_a?(ActiveRecord::Relation)
         return super if Array.wrap(value).all? { |x| x.is_a? Integer }
 
