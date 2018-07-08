@@ -27,7 +27,7 @@ appraise 'activerecord_5.0.2' do
 
   gemfile.platforms :ruby, :mswin, :mingw do
     gem 'sqlite3'
-    gem 'pg', '~> 0.18'
+    gem 'pg', '~> 0.21'
   end
 end
 
