@@ -112,42 +112,11 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       expect(Article.accessible_by(@ability)).to eq([article])
     end
 
-    context 'rules overriding' do
-      before do
-        @article = Article.create!(published: true)
-        Article.create!(published: false)
-      end
-      it 'fetches only the articles that are published' do
-        @ability.can :read, Article, published: true
-        expect(Article.accessible_by(@ability)).to eq([@article])
-      end
-
-      context 'a previous cannot rule has been defined' do
-        it 'can still read only published articles' do
-          @ability.cannot :read, Article
-          @ability.can :read, Article, published: true
-          expect(Article.accessible_by(@ability)).to eq [@article]
-        end
-      end
-
-      context 'permission has been given and then removed' do
-        it 'can still read only published articles' do
-          @ability.can :read, Article, published: true
-          @ability.cannot :read, Article
-          @ability.can :read, Article, published: true
-          expect(Article.accessible_by(@ability)).to eq [@article]
-        end
-
-        context 'a specific rule can be negated multiple times with no effect' do
-          it 'can still read only published articles' do
-            @ability.cannot :read, Article, published: true
-            @ability.can :read, Article, published: true
-            @ability.cannot :read, Article, published: true
-            @ability.can :read, Article, published: true
-            expect(Article.accessible_by(@ability)).to eq [@article]
-          end
-        end
-      end
+    it 'fetches only the articles that are published' do
+      @ability.can :read, Article, published: true
+      article1 = Article.create!(published: true)
+      Article.create!(published: false)
+      expect(Article.accessible_by(@ability)).to eq([article1])
     end
 
     it 'fetches any articles which are published or secret' do
@@ -310,8 +279,8 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       @ability.cannot :update, Article, secret: true
       expect(@ability.model_adapter(Article, :update).conditions)
         .to eq(%[not ("#{@article_table}"."secret" = 't') ] +
-                 %[AND (("#{@article_table}"."published" = 't') ] +
-                 %[OR ("#{@article_table}"."id" = 1))])
+               %[AND (("#{@article_table}"."published" = 't') ] +
+               %[OR ("#{@article_table}"."id" = 1))])
       expect(@ability.model_adapter(Article, :manage).conditions).to eq(id: 1)
       expect(@ability.model_adapter(Article, :read).conditions).to eq("'t'='t'")
     end
@@ -382,16 +351,6 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       allow(relation).to receive(:count).and_raise('Unexpected scope execution.')
 
       expect { @ability.can? :read, Article }.not_to raise_error
-    end
-
-    it 'should ignore cannot rules with attributes when querying' do
-      user = User.create!
-      article = Article.create!(user: user)
-      ability = Ability.new(user)
-      ability.can :read, Article
-      ability.cannot :read, Article, :secret
-
-      expect(Article.accessible_by(ability)).to eq([article])
     end
 
     context 'with namespaced models' do
