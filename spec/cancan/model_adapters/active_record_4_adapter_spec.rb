@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-if defined? CanCan::ModelAdapters::ActiveRecord4Adapter
+if ActiveRecord::VERSION::MAJOR == 4
   describe CanCan::ModelAdapters::ActiveRecord4Adapter do
     context 'with sqlite3' do
       before :each do

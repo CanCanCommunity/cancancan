@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-if ActiveRecord::VERSION::MAJOR == 5 && defined?(CanCan::ModelAdapters::ActiveRecord5Adapter)
+if ActiveRecord::VERSION::MAJOR == 5
   describe CanCan::ModelAdapters::ActiveRecord5Adapter do
     context 'with sqlite3' do
       before :each do

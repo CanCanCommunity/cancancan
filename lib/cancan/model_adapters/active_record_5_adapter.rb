@@ -19,48 +19,6 @@ module CanCan
           attribute == value.to_s
         end
       end
-
-      private
-
-      def build_relation(*where_conditions)
-        relation = @model_class.where(*where_conditions)
-        relation = relation.left_joins(joins).distinct if joins.present?
-        relation
-      end
-
-      # Rails 4.2 deprecates `sanitize_sql_hash_for_conditions`
-      def sanitize_sql(conditions)
-        if conditions.is_a?(Hash)
-          sanitize_sql_activerecord5(conditions)
-        else
-          @model_class.send(:sanitize_sql, conditions)
-        end
-      end
-
-      def sanitize_sql_activerecord5(conditions)
-        table = @model_class.send(:arel_table)
-        table_metadata = ActiveRecord::TableMetadata.new(@model_class, table)
-        predicate_builder = ActiveRecord::PredicateBuilder.new(table_metadata)
-
-        conditions = predicate_builder.resolve_column_aliases(conditions)
-
-        conditions.stringify_keys!
-
-        predicate_builder.build_from_hash(conditions).map do |b|
-          visit_nodes(b)
-        end.join(' AND ')
-      end
-
-      def visit_nodes(b)
-        # Rails 5.2 adds a BindParam node that prevents the visitor method from properly compiling the SQL query
-        if ActiveRecord::VERSION::MINOR >= 2
-          connection = @model_class.send(:connection)
-          collector = Arel::Collectors::SubstituteBinds.new(connection, Arel::Collectors::SQLString.new)
-          connection.visitor.accept(b, collector).value
-        else
-          @model_class.send(:connection).visitor.compile(b)
-        end
-      end
     end
   end
 end

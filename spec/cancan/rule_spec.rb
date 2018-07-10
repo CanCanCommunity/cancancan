@@ -38,18 +38,6 @@ describe CanCan::Rule do
     expect(rule.associations_hash).to eq({})
   end
 
-  it 'is not mergeable if conditions are not simple hashes' do
-    meta_where = OpenStruct.new(name: 'metawhere', column: 'test')
-    @conditions[meta_where] = :bar
-
-    expect(@rule).to be_unmergeable
-  end
-
-  it 'is not mergeable if conditions is an empty hash' do
-    @conditions = {}
-    expect(@rule).to_not be_unmergeable
-  end
-
   it 'allows nil in attribute spot for edge cases' do
     rule1 = CanCan::Rule.new(true, :action, :subject, nil, :var)
     expect(rule1.attributes).to eq []

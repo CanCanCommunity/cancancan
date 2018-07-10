@@ -28,6 +28,18 @@ module CanCan
       @block = block
     end
 
+    def can_rule?
+      base_behavior
+    end
+
+    def cannot_rule?
+      !base_behavior
+    end
+
+    def with_conditions?
+      @conditions.present?
+    end
+
     # Matches the action, subject, and attribute; not necessarily the conditions
     def relevant?(action, subject)
       subject = subject.values.first if subject.class == Hash
@@ -40,11 +52,6 @@ module CanCan
 
     def only_raw_sql?
       @block.nil? && !conditions_empty? && !@conditions.is_a?(Hash)
-    end
-
-    def unmergeable?
-      @conditions.respond_to?(:keys) && @conditions.present? &&
-        (!@conditions.keys.first.is_a? Symbol)
     end
 
     def associations_hash(conditions = @conditions)

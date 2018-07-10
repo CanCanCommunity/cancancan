@@ -1,31 +1,77 @@
-require_relative 'can_can/model_adapters/active_record_adapter/joins.rb'
 module CanCan
   module ModelAdapters
     module ActiveRecordAdapter
-      include CanCan::ModelAdapters::ActiveRecordAdapter::Joins
-
-      # Returns conditions intended to be used inside a database query. Normally you will not call this
-      # method directly, but instead go through ModelAdditions#accessible_by.
-      #
-      # If there is only one "can" definition, a hash of conditions will be returned matching the one defined.
-      #
-      #   can :manage, User, :id => 1
-      #   query(:manage, User).conditions # => { :id => 1 }
-      #
-      # If there are multiple "can" definitions, a SQL string will be returned to handle complex cases.
-      #
-      #   can :manage, User, :id => 1
-      #   can :manage, User, :manager_id => 1
-      #   cannot :manage, User, :self_managed => true
-      #   query(:manage, User).conditions # => "not (self_managed = 't') AND ((manager_id = 1) OR (id = 1))"
-      #
-      def conditions
-        if @rules.size == 1 && @rules.first.base_behavior
-          # Return the conditions directly if there's just one definition
-          tableized_conditions(@rules.first.conditions).dup
+      def database_records
+        return @model_class.where(nil).merge(override_scope) if override_scope
+        rules = collapse(@rules)
+        return @model_class.where('1 = 0') if rules.none?(&:can_rule?)
+        if rules.length == 1
+          @model_class.where(tableized_conditions(rules[0].conditions)).joins(joins_for(rules[0])).distinct
         else
-          extract_multiple_conditions
+          relations = build_relations(rules)
+          @model_class.select("DISTINCT #{@model_class.table_name}.*")
+            .from("(#{build_sql(relations)}) AS #{@model_class.table_name}")
         end
+      end
+
+      private
+
+      def collapse(rules)
+        rules_collapsed = rules.reverse
+
+        if rules_collapsed.length > 1
+          rules_collapsed.each_with_index do |rule, index|
+            next if index >= rules_collapsed.length - 1
+            next unless rule.cannot_rule?
+            next if rule.with_conditions?
+            next unless rules_collapsed[index + 1].cannot_rule?
+            rules_collapsed.delete_at(index)
+          end
+        end
+
+
+        if rules_collapsed.length > 1
+          rules_collapsed.each_with_index do |rule, index|
+            next if index >= rules_collapsed.length - 1
+            next unless rule.can_rule?
+            next if rule.with_conditions?
+            next unless rules_collapsed[index + 1].can_rule?
+            rules_collapsed.delete_at(index + 1)
+          end
+        end
+
+        while !rules_collapsed.empty? && rules_collapsed.first.cannot_rule?
+          if rules_collapsed.all?(&:cannot_rule?)
+            rules_collapsed = []
+          elsif !rules_collapsed.first.with_conditions?
+            rules_collapsed.shift
+          end
+        end
+
+        rules_collapsed
+      end
+
+      def build_sql(relations)
+        sql = ''
+        relations.each_with_index do |relation, index|
+          sql << relation[1].to_sql
+          if index < relations.length - 1
+            sql << (relations[index + 1][0] ? ' UNION ' : ' EXCEPT ')
+          end
+        end
+        sql
+      end
+
+      def removable?(rule)
+        rule.cannot_rule? && !rule.with_conditions?
+      end
+
+      def build_relations(rules)
+        rules.map { |rule| [rule.base_behavior, relation_for(rule)] }
+      end
+
+      def relation_for(rule)
+        @model_class.where(tableized_conditions(rule.conditions)).joins(joins_for(rule))
       end
 
       def extract_multiple_conditions
@@ -64,22 +110,6 @@ module CanCan
         end
       end
 
-      def database_records
-        if override_scope
-          @model_class.where(nil).merge(override_scope)
-        elsif @model_class.respond_to?(:where) && @model_class.respond_to?(:joins)
-          mergeable_conditions? ? build_relation(conditions) : build_relation(*@rules.map(&:conditions))
-        else
-          @model_class.all(conditions: conditions, joins: joins)
-        end
-      end
-
-      private
-
-      def mergeable_conditions?
-        @rules.find(&:unmergeable?).blank?
-      end
-
       def override_scope
         conditions = @rules.map(&:conditions).compact
         return unless conditions.any? { |c| c.is_a?(ActiveRecord::Relation) }
@@ -94,36 +124,18 @@ module CanCan
               "Instead use a hash or SQL for #{rule_found.actions.first} #{rule_found.subjects.first} ability."
       end
 
-      def merge_conditions(sql, conditions_hash, behavior)
-        if conditions_hash.blank?
-          behavior ? true_sql : false_sql
-        else
-          merge_non_empty_conditions(behavior, conditions_hash, sql)
+      def joins_for(rule)
+        joins_hash = rule.associations_hash
+        clean_joins(joins_hash) unless joins_hash.empty?
+      end
+
+      # Removes empty hashes and moves everything into arrays.
+      def clean_joins(joins_hash)
+        joins = []
+        joins_hash.each do |name, nested|
+          joins << (nested.empty? ? name : { name => clean_joins(nested) })
         end
-      end
-
-      def merge_non_empty_conditions(behavior, conditions_hash, sql)
-        conditions = sanitize_sql(conditions_hash)
-        case sql
-        when true_sql
-          behavior ? true_sql : "not (#{conditions})"
-        when false_sql
-          behavior ? conditions : false_sql
-        else
-          behavior ? "(#{conditions}) OR (#{sql})" : "not (#{conditions}) AND (#{sql})"
-        end
-      end
-
-      def false_sql
-        sanitize_sql(['?=?', true, false])
-      end
-
-      def true_sql
-        sanitize_sql(['?=?', true, true])
-      end
-
-      def sanitize_sql(conditions)
-        @model_class.send(:sanitize_sql, conditions)
+        joins
       end
     end
   end
