@@ -12,7 +12,13 @@ module CanCan
     def compress
       compress_cannot_rules
       compress_can_rules
+      compress_first_rule
+      @rules_collapsed
+    end
 
+    private
+
+    def compress_first_rule
       while !@rules_collapsed.empty? && @rules_collapsed.first.cannot_rule?
         if @rules_collapsed.all?(&:cannot_rule?)
           @rules_collapsed = []
@@ -22,11 +28,7 @@ module CanCan
           break
         end
       end
-
-      @rules_collapsed
     end
-
-    private
 
     def compress_can_rules
       return unless @rules_collapsed.length > 1
