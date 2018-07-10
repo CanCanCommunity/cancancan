@@ -13,8 +13,11 @@ module CanCan
 
       # TODO: this should be private
       def self.matches_condition?(subject, name, value)
+        # Get the mapping from enum strings to values.
         enum = subject.class.send(name.to_s.pluralize)
+        # Get the value of the attribute as an integer.
         attribute = enum[subject.send(name)]
+        # Check to see if the value matches the condition.
         if value.is_a?(Enumerable)
           value.include? attribute
         else

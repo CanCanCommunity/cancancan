@@ -102,13 +102,13 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
 
   it 'is for only active record classes' do
     if ActiveRecord.respond_to?(:version) &&
-      ActiveRecord.version > Gem::Version.new('5')
+       ActiveRecord.version > Gem::Version.new('5')
       expect(CanCan::ModelAdapters::ActiveRecord5Adapter).to_not be_for_class(Object)
       expect(CanCan::ModelAdapters::ActiveRecord5Adapter).to be_for_class(Article)
       expect(CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article))
         .to eq(CanCan::ModelAdapters::ActiveRecord5Adapter)
     elsif ActiveRecord.respond_to?(:version) &&
-      ActiveRecord.version > Gem::Version.new('4')
+          ActiveRecord.version > Gem::Version.new('4')
       expect(CanCan::ModelAdapters::ActiveRecord4Adapter).to_not be_for_class(Object)
       expect(CanCan::ModelAdapters::ActiveRecord4Adapter).to be_for_class(Article)
       expect(CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article))
@@ -259,35 +259,35 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
   end
 
   it 'has false conditions if no abilities match' do
-    expect(@ability.model_adapter(Article, :read)).
-      to generate_sql('SELECT "articles".* FROM "articles" WHERE (1 = 0)')
+    expect(@ability.model_adapter(Article, :read))
+      .to generate_sql('SELECT "articles".* FROM "articles" WHERE (1 = 0)')
   end
 
   it 'returns false conditions for cannot clause' do
     @ability.cannot :read, Article
-    expect(@ability.model_adapter(Article, :read)).
-      to generate_sql('SELECT "articles".* FROM "articles" WHERE (1 = 0)')
+    expect(@ability.model_adapter(Article, :read))
+      .to generate_sql('SELECT "articles".* FROM "articles" WHERE (1 = 0)')
   end
 
   it 'returns SQL for single `can` definition in front of default `cannot` condition' do
     @ability.cannot :read, Article
     @ability.can :read, Article, published: false, secret: true
 
-    expect(@ability.model_adapter(Article, :read)).to generate_sql(%{
+    expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
 SELECT DISTINCT "articles".*
 FROM "articles"
-WHERE "articles"."published" = 'f' AND "articles"."secret" = 't'})
-# todo: wanted result
-#       expect(@ability.model_adapter(Article, :read)).to generate_sql(%{
-# SELECT "articles".*
-# FROM "articles"
-# WHERE "articles"."published" = 'f' AND "articles"."secret" = 't'})
+WHERE "articles"."published" = 'f' AND "articles"."secret" = 't'))
+    # TODO: wanted result
+    #       expect(@ability.model_adapter(Article, :read)).to generate_sql(%{
+    # SELECT "articles".*
+    # FROM "articles"
+    # WHERE "articles"."published" = 'f' AND "articles"."secret" = 't'})
   end
 
   it 'returns true condition for single `can` definition in front of default `can` condition' do
     @ability.can :read, Article
     @ability.can :read, Article, published: false, secret: true
-    expect(@ability.model_adapter(Article, :read)).to generate_sql(%{SELECT DISTINCT "articles".* FROM "articles"})
+    expect(@ability.model_adapter(Article, :read)).to generate_sql(%(SELECT DISTINCT "articles".* FROM "articles"))
   end
 
   it 'returns `false condition` for single `cannot` definition in front of default `cannot` condition' do
@@ -326,30 +326,29 @@ SELECT "articles".* FROM "articles" WHERE "articles"."published" = 't'
 EXCEPT
 SELECT "articles".* FROM "articles" WHERE "articles"."secret" = 't') AS articles})
     expect(@ability.model_adapter(Article, :manage))
-      .to generate_sql(%{
-SELECT DISTINCT "articles".* FROM "articles" WHERE "articles"."id" = 1})
+      .to generate_sql(%(
+SELECT DISTINCT "articles".* FROM "articles" WHERE "articles"."id" = 1))
 
-    expect(@ability.model_adapter(Article, :read)).to generate_sql(%{SELECT DISTINCT "articles".* FROM "articles"})
+    expect(@ability.model_adapter(Article, :read)).to generate_sql(%(SELECT DISTINCT "articles".* FROM "articles"))
   end
 
   it 'returns appropriate sql conditions in complex case with nested joins' do
     @ability.can :read, Comment, article: { category: { visible: true } }
 
-
-    expect(@ability.model_adapter(Comment, :read)).to generate_sql(%{
+    expect(@ability.model_adapter(Comment, :read)).to generate_sql(%(
 SELECT DISTINCT "comments".* FROM "comments"
 INNER JOIN "articles" ON "articles"."id" = "comments"."article_id"
 INNER JOIN "categories" ON "categories"."id" = "articles"."category_id"
-WHERE "categories"."visible" = 't'})
+WHERE "categories"."visible" = 't'))
   end
 
   it 'returns appropriate sql conditions in complex case with nested joins of different depth' do
     @ability.can :read, Comment, article: { published: true, category: { visible: true } }
-    expect(@ability.model_adapter(Comment, :read)).to generate_sql(%{
+    expect(@ability.model_adapter(Comment, :read)).to generate_sql(%(
 SELECT DISTINCT "comments".* FROM "comments"
 INNER JOIN "articles" ON "articles"."id" = "comments"."article_id"
 INNER JOIN "categories" ON "categories"."id" = "articles"."category_id"
-WHERE "articles"."published" = 't' AND "categories"."visible" = 't'})
+WHERE "articles"."published" = 't' AND "categories"."visible" = 't'))
   end
 
   it 'does not forget conditions when calling with SQL string' do
@@ -415,11 +414,11 @@ SELECT "articles".* FROM "articles"
 INNER JOIN "projects" ON "projects"."id" = "articles"."project_id"
 WHERE "projects"."admin" = 't') AS articles
 })
-# wanted
-# expect(adapter).to generate_sql(%{
-#     SELECT DISTINCT "articles".* FROM "articles"
-#     INNER JOIN "projects" ON "projects"."id" = "articles"."project_id"
-#     WHERE "projects"."blocked" = 'f' OR "projects"."admin" = 't'})
+    # wanted
+    # expect(adapter).to generate_sql(%{
+    #     SELECT DISTINCT "articles".* FROM "articles"
+    #     INNER JOIN "projects" ON "projects"."id" = "articles"."project_id"
+    #     WHERE "projects"."blocked" = 'f' OR "projects"."admin" = 't'})
   end
 
   it 'merges nested and non-nested joins' do

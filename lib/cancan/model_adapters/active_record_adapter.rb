@@ -1,54 +1,26 @@
+require 'cancan/rules_compressor'
+
 module CanCan
   module ModelAdapters
     module ActiveRecordAdapter
       def database_records
         return @model_class.where(nil).merge(override_scope) if override_scope
-        rules = collapse(@rules)
+        rules = RulesCompressor.new(@rules).rules_collapsed
         return @model_class.where('1 = 0') if rules.none?(&:can_rule?)
-        if rules.length == 1
-          @model_class.where(tableized_conditions(rules[0].conditions)).joins(joins_for(rules[0])).distinct
-        else
-          relations = build_relations(rules)
-          @model_class.select("DISTINCT #{@model_class.table_name}.*")
-            .from("(#{build_sql(relations)}) AS #{@model_class.table_name}")
-        end
+        return one_rule_query(rules[0]) if rules.length == 1
+        multiple_rules_query(rules)
       end
 
       private
 
-      def collapse(rules)
-        rules_collapsed = rules.reverse
+      def multiple_rules_query(rules)
+        relations = build_relations(rules)
+        @model_class.select("DISTINCT #{@model_class.table_name}.*")
+                    .from("(#{build_sql(relations)}) AS #{@model_class.table_name}")
+      end
 
-        if rules_collapsed.length > 1
-          rules_collapsed.each_with_index do |rule, index|
-            next if index >= rules_collapsed.length - 1
-            next unless rule.cannot_rule?
-            next if rule.with_conditions?
-            next unless rules_collapsed[index + 1].cannot_rule?
-            rules_collapsed.delete_at(index)
-          end
-        end
-
-
-        if rules_collapsed.length > 1
-          rules_collapsed.each_with_index do |rule, index|
-            next if index >= rules_collapsed.length - 1
-            next unless rule.can_rule?
-            next if rule.with_conditions?
-            next unless rules_collapsed[index + 1].can_rule?
-            rules_collapsed.delete_at(index + 1)
-          end
-        end
-
-        while !rules_collapsed.empty? && rules_collapsed.first.cannot_rule?
-          if rules_collapsed.all?(&:cannot_rule?)
-            rules_collapsed = []
-          elsif !rules_collapsed.first.with_conditions?
-            rules_collapsed.shift
-          end
-        end
-
-        rules_collapsed
+      def one_rule_query(rule)
+        @model_class.where(tableized_conditions(rule.conditions)).joins(joins_for(rule)).distinct
       end
 
       def build_sql(relations)
