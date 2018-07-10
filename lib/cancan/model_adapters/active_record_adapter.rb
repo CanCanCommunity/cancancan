@@ -5,7 +5,7 @@ module CanCan
     module ActiveRecordAdapter
       def database_records
         return @model_class.where(nil).merge(override_scope) if override_scope
-        rules = RulesCompressor.new(@rules).rules_collapsed
+        rules = RulesCompressor.new(@rules.reverse).rules_collapsed
         return @model_class.where('1 = 0') if rules.none?(&:can_rule?)
         return one_rule_query(rules[0]) if rules.length == 1
         multiple_rules_query(rules)
@@ -32,10 +32,6 @@ module CanCan
           end
         end
         sql
-      end
-
-      def removable?(rule)
-        rule.cannot_rule? && !rule.with_conditions?
       end
 
       def build_relations(rules)

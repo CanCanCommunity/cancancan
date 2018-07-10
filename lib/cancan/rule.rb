@@ -6,7 +6,7 @@ module CanCan
   class Rule # :nodoc:
     include ConditionsMatcher
     include ParameterValidators
-    attr_reader :base_behavior, :subjects, :actions, :conditions, :attributes
+    attr_reader :base_behavior, :subjects, :actions, :conditions, :attributes, :block
     attr_writer :expanded_actions
 
     # The first argument when initializing is the base_behavior which is a true/false
@@ -36,8 +36,31 @@ module CanCan
       !base_behavior
     end
 
-    def with_conditions?
-      @conditions.present?
+    def can_catch_all?
+      can_rule? && catch_all?
+    end
+
+    def cannot_catch_all?
+      cannot_rule? && catch_all?
+    end
+
+    def catch_all?
+      [nil, false, [], {}, '', ' '].include? @conditions
+    end
+
+    # rubocop:disable Metrics/AbcSize
+    def ==(other)
+      base_behavior == other.base_behavior &&
+        actions == other.actions &&
+        subjects == other.subjects &&
+        attributes == other.attributes &&
+        conditions == other.conditions &&
+        block == other.block
+    end
+
+    def to_s
+      "#{base_behavior ? 'can' : 'cannot'} [#{actions.map { |a| ":#{a}" }.join(', ')}],
+#{subjects.inspect}, #{conditions.inspect}"
     end
 
     # Matches the action, subject, and attribute; not necessarily the conditions
