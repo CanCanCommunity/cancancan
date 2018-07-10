@@ -76,6 +76,44 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
       has_many :mentioned_users, through: :mentions, source: :user
       belongs_to :user
     end
+    
+    context 'rules overriding' do
+      before do
+        @article = Article.create!(published: true)
+        Article.create!(published: false)
+      end
+      it 'fetches only the articles that are published' do
+        @ability.can :read, Article, published: true
+        expect(Article.accessible_by(@ability)).to eq([@article])
+      end
+
+      context 'a previous cannot rule has been defined' do
+        it 'can still read only published articles' do
+          @ability.cannot :read, Article
+          @ability.can :read, Article, published: true
+          expect(Article.accessible_by(@ability)).to eq [@article]
+        end
+      end
+
+      context 'permission has been given and then removed' do
+        it 'can still read only published articles' do
+          @ability.can :read, Article, published: true
+          @ability.cannot :read, Article
+          @ability.can :read, Article, published: true
+          expect(Article.accessible_by(@ability)).to eq [@article]
+        end
+
+        context 'a specific rule can be negated multiple times with no effect' do
+          it 'can still read only published articles' do
+            @ability.cannot :read, Article, published: true
+            @ability.can :read, Article, published: true
+            @ability.cannot :read, Article, published: true
+            @ability.can :read, Article, published: true
+            expect(Article.accessible_by(@ability)).to eq [@article]
+          end
+        end
+      end
+    end
 
     class Mention < ActiveRecord::Base
       self.table_name = 'legacy_mentions'
