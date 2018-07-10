@@ -18,6 +18,8 @@ module CanCan
           @rules_collapsed = []
         elsif !@rules_collapsed.first.with_conditions?
           @rules_collapsed.shift
+        else
+          break
         end
       end
 

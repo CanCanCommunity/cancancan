@@ -1,6 +1,6 @@
 require 'spec_helper'
 describe CanCan::ModelAdapters::ActiveRecordAdapter do
-  before :each do
+  before do
     ActiveRecord::Base.establish_connection(adapter: 'sqlite3', database: ':memory:')
     ActiveRecord::Migration.verbose = false
     ActiveRecord::Schema.define do
@@ -76,44 +76,6 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
       has_many :mentioned_users, through: :mentions, source: :user
       belongs_to :user
     end
-    
-    context 'rules overriding' do
-      before do
-        @article = Article.create!(published: true)
-        Article.create!(published: false)
-      end
-      it 'fetches only the articles that are published' do
-        @ability.can :read, Article, published: true
-        expect(Article.accessible_by(@ability)).to eq([@article])
-      end
-
-      context 'a previous cannot rule has been defined' do
-        it 'can still read only published articles' do
-          @ability.cannot :read, Article
-          @ability.can :read, Article, published: true
-          expect(Article.accessible_by(@ability)).to eq [@article]
-        end
-      end
-
-      context 'permission has been given and then removed' do
-        it 'can still read only published articles' do
-          @ability.can :read, Article, published: true
-          @ability.cannot :read, Article
-          @ability.can :read, Article, published: true
-          expect(Article.accessible_by(@ability)).to eq [@article]
-        end
-
-        context 'a specific rule can be negated multiple times with no effect' do
-          it 'can still read only published articles' do
-            @ability.cannot :read, Article, published: true
-            @ability.can :read, Article, published: true
-            @ability.cannot :read, Article, published: true
-            @ability.can :read, Article, published: true
-            expect(Article.accessible_by(@ability)).to eq [@article]
-          end
-        end
-      end
-    end
 
     class Mention < ActiveRecord::Base
       self.table_name = 'legacy_mentions'
@@ -140,13 +102,13 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
 
   it 'is for only active record classes' do
     if ActiveRecord.respond_to?(:version) &&
-       ActiveRecord.version > Gem::Version.new('5')
+      ActiveRecord.version > Gem::Version.new('5')
       expect(CanCan::ModelAdapters::ActiveRecord5Adapter).to_not be_for_class(Object)
       expect(CanCan::ModelAdapters::ActiveRecord5Adapter).to be_for_class(Article)
       expect(CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article))
         .to eq(CanCan::ModelAdapters::ActiveRecord5Adapter)
     elsif ActiveRecord.respond_to?(:version) &&
-          ActiveRecord.version > Gem::Version.new('4')
+      ActiveRecord.version > Gem::Version.new('4')
       expect(CanCan::ModelAdapters::ActiveRecord4Adapter).to_not be_for_class(Object)
       expect(CanCan::ModelAdapters::ActiveRecord4Adapter).to be_for_class(Article)
       expect(CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article))
@@ -158,6 +120,45 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
     article = Article.create!
     adapter = CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article)
     expect(adapter.find(Article, article.id)).to eq(article)
+  end
+
+  context 'rules overriding' do
+    before do
+      @article = Article.create!(published: true)
+      Article.create!(published: false)
+    end
+
+    it 'fetches only the articles that are published' do
+      @ability.can :read, Article, published: true
+      expect(Article.accessible_by(@ability)).to eq([@article])
+    end
+
+    context 'a previous cannot rule has been defined' do
+      it 'can still read only published articles' do
+        @ability.cannot :read, Article
+        @ability.can :read, Article, published: true
+        expect(Article.accessible_by(@ability)).to eq [@article]
+      end
+    end
+
+    context 'permission has been given and then removed' do
+      it 'can still read only published articles' do
+        @ability.can :read, Article, published: true
+        @ability.cannot :read, Article
+        @ability.can :read, Article, published: true
+        expect(Article.accessible_by(@ability)).to eq [@article]
+      end
+
+      context 'a specific rule can be negated multiple times with no effect' do
+        it 'can still read only published articles' do
+          @ability.cannot :read, Article, published: true
+          @ability.can :read, Article, published: true
+          @ability.cannot :read, Article, published: true
+          @ability.can :read, Article, published: true
+          expect(Article.accessible_by(@ability)).to eq [@article]
+        end
+      end
+    end
   end
 
   it 'does not fetch any records when no abilities are defined' do
@@ -368,6 +369,20 @@ SELECT "articles".* FROM "articles" WHERE "articles"."secret" = 't') AS articles
 SELECT DISTINCT "articles".* FROM "articles" WHERE "articles"."id" = 1))
 
     expect(@ability.model_adapter(Article, :read)).to generate_sql(%(SELECT DISTINCT "articles".* FROM "articles"))
+  end
+
+  it 'returns appropriate sql in cases where rules specify different conditions on a table via distinct joins' do
+    @ability.can :read, Article, user: { id: 1 }
+    @ability.can :read, Article, mentioned_users: { id: 2 }
+    expect(@ability.model_adapter(Article, :read)).to generate_sql(%{
+SELECT DISTINCT articles.*
+FROM (SELECT "articles".* FROM "articles"
+INNER JOIN "users" ON "users"."id" = "articles"."user_id"
+WHERE "users"."id" = 1
+UNION
+SELECT "articles".* FROM "articles"
+INNER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
+INNER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id" WHERE "users"."id" = 2) AS articles})
   end
 
   it 'returns appropriate sql conditions in complex case with nested joins' do
