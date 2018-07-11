@@ -59,8 +59,8 @@ module CanCan
     end
 
     def to_s
-      "#{base_behavior ? 'can' : 'cannot'} [#{actions.map { |a| ":#{a}" }.join(', ')}],
-#{subjects.inspect}, #{conditions.inspect}"
+      "#{base_behavior ? 'can' : 'cannot'} [#{actions.map { |a| ":#{a}" }.join(', ')}],"\
+"#{subjects.inspect}, #{conditions.inspect}"
     end
 
     # Matches the action, subject, and attribute; not necessarily the conditions
