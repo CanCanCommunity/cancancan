@@ -92,11 +92,6 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
         expect(CanCan::ModelAdapters::ActiveRecord4Adapter).to be_for_class(Article)
         expect(CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article))
           .to eq(CanCan::ModelAdapters::ActiveRecord4Adapter)
-      else
-        expect(CanCan::ModelAdapters::ActiveRecord3Adapter).to_not be_for_class(Object)
-        expect(CanCan::ModelAdapters::ActiveRecord3Adapter).to be_for_class(Article)
-        expect(CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article))
-          .to eq(CanCan::ModelAdapters::ActiveRecord3Adapter)
       end
     end
 

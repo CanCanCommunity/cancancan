@@ -1,6 +1,16 @@
 Unreleased
 
+* Feature cancancan#172 - Include conditions passed to authorize! in AccessDenied exception (kraflab)
 * Removed support for dynamic finders (coorasse)
+* Fix cancancan#478 - Fixes SQL exception from rails 5.2 upgrade (lizzyaustad & kevintyll)
+
+2.1.4 (Apr 09th, 2018)
+
+* Inject cancancan in ActionController::API and ActionController::Base when they are both defined (arturoherrero)
+
+2.1.4 (Apr 09th, 2018)
+
+* Inject cancancan in ActionController::API and ActionController::Base when they are both defined (arturoherrero)
 
 2.1.3 (Jan 16th, 2018)
 
