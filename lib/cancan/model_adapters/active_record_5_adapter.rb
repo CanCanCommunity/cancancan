@@ -13,10 +13,11 @@ module CanCan
         return super if Array.wrap(value).all? { |x| x.is_a? Integer }
 
         attribute = subject.send(name)
+        raw_attribute = subject.class.send(name.to_s.pluralize)[attribute]
         if value.is_a?(Enumerable)
-          value.map(&:to_s).include? attribute
+          !(value.map(&:to_s) & [attribute, raw_attribute]).empty?
         else
-          attribute == value.to_s
+          attribute == value.to_s || raw_attribute == value.to_s
         end
       end
 
@@ -39,9 +40,10 @@ module CanCan
 
         conditions.stringify_keys!
 
-        predicate_builder.build_from_hash(conditions).map do |b|
-          visit_nodes(b)
-        end.join(' AND ')
+        predicate_builder
+          .build_from_hash(conditions)
+          .map { |b| visit_nodes(b) }
+          .join(' AND ')
       end
 
       def visit_nodes(b)
