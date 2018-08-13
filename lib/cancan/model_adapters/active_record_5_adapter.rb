@@ -14,11 +14,7 @@ module CanCan
 
         attribute = subject.send(name)
         raw_attribute = subject.class.send(name.to_s.pluralize)[attribute]
-        if value.is_a?(Enumerable)
-          !(value.map(&:to_s) & [attribute, raw_attribute]).empty?
-        else
-          attribute == value.to_s || raw_attribute == value.to_s
-        end
+        !(Array(value).map(&:to_s) & [attribute, raw_attribute]).empty?
       end
 
       private
