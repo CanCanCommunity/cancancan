@@ -15,6 +15,8 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
 
         create_table(:projects) do |t|
           t.string :name
+          t.integer :manager_id
+          t.integer :director_id
           t.timestamps null: false
         end
 
@@ -46,6 +48,8 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       end
 
       class Project < ActiveRecord::Base
+        belongs_to :manager, class_name: 'User'
+        belongs_to :director, class_name: 'User'
       end
 
       class Category < ActiveRecord::Base
@@ -412,5 +416,29 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
         expect(Course.accessible_by(@ability)).to eq([valid_course])
       end
     end
+
+    context 'when associations share the same table' do
+      it 'fetches the valid record' do
+        user = User.create!()
+        project = Project.create!(director_id: user.id)
+
+        @ability.can :read, Project, director: {id: user.id}
+        @ability.can :read, Project, manager: {id: -1}
+
+        expect(Project.accessible_by(@ability)).to eq([project])
+      end
+
+      it 'does not fetch the invalid record' do
+        user = User.create!()
+        project = Project.create!(director_id: user.id)
+
+        @ability.can :read, Project, manager: {id: user.id}
+        @ability.can :read, Project, director: {id: -1}
+
+        expect(Project.accessible_by(@ability)).to_not eq([project])
+      end
+    end
+
+
   end
 end
