@@ -432,10 +432,10 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
         user = User.create!()
         project = Project.create!(director_id: user.id)
 
-        @ability.can :read, Project, director: {id: -1}
         @ability.can :read, Project, manager: {id: user.id}
+        @ability.can :read, Project, director: {id: -1}
 
-        expect(Project.accessible_by(@ability)).to eq([project])
+        expect(Project.accessible_by(@ability)).to_not eq([project])
       end
     end
 
