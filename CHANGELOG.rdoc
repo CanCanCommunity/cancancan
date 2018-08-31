@@ -1,5 +1,7 @@
 Unreleased
 
+* Remove ruby 2.2 from Travis and add ruby 2.5.1 (coorasse)
+
 2.2.0 (Apr 13th, 2018)
 
 * Include conditions passed to authorize! in AccessDenied exception (kraflab)
