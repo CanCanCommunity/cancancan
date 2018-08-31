@@ -1,5 +1,7 @@
 Unreleased
 
+* Compress useless rules before generating a query to optimize performances (coorasse)
+
 2.2.0 (Apr 13th, 2018)
 
 * Include conditions passed to authorize! in AccessDenied exception (kraflab)
