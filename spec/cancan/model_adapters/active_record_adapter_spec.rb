@@ -249,14 +249,17 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
     it 'returns SQL for single `can` definition in front of default `cannot` condition' do
       @ability.cannot :read, Article
       @ability.can :read, Article, published: false, secret: true
-      expect(@ability.model_adapter(Article, :read).conditions)
-        .to orderlessly_match(%("#{@article_table}"."published" = 'f' AND "#{@article_table}"."secret" = 't'))
+      expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
+SELECT "articles".*
+FROM "articles"
+WHERE "articles"."published" = 'f' AND "articles"."secret" = 't'))
     end
 
     it 'returns true condition for single `can` definition in front of default `can` condition' do
       @ability.can :read, Article
       @ability.can :read, Article, published: false, secret: true
-      expect(@ability.model_adapter(Article, :read).conditions).to eq("'t'='t'")
+      expect(@ability.model_adapter(Article, :read).conditions).to eq({})
+      expect(@ability.model_adapter(Article, :read)).to generate_sql(%(SELECT "articles".* FROM "articles"))
     end
 
     it 'returns `false condition` for single `cannot` definition in front of default `cannot` condition' do
@@ -279,10 +282,11 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       @ability.cannot :update, Article, secret: true
       expect(@ability.model_adapter(Article, :update).conditions)
         .to eq(%[not ("#{@article_table}"."secret" = 't') ] +
-               %[AND (("#{@article_table}"."published" = 't') ] +
-               %[OR ("#{@article_table}"."id" = 1))])
+                 %[AND (("#{@article_table}"."published" = 't') ] +
+                 %[OR ("#{@article_table}"."id" = 1))])
       expect(@ability.model_adapter(Article, :manage).conditions).to eq(id: 1)
-      expect(@ability.model_adapter(Article, :read).conditions).to eq("'t'='t'")
+      expect(@ability.model_adapter(Article, :read).conditions).to eq({})
+      expect(@ability.model_adapter(Article, :read)).to generate_sql(%(SELECT "articles".* FROM "articles"))
     end
 
     it 'returns appropriate sql conditions in complex case with nested joins' do

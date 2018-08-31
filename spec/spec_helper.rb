@@ -24,4 +24,15 @@ RSpec.configure do |config|
   config.expect_with :rspec do |c|
     c.syntax = :expect
   end
+
+  config.include SQLHelpers
+end
+
+RSpec::Matchers.define :generate_sql do |expected|
+  match do |actual|
+    normalized_sql(actual) == expected.gsub(/\s+/, ' ').strip
+  end
+  failure_message do |actual|
+    "Returned sql:\n#{normalized_sql(actual)}\ninstead of:\n#{expected.gsub(/\s+/, ' ').strip}"
+  end
 end

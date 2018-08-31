@@ -1,5 +1,6 @@
 Unreleased
 
+* Compress irrelevant rules before generating a query to optimize performances (coorasse)
 * Remove ruby 2.2 from Travis and add ruby 2.5.1 (coorasse)
 
 2.2.0 (Apr 13th, 2018)
