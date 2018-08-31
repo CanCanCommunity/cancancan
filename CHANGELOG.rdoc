@@ -2,6 +2,8 @@ Unreleased
 
 * Compress irrelevant rules before generating a query to optimize performances (coorasse)
 * Remove ruby 2.2 from Travis and add ruby 2.5.1 (coorasse)
+* Predict associations names to support multiple references to the same table (coorasse)
+* Raise a specific exception when using a wrong association name in rules definition (@coorasse)
 
 2.2.0 (Apr 13th, 2018)
 
