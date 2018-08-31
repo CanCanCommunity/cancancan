@@ -11,11 +11,9 @@
 [Screencast 1](http://railscasts.com/episodes/192-authorization-with-cancan) |
 [Screencast 2](https://www.youtube.com/watch?v=cTYu-OjUgDw)
 
-CanCanCan is an authorization library for Ruby and Ruby on Rails which restricts what
-resources a given user is allowed to access.
+CanCanCan is an authorization library for Ruby >= 2.2.0 and Ruby on Rails >= 4.2 which restricts what resources a given user is allowed to access. 
 
-All permissions can be defined in one or multiple ability files and not duplicated across controllers, views,
-and database queries, keeping your permissions logic in one place.
+All permissions can be defined in one or multiple ability files and not duplicated across controllers, views, and database queries, keeping your permissions logic in one place.
 
 It consists of two main parts:
 1. **the authorizations definition library** that allows you to define the rules, for a user,
@@ -28,7 +26,7 @@ of models for you in the controllers.
 
 Add this to your Gemfile: 
 
-    gem 'cancancan'
+    gem 'cancancan', '~> 2.0'
     
 and run the `bundle install` command.
 
@@ -43,12 +41,6 @@ For Rails < 4.2 use:
 User permissions are defined in an `Ability` class.
 
     rails g cancan:ability
-
-You can define an ability with a very intuitive syntax as
-
-    can :update, Article
-
- allowing the users to update the articles.
 
 See [Defining Abilities](https://github.com/CanCanCommunity/cancancan/wiki/defining-abilities) for details.
 
@@ -110,7 +102,7 @@ For the `:update` action, CanCanCan will load and authorize the resource but *no
 
 ```ruby
 def update
-  if @article.update(update_params)
+  if @article.update_attributes(update_params)
     # hurray
   else
     render :edit
@@ -208,28 +200,10 @@ If you are interested in supporting them, contribute to the sibling gems `cancan
 
 Version 2.0 drops also support for Rails < 4.2 and ruby < 2.2 so, again, use the version 1 of the Gem for these.
 
-## Version 3.0
-
-Version 3.0 adds support for attribute-level rules. You can now define the following:
-
-```ruby
-can :read, User, :first_name
-can :read, User, :last_name
-cannot :read, User, :api_key
-```
-
-and check with:
-
-```ruby
-can? :read, User, :first_name
-# => true
-
-can? :read, User, :api_key
-# => false
-```
 
 ## Wiki Docs
 
+* [Upgrading to 1.6](https://github.com/CanCanCommunity/cancancan/wiki/Upgrading-to-1.6)
 * [Defining Abilities](https://github.com/CanCanCommunity/cancancan/wiki/Defining-Abilities)
 * [Checking Abilities](https://github.com/CanCanCommunity/cancancan/wiki/Checking-Abilities)
 * [Authorizing Controller Actions](https://github.com/CanCanCommunity/cancancan/wiki/Authorizing-Controller-Actions)
@@ -249,18 +223,19 @@ Any help is greatly appreciated, feel free to submit pull-requests or open issue
 ## Questions?
 
 If you have any question or doubt regarding CanCanCan which you cannot find the solution to in the 
-[documentation](https://github.com/CanCanCommunity/cancancan/wiki) please
+[documentation](https://github.com/CanCanCommunity/cancancan/wiki) or our 
+[mailing list](http://groups.google.com/group/cancancan), please 
 [open a question on Stackoverflow](http://stackoverflow.com/questions/ask?tags=cancancan) with tag 
 [cancancan](http://stackoverflow.com/questions/tagged/cancancan)
 
 ## Bugs?
 
-If you find a bug please add an [issue on GitHub](https://github.com/CanCanCommunity/cancancan/issues) or fork the
-project and send a pull request.
+If you find a bug please add an [issue on GitHub](https://github.com/CanCanCommunity/cancancan/issues) or fork the project and send a pull request.
+
 
 ## Development
 
-CanCanCan uses [appraisals](https://github.com/thoughtbot/appraisal) to test the code base against multiple versions
+CanCanCan uses [appraisals](https://github.com/thoughtbot/appraisal) to test the code base against multiple versions 
 of Rails, as well as the different model adapters.
 
 When first developing, you need to run `bundle install` and then `appraisal install`, to install the different sets.
