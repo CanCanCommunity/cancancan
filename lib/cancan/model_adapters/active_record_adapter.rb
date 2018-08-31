@@ -1,4 +1,5 @@
 require_relative 'can_can/model_adapters/active_record_adapter/joins.rb'
+require 'cancan/rules_compressor'
 module CanCan
   module ModelAdapters
     module ActiveRecordAdapter
@@ -20,16 +21,17 @@ module CanCan
       #   query(:manage, User).conditions # => "not (self_managed = 't') AND ((manager_id = 1) OR (id = 1))"
       #
       def conditions
-        if @rules.size == 1 && @rules.first.base_behavior
+        compressed_rules = RulesCompressor.new(@rules.reverse).rules_collapsed.reverse
+        if compressed_rules.size == 1 && compressed_rules.first.base_behavior
           # Return the conditions directly if there's just one definition
-          tableized_conditions(@rules.first.conditions).dup
+          tableized_conditions(compressed_rules.first.conditions).dup
         else
-          extract_multiple_conditions
+          extract_multiple_conditions(compressed_rules)
         end
       end
 
-      def extract_multiple_conditions
-        @rules.reverse.inject(false_sql) do |sql, rule|
+      def extract_multiple_conditions(rules)
+        rules.reverse.inject(false_sql) do |sql, rule|
           merge_conditions(sql, tableized_conditions(rule.conditions).dup, rule.base_behavior)
         end
       end
