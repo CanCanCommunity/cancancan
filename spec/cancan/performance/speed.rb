@@ -1,11 +1,10 @@
 require 'spec_helper'
 
-RSpec.describe "query performance" do
+RSpec.describe 'query performance' do
   before :each do
     ActiveRecord::Base.establish_connection(adapter: 'sqlite3', database: ':memory:')
     ActiveRecord::Migration.verbose = false
     ActiveRecord::Schema.define do
-
       create_table(:users) do |t|
         t.string :name
         t.timestamps null: false
@@ -65,7 +64,6 @@ RSpec.describe "query performance" do
 
         x.compare!
       end
-
     end
   end
 end

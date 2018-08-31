@@ -42,5 +42,6 @@ AllCops:
   Exclude:
     - 'gemfiles/vendor/bundle/**/*'
     - 'Appraisals'
+    - 'spec/cancan/performance/speed.rb'
 
 inherit_from: .rubocop_todo.yml
