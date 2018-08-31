@@ -153,6 +153,7 @@ if defined? CanCan::ModelAdapters::ActiveRecord4Adapter
           parent = Parent.create!
           Child.create!(parent: parent, created_at: 1.hours.ago)
           Child.create!(parent: parent, created_at: 2.hours.ago)
+
           expect(Parent.accessible_by(@ability)).to eq([parent])
         end
       end

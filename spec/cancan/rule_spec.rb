@@ -5,7 +5,7 @@ require 'ostruct' # for OpenStruct below
 describe CanCan::Rule do
   before(:each) do
     @conditions = {}
-    @rule = CanCan::Rule.new(true, :read, Integer, @conditions)
+    @rule = CanCan::Rule.new(true, :read, Integer, @conditions, nil)
   end
 
   it 'returns no association joins if none exist' do
@@ -34,7 +34,7 @@ describe CanCan::Rule do
   end
 
   it 'returns no association joins if conditions is nil' do
-    rule = CanCan::Rule.new(true, :read, Integer, nil)
+    rule = CanCan::Rule.new(true, :read, Integer, nil, nil)
     expect(rule.associations_hash).to eq({})
   end
 
@@ -48,15 +48,5 @@ describe CanCan::Rule do
   it 'is not mergeable if conditions is an empty hash' do
     @conditions = {}
     expect(@rule).to_not be_unmergeable
-  end
-
-  it 'allows nil in attribute spot for edge cases' do
-    rule1 = CanCan::Rule.new(true, :action, :subject, nil, :var)
-    expect(rule1.attributes).to eq []
-    expect(rule1.conditions).to eq :var
-
-    rule2 = CanCan::Rule.new(true, :action, :subject, nil, %i[foo bar])
-    expect(rule2.attributes).to eq []
-    expect(rule2.conditions).to eq %i[foo bar]
   end
 end
