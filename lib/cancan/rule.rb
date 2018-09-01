@@ -5,27 +5,14 @@ module CanCan
   # helpful methods to determine permission checking and conditions hash generation.
   class Rule # :nodoc:
     include ConditionsMatcher
-    include ParameterValidators
     attr_reader :base_behavior, :subjects, :actions, :conditions, :attributes, :block
     attr_writer :expanded_actions
 
-    # The first argument when initializing is the base_behavior which is a true/false
-    # value. True for "can" and false for "cannot". The next two arguments are the action
-    # and subject respectively (such as :read, @project). The third argument is a hash
-    # of conditions and the last one is the block passed to the "can" call.
-    def initialize(base_behavior, action, subject, *extra_args, &block)
-      # for backwards compatibility, attributes are an optional parameter. Check if
-      # attributes were passed or are actually conditions
-      attributes, extra_args = parse_attributes_from_extra_args(extra_args)
-      condition_and_block_check(extra_args, block, action, subject)
-      @match_all = action.nil? && subject.nil?
-      raise Error, "Subject is required for #{action}" if action && subject.nil?
-      @base_behavior = base_behavior
-      @actions = Array(action)
-      @subjects = Array(subject)
-      @attributes = Array(attributes)
-      @conditions = extra_args || {}
-      @block = block
+    def initialize(base_behavior, action, subject, conditions, block)
+      both_block_and_hash_error = 'You are not able to supply a block with a hash of conditions in '\
+                                  "#{action} #{subject} ability. Use either one."
+      raise Error, both_block_and_hash_error if conditions.is_a?(Hash) && block
+      @conditions = conditions || {}
     end
 
     def can_rule?
