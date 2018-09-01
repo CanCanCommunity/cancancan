@@ -7,11 +7,11 @@ describe CanCan::RulesCompressor do
   end
 
   def can(action, subject, args = nil)
-    CanCan::Rule.new(true, action, subject, args, nil)
+    CanCan::Rule.new(true, action, subject, args)
   end
 
   def cannot(action, subject, args = nil)
-    CanCan::Rule.new(false, action, subject, args, nil)
+    CanCan::Rule.new(false, action, subject, args)
   end
 
   context 'a "cannot catch_all" rule is in first position' do
@@ -85,7 +85,6 @@ describe CanCan::RulesCompressor do
     end
   end
 
-  # TODO: not supported yet
   xcontext 'duplicate rules' do
     let(:rules) do
       [can(:read, Blog, id: 4),
@@ -101,7 +100,6 @@ describe CanCan::RulesCompressor do
     end
   end
 
-  # TODO: not supported yet
   xcontext 'merges rules' do
     let(:rules) do
       [can(:read, Blog, id: 4),
