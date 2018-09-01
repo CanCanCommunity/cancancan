@@ -8,7 +8,8 @@
 
 [Wiki](https://github.com/CanCanCommunity/cancancan/wiki) | 
 [RDocs](http://rdoc.info/projects/CanCanCommunity/cancancan) | 
-[Screencast](http://railscasts.com/episodes/192-authorization-with-cancan) |
+[Screencast 1](http://railscasts.com/episodes/192-authorization-with-cancan) |
+[Screencast 2](https://www.youtube.com/watch?v=cTYu-OjUgDw)
 
 CanCanCan is an authorization library for Ruby >= 2.2.0 and Ruby on Rails >= 4.2 which restricts what resources a given user is allowed to access. 
 
