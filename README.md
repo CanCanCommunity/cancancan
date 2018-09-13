@@ -203,7 +203,6 @@ Version 2.0 drops also support for Rails < 4.2 and ruby < 2.2 so, again, use the
 
 ## Wiki Docs
 
-* [Upgrading to 1.6](https://github.com/CanCanCommunity/cancancan/wiki/Upgrading-to-1.6)
 * [Defining Abilities](https://github.com/CanCanCommunity/cancancan/wiki/Defining-Abilities)
 * [Checking Abilities](https://github.com/CanCanCommunity/cancancan/wiki/Checking-Abilities)
 * [Authorizing Controller Actions](https://github.com/CanCanCommunity/cancancan/wiki/Authorizing-Controller-Actions)

@@ -41,6 +41,7 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
         end
 
         create_table(:users) do |t|
+          t.string :name
           t.timestamps null: false
         end
       end
@@ -72,6 +73,8 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
 
       class User < ActiveRecord::Base
         has_many :articles
+        has_many :mentions
+        has_many :mentioned_articles, through: :mentions, source: :article
       end
 
       (@ability = double).extend(CanCan::Ability)
@@ -414,6 +417,52 @@ WHERE "articles"."published" = 'f' AND "articles"."secret" = 't'))
         valid_course = Course.create!(start_at: Time.now)
 
         expect(Course.accessible_by(@ability)).to eq([valid_course])
+      end
+    end
+
+    context 'when a table references another one twice' do
+      before do
+        ActiveRecord::Schema.define do
+          create_table(:transactions) do |t|
+            t.integer :sender_id
+            t.integer :receiver_id
+          end
+        end
+
+        class Transaction < ActiveRecord::Base
+          belongs_to :sender, class_name: 'User', foreign_key: :sender_id
+          belongs_to :receiver, class_name: 'User', foreign_key: :receiver_id
+        end
+      end
+
+      it 'can filter correctly on both associations' do
+        sender = User.create!
+        receiver = User.create!
+        t1 = Transaction.create!(sender: sender, receiver: receiver)
+        t2 = Transaction.create!(sender: receiver, receiver: sender)
+
+        ability = Ability.new(sender)
+        ability.can :read, Transaction, sender: { id: sender.id }
+        ability.can :read, Transaction, receiver: { id: sender.id }
+        expect(Transaction.accessible_by(ability)).to eq([t1, t2])
+      end
+    end
+
+    context 'when a table is references multiple times' do
+      it 'can filter correctly on the different associations' do
+        u1 = User.create!(name: 'pippo')
+        u2 = User.create!(name: 'paperino')
+
+        a1 = Article.create!(user: u1)
+        a2 = Article.create!(user: u2)
+
+        ability = Ability.new(u1)
+        ability.can :read, Article, user: { id: u1.id }
+        ability.can :read, Article, mentioned_users: { name: u1.name }
+        ability.can :read, Article, mentioned_users: { mentioned_articles: { id: a2.id } }
+        ability.can :read, Article, mentioned_users: { articles: { user: { name: 'deep' } } }
+        ability.can :read, Article, mentioned_users: { articles: { mentioned_users: { name: 'd2' } } }
+        expect(Article.accessible_by(ability)).to eq([a1])
       end
     end
   end
