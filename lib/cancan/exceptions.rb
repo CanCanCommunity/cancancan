@@ -11,6 +11,9 @@ module CanCan
   # Raised when using check_authorization without calling authorized!
   class AuthorizationNotPerformed < Error; end
 
+  # Raised when using a wrong association name
+  class WrongAssociationName < Error; end
+
   # This error is raised when a user isn't allowed to access a given controller action.
   # This usually happens within a call to ControllerAdditions#authorize! but can be
   # raised manually.

@@ -1,4 +1,6 @@
 require_relative 'can_can/model_adapters/active_record_adapter/joins.rb'
+require_relative 'conditions_extractor.rb'
+require 'cancan/rules_compressor'
 module CanCan
   module ModelAdapters
     module ActiveRecordAdapter
@@ -20,47 +22,19 @@ module CanCan
       #   query(:manage, User).conditions # => "not (self_managed = 't') AND ((manager_id = 1) OR (id = 1))"
       #
       def conditions
-        if @rules.size == 1 && @rules.first.base_behavior
+        compressed_rules = RulesCompressor.new(@rules.reverse).rules_collapsed.reverse
+        conditions_extractor = ConditionsExtractor.new(@model_class)
+        if compressed_rules.size == 1 && compressed_rules.first.base_behavior
           # Return the conditions directly if there's just one definition
-          tableized_conditions(@rules.first.conditions).dup
+          conditions_extractor.tableize_conditions(compressed_rules.first.conditions).dup
         else
-          extract_multiple_conditions
+          extract_multiple_conditions(conditions_extractor, compressed_rules)
         end
       end
 
-      def extract_multiple_conditions
-        @rules.reverse.inject(false_sql) do |sql, rule|
-          merge_conditions(sql, tableized_conditions(rule.conditions).dup, rule.base_behavior)
-        end
-      end
-
-      def tableized_conditions(conditions, model_class = @model_class)
-        return conditions unless conditions.is_a? Hash
-        conditions.each_with_object({}) do |(name, value), result_hash|
-          calculate_result_hash(model_class, name, result_hash, value)
-        end
-      end
-
-      def calculate_result_hash(model_class, name, result_hash, value)
-        if value.is_a? Hash
-          association_class = model_class.reflect_on_association(name).klass.name.constantize
-          nested_resulted = calculate_nested(model_class, name, result_hash, value.dup)
-          result_hash.merge!(tableized_conditions(nested_resulted, association_class))
-        else
-          result_hash[name] = value
-        end
-        result_hash
-      end
-
-      def calculate_nested(model_class, name, result_hash, value)
-        value.each_with_object({}) do |(k, v), nested|
-          if v.is_a? Hash
-            value.delete(k)
-            nested[k] = v
-          else
-            result_hash[model_class.reflect_on_association(name).table_name.to_sym] = value
-          end
-          nested
+      def extract_multiple_conditions(conditions_extractor, rules)
+        rules.reverse.inject(false_sql) do |sql, rule|
+          merge_conditions(sql, conditions_extractor.tableize_conditions(rule.conditions).dup, rule.base_behavior)
         end
       end
 
