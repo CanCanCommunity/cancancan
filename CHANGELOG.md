@@ -1,8 +1,8 @@
 ## Unreleased
 
-* [#489](https://github.com/CanCanCommunity/cancancan/pull/489/files): Drop support for actions without a subject ([@andrew-aladev][])
-* Allow to add attribute-level rules ([@phaedryx][])
-* [#512](https://github.com/CanCanCommunity/cancancan/pull/512): Removed eager loading of associations for ActiveRecord 5 ([@kaspernj][])
+* [#489](https://github.com/CanCanCommunity/cancancan/pull/489): Drop support for actions without a subject. ([@andrew-aladev][])
+* [#474](https://github.com/CanCanCommunity/cancancan/pull/474): Allow to add attribute-level rules. ([@phaedryx][])
+* [#512](https://github.com/CanCanCommunity/cancancan/pull/512): Removed eager loading of associations for ActiveRecord 5. ([@kaspernj][])
 
 ## 2.3.0 (Sep 16th, 2018)
 
@@ -621,3 +621,6 @@
 [@oliverklee]: https://github.com/oliverklee
 [@gingray]: https://github.com/gingray
 [@timraymond]: https://github.com/timraymond
+[@andrew-aladev]: https://github.com/andrew-aladev
+[@phaedryx]: https://github.com/phaedryx
+[@kaspernj]: https://github.com/kaspernj

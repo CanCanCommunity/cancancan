@@ -360,6 +360,15 @@ WHERE "articles"."published" = 'f' AND "articles"."secret" = 't'))
       expect { @ability.can? :read, Article }.not_to raise_error
     end
 
+    it 'should ignore cannot rules with attributes when querying' do
+      user = User.create!
+      article = Article.create!(user: user)
+      ability = Ability.new(user)
+      ability.can :read, Article
+      ability.cannot :read, Article, :secret
+      expect(Article.accessible_by(ability)).to eq([article])
+    end
+
     context 'with namespaced models' do
       before :each do
         ActiveRecord::Schema.define do
