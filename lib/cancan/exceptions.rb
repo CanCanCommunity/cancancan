@@ -11,6 +11,9 @@ module CanCan
   # Raised when using check_authorization without calling authorized!
   class AuthorizationNotPerformed < Error; end
 
+  # Raised when a rule is created with both a block and a hash of conditions
+  class BlockAndConditionsError < Error; end
+
   # Raised when using a wrong association name
   class WrongAssociationName < Error; end
 

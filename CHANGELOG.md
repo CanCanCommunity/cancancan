@@ -1,3 +1,9 @@
+## Unreleased
+
+* [#489](https://github.com/CanCanCommunity/cancancan/pull/489/files): Drop support for actions without a subject ([@andrew-aladev][])
+* Allow to add attribute-level rules ([@phaedryx][])
+* [#512](https://github.com/CanCanCommunity/cancancan/pull/512): Removed eager loading of associations for ActiveRecord 5 ([@kaspernj][])
+
 ## 2.3.0 (Sep 16th, 2018)
 
 * [#528](https://github.com/CanCanCommunity/cancancan/issues/528): Compress irrelevant rules before generating a query to optimize performances. ([@coorasse][])

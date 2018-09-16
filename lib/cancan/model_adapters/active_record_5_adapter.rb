@@ -22,13 +22,9 @@ module CanCan
 
       private
 
-      # As of rails 4, `includes()` no longer causes active record to
-      # look inside the where clause to decide to outer join tables
-      # you're using in the where. Instead, `references()` is required
-      # in addition to `includes()` to force the outer join.
       def build_relation(*where_conditions)
         relation = @model_class.where(*where_conditions)
-        relation = relation.includes(joins).references(joins) if joins.present?
+        relation = relation.left_joins(joins).distinct if joins.present?
         relation
       end
 
