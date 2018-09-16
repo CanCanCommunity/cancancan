@@ -1,0 +1,5 @@
+version: "2"
+checks:
+  argument-count:
+    config:
+      threshold: 5
