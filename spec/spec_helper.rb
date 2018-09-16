@@ -18,10 +18,22 @@ Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }
 RSpec.configure do |config|
   config.filter_run focus: true
   config.run_all_when_everything_filtered = true
+  config.disable_monkey_patching = true
   config.mock_with :rspec
   config.order = 'random'
 
   config.expect_with :rspec do |c|
     c.syntax = :expect
+  end
+
+  config.include SQLHelpers
+end
+
+RSpec::Matchers.define :generate_sql do |expected|
+  match do |actual|
+    normalized_sql(actual) == expected.gsub(/\s+/, ' ').strip
+  end
+  failure_message do |actual|
+    "Returned sql:\n#{normalized_sql(actual)}\ninstead of:\n#{expected.gsub(/\s+/, ' ').strip}"
   end
 end
