@@ -66,6 +66,48 @@ if ActiveRecord::VERSION::MAJOR == 5 && defined?(CanCan::ModelAdapters::ActiveRe
         expect(accessible).to contain_exactly(red, blue)
       end
 
+      it 'allows strings as enum values' do
+        ActiveRecord::Schema.define do
+          create_table(:things) do |t|
+            t.string :size, default: 'big', null: false
+          end
+        end
+
+        class Thing < ActiveRecord::Base
+          enum size: { big: 'big', medium: 'average', small: 'small' }
+        end
+
+        big = Thing.create!(size: :big)
+        medium = Thing.create!(size: :medium)
+        small = Thing.create!(size: :small)
+
+        # A condition with a single value.
+        @ability.can :read, Thing, size: :medium
+
+        expect(@ability.cannot?(:read, big)).to be true
+        expect(@ability.can?(:read, medium)).to be true
+        expect(@ability.cannot?(:read, small)).to be true
+
+        accessible = Thing.accessible_by(@ability)
+        expect(accessible).to contain_exactly(medium)
+
+        @ability.cannot :read, Thing, size: 'average' # should undo previous rule
+        expect(@ability.can?(:read, medium)).to be false
+
+        accessible = Thing.accessible_by(@ability)
+        expect(accessible).to be_empty
+
+        # A condition with multiple values.
+        @ability.can :update, Thing, size: %i[big small]
+
+        expect(@ability.can?(:update, big)).to be true
+        expect(@ability.cannot?(:update, medium)).to be true
+        expect(@ability.can?(:update, small)).to be true
+
+        accessible = Thing.accessible_by(@ability, :update)
+        expect(accessible).to contain_exactly(big, small)
+      end
+
       it 'allows dual filter on enums' do
         ActiveRecord::Schema.define do
           create_table(:discs) do |t|
