@@ -13,15 +13,17 @@ module CanCan
 
       # TODO: this should be private
       def self.matches_condition?(subject, name, value)
+        attribute_enum_string = subject.send(name)
         # Get the mapping from enum strings to values.
         enum = subject.class.send(name.to_s.pluralize)
         # Get the value of the attribute as an integer.
-        attribute = enum[subject.send(name)]
+        attribute_enum_value = enum[attribute_enum_string]
         # Check to see if the value matches the condition.
         if value.is_a?(Enumerable)
-          value.include? attribute
+          value.include?(attribute_enum_string) ||
+            value.include?(attribute_enum_value)
         else
-          attribute == value
+          [attribute_enum_value, attribute_enum_string].include?(value)
         end
       end
 
