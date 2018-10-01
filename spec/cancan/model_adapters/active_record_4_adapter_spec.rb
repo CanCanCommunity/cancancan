@@ -39,7 +39,7 @@ if defined? CanCan::ModelAdapters::ActiveRecord4Adapter
           .to eq [child2, child1]
       end
 
-      if ActiveRecord::VERSION::MINOR >= 1
+      if ActiveRecord::VERSION::MINOR >= 1 || ActiveRecord::VERSION::MAJOR >= 5
         it 'allows filters on enums' do
           ActiveRecord::Schema.define do
             create_table(:shapes) do |t|
@@ -48,7 +48,9 @@ if defined? CanCan::ModelAdapters::ActiveRecord4Adapter
           end
 
           class Shape < ActiveRecord::Base
-            enum color: [:red, :green, :blue]
+            unless defined_enums.keys.include? 'color'
+              enum color: %i[red green blue]
+            end
           end
 
           red = Shape.create!(color: :red)
@@ -86,8 +88,8 @@ if defined? CanCan::ModelAdapters::ActiveRecord4Adapter
           end
 
           class Disc < ActiveRecord::Base
-            enum color: [:red, :green, :blue]
-            enum shape: { triangle: 3, rectangle: 4 }
+            enum color: %i[red green blue] unless defined_enums.keys.include? 'color'
+            enum shape: { triangle: 3, rectangle: 4 } unless defined_enums.keys.include? 'shape'
           end
 
           red_triangle = Disc.create!(color: Disc.colors[:red], shape: Disc.shapes[:triangle])

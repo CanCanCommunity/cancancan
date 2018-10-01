@@ -10,28 +10,35 @@ Style/FrozenStringLiteralComment:
 Style/EmptyMethod:
   Enabled: false
 
-Style/VariableNumber:
-  Enabled: false
-
 Style/ClassAndModuleChildren:
   Enabled: false
 
 Metrics/LineLength:
   Max: 120
 
-Metrics/ClassLength:
+Metrics/BlockLength:
   Exclude:
-    - 'lib/cancan/controller_resource.rb'
-    - 'lib/cancan/rule.rb'
+    - 'lib/cancan/matchers.rb'
+    - '**/*_spec.rb'
 
-Metrics/ModuleLength:
+# TODO
+# Offense count: 2
+# Configuration parameters: NamePrefix, NamePrefixBlacklist, NameWhitelist.
+# NamePrefix: is_, has_, have_
+# NamePrefixBlacklist: is_, has_, have_
+# NameWhitelist: is_a?
+Style/PredicateName:
   Exclude:
-    - "**/*_spec.rb"
+    - 'spec/**/*'
     - 'lib/cancan/ability.rb'
-    - 'lib/cancan/model_adapters/active_record_adapter.rb'
+
+# TODO
+Lint/AmbiguousBlockAssociation:
+  Enabled: false
+
 
 AllCops:
-  TargetRubyVersion: 2.0
+  TargetRubyVersion: 2.2.0
   Exclude:
     - 'gemfiles/vendor/bundle/**/*'
     - 'Appraisals'

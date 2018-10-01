@@ -158,7 +158,7 @@ describe CanCan::Ability do
   end
 
   it 'is able to specify multiple actions and match any' do
-    @ability.can [:read, :update], :all
+    @ability.can %i[read update], :all
     expect(@ability.can?(:read, 123)).to be(true)
     expect(@ability.can?(:update, 123)).to be(true)
     expect(@ability.can?(:count, 123)).to be(false)
@@ -188,9 +188,9 @@ describe CanCan::Ability do
 
     expected_list = { can: { manage: ['all'],
                              learn: ['Range'] },
-                      cannot: { read: %w(String Hash),
-                                index: %w(String Hash),
-                                show: %w(String Hash),
+                      cannot: { read: %w[String Hash],
+                                index: %w[String Hash],
+                                show: %w[String Hash],
                                 preview: ['Array'] } }
 
     expect(@ability.permissions).to eq(expected_list)
@@ -201,8 +201,8 @@ describe CanCan::Ability do
     expect(@ability.can?(:read, :stats)).to be(true)
     expect(@ability.can?(:update, :stats)).to be(false)
     expect(@ability.can?(:read, :nonstats)).to be(false)
-    expect(@ability.can?(:read, any: [:stats, :nonstats])).to be(true)
-    expect(@ability.can?(:read, any: [:nonstats, :neitherstats])).to be(false)
+    expect(@ability.can?(:read, any: %i[stats nonstats])).to be(true)
+    expect(@ability.can?(:read, any: %i[nonstats neitherstats])).to be(false)
   end
 
   it 'checks ancestors of class' do
@@ -218,7 +218,7 @@ describe CanCan::Ability do
     @ability.cannot :read, Integer
     expect(@ability.can?(:read, 'foo')).to be(true)
     expect(@ability.can?(:read, 123)).to be(false)
-    expect(@ability.can?(:read, any: %w(foo bar))).to be(true)
+    expect(@ability.can?(:read, any: %w[foo bar])).to be(true)
     expect(@ability.can?(:read, any: [123, 'foo'])).to be(false)
     expect(@ability.can?(:read, any: [123, 456])).to be(false)
   end
@@ -261,7 +261,7 @@ describe CanCan::Ability do
   it 'appends aliased actions' do
     @ability.alias_action :update, to: :modify
     @ability.alias_action :destroy, to: :modify
-    expect(@ability.aliased_actions[:modify]).to eq([:update, :destroy])
+    expect(@ability.aliased_actions[:modify]).to eq(%i[update destroy])
   end
 
   it 'clears aliased actions' do
@@ -328,11 +328,11 @@ describe CanCan::Ability do
   end
 
   it 'accepts a set as a condition value' do
-    expect(object_with_foo_2 = double(foo: 2)).to receive(:foo)
-    expect(object_with_foo_3 = double(foo: 3)).to receive(:foo)
+    expect(object_with_foo_two = double(foo: 2)).to receive(:foo)
+    expect(object_with_foo_three = double(foo: 3)).to receive(:foo)
     @ability.can :read, Object, foo: [1, 2, 5].to_set
-    expect(@ability.can?(:read, object_with_foo_2)).to be(true)
-    expect(@ability.can?(:read, object_with_foo_3)).to be(false)
+    expect(@ability.can?(:read, object_with_foo_two)).to be(true)
+    expect(@ability.can?(:read, object_with_foo_three)).to be(false)
   end
 
   it 'does not match subjects return nil for methods that must match nested a nested conditions hash' do
@@ -400,7 +400,7 @@ describe CanCan::Ability do
 
   it 'checks permissions correctly when passing a hash of subjects with multiple definitions' do
     @ability.can :read, Range, string: { length: 4 }
-    @ability.can [:create, :read], Range, string: { upcase: 'FOO' }
+    @ability.can %i[create read], Range, string: { upcase: 'FOO' }
 
     expect(@ability.can?(:read, 'foo' => Range)).to be(true)
     expect(@ability.can?(:read, 'foobar' => Range)).to be(false)
@@ -418,29 +418,61 @@ describe CanCan::Ability do
 
   it "has initial attributes based on hash conditions of 'new' action" do
     @ability.can :manage, Range, foo: 'foo', hash: { skip: 'hashes' }
-    @ability.can :create, Range, bar: 123, array: %w(skip arrays)
+    @ability.can :create, Range, bar: 123, array: %w[skip arrays]
     @ability.can :new, Range, baz: 'baz', range: 1..3
     @ability.cannot :new, Range, ignore: 'me'
     expect(@ability.attributes_for(:new, Range)).to eq(foo: 'foo', bar: 123, baz: 'baz')
   end
 
-  it 'raises access denied exception if ability us unauthorized to perform a certain action' do
-    begin
-      @ability.authorize! :read, :foo, 1, 2, 3, message: 'Access denied!'
-    rescue CanCan::AccessDenied => e
-      expect(e.message).to eq('Access denied!')
-      expect(e.action).to eq(:read)
-      expect(e.subject).to eq(:foo)
-    else
-      raise 'Expected CanCan::AccessDenied exception to be raised'
-    end
-  end
+  describe '#authorize!' do
+    describe 'when ability is not authorized to perform an action' do
+      it 'raises access denied exception' do
+        begin
+          @ability.authorize! :read, :foo, 1, 2, 3, message: 'Access denied!'
+        rescue CanCan::AccessDenied => e
+          expect(e.message).to eq('Access denied!')
+          expect(e.action).to eq(:read)
+          expect(e.subject).to eq(:foo)
+          expect(e.conditions).to eq([1, 2, 3])
+        else
+          raise 'Expected CanCan::AccessDenied exception to be raised'
+        end
+      end
 
-  it 'does not raise access denied exception if ability is authorized to perform an action and return subject' do
-    @ability.can :read, :foo
-    expect do
-      expect(@ability.authorize!(:read, :foo)).to eq(:foo)
-    end.to_not raise_error
+      describe 'when no extra conditions are specified' do
+        it 'raises access denied exception without conditions' do
+          begin
+            @ability.authorize! :read, :foo, message: 'Access denied!'
+          rescue CanCan::AccessDenied => e
+            expect(e.conditions).to eq([])
+          else
+            raise 'Expected CanCan::AccessDenied exception to be raised'
+          end
+        end
+      end
+
+      describe 'when no message is specified' do
+        it 'raises access denied exception with default message' do
+          begin
+            @ability.authorize! :read, :foo
+          rescue CanCan::AccessDenied => e
+            e.default_message = 'Access denied!'
+            expect(e.message).to eq('Access denied!')
+          else
+            raise 'Expected CanCan::AccessDenied exception to be raised'
+          end
+        end
+      end
+    end
+
+    describe 'when ability is authorized to perform an action' do
+      it 'does not raise access denied exception' do
+        @ability.can :read, :foo
+        expect do
+          expect(@ability.authorize!(:read, :foo)).to eq(:foo)
+        end.to_not raise_error
+      end
+    end
   end
 
   it 'knows when block is used in conditions' do
@@ -457,17 +489,6 @@ describe CanCan::Ability do
     expect(@ability).to_not have_raw_sql(:read, :foo)
     @ability.can :read, :foo, 'false'
     expect(@ability).to have_raw_sql(:read, :foo)
-  end
-
-  it 'raises access denied exception with default message if not specified' do
-    begin
-      @ability.authorize! :read, :foo
-    rescue CanCan::AccessDenied => e
-      e.default_message = 'Access denied!'
-      expect(e.message).to eq('Access denied!')
-    else
-      raise 'Expected CanCan::AccessDenied exception to be raised'
-    end
   end
 
   it 'determines model adapterO class by asking AbstractAdapter' do
@@ -525,7 +546,7 @@ describe CanCan::Ability do
 
     it 'has variables for action and subject' do
       # old syntax for now in case testing with old I18n
-      I18n.backend.store_translations :en, unauthorized: { manage: { all: '%{action} %{subject}' } }
+      I18n.backend.store_translations :en, unauthorized: { manage: { all: '%<action>s %<subject>s' } }
       expect(@ability.unauthorized_message(:update, Array)).to eq('update array')
       expect(@ability.unauthorized_message(:update, ArgumentError)).to eq('update argument error')
       expect(@ability.unauthorized_message(:edit, 1..3)).to eq('edit range')

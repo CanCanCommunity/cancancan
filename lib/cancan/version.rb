@@ -1,3 +1,3 @@
 module CanCan
-  VERSION = '1.17.0'.freeze
+  VERSION = '2.3.0'.freeze
 end

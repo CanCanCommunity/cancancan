@@ -1,14 +1,15 @@
 require 'spec_helper'
 
 describe CanCan::AccessDenied do
-  describe 'with action and subject' do
+  describe 'with action, subject, and conditions' do
     before(:each) do
-      @exception = CanCan::AccessDenied.new(nil, :some_action, :some_subject)
+      @exception = CanCan::AccessDenied.new(nil, :some_action, :some_subject, :some_conditions)
     end
 
-    it 'has action and subject accessors' do
+    it 'has action, subject, and conditions accessors' do
       expect(@exception.action).to eq(:some_action)
       expect(@exception.subject).to eq(:some_subject)
+      expect(@exception.conditions).to eq(:some_conditions)
     end
 
     it 'has a changable default message' do
@@ -23,9 +24,10 @@ describe CanCan::AccessDenied do
       @exception = CanCan::AccessDenied.new('Access denied!')
     end
 
-    it 'has nil action and subject' do
+    it 'has nil action, subject, and conditions' do
       expect(@exception.action).to be_nil
       expect(@exception.subject).to be_nil
+      expect(@exception.conditions).to be_nil
     end
 
     it 'has passed message' do

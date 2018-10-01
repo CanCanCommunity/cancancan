@@ -41,6 +41,7 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
         end
 
         create_table(:users) do |t|
+          t.string :name
           t.timestamps null: false
         end
       end
@@ -72,6 +73,8 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
 
       class User < ActiveRecord::Base
         has_many :articles
+        has_many :mentions
+        has_many :mentioned_articles, through: :mentions, source: :article
       end
 
       (@ability = double).extend(CanCan::Ability)
@@ -81,16 +84,17 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
 
     it 'is for only active record classes' do
       if ActiveRecord.respond_to?(:version) &&
-         ActiveRecord.version > Gem::Version.new('4')
+         ActiveRecord.version > Gem::Version.new('5')
+        expect(CanCan::ModelAdapters::ActiveRecord5Adapter).to_not be_for_class(Object)
+        expect(CanCan::ModelAdapters::ActiveRecord5Adapter).to be_for_class(Article)
+        expect(CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article))
+          .to eq(CanCan::ModelAdapters::ActiveRecord5Adapter)
+      elsif ActiveRecord.respond_to?(:version) &&
+            ActiveRecord.version > Gem::Version.new('4')
         expect(CanCan::ModelAdapters::ActiveRecord4Adapter).to_not be_for_class(Object)
         expect(CanCan::ModelAdapters::ActiveRecord4Adapter).to be_for_class(Article)
         expect(CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article))
           .to eq(CanCan::ModelAdapters::ActiveRecord4Adapter)
-      else
-        expect(CanCan::ModelAdapters::ActiveRecord3Adapter).to_not be_for_class(Object)
-        expect(CanCan::ModelAdapters::ActiveRecord3Adapter).to be_for_class(Article)
-        expect(CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article))
-          .to eq(CanCan::ModelAdapters::ActiveRecord3Adapter)
       end
     end
 
@@ -248,14 +252,17 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
     it 'returns SQL for single `can` definition in front of default `cannot` condition' do
       @ability.cannot :read, Article
       @ability.can :read, Article, published: false, secret: true
-      expect(@ability.model_adapter(Article, :read).conditions)
-        .to orderlessly_match(%("#{@article_table}"."published" = 'f' AND "#{@article_table}"."secret" = 't'))
+      expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
+SELECT "articles".*
+FROM "articles"
+WHERE "articles"."published" = 'f' AND "articles"."secret" = 't'))
     end
 
     it 'returns true condition for single `can` definition in front of default `can` condition' do
       @ability.can :read, Article
       @ability.can :read, Article, published: false, secret: true
-      expect(@ability.model_adapter(Article, :read).conditions).to eq("'t'='t'")
+      expect(@ability.model_adapter(Article, :read).conditions).to eq({})
+      expect(@ability.model_adapter(Article, :read)).to generate_sql(%(SELECT "articles".* FROM "articles"))
     end
 
     it 'returns `false condition` for single `cannot` definition in front of default `cannot` condition' do
@@ -278,10 +285,11 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       @ability.cannot :update, Article, secret: true
       expect(@ability.model_adapter(Article, :update).conditions)
         .to eq(%[not ("#{@article_table}"."secret" = 't') ] +
-               %[AND (("#{@article_table}"."published" = 't') ] +
-               %[OR ("#{@article_table}"."id" = 1))])
+                 %[AND (("#{@article_table}"."published" = 't') ] +
+                 %[OR ("#{@article_table}"."id" = 1))])
       expect(@ability.model_adapter(Article, :manage).conditions).to eq(id: 1)
-      expect(@ability.model_adapter(Article, :read).conditions).to eq("'t'='t'")
+      expect(@ability.model_adapter(Article, :read).conditions).to eq({})
+      expect(@ability.model_adapter(Article, :read)).to generate_sql(%(SELECT "articles".* FROM "articles"))
     end
 
     it 'returns appropriate sql conditions in complex case with nested joins' do
@@ -317,7 +325,7 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
     it 'merges separate joins into a single array' do
       @ability.can :read, Article, project: { blocked: false }
       @ability.can :read, Article, company: { admin: true }
-      expect(@ability.model_adapter(Article, :read).joins.inspect).to orderlessly_match([:company, :project].inspect)
+      expect(@ability.model_adapter(Article, :read).joins.inspect).to orderlessly_match(%i[company project].inspect)
     end
 
     it 'merges same joins into a single array' do
@@ -409,6 +417,52 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
         valid_course = Course.create!(start_at: Time.now)
 
         expect(Course.accessible_by(@ability)).to eq([valid_course])
+      end
+    end
+
+    context 'when a table references another one twice' do
+      before do
+        ActiveRecord::Schema.define do
+          create_table(:transactions) do |t|
+            t.integer :sender_id
+            t.integer :receiver_id
+          end
+        end
+
+        class Transaction < ActiveRecord::Base
+          belongs_to :sender, class_name: 'User', foreign_key: :sender_id
+          belongs_to :receiver, class_name: 'User', foreign_key: :receiver_id
+        end
+      end
+
+      it 'can filter correctly on both associations' do
+        sender = User.create!
+        receiver = User.create!
+        t1 = Transaction.create!(sender: sender, receiver: receiver)
+        t2 = Transaction.create!(sender: receiver, receiver: sender)
+
+        ability = Ability.new(sender)
+        ability.can :read, Transaction, sender: { id: sender.id }
+        ability.can :read, Transaction, receiver: { id: sender.id }
+        expect(Transaction.accessible_by(ability)).to eq([t1, t2])
+      end
+    end
+
+    context 'when a table is references multiple times' do
+      it 'can filter correctly on the different associations' do
+        u1 = User.create!(name: 'pippo')
+        u2 = User.create!(name: 'paperino')
+
+        a1 = Article.create!(user: u1)
+        a2 = Article.create!(user: u2)
+
+        ability = Ability.new(u1)
+        ability.can :read, Article, user: { id: u1.id }
+        ability.can :read, Article, mentioned_users: { name: u1.name }
+        ability.can :read, Article, mentioned_users: { mentioned_articles: { id: a2.id } }
+        ability.can :read, Article, mentioned_users: { articles: { user: { name: 'deep' } } }
+        ability.can :read, Article, mentioned_users: { articles: { mentioned_users: { name: 'd2' } } }
+        expect(Article.accessible_by(ability)).to eq([a1])
       end
     end
   end

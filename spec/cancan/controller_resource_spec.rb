@@ -254,7 +254,7 @@ describe CanCan::ControllerResource do
     it 'does not build a single resource when on custom collection action even with id' do
       params.merge!(action: 'sort', id: '123')
 
-      resource = CanCan::ControllerResource.new(controller, collection: [:sort, :list])
+      resource = CanCan::ControllerResource.new(controller, collection: %i[sort list])
       resource.load_resource
       expect(controller.instance_variable_get(:@model)).to be_nil
     end
@@ -390,7 +390,7 @@ describe CanCan::ControllerResource do
       controller.instance_variable_set(:@category, category)
       allow(category.models).to receive(:find).with('123') { :some_model }
 
-      resource = CanCan::ControllerResource.new(controller, through: [:category, :user])
+      resource = CanCan::ControllerResource.new(controller, through: %i[category user])
       resource.load_resource
       expect(controller.instance_variable_get(:@model)).to eq(:some_model)
     end
@@ -407,6 +407,13 @@ describe CanCan::ControllerResource do
 
     it 'does not try to load resource for other action if params[:id] is undefined' do
       params.merge!(action: 'list', id: nil)
+      resource = CanCan::ControllerResource.new(controller)
+      resource.load_resource
+      expect(controller.instance_variable_get(:@model)).to be_nil
+    end
+
+    it 'does not try to load resource for other action if params[:id] is blank' do
+      params.merge!(action: 'list', id: '')
       resource = CanCan::ControllerResource.new(controller)
       resource.load_resource
       expect(controller.instance_variable_get(:@model)).to be_nil
@@ -486,6 +493,15 @@ describe CanCan::ControllerResource do
       model = Model.new
       allow(Model).to receive(:name).with('foo') { model }
 
+      params.merge!(action: 'show', id: 'foo')
+      resource = CanCan::ControllerResource.new(controller, find_by: :name)
+      resource.load_resource
+      expect(controller.instance_variable_get(:@model)).to eq(model)
+    end
+
+    it 'loads resource using dynamic finder method' do
+      model = Model.new
+      allow(Model).to receive(:find_by_name!).with('foo') { model }
       params.merge!(action: 'show', id: 'foo')
       resource = CanCan::ControllerResource.new(controller, find_by: :name)
       resource.load_resource
@@ -577,26 +593,8 @@ describe CanCan::ControllerResource do
     expect(resource.send(:resource_class)).to eq(Section)
   end
 
-  it 'raises ImplementationRemoved when adding :name option' do
-    expect do
-      CanCan::ControllerResource.new(controller, name: :foo)
-    end.to raise_error(CanCan::ImplementationRemoved)
-  end
-
-  it 'raises ImplementationRemoved exception when specifying :resource option since it is no longer used' do
-    expect do
-      CanCan::ControllerResource.new(controller, resource: Model)
-    end.to raise_error(CanCan::ImplementationRemoved)
-  end
-
-  it 'raises ImplementationRemoved exception when passing :nested option' do
-    expect do
-      CanCan::ControllerResource.new(controller, nested: :model)
-    end.to raise_error(CanCan::ImplementationRemoved)
-  end
-
   it 'skips resource behavior for :only actions in array' do
-    allow(controller_class).to receive(:cancan_skipper) { { load: { nil => { only: [:index, :show] } } } }
+    allow(controller_class).to receive(:cancan_skipper) { { load: { nil => { only: %i[index show] } } } }
     params[:action] = 'index'
     expect(CanCan::ControllerResource.new(controller).skip?(:load)).to be(true)
     expect(CanCan::ControllerResource.new(controller, :some_resource).skip?(:load)).to be(false)
@@ -616,7 +614,7 @@ describe CanCan::ControllerResource do
   end
 
   it 'skips resource behavior :except actions in array' do
-    allow(controller_class).to receive(:cancan_skipper) { { load: { nil => { except: [:index, :show] } } } }
+    allow(controller_class).to receive(:cancan_skipper) { { load: { nil => { except: %i[index show] } } } }
     params[:action] = 'index'
     expect(CanCan::ControllerResource.new(controller).skip?(:load)).to be_falsey
     params[:action] = 'show'
@@ -641,5 +639,34 @@ describe CanCan::ControllerResource do
     resource = CanCan::ControllerResource.new(controller)
     expect { resource.load_and_authorize_resource }.not_to raise_error
     expect(controller.instance_variable_get(:@model)).to be_nil
+  end
+
+  context 'when model name is Action' do
+    let(:action_params) { HashWithIndifferentAccess.new(controller: 'actions') }
+    let(:action_controller_class) { Class.new }
+    let(:action_controller) { controller_class.new }
+    before :each do
+      class Action
+        attr_accessor :name
+
+        def initialize(attributes = {})
+          attributes.each do |attribute, value|
+            send("#{attribute}=", value)
+          end
+        end
+      end
+
+      allow(action_controller).to receive(:params) { action_params }
+      allow(action_controller).to receive(:current_ability) { ability }
+      allow(action_controller_class).to receive(:cancan_skipper) { { authorize: {}, load: {} } }
+    end
+
+    it 'builds a new resource with attributes from current ability' do
+      action_params[:action] = 'new'
+      ability.can(:create, Action, name: 'from conditions')
+      resource = CanCan::ControllerResource.new(action_controller)
+      resource.load_resource
+      expect(action_controller.instance_variable_get(:@action).name).to eq('from conditions')
+    end
   end
 end
