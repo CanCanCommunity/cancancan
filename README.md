@@ -172,6 +172,7 @@ If you want to ensure authorization happens on every action in your application,
 ```ruby
 class ApplicationController < ActionController::Base
   check_authorization
+  #   check_authorization unless :devise_controller? ## use this if using devise. Otherwise cancancan will check for authorisation before users have logged in etc.
 end
 ```
 
