@@ -1,3 +1,7 @@
+## Unreleased
+
+* [#444](https://github.com/CanCanCommunity/cancancan/issues/444): Allow to use symbols when defining conditions over enums. ([@s-mage][])
+
 ## 2.3.0 (Sep 16th, 2018)
 
 * [#528](https://github.com/CanCanCommunity/cancancan/issues/528): Compress irrelevant rules before generating a query to optimize performances. ([@coorasse][])
@@ -615,3 +619,4 @@
 [@oliverklee]: https://github.com/oliverklee
 [@gingray]: https://github.com/gingray
 [@timraymond]: https://github.com/timraymond
+[@s-mage]: https://github.com/s-mage
