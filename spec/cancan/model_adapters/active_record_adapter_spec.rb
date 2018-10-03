@@ -465,5 +465,67 @@ WHERE "articles"."published" = 'f' AND "articles"."secret" = 't'))
         expect(Article.accessible_by(ability)).to eq([a1])
       end
     end
+
+    context 'when STI is in use' do
+      before do
+        ActiveRecord::Schema.define do
+          create_table(:brands) do |t|
+            t.string :name
+          end
+
+          create_table(:vehicles) do |t|
+            t.references :brand
+            t.string :type
+          end
+        end
+
+        class Brand < ActiveRecord::Base
+          has_many :vehicles
+        end
+
+        class Vehicle < ActiveRecord::Base
+          belongs_to :brand
+        end
+
+        class Car < Vehicle
+        end
+
+        class Motorbike < Vehicle
+        end
+      end
+
+      it 'recognises rules applied to the base class' do
+        u1 = User.create!(name: 'pippo')
+
+        brand = Brand.create!
+        car = Car.create!(brand: brand)
+        motorbike = Motorbike.create!(brand: brand)
+
+        ability = Ability.new(u1)
+        ability.can :read, Vehicle
+        # puts Vehicle.accessible_by(ability)
+        expect(Vehicle.accessible_by(ability)).to eq([car, motorbike])
+        expect(Car.accessible_by(ability)).to eq([car])
+        expect(Motorbike.accessible_by(ability)).to eq([motorbike])
+      end
+
+      it 'recognises rules applied to subclasses' do
+        u1 = User.create!(name: 'pippo')
+
+        brand = Brand.create!
+        car = Car.create!(brand: brand)
+        motorbike = Motorbike.create!(brand: brand)
+
+        ability = Ability.new(u1)
+        ability.can :read, Car, id: 'Moto', pipi: '2'
+        # ability.can :read, Vehicle, type: 'Car'
+
+        puts Vehicle.accessible_by(ability).to_sql
+        expect(Vehicle.accessible_by(ability)).to eq([car])
+        expect(Car.accessible_by(ability)).to eq([car])
+        expect(Motorbike.accessible_by(ability)).to eq([])
+      end
+    end
+
   end
 end

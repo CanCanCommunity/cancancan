@@ -12,14 +12,14 @@ module CanCan
     # value. True for "can" and false for "cannot". The next two arguments are the action
     # and subject respectively (such as :read, @project). The third argument is a hash
     # of conditions and the last one is the block passed to the "can" call.
-    def initialize(base_behavior, action, subject, conditions, block)
+    def initialize(base_behavior, action, subjects, conditions, block)
       both_block_and_hash_error = 'You are not able to supply a block with a hash of conditions in '\
-                                  "#{action} #{subject} ability. Use either one."
+                                  "#{action} #{subjects} ability. Use either one."
       raise Error, both_block_and_hash_error if conditions.is_a?(Hash) && block
       @match_all = action.nil? && subject.nil?
       @base_behavior = base_behavior
       @actions = Array(action)
-      @subjects = Array(subject)
+      @subjects = subjects
       @conditions = conditions || {}
       @block = block
     end
@@ -39,7 +39,9 @@ module CanCan
     # Matches both the subject and action, not necessarily the conditions
     def relevant?(action, subject)
       subject = subject.values.first if subject.class == Hash
-      @match_all || (matches_action?(action) && matches_subject?(subject))
+      res = @match_all || (matches_action?(action) && matches_subject?(subject))
+      puts "is #{self} relevant for #{action}:#{subject}? #{res}"
+      res
     end
 
     def only_block?
@@ -47,6 +49,9 @@ module CanCan
     end
 
     def only_raw_sql?
+      puts "only raw sql?"
+      puts "ce: #{conditions_empty?}"
+      puts "ch: #{@conditions.is_a?(Hash)}"
       @block.nil? && !conditions_empty? && !@conditions.is_a?(Hash)
     end
 
@@ -73,6 +78,10 @@ module CanCan
         end
       end
       attributes
+    end
+
+    def to_s
+      "#{base_behavior ? 'can' : 'cannot'} #{actions.inspect} #{subjects.inspect} #{conditions.inspect}"
     end
 
     private

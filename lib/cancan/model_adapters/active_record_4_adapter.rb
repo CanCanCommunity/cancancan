@@ -2,6 +2,18 @@ module CanCan
   module ModelAdapters
     class ActiveRecord4Adapter < AbstractAdapter
       include ActiveRecordAdapter
+
+      def self.revamp(subject, conditions)
+        puts 'revamp'
+        puts conditions.inspect
+        sti = !subject.descends_from_active_record?
+        if sti
+          [subject.base_class, { type: subject.sti_name }.merge(conditions.to_h)]
+        else
+          [subject, conditions]
+        end
+      end
+
       def self.for_class?(model_class)
         ActiveRecord::VERSION::MAJOR == 4 && model_class <= ActiveRecord::Base
       end
@@ -32,6 +44,7 @@ module CanCan
       # you're using in the where. Instead, `references()` is required
       # in addition to `includes()` to force the outer join.
       def build_relation(*where_conditions)
+        puts where_conditions.inspect
         relation = @model_class.where(*where_conditions)
         relation = relation.includes(joins).references(joins) if joins.present?
         relation

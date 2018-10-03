@@ -12,6 +12,7 @@ module CanCan
       private
 
       def add_rule(rule)
+        puts "adding rule: #{rule}"
         rules << rule
         add_rule_to_index(rule, rules.size - 1)
       end
@@ -19,12 +20,17 @@ module CanCan
       def add_rule_to_index(rule, position)
         @rules_index ||= Hash.new { |h, k| h[k] = [] }
 
-        subjects = rule.subjects.compact
+        subjects = extract_subjects_from_rule(rule)
         subjects << :all if subjects.empty?
 
         subjects.each do |subject|
+          puts "adding #{position} to #{subject}"
           @rules_index[subject] << position
         end
+      end
+
+      def extract_subjects_from_rule(rule)
+        rule.subjects.compact
       end
 
       # Returns an array of Rule instances which match the action and subject
@@ -37,10 +43,13 @@ module CanCan
         end
         relevant.reverse!.uniq!
         optimize_order! relevant
+        puts "found some relevant rules for #{action}##{subject}: #{relevant}"
         relevant
       end
 
       def possible_relevant_rules(subject)
+        puts "rules index"
+        # puts JSON.pretty_generate(@rules_index)
         if subject.is_a?(Hash)
           rules
         else
@@ -55,7 +64,8 @@ module CanCan
           next unless rule.only_raw_sql?
           raise Error,
                 "The can? and cannot? call cannot be used with a raw sql 'can' definition."\
-              " The checking code cannot be determined for #{action.inspect} #{subject.inspect}"
+              " The checking code cannot be determined for #{action.inspect} #{subject.inspect}."\
+              " The rule responsible of the issue is #{rule}"
         end
       end
 

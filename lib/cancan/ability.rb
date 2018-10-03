@@ -134,8 +134,19 @@ module CanCan
     #     # check the database and return true/false
     #   end
     #
-    def can(action = nil, subject = nil, conditions = nil, &block)
-      add_rule(Rule.new(true, action, subject, conditions, block))
+    def can(action = nil, subjects = nil, conditions = nil, &block)
+      puts 'conditions.inspect'
+      puts conditions.inspect
+      revamped = Array(subjects).map do |subject|
+        r, s = adapter_class(subject).revamp(subject, conditions)
+        puts 'r'
+        puts r
+        puts s
+        [r, s]
+      end
+      # puts "revamped subjects: #{revamped_subjects.inspect}"
+      # puts "revamped conditions: #{revamped_conditions.inspect}"
+      add_rule(Rule.new(true, action, revamped.map(&:first), revamped.map(&:second), block))
     end
 
     # Defines an ability which cannot be done. Accepts the same arguments as "can".
@@ -161,7 +172,7 @@ module CanCan
     end
 
     def model_adapter(model_class, action)
-      adapter_class = ModelAdapters::AbstractAdapter.adapter_class(model_class)
+      adapter_class = adapter_class(model_class)
       adapter_class.new(model_class, relevant_rules_for_query(action, model_class))
     end
 
@@ -256,6 +267,10 @@ module CanCan
     end
 
     private
+
+    def adapter_class(model_class)
+      ModelAdapters::AbstractAdapter.adapter_class(model_class)
+    end
 
     def unauthorized_message_keys(action, subject)
       subject = (subject.class == Class ? subject : subject.class).name.underscore unless subject.is_a? Symbol

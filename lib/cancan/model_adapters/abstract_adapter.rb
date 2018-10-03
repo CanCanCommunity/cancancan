@@ -51,6 +51,10 @@ module CanCan
         # This should be overridden in a subclass to return records which match @rules
         raise NotImplemented, 'This model adapter does not support fetching records from the database.'
       end
+
+      def self.revamp(subject, conditions)
+        [subject, conditions]
+      end
     end
   end
 end
