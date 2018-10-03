@@ -384,14 +384,8 @@ module CanCan
   end
 end
 
-if defined? ActionController::Base
-  ActionController::Base.class_eval do
-    include CanCan::ControllerAdditions
-  end
-end
-
-if defined? ActionController::API
-  ActionController::API.class_eval do
+if defined? ActiveSupport
+  ActiveSupport.on_load(:action_controller) do
     include CanCan::ControllerAdditions
   end
 end
