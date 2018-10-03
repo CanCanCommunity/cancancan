@@ -12,6 +12,7 @@ Kernel.const_get(rspec_module)::Matchers.define :be_able_to do |*args|
     actions = args.first
     if actions.is_a? Array
       break false if actions.empty?
+
       actions.all? { |action| ability.can?(action, *args[1..-1]) }
     else
       ability.can?(*args)

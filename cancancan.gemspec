@@ -1,6 +1,4 @@
-# coding: utf-8
-
-lib = File.expand_path('../lib', __FILE__)
+lib = File.expand_path('lib', __dir__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'cancan/version'
 
@@ -20,9 +18,9 @@ Gem::Specification.new do |s|
 
   s.required_ruby_version = '>= 2.2.0'
 
+  s.add_development_dependency 'appraisal', '~> 2.0', '>= 2.0.0'
   s.add_development_dependency 'bundler', '~> 1.3'
-  s.add_development_dependency 'rubocop', '~> 0.48.1'
   s.add_development_dependency 'rake', '~> 10.1', '>= 10.1.1'
   s.add_development_dependency 'rspec', '~> 3.2', '>= 3.2.0'
-  s.add_development_dependency 'appraisal', '~> 2.0', '>= 2.0.0'
+  s.add_development_dependency 'rubocop', '~> 0.59.2'
 end

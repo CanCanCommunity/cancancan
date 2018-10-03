@@ -27,7 +27,7 @@ Metrics/BlockLength:
 # NamePrefix: is_, has_, have_
 # NamePrefixBlacklist: is_, has_, have_
 # NameWhitelist: is_a?
-Style/PredicateName:
+Naming/PredicateName:
   Exclude:
     - 'spec/**/*'
     - 'lib/cancan/ability.rb'
@@ -35,7 +35,6 @@ Style/PredicateName:
 # TODO
 Lint/AmbiguousBlockAssociation:
   Enabled: false
-
 
 AllCops:
   TargetRubyVersion: 2.2.0
