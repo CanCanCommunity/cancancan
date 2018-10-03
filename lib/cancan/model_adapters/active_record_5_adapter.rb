@@ -42,14 +42,14 @@ module CanCan
           .join(' AND ')
       end
 
-      def visit_nodes(b)
+      def visit_nodes(node)
         # Rails 5.2 adds a BindParam node that prevents the visitor method from properly compiling the SQL query
         if ActiveRecord::VERSION::MINOR >= 2
           connection = @model_class.send(:connection)
           collector = Arel::Collectors::SubstituteBinds.new(connection, Arel::Collectors::SQLString.new)
-          connection.visitor.accept(b, collector).value
+          connection.visitor.accept(node, collector).value
         else
-          @model_class.send(:connection).visitor.compile(b)
+          @model_class.send(:connection).visitor.compile(node)
         end
       end
     end

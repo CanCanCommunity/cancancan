@@ -7,12 +7,10 @@ require 'matchers'
 require 'cancan/matchers'
 
 # I8n setting to fix deprecation.
-if defined?(I18n) && I18n.respond_to?('enforce_available_locales=')
-  I18n.enforce_available_locales = false
-end
+I18n.enforce_available_locales = false if defined?(I18n) && I18n.respond_to?('enforce_available_locales=')
 
 # Add support to load paths
-$LOAD_PATH.unshift File.expand_path('../support', __FILE__)
+$LOAD_PATH.unshift File.expand_path('support', __dir__)
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }
 
 RSpec.configure do |config|
