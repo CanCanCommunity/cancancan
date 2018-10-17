@@ -6,12 +6,12 @@
 [![Travis badge](https://travis-ci.org/CanCanCommunity/cancancan.svg?branch=develop)](https://travis-ci.org/CanCanCommunity/cancancan)
 [![Code Climate Badge](https://codeclimate.com/github/CanCanCommunity/cancancan.svg)](https://codeclimate.com/github/CanCanCommunity/cancancan)
 
-[Wiki](https://github.com/CanCanCommunity/cancancan/wiki) | 
-[RDocs](http://rdoc.info/projects/CanCanCommunity/cancancan) | 
+[Wiki](https://github.com/CanCanCommunity/cancancan/wiki) |
+[RDocs](http://rdoc.info/projects/CanCanCommunity/cancancan) |
 [Screencast 1](http://railscasts.com/episodes/192-authorization-with-cancan) |
 [Screencast 2](https://www.youtube.com/watch?v=cTYu-OjUgDw)
 
-CanCanCan is an authorization library for Ruby >= 2.2.0 and Ruby on Rails >= 4.2 which restricts what resources a given user is allowed to access. 
+CanCanCan is an authorization library for Ruby >= 2.2.0 and Ruby on Rails >= 4.2 which restricts what resources a given user is allowed to access.
 
 All permissions can be defined in one or multiple ability files and not duplicated across controllers, views, and database queries, keeping your permissions logic in one place.
 
@@ -24,16 +24,16 @@ of models for you in the controllers.
 
 ## Installation
 
-Add this to your Gemfile: 
+Add this to your Gemfile:
 
     gem 'cancancan', '~> 2.0'
-    
+
 and run the `bundle install` command.
 
 For Rails < 4.2 use:
 
     gem 'cancancan', '~> 1.10'
-   
+
 ## Getting Started
 
 ### 1. Define Abilities
@@ -76,8 +76,8 @@ end
 
 ### 3.1 Loaders
 
-Setting this for every action can be tedious, therefore the `load_and_authorize_resource` method is provided to 
-automatically authorize all actions in a RESTful style resource controller. 
+Setting this for every action can be tedious, therefore the `load_and_authorize_resource` method is provided to
+automatically authorize all actions in a RESTful style resource controller.
 It will use a before action to load the resource into an instance variable and authorize it for every action.
 
 ```ruby
@@ -115,7 +115,7 @@ def update_params
 end
 ```
 
-For the `:create` action, CanCanCan will try to initialize a new instance with sanitized input by seeing if your 
+For the `:create` action, CanCanCan will try to initialize a new instance with sanitized input by seeing if your
 controller will respond to the following methods (in order):
 
 1. `create_params`
@@ -146,7 +146,7 @@ class ArticlesController < ApplicationController
 end
 ```
 
-You can also use a string that will be evaluated in the context of the controller using `instance_eval` and needs to contain valid Ruby code. 
+You can also use a string that will be evaluated in the context of the controller using `instance_eval` and needs to contain valid Ruby code.
 
     load_and_authorize_resource param_method: 'permitted_params.article'
 
@@ -158,7 +158,7 @@ See [Strong Parameters](https://github.com/CanCanCommunity/cancancan/wiki/Strong
 
 ### 4. Handle Unauthorized Access
 
-If the user authorization fails, a `CanCan::AccessDenied` exception will be raised. 
+If the user authorization fails, a `CanCan::AccessDenied` exception will be raised.
 You can catch this and modify its behavior in the `ApplicationController`.
 
 ```ruby
@@ -186,19 +186,38 @@ class ApplicationController < ActionController::Base
 end
 ```
 
-This will raise an exception if authorization is not performed in an action. 
-If you want to skip this, add `skip_authorization_check` to a controller subclass. 
+This will raise an exception if authorization is not performed in an action.
+If you want to skip this, add `skip_authorization_check` to a controller subclass.
 See [Ensure Authorization](https://github.com/CanCanCommunity/cancancan/wiki/Ensure-Authorization) for more information.
 
 ## Version 2.0
 
-Version 2.0 drops support for Mongoid and Sequel. 
+Version 2.0 drops support for Mongoid and Sequel.
 
 Please use `gem 'cancancan', '~> 1.10'` for them.
 
 If you are interested in supporting them, contribute to the sibling gems `cancancan-sequel` and `cancancan-mongoid`.
 
 Version 2.0 drops also support for Rails < 4.2 and ruby < 2.2 so, again, use the version 1 of the Gem for these.
+
+## Rails API mode
+To use this gem in rails api mode, you need to make the following changes:
+
+#### Include ControllerAdditions in ApplicationController
+
+```ruby
+class ApplicationController < ActionController::API
+  include CanCan::ControllerAdditions
+end
+```
+
+#### Use json as default format for access denied exception
+
+```ruby
+rescue_from CanCan::AccessDenied do |exception|
+  render json: { message: exception.message }, status: 403
+end
+```
 
 
 ## Wiki Docs
@@ -212,8 +231,8 @@ Version 2.0 drops also support for Rails < 4.2 and ruby < 2.2 so, again, use the
 
 ## Mission
 
-This repo is a continuation of the dead [CanCan](https://github.com/ryanb/cancan) project. 
-Our mission is to keep CanCan alive and moving forward, with maintenance fixes and new features. 
+This repo is a continuation of the dead [CanCan](https://github.com/ryanb/cancan) project.
+Our mission is to keep CanCan alive and moving forward, with maintenance fixes and new features.
 Pull Requests are welcome!
 
 Any help is greatly appreciated, feel free to submit pull-requests or open issues.
@@ -221,10 +240,10 @@ Any help is greatly appreciated, feel free to submit pull-requests or open issue
 
 ## Questions?
 
-If you have any question or doubt regarding CanCanCan which you cannot find the solution to in the 
-[documentation](https://github.com/CanCanCommunity/cancancan/wiki) or our 
-[mailing list](http://groups.google.com/group/cancancan), please 
-[open a question on Stackoverflow](http://stackoverflow.com/questions/ask?tags=cancancan) with tag 
+If you have any question or doubt regarding CanCanCan which you cannot find the solution to in the
+[documentation](https://github.com/CanCanCommunity/cancancan/wiki) or our
+[mailing list](http://groups.google.com/group/cancancan), please
+[open a question on Stackoverflow](http://stackoverflow.com/questions/ask?tags=cancancan) with tag
 [cancancan](http://stackoverflow.com/questions/tagged/cancancan)
 
 ## Bugs?
@@ -234,14 +253,14 @@ If you find a bug please add an [issue on GitHub](https://github.com/CanCanCommu
 
 ## Development
 
-CanCanCan uses [appraisals](https://github.com/thoughtbot/appraisal) to test the code base against multiple versions 
+CanCanCan uses [appraisals](https://github.com/thoughtbot/appraisal) to test the code base against multiple versions
 of Rails, as well as the different model adapters.
 
 When first developing, you need to run `bundle install` and then `appraisal install`, to install the different sets.
 
 You can then run all appraisal files (like CI does), with `appraisal rake` or just run a specific set `appraisal activerecord_5.0 rake`.
 
-See the [CONTRIBUTING](https://github.com/CanCanCommunity/cancancan/blob/develop/CONTRIBUTING.md) and 
+See the [CONTRIBUTING](https://github.com/CanCanCommunity/cancancan/blob/develop/CONTRIBUTING.md) and
 [spec/README](https://github.com/CanCanCommunity/cancancan/blob/master/spec/README.rdoc) for more information.
 
 
@@ -251,10 +270,8 @@ See the [CONTRIBUTING](https://github.com/CanCanCommunity/cancancan/blob/develop
 
 Thanks to [Renuo AG](https://www.renuo.ch) for currently maintaining and supporting the project.
 
-Also many thanks to the [CanCanCan contributors](https://github.com/CanCanCommunity/cancancan/contributors). 
+Also many thanks to the [CanCanCan contributors](https://github.com/CanCanCommunity/cancancan/contributors).
 See the [CHANGELOG](https://github.com/CanCanCommunity/cancancan/blob/master/CHANGELOG.rdoc) for the full list.
 
-CanCanCan was inspired by [declarative_authorization](https://github.com/stffn/declarative_authorization/) and 
-[aegis](https://github.com/makandra/aegis). 
-
-
+CanCanCan was inspired by [declarative_authorization](https://github.com/stffn/declarative_authorization/) and
+[aegis](https://github.com/makandra/aegis).
