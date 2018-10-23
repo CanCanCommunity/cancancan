@@ -491,7 +491,7 @@ describe CanCan::Ability do
     expect(@ability).to have_raw_sql(:read, :foo)
   end
 
-  it 'determines model adapterO class by asking AbstractAdapter' do
+  it 'determines model adapter class by asking AbstractAdapter' do
     adapter_class = double
     model_class = double
     allow(CanCan::ModelAdapters::AbstractAdapter).to receive(:adapter_class).with(model_class) { adapter_class }
