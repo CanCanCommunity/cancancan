@@ -10,6 +10,9 @@
 [RDocs](http://rdoc.info/projects/CanCanCommunity/cancancan) | 
 [Screencast 1](http://railscasts.com/episodes/192-authorization-with-cancan) |
 [Screencast 2](https://www.youtube.com/watch?v=cTYu-OjUgDw)
+[![Backers on Open Collective](https://opencollective.com/cancancan/backers/badge.svg)](#backers)
+
+ [![Sponsors on Open Collective](https://opencollective.com/cancancan/sponsors/badge.svg)](#sponsors) 
 
 CanCanCan is an authorization library for Ruby >= 2.2.0 and Ruby on Rails >= 4.2 which restricts what resources a given user is allowed to access. 
 
@@ -243,6 +246,28 @@ You can then run all appraisal files (like CI does), with `appraisal rake` or ju
 
 See the [CONTRIBUTING](https://github.com/CanCanCommunity/cancancan/blob/develop/CONTRIBUTING.md) and 
 [spec/README](https://github.com/CanCanCommunity/cancancan/blob/master/spec/README.rdoc) for more information.
+
+## Credits
+
+### Contributors
+
+This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
+
+<a href="graphs/contributors"><img src="https://opencollective.com/cancancan/contributors.svg?width=890&button=false" /></a>
+
+### Backers
+
+Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com/cancancan#backer)]
+
+<a href="https://opencollective.com/cancancan#backers" target="_blank"><img src="https://opencollective.com/cancancan/backers.svg?width=890"></a>
+
+### Sponsors
+
+Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [[Become a sponsor](https://opencollective.com/cancancan#sponsor)]
+
+<a href="https://opencollective.com/cancancan/sponsor/0/website" target="_blank"><img src="https://opencollective.com/cancancan/sponsor/0/avatar.svg"></a>
+
+
 
 
 ## Special Thanks
