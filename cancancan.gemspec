@@ -20,7 +20,7 @@ Gem::Specification.new do |s|
 
   s.required_ruby_version = '>= 2.2.0'
 
-  s.add_development_dependency 'bundler', '~> 1.3'
+  s.add_development_dependency 'bundler', '~> 2.0'
   s.add_development_dependency 'rubocop', '~> 0.48.1'
   s.add_development_dependency 'rake', '~> 10.1', '>= 10.1.1'
   s.add_development_dependency 'rspec', '~> 3.2', '>= 3.2.0'
