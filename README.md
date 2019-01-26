@@ -203,7 +203,6 @@ Version 2.0 drops also support for Rails < 4.2 and ruby < 2.2 so, again, use the
 
 ## Wiki Docs
 
-* [Upgrading to 1.6](https://github.com/CanCanCommunity/cancancan/wiki/Upgrading-to-1.6)
 * [Defining Abilities](https://github.com/CanCanCommunity/cancancan/wiki/Defining-Abilities)
 * [Checking Abilities](https://github.com/CanCanCommunity/cancancan/wiki/Checking-Abilities)
 * [Authorizing Controller Actions](https://github.com/CanCanCommunity/cancancan/wiki/Authorizing-Controller-Actions)
@@ -253,7 +252,7 @@ See the [CONTRIBUTING](https://github.com/CanCanCommunity/cancancan/blob/develop
 Thanks to [Renuo AG](https://www.renuo.ch) for currently maintaining and supporting the project.
 
 Also many thanks to the [CanCanCan contributors](https://github.com/CanCanCommunity/cancancan/contributors). 
-See the [CHANGELOG](https://github.com/CanCanCommunity/cancancan/blob/master/CHANGELOG.rdoc) for the full list.
+See the [CHANGELOG](https://github.com/CanCanCommunity/cancancan/blob/master/CHANGELOG.md) for the full list.
 
 CanCanCan was inspired by [declarative_authorization](https://github.com/stffn/declarative_authorization/) and 
 [aegis](https://github.com/makandra/aegis). 

@@ -2,12 +2,13 @@ language: ruby
 cache: bundler
 sudo: false
 rvm:
-  - 2.2.8
   - 2.3.5
   - 2.4.2
   - 2.5.0
-  - jruby-9.0.5.0
+  - 2.5.1
+  - 2.6.0
   - jruby-9.1.9.0
+  - jruby-9.2.5.0
 gemfile:
   - gemfiles/activerecord_4.2.gemfile
   - gemfiles/activerecord_5.0.2.gemfile
@@ -18,34 +19,22 @@ services:
 matrix:
   fast_finish: true
   exclude:
-    - rvm: 2.2.0
-      gemfile: gemfiles/activerecord_5.0.2.gemfile
-    - rvm: 2.2.0
-      gemfile: gemfiles/activerecord_5.1.0.gemfile
-    - rvm: 2.2.7
-      gemfile: gemfiles/activerecord_5.0.2.gemfile
-    - rvm: 2.2.7
-      gemfile: gemfiles/activerecord_5.1.0.gemfile
-    - rvm: jruby-9.0.5.0
-      gemfile: gemfiles/activerecord_5.0.2.gemfile
     - rvm: jruby-9.1.9.0
       gemfile: gemfiles/activerecord_5.0.2.gemfile
-    - rvm: jruby-9.0.5.0
-      gemfile: gemfiles/activerecord_5.1.0.gemfile
     - rvm: jruby-9.1.9.0
       gemfile: gemfiles/activerecord_5.1.0.gemfile
-    - rvm: jruby-9.0.5.0
-      gemfile: gemfiles/activerecord_5.2.0.gemfile
     - rvm: jruby-9.1.9.0
       gemfile: gemfiles/activerecord_5.2.0.gemfile
+    - rvm: jruby-9.2.5.0
+      gemfile: gemfiles/activerecord_5.0.2.gemfile
 notifications:
   email:
     recipients:
       - alessandro.rodi@renuo.ch
-      - josua.schmid@renuo.ch
     on_success: change
     on_failure: change
 before_install:
   - gem update --system
+  - gem install bundler
 script:
   - bundle exec rubocop && bundle exec rake

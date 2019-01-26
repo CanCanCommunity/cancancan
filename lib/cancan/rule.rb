@@ -24,6 +24,18 @@ module CanCan
       @block = block
     end
 
+    def can_rule?
+      base_behavior
+    end
+
+    def cannot_catch_all?
+      !can_rule? && catch_all?
+    end
+
+    def catch_all?
+      [nil, false, [], {}, '', ' '].include? @conditions
+    end
+
     # Matches both the subject and action, not necessarily the conditions
     def relevant?(action, subject)
       subject = subject.values.first if subject.class == Hash

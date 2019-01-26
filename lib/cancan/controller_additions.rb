@@ -225,7 +225,7 @@ module CanCan
         cancan_skipper[:authorize][name] = options
       end
 
-      # Add this to a controller to ensure it performs authorization through +authorized+! or +authorize_resource+ call.
+      # Add this to a controller to ensure it performs authorization through +authorize+! or +authorize_resource+ call.
       # If neither of these authorization methods are called,
       # a CanCan::AuthorizationNotPerformed exception will be raised.
       # This is normally added to the ApplicationController to ensure all controller actions do authorization.
@@ -384,6 +384,8 @@ module CanCan
   end
 end
 
-ActiveSupport.on_load(:action_controller) do
-  include CanCan::ControllerAdditions
+if defined? ActiveSupport
+  ActiveSupport.on_load(:action_controller) do
+    include CanCan::ControllerAdditions
+  end
 end

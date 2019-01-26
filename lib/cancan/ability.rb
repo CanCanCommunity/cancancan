@@ -202,12 +202,13 @@ module CanCan
       relevant_rules(action, subject).any?(&:only_raw_sql?)
     end
 
-    # Copies all rules of the given +CanCan::Ability+ and adds them to +self+.
+    # Copies all rules and aliased actions of the given +CanCan::Ability+ and adds them to +self+.
     #   class ReadAbility
     #     include CanCan::Ability
     #
     #     def initialize
     #       can :read, User
+    #       alias_action :show, :index, to: :see
     #     end
     #   end
     #
@@ -216,6 +217,7 @@ module CanCan
     #
     #     def initialize
     #       can :edit, User
+    #       alias_action :create, :update, to: :modify
     #     end
     #   end
     #
@@ -223,11 +225,35 @@ module CanCan
     #   read_ability.can? :edit, User.new #=> false
     #   read_ability.merge(WritingAbility.new)
     #   read_ability.can? :edit, User.new #=> true
+    #   read_ability.aliased_actions #=> [:see => [:show, :index], :modify => [:create, :update]]
     #
+    # If there are collisions when merging the +aliased_actions+, the actions on +self+ will be
+    # overwritten.
+    #
+    # class ReadAbility
+    #   include CanCan::Ability
+    #
+    #   def initialize
+    #     alias_action :show, :index, to: :see
+    #   end
+    # end
+    #
+    # class ShowAbility
+    #   include CanCan::Ability
+    #
+    #   def initialize
+    #     alias_action :show, to: :see
+    #   end
+    # end
+    #
+    # read_ability = ReadAbility.new
+    # read_ability.merge(ShowAbility)
+    # read_ability.aliased_actions #=> [:see => [:show]]
     def merge(ability)
       ability.rules.each do |rule|
         add_rule(rule.dup)
       end
+      @aliased_actions = aliased_actions.merge(ability.aliased_actions)
       self
     end
 
