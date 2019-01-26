@@ -8,7 +8,7 @@ module CanCan
   # Raised when removed code is called, an alternative solution is provided in message.
   class ImplementationRemoved < Error; end
 
-  # Raised when using check_authorization without calling authorized!
+  # Raised when using check_authorization without calling authorize!
   class AuthorizationNotPerformed < Error; end
 
   # Raised when using a wrong association name
@@ -33,7 +33,7 @@ module CanCan
   #   exception.default_message = "Default error message"
   #   exception.message # => "Default error message"
   #
-  # See ControllerAdditions#authorized! for more information on rescuing from this exception
+  # See ControllerAdditions#authorize! for more information on rescuing from this exception
   # and customizing the message using I18n.
   class AccessDenied < Error
     attr_reader :action, :subject, :conditions

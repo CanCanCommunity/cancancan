@@ -491,7 +491,7 @@ describe CanCan::Ability do
     expect(@ability).to have_raw_sql(:read, :foo)
   end
 
-  it 'determines model adapterO class by asking AbstractAdapter' do
+  it 'determines model adapter class by asking AbstractAdapter' do
     adapter_class = double
     model_class = double
     allow(CanCan::ModelAdapters::AbstractAdapter).to receive(:adapter_class).with(model_class) { adapter_class }
@@ -562,6 +562,35 @@ describe CanCan::Ability do
       @ability.merge(another_ability)
       expect(@ability.can?(:use, :search)).to be(true)
       expect(@ability.send(:rules).size).to eq(2)
+    end
+
+    it 'adds the aliased actions from the given ability' do
+      @ability.alias_action :show, to: :see
+      (another_ability = double).extend(CanCan::Ability)
+      another_ability.alias_action :create, :update, to: :manage
+
+      @ability.merge(another_ability)
+      expect(@ability.aliased_actions).to eq(
+        read: %i[index show],
+        create: %i[new],
+        update: %i[edit],
+        manage: %i[create update],
+        see: %i[show]
+      )
+    end
+
+    it 'overwrittes the aliased actions with the value from the given ability' do
+      @ability.alias_action :show, :index, to: :see
+      (another_ability = double).extend(CanCan::Ability)
+      another_ability.alias_action :show, to: :see
+
+      @ability.merge(another_ability)
+      expect(@ability.aliased_actions).to eq(
+        read: %i[index show],
+        create: %i[new],
+        update: %i[edit],
+        see: %i[show]
+      )
     end
 
     it 'can add an empty ability' do
