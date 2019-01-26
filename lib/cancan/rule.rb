@@ -16,6 +16,7 @@ module CanCan
       both_block_and_hash_error = 'You are not able to supply a block with a hash of conditions in '\
                                   "#{action} #{subject} ability. Use either one."
       raise Error, both_block_and_hash_error if conditions.is_a?(Hash) && block
+
       @match_all = action.nil? && subject.nil?
       @base_behavior = base_behavior
       @actions = Array(action)

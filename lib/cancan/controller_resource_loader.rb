@@ -11,6 +11,7 @@ module CanCan
 
     def load_resource
       return if skip?(:load)
+
       if load_instance?
         self.resource_instance ||= load_resource_instance
       elsif load_collection?
@@ -26,6 +27,7 @@ module CanCan
 
     def resource_params_by_key(key)
       return unless @options[key] && @params.key?(extract_key(@options[key]))
+
       @params[extract_key(@options[key])]
     end
 
