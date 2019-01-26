@@ -1,9 +1,10 @@
 module CanCan
   module ModelAdapters
-    class ActiveRecord4Adapter < AbstractAdapter
-      include ActiveRecordAdapter
+    class ActiveRecord4Adapter < ActiveRecordAdapter
+      AbstractAdapter.inherited(self)
+
       def self.for_class?(model_class)
-        ActiveRecord::VERSION::MAJOR == 4 && model_class <= ActiveRecord::Base
+        version_lower?('5.0.0') && model_class <= ActiveRecord::Base
       end
 
       # TODO: this should be private
@@ -39,7 +40,7 @@ module CanCan
 
       # Rails 4.2 deprecates `sanitize_sql_hash_for_conditions`
       def sanitize_sql(conditions)
-        if ActiveRecord::VERSION::MINOR >= 2 && conditions.is_a?(Hash)
+        if self.class.version_greater_or_equal?('4.2.0') && conditions.is_a?(Hash)
           sanitize_sql_activerecord4(conditions)
         else
           @model_class.send(:sanitize_sql, conditions)

@@ -22,7 +22,7 @@ module CanCan
 
       def subject_class?(subject)
         klass = (subject.is_a?(Hash) ? subject.values.first : subject).class
-        klass == Class || klass == Module
+        [Class, Module].include? klass
       end
 
       def get_attributes(rule, subject)

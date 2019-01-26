@@ -1,10 +1,15 @@
-require_relative 'can_can/model_adapters/active_record_adapter/joins.rb'
 require_relative 'conditions_extractor.rb'
 require 'cancan/rules_compressor'
 module CanCan
   module ModelAdapters
-    module ActiveRecordAdapter
-      include CanCan::ModelAdapters::ActiveRecordAdapter::Joins
+    class ActiveRecordAdapter < AbstractAdapter
+      def self.version_greater_or_equal?(version)
+        Gem::Version.new(ActiveRecord.version).release >= Gem::Version.new(version)
+      end
+
+      def self.version_lower?(version)
+        Gem::Version.new(ActiveRecord.version).release < Gem::Version.new(version)
+      end
 
       # Returns conditions intended to be used inside a database query. Normally you will not call this
       # method directly, but instead go through ModelAdditions#accessible_by.
@@ -48,7 +53,37 @@ module CanCan
         end
       end
 
+      # Returns the associations used in conditions for the :joins option of a search.
+      # See ModelAdditions#accessible_by
+      def joins
+        joins_hash = {}
+        @rules.reverse_each do |rule|
+          merge_joins(joins_hash, rule.associations_hash)
+        end
+        clean_joins(joins_hash) unless joins_hash.empty?
+      end
+
       private
+
+      # Removes empty hashes and moves everything into arrays.
+      def clean_joins(joins_hash)
+        joins = []
+        joins_hash.each do |name, nested|
+          joins << (nested.empty? ? name : { name => clean_joins(nested) })
+        end
+        joins
+      end
+
+      # Takes two hashes and does a deep merge.
+      def merge_joins(base, add)
+        add.each do |name, nested|
+          if base[name].is_a?(Hash)
+            merge_joins(base[name], nested) unless nested.empty?
+          else
+            base[name] = nested
+          end
+        end
+      end
 
       def mergeable_conditions?
         @rules.find(&:unmergeable?).blank?
