@@ -1,3 +1,7 @@
+## Unreleased
+
+* [#538](https://github.com/CanCanCommunity/cancancan/issues/538): Merge alias actions when merging abilities. ([@Jcambass][])
+
 ## 2.3.0 (Sep 16th, 2018)
 
 * [#528](https://github.com/CanCanCommunity/cancancan/issues/528): Compress irrelevant rules before generating a query to optimize performances. ([@coorasse][])
@@ -615,3 +619,4 @@
 [@oliverklee]: https://github.com/oliverklee
 [@gingray]: https://github.com/gingray
 [@timraymond]: https://github.com/timraymond
+[@Jcambass]: https://github.com/Jcambass
