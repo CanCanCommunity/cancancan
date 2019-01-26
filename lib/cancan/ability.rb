@@ -269,7 +269,7 @@ module CanCan
     #   }
     def permissions
       permissions_list = {
-        can:    Hash.new { |actions, k1| actions[k1] = Hash.new { |subjects, k2| subjects[k2] = [] } },
+        can: Hash.new { |actions, k1| actions[k1] = Hash.new { |subjects, k2| subjects[k2] = [] } },
         cannot: Hash.new { |actions, k1| actions[k1] = Hash.new { |subjects, k2| subjects[k2] = [] } }
       }
       rules.each { |rule| extract_rule_in_permissions(permissions_list, rule) }

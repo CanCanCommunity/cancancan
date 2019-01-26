@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-if defined? CanCan::ModelAdapters::ActiveRecord4Adapter
+if CanCan::ModelAdapters::ActiveRecordAdapter.version_lower?('5.0.0')
   describe CanCan::ModelAdapters::ActiveRecord4Adapter do
     context 'with sqlite3' do
       before :each do
@@ -39,7 +39,7 @@ if defined? CanCan::ModelAdapters::ActiveRecord4Adapter
           .to eq [child2, child1]
       end
 
-      if ActiveRecord::VERSION::MINOR >= 1 || ActiveRecord::VERSION::MAJOR >= 5
+      if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('4.1.0')
         it 'allows filters on enums' do
           ActiveRecord::Schema.define do
             create_table(:shapes) do |t|

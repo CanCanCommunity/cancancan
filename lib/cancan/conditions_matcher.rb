@@ -5,6 +5,7 @@ module CanCan
       return call_block_with_all(action, subject, extra_args) if @match_all
       return matches_block_conditions(subject, attribute, *extra_args) if @block
       return matches_non_block_conditions(subject) unless conditions_empty?
+
       true
     end
 
@@ -17,12 +18,14 @@ module CanCan
 
     def matches_block_conditions(subject, *extra_args)
       return @base_behavior if subject_class?(subject)
+
       @block.call(subject, *extra_args)
     end
 
     def matches_non_block_conditions(subject)
       return nested_subject_matches_conditions?(subject) if subject.class == Hash
       return matches_conditions_hash?(subject) unless subject_class?(subject)
+
       # Don't stop at "cannot" definitions when there are conditions.
       @base_behavior
     end

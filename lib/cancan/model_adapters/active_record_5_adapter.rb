@@ -4,7 +4,7 @@ module CanCan
       AbstractAdapter.inherited(self)
 
       def self.for_class?(model_class)
-        ActiveRecord::VERSION::MAJOR == 5 && model_class <= ActiveRecord::Base
+        version_greater_or_equal?('5.0.0') && model_class <= ActiveRecord::Base
       end
 
       # rails 5 is capable of using strings in enum
@@ -51,7 +51,7 @@ module CanCan
 
       def visit_nodes(node)
         # Rails 5.2 adds a BindParam node that prevents the visitor method from properly compiling the SQL query
-        if ActiveRecord::VERSION::MINOR >= 2
+        if self.class.version_greater_or_equal?('5.2.0')
           connection = @model_class.send(:connection)
           collector = Arel::Collectors::SubstituteBinds.new(connection, Arel::Collectors::SQLString.new)
           connection.visitor.accept(node, collector).value

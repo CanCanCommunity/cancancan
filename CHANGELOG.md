@@ -1,5 +1,6 @@
 ## Unreleased
 
+* [#560](https://github.com/CanCanCommunity/cancancan/pull/560): Add support for Rails 6.0. ([@coorasse][])
 * [#489](https://github.com/CanCanCommunity/cancancan/pull/489): Drop support for actions without a subject. ([@andrew-aladev][])
 * [#474](https://github.com/CanCanCommunity/cancancan/pull/474): Allow to add attribute-level rules. ([@phaedryx][])
 * [#512](https://github.com/CanCanCommunity/cancancan/pull/512): Removed eager loading of associations for ActiveRecord 5. ([@kaspernj][])

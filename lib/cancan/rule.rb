@@ -20,6 +20,7 @@ module CanCan
       condition_and_block_check(extra_args, block, action, subject)
       @match_all = action.nil? && subject.nil?
       raise Error, "Subject is required for #{action}" if action && subject.nil?
+
       @base_behavior = base_behavior
       @actions = Array(action)
       @subjects = Array(subject)
@@ -82,6 +83,7 @@ module CanCan
     def matches_attributes?(attribute)
       return true if @attributes.empty?
       return @base_behavior if attribute.nil?
+
       @attributes.include?(attribute.to_sym)
     end
 
@@ -111,6 +113,7 @@ module CanCan
 
     def condition_and_block_check(conditions, block, action, subject)
       return unless conditions.is_a?(Hash) && block
+
       raise BlockAndConditionsError, 'A hash of conditions is mutually exclusive with a block. '\
         "Check \":#{action} #{subject}\" ability."
     end
