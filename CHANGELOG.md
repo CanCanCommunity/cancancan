@@ -4,6 +4,9 @@
 * [#474](https://github.com/CanCanCommunity/cancancan/pull/474): Allow to add attribute-level rules. ([@phaedryx][])
 * [#512](https://github.com/CanCanCommunity/cancancan/pull/512): Removed eager loading of associations for ActiveRecord 5. ([@kaspernj][])
 
+* [#444](https://github.com/CanCanCommunity/cancancan/issues/444): Allow to use symbols when defining conditions over enums. ([@s-mage][])
+* [#538](https://github.com/CanCanCommunity/cancancan/issues/538): Merge alias actions when merging abilities. ([@Jcambass][])
+
 ## 2.3.0 (Sep 16th, 2018)
 
 * [#528](https://github.com/CanCanCommunity/cancancan/issues/528): Compress irrelevant rules before generating a query to optimize performances. ([@coorasse][])
@@ -621,6 +624,8 @@
 [@oliverklee]: https://github.com/oliverklee
 [@gingray]: https://github.com/gingray
 [@timraymond]: https://github.com/timraymond
+[@s-mage]: https://github.com/s-mage
+[@Jcambass]: https://github.com/Jcambass
 [@andrew-aladev]: https://github.com/andrew-aladev
 [@phaedryx]: https://github.com/phaedryx
 [@kaspernj]: https://github.com/kaspernj

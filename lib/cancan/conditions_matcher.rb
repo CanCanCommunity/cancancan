@@ -12,7 +12,7 @@ module CanCan
 
     def subject_class?(subject)
       klass = (subject.is_a?(Hash) ? subject.values.first : subject).class
-      klass == Class || klass == Module
+      [Class, Module].include? klass
     end
 
     def matches_block_conditions(subject, *extra_args)
@@ -38,6 +38,7 @@ module CanCan
     # matches_conditions_hash?(subject, conditions)
     def matches_conditions_hash?(subject, conditions = @conditions)
       return true if conditions.empty?
+
       adapter = model_adapter(subject)
 
       if adapter.override_conditions_hash_matching?(subject, conditions)

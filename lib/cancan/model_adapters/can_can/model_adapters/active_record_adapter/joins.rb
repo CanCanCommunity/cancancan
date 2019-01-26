@@ -6,7 +6,7 @@ module CanCan
         # See ModelAdditions#accessible_by
         def joins
           joins_hash = {}
-          @rules.reverse.each do |rule|
+          @rules.reverse_each do |rule|
             merge_joins(joins_hash, rule.associations_hash)
           end
           clean_joins(joins_hash) unless joins_hash.empty?

@@ -31,6 +31,7 @@ module CanCan
       # This does not take into consideration any hash conditions or block statements
       def relevant_rules(action, subject)
         return [] unless @rules
+
         relevant = possible_relevant_rules(subject).select do |rule|
           rule.expanded_actions = expand_actions(rule.actions)
           rule.relevant? action, subject
@@ -53,6 +54,7 @@ module CanCan
       def relevant_rules_for_match(action, subject)
         relevant_rules(action, subject).each do |rule|
           next unless rule.only_raw_sql?
+
           raise Error,
                 "The can? and cannot? call cannot be used with a raw sql 'can' definition."\
                 " The checking code cannot be determined for #{action.inspect} #{subject.inspect}"
@@ -78,6 +80,7 @@ module CanCan
           (first_can_in_group = -1) && next unless rule.base_behavior
           (first_can_in_group = i) && next if first_can_in_group == -1
           next unless rule.subjects == [:all]
+
           rules[i] = rules[first_can_in_group]
           rules[first_can_in_group] = rule
           first_can_in_group += 1

@@ -58,6 +58,7 @@ module CanCan
         conditions = @rules.map(&:conditions).compact
         return unless conditions.any? { |c| c.is_a?(ActiveRecord::Relation) }
         return conditions.first if conditions.size == 1
+
         raise_override_scope_error
       end
 

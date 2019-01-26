@@ -225,7 +225,7 @@ module CanCan
         cancan_skipper[:authorize][name] = options
       end
 
-      # Add this to a controller to ensure it performs authorization through +authorized+! or +authorize_resource+ call.
+      # Add this to a controller to ensure it performs authorization through +authorize+! or +authorize_resource+ call.
       # If neither of these authorization methods are called,
       # a CanCan::AuthorizationNotPerformed exception will be raised.
       # This is normally added to the ApplicationController to ensure all controller actions do authorization.
@@ -260,6 +260,7 @@ module CanCan
           next if controller.instance_variable_defined?(:@_authorized)
           next if options[:if] && !controller.send(options[:if])
           next if options[:unless] && controller.send(options[:unless])
+
           raise AuthorizationNotPerformed,
                 'This action failed the check_authorization because it does not authorize_resource. '\
                 'Add skip_authorization_check to bypass this check.'

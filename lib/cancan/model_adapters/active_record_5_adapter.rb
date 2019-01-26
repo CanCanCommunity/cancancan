@@ -13,11 +13,8 @@ module CanCan
         return super if Array.wrap(value).all? { |x| x.is_a? Integer }
 
         attribute = subject.send(name)
-        if value.is_a?(Enumerable)
-          value.map(&:to_s).include? attribute
-        else
-          attribute == value.to_s
-        end
+        raw_attribute = subject.class.send(name.to_s.pluralize)[attribute]
+        !(Array(value).map(&:to_s) & [attribute, raw_attribute]).empty?
       end
 
       private
@@ -46,19 +43,20 @@ module CanCan
 
         conditions.stringify_keys!
 
-        predicate_builder.build_from_hash(conditions).map do |b|
-          visit_nodes(b)
-        end.join(' AND ')
+        predicate_builder
+          .build_from_hash(conditions)
+          .map { |b| visit_nodes(b) }
+          .join(' AND ')
       end
 
-      def visit_nodes(b)
+      def visit_nodes(node)
         # Rails 5.2 adds a BindParam node that prevents the visitor method from properly compiling the SQL query
         if ActiveRecord::VERSION::MINOR >= 2
           connection = @model_class.send(:connection)
           collector = Arel::Collectors::SubstituteBinds.new(connection, Arel::Collectors::SQLString.new)
-          connection.visitor.accept(b, collector).value
+          connection.visitor.accept(node, collector).value
         else
-          @model_class.send(:connection).visitor.compile(b)
+          @model_class.send(:connection).visitor.compile(node)
         end
       end
     end
