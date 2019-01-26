@@ -564,6 +564,35 @@ describe CanCan::Ability do
       expect(@ability.send(:rules).size).to eq(2)
     end
 
+    it 'adds the aliased actions from the given ability' do
+      @ability.alias_action :show, to: :see
+      (another_ability = double).extend(CanCan::Ability)
+      another_ability.alias_action :create, :update, to: :manage
+
+      @ability.merge(another_ability)
+      expect(@ability.aliased_actions).to eq(
+        read: %i[index show],
+        create: %i[new],
+        update: %i[edit],
+        manage: %i[create update],
+        see: %i[show]
+      )
+    end
+
+    it 'overwrittes the aliased actions with the value from the given ability' do
+      @ability.alias_action :show, :index, to: :see
+      (another_ability = double).extend(CanCan::Ability)
+      another_ability.alias_action :show, to: :see
+
+      @ability.merge(another_ability)
+      expect(@ability.aliased_actions).to eq(
+        read: %i[index show],
+        create: %i[new],
+        update: %i[edit],
+        see: %i[show]
+      )
+    end
+
     it 'can add an empty ability' do
       (another_ability = double).extend(CanCan::Ability)
 
