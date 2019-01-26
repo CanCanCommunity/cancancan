@@ -58,29 +58,25 @@ module CanCan
       def joins
         joins_hash = {}
         @rules.reverse_each do |rule|
-          merge_joins(joins_hash, rule.associations_hash)
+          deep_merge(joins_hash, rule.associations_hash)
         end
-        clean_joins(joins_hash) unless joins_hash.empty?
+        deep_clean(joins_hash) unless joins_hash.empty?
       end
 
       private
 
       # Removes empty hashes and moves everything into arrays.
-      def clean_joins(joins_hash)
-        joins = []
-        joins_hash.each do |name, nested|
-          joins << (nested.empty? ? name : { name => clean_joins(nested) })
-        end
-        joins
+      def deep_clean(joins_hash)
+        joins_hash.map { |name, nested| nested.empty? ? name : { name => deep_clean(nested) } }
       end
 
       # Takes two hashes and does a deep merge.
-      def merge_joins(base, add)
-        add.each do |name, nested|
-          if base[name].is_a?(Hash)
-            merge_joins(base[name], nested) unless nested.empty?
+      def deep_merge(base_hash, added_hash)
+        added_hash.each do |key, value|
+          if base_hash[key].is_a?(Hash)
+            deep_merge(base_hash[key], value) unless value.empty?
           else
-            base[name] = nested
+            base_hash[key] = value
           end
         end
       end
