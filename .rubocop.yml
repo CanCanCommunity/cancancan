@@ -39,7 +39,7 @@ Lint/AmbiguousBlockAssociation:
 AllCops:
   TargetRubyVersion: 2.2.0
   Exclude:
-    - 'gemfiles/vendor/bundle/**/*'
+    - 'gemfiles/**/*'
     - 'Appraisals'
 
 inherit_from: .rubocop_todo.yml
