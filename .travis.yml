@@ -9,6 +9,7 @@ rvm:
   - 2.6.0
   - jruby-9.1.9.0
   - jruby-9.2.5.0
+  - truffleruby
 gemfile:
   - gemfiles/activerecord_4.2.gemfile
   - gemfiles/activerecord_5.0.2.gemfile
