@@ -1,7 +1,6 @@
 require 'spec_helper'
 
-if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0') &&
-   defined?(CanCan::ModelAdapters::ActiveRecord5Adapter)
+if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
   describe CanCan::ModelAdapters::ActiveRecord5Adapter do
     context 'with sqlite3' do
       before :each do
