@@ -2,6 +2,7 @@
 
 * [#444](https://github.com/CanCanCommunity/cancancan/issues/444): Allow to use symbols when defining conditions over enums. ([@s-mage][])
 * [#538](https://github.com/CanCanCommunity/cancancan/issues/538): Merge alias actions when merging abilities. ([@Jcambass][])
+* [#462](https://github.com/CanCanCommunity/cancancan/issues/462): Add support to translate the model name in messages. ([@nyamadori][])
 
 ## 2.3.0 (Sep 16th, 2018)
 
@@ -622,3 +623,4 @@
 [@timraymond]: https://github.com/timraymond
 [@s-mage]: https://github.com/s-mage
 [@Jcambass]: https://github.com/Jcambass
+[@nyamadori]: https://github.com/nyamadori
