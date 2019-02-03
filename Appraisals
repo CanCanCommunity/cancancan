@@ -1,4 +1,4 @@
-appraise 'activerecord_4.2' do
+appraise 'activerecord_4.2.0' do
   gem 'activerecord', '~> 4.2.0', require: 'active_record'
   gem 'activesupport', '~> 4.2.0', require: 'active_support/all'
   gem 'actionpack', '~> 4.2.0', require: 'action_pack'
