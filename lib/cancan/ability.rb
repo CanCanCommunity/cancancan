@@ -1,5 +1,7 @@
 require_relative 'ability/rules.rb'
 require_relative 'ability/actions.rb'
+require_relative 'unauthorized_message_resolver.rb'
+
 module CanCan
   # This module is designed to be included into an Ability class. This will
   # provide the "can" methods for defining and checking abilities.
@@ -19,6 +21,7 @@ module CanCan
   module Ability
     include CanCan::Ability::Rules
     include CanCan::Ability::Actions
+    include CanCan::UnauthorizedMessageResolver
 
     # Check if the user has permission to perform a given action on an object.
     #
@@ -173,23 +176,6 @@ module CanCan
         raise AccessDenied.new(message, action, subject, args)
       end
       subject
-    end
-
-    def unauthorized_message(action, subject)
-      keys = unauthorized_message_keys(action, subject)
-      variables = { action: action.to_s }
-      variables[:subject] = translate_subject(subject)
-      message = I18n.translate(keys.shift, variables.merge(scope: :unauthorized, default: keys + ['']))
-      message.blank? ? nil : message
-    end
-
-    def translate_subject(subject)
-      klass = (subject.class == Class ? subject : subject.class)
-      if klass.respond_to?(:model_name)
-        klass.model_name.human
-      else
-        klass.to_s.underscore.humanize.downcase
-      end
     end
 
     def attributes_for(action, subject)
