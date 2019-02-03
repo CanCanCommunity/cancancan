@@ -1,5 +1,6 @@
 require_relative 'ability/rules.rb'
 require_relative 'ability/actions.rb'
+require_relative 'unauthorized_message_resolver.rb'
 require_relative 'ability/strong_parameter_support'
 
 module CanCan
@@ -21,6 +22,7 @@ module CanCan
   module Ability
     include CanCan::Ability::Rules
     include CanCan::Ability::Actions
+    include CanCan::UnauthorizedMessageResolver
     include StrongParameterSupport
 
     # Check if the user has permission to perform a given action on an object.
@@ -176,14 +178,6 @@ module CanCan
         raise AccessDenied.new(message, action, subject, args)
       end
       subject
-    end
-
-    def unauthorized_message(action, subject)
-      keys = unauthorized_message_keys(action, subject)
-      variables = { action: action.to_s }
-      variables[:subject] = (subject.class == Class ? subject : subject.class).to_s.underscore.humanize.downcase
-      message = I18n.translate(keys.shift, variables.merge(scope: :unauthorized, default: keys + ['']))
-      message.blank? ? nil : message
     end
 
     def attributes_for(action, subject)
