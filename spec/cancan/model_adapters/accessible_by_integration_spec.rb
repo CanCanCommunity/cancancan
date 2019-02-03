@@ -1,14 +1,12 @@
 require 'spec_helper'
 
 # integration tests for latest ActiveRecord version.
-describe CanCan::ModelAdapters::ActiveRecord5Adapter do
+RSpec.describe CanCan::ModelAdapters::ActiveRecord5Adapter do
   let(:ability) { double.extend(CanCan::Ability) }
   let(:users_table) { Post.table_name }
   let(:posts_table) { Post.table_name }
   let(:likes_table) { Like.table_name }
   before :each do
-    ActiveRecord::Base.logger = Logger.new(STDOUT)
-
     ActiveRecord::Base.establish_connection(adapter: 'sqlite3', database: ':memory:')
     ActiveRecord::Migration.verbose = false
 
@@ -90,8 +88,7 @@ describe CanCan::ModelAdapters::ActiveRecord5Adapter do
   end
 
   describe 'selecting custom columns' do
-    # TODO: it currently overrides the select statement. 3.0.0 fixes it.
-    xit 'extracts custom columns correctly' do
+    it 'extracts custom columns correctly' do
       posts = Post.accessible_by(ability).select('title as mytitle')
       expect(posts[0].mytitle).to eq 'post1'
     end
