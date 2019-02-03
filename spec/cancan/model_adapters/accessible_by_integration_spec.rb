@@ -90,7 +90,7 @@ describe CanCan::ModelAdapters::ActiveRecord5Adapter do
   end
 
   describe 'selecting custom columns' do
-    # TODO: it currently overrides
+    # TODO: it currently overrides the select statement. 3.0.0 fixes it.
     xit 'extracts custom columns correctly' do
       posts = Post.accessible_by(ability).select('title as mytitle')
       expect(posts[0].mytitle).to eq 'post1'
