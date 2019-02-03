@@ -4,6 +4,7 @@ module CanCan
     def matches_conditions?(action, subject, extra_args)
       return call_block_with_all(action, subject, extra_args) if @match_all
       return @block.call(subject, *extra_args) if @block && !subject_class?(subject)
+
       matches_non_block_conditions(subject)
     end
 
@@ -11,7 +12,7 @@ module CanCan
 
     def subject_class?(subject)
       klass = (subject.is_a?(Hash) ? subject.values.first : subject).class
-      klass == Class || klass == Module
+      [Class, Module].include? klass
     end
 
     def matches_non_block_conditions(subject)
@@ -34,6 +35,7 @@ module CanCan
     # matches_conditions_hash?(subject, conditions)
     def matches_conditions_hash?(subject, conditions = @conditions)
       return true if conditions.empty?
+
       adapter = model_adapter(subject)
 
       if adapter.override_conditions_hash_matching?(subject, conditions)

@@ -13,26 +13,12 @@ module CanCan
         return super if Array.wrap(value).all? { |x| x.is_a? Integer }
 
         attribute = subject.send(name)
-        if value.is_a?(Enumerable)
-          value.map(&:to_s).include? attribute
-        else
-          attribute == value.to_s
-        end
+        raw_attribute = subject.class.send(name.to_s.pluralize)[attribute]
+        !(Array(value).map(&:to_s) & [attribute, raw_attribute]).empty?
       end
 
       private
 
-      # As of rails 4, `includes()` no longer causes active record to
-      # look inside the where clause to decide to outer join tables
-      # you're using in the where. Instead, `references()` is required
-      # in addition to `includes()` to force the outer join.
-      def build_relation(*where_conditions)
-        relation = @model_class.where(*where_conditions)
-        relation = relation.includes(joins).references(joins) if joins.present?
-        relation
-      end
-
-      # Rails 4.2 deprecates `sanitize_sql_hash_for_conditions`
       def sanitize_sql(conditions)
         if conditions.is_a?(Hash)
           sanitize_sql_activerecord5(conditions)
@@ -50,19 +36,20 @@ module CanCan
 
         conditions.stringify_keys!
 
-        predicate_builder.build_from_hash(conditions).map do |b|
-          visit_nodes(b)
-        end.join(' AND ')
+        predicate_builder
+          .build_from_hash(conditions)
+          .map { |b| visit_nodes(b) }
+          .join(' AND ')
       end
 
-      def visit_nodes(b)
+      def visit_nodes(node)
         # Rails 5.2 adds a BindParam node that prevents the visitor method from properly compiling the SQL query
         if ActiveRecord::VERSION::MINOR >= 2
           connection = @model_class.send(:connection)
           collector = Arel::Collectors::SubstituteBinds.new(connection, Arel::Collectors::SQLString.new)
-          connection.visitor.accept(b, collector).value
+          connection.visitor.accept(node, collector).value
         else
-          @model_class.send(:connection).visitor.compile(b)
+          @model_class.send(:connection).visitor.compile(node)
         end
       end
     end

@@ -11,6 +11,7 @@ module CanCan
     def compress(array)
       idx = array.rindex(&:catch_all?)
       return array unless idx
+
       value = array[idx]
       array[idx..-1]
         .drop_while { |n| n.base_behavior == value.base_behavior }

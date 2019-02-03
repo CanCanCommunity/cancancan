@@ -34,6 +34,7 @@ module CanCan
 
     def authorize_resource
       return if skip?(:authorize)
+
       @controller.authorize!(authorization_action, resource_instance || resource_class_with_parent)
     end
 
@@ -43,6 +44,7 @@ module CanCan
 
     def skip?(behavior)
       return false unless (options = @controller.class.cancan_skipper[behavior][@name])
+
       options == {} ||
         options[:except] && !action_exists_in?(options[:except]) ||
         action_exists_in?(options[:only])
@@ -90,6 +92,7 @@ module CanCan
 
     def resource_instance
       return unless load_instance? && @controller.instance_variable_defined?("@#{instance_name}")
+
       @controller.instance_variable_get("@#{instance_name}")
     end
 
@@ -99,6 +102,7 @@ module CanCan
 
     def collection_instance
       return unless @controller.instance_variable_defined?("@#{instance_name.to_s.pluralize}")
+
       @controller.instance_variable_get("@#{instance_name.to_s.pluralize}")
     end
 

@@ -1,5 +1,6 @@
 ## Unreleased
 
+* [#444](https://github.com/CanCanCommunity/cancancan/issues/444): Allow to use symbols when defining conditions over enums. ([@s-mage][])
 * [#538](https://github.com/CanCanCommunity/cancancan/issues/538): Merge alias actions when merging abilities. ([@Jcambass][])
 
 ## 2.3.0 (Sep 16th, 2018)
@@ -619,4 +620,5 @@
 [@oliverklee]: https://github.com/oliverklee
 [@gingray]: https://github.com/gingray
 [@timraymond]: https://github.com/timraymond
+[@s-mage]: https://github.com/s-mage
 [@Jcambass]: https://github.com/Jcambass
