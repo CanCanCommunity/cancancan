@@ -28,6 +28,7 @@ describe CanCan::ModelAdapters::ActiveRecord5Adapter do
       create_table(:likes) do |t|
         t.integer :post_id
         t.integer :user_id
+        t.integer :position
         t.timestamps null: false
       end
 
@@ -67,8 +68,9 @@ describe CanCan::ModelAdapters::ActiveRecord5Adapter do
     @post1 = Post.create!(title: 'post1', user: @user1)
     @post2 = Post.create!(user: @user1, published: false)
     @post3 = Post.create!(user: @user2)
-    @like1 = Like.create!(post: @post1, user: @user1)
-    @like2 = Like.create!(post: @post1, user: @user2)
+    @like1 = Like.create!(post: @post1, user: @user1, position: 2)
+    @like2 = Like.create!(post: @post1, user: @user2, position: 3)
+    @like3 = Like.create!(post: @post2, user: @user2, position: 1)
     @editor1 = Editor.create(user: @user1, post: @post2)
     ability.can :read, Post, user_id: @user1
     ability.can :read, Post, editors: { user_id: @user1 }
@@ -86,6 +88,13 @@ describe CanCan::ModelAdapters::ActiveRecord5Adapter do
     it 'adds the where clause correctly' do
       posts = Post.accessible_by(ability).where(published: true)
       expect(posts.length).to eq 1
+    end
+  end
+
+  describe 'ordering on joined table' do
+    it 'can order by a relation attribute' do
+      posts = @user1.posts.accessible_by(ability).includes(:likes).order('likes.position')
+      expect(posts).to eq [@post2, @post1]
     end
   end
 
