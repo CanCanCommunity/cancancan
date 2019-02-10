@@ -10,7 +10,7 @@ appraise 'activerecord_4.2.0' do
   end
 
   gemfile.platforms :ruby, :mswin, :mingw do
-    gem 'sqlite3'
+    gem 'sqlite3', '~> 1.3.0'
     gem 'pg', '~> 0.21'
   end
 end
@@ -26,7 +26,7 @@ appraise 'activerecord_5.0.2' do
   end
 
   gemfile.platforms :ruby, :mswin, :mingw do
-    gem 'sqlite3'
+    gem 'sqlite3', '~> 1.3.0'
     gem 'pg', '~> 0.21'
   end
 end
@@ -42,15 +42,15 @@ appraise 'activerecord_5.1.0' do
   end
 
   gemfile.platforms :ruby, :mswin, :mingw do
-    gem 'sqlite3'
+    gem 'sqlite3', '~> 1.3.0'
     gem 'pg', '~> 0.21'
   end
 end
 
-appraise 'activerecord_5.2.1' do
-  gem 'activerecord', '~> 5.2.1', require: 'active_record'
-  gem 'activesupport', '~> 5.2.1', require: 'active_support/all'
-  gem 'actionpack', '~> 5.2.1', require: 'action_pack'
+appraise 'activerecord_5.2.2' do
+  gem 'activerecord', '~> 5.2.2', require: 'active_record'
+  gem 'activesupport', '~> 5.2.2', require: 'active_support/all'
+  gem 'actionpack', '~> 5.2.2', require: 'action_pack'
 
   gemfile.platforms :jruby do
     gem 'activerecord-jdbcsqlite3-adapter'
@@ -58,7 +58,7 @@ appraise 'activerecord_5.2.1' do
   end
 
   gemfile.platforms :ruby, :mswin, :mingw do
-    gem 'sqlite3'
+    gem 'sqlite3', '~> 1.3.0'
     gem 'pg', '~> 0.21'
   end
 end
@@ -75,6 +75,6 @@ appraise 'activerecord_6.0.0' do
 
   platforms :ruby, :mswin, :mingw do
     gem 'pg', '~> 1.1.4'
-    gem 'sqlite3'
+    gem 'sqlite3', '~> 1.3.0'
   end
 end
