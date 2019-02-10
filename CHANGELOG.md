@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.0
 
 * [#560](https://github.com/CanCanCommunity/cancancan/pull/560): Add support for Rails 6.0. ([@coorasse][])
 * [#489](https://github.com/CanCanCommunity/cancancan/pull/489): Drop support for actions without a subject. ([@andrew-aladev][])
@@ -8,6 +8,8 @@
 * [#444](https://github.com/CanCanCommunity/cancancan/issues/444): Allow to use symbols when defining conditions over enums. ([@s-mage][])
 * [#538](https://github.com/CanCanCommunity/cancancan/issues/538): Merge alias actions when merging abilities. ([@Jcambass][])
 * [#462](https://github.com/CanCanCommunity/cancancan/issues/462): Add support to translate the model name in messages. ([@nyamadori][])
+
+Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.com/CanCanCommunity/cancancan/wiki/Migrating-from-CanCanCan-2.x-to-3.0)
 
 ## 2.3.0 (Sep 16th, 2018)
 
