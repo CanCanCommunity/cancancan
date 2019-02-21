@@ -29,6 +29,13 @@ module CanCan
       @block = block
     end
 
+    def inspect
+      repr = "#<#{self.class.name}"
+      repr << "#{@base_behavior ? 'can' : 'cannot'} #{@actions.inspect}, #{@subjects.inspect}, #{@attributes.inspect}"
+      repr << @conditions.inspect.to_s if [Hash, String].include?(@conditions.class)
+      repr << '>'
+    end
+
     def can_rule?
       base_behavior
     end
