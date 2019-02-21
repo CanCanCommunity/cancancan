@@ -7,7 +7,7 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecord5Adapter do
   let(:posts_table) { Post.table_name }
   let(:likes_table) { Like.table_name }
   before :each do
-    ActiveRecord::Base.establish_connection(adapter: 'sqlite3', database: ':memory:')
+    connect_db
     ActiveRecord::Migration.verbose = false
 
     ActiveRecord::Schema.define do

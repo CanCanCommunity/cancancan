@@ -4,7 +4,7 @@ if CanCan::ModelAdapters::ActiveRecordAdapter.version_lower?('5.0.0')
   describe CanCan::ModelAdapters::ActiveRecord4Adapter do
     context 'with sqlite3' do
       before :each do
-        ActiveRecord::Base.establish_connection(adapter: 'sqlite3', database: ':memory:')
+        connect_db
         ActiveRecord::Migration.verbose = false
         ActiveRecord::Schema.define do
           create_table(:parents) do |t|
@@ -111,15 +111,7 @@ if CanCan::ModelAdapters::ActiveRecordAdapter.version_lower?('5.0.0')
 
     context 'with postgresql' do
       before :each do
-        ActiveRecord::Base.establish_connection(adapter: 'postgresql',
-                                                database: 'postgres',
-                                                schema_search_path: 'public')
-        ActiveRecord::Base.connection.drop_database('cancan_postgresql_spec')
-        ActiveRecord::Base.connection.create_database('cancan_postgresql_spec',
-                                                      'encoding' => 'utf-8',
-                                                      'adapter' => 'postgresql')
-        ActiveRecord::Base.establish_connection(adapter: 'postgresql',
-                                                database: 'cancan_postgresql_spec')
+        connect_db
         ActiveRecord::Migration.verbose = false
         ActiveRecord::Schema.define do
           create_table(:parents) do |t|

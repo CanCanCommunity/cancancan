@@ -9,6 +9,7 @@ gem "activesupport", "~> 6.0.0.beta1", require: "active_support/all"
 platforms :jruby do
   gem "activerecord-jdbcsqlite3-adapter"
   gem "jdbc-sqlite3"
+  gem "jdbc-postgres"
 end
 
 platforms :ruby, :mswin, :mingw do

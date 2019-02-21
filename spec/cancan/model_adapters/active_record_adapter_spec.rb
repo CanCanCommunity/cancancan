@@ -2,24 +2,16 @@ require 'spec_helper'
 
 describe CanCan::ModelAdapters::ActiveRecordAdapter do
   let(:true_v) do
-    if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('6')
-      1
-    else
-      "'t'"
-    end
+    ActiveRecord::Base.connection.quoted_true
   end
   let(:false_v) do
-    if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('6')
-      0
-    else
-      "'f'"
-    end
+    ActiveRecord::Base.connection.quoted_false
   end
 
   let(:false_condition) { "#{true_v}=#{false_v}" }
 
   before :each do
-    ActiveRecord::Base.establish_connection(adapter: 'sqlite3', database: ':memory:')
+    connect_db
     ActiveRecord::Migration.verbose = false
     ActiveRecord::Schema.define do
       create_table(:categories) do |t|
@@ -125,14 +117,14 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
   it 'fetches all articles when one can read all' do
     @ability.can :read, Article
     article = Article.create!
-    expect(Article.accessible_by(@ability)).to eq([article])
+    expect(Article.accessible_by(@ability)).to match_array([article])
   end
 
   it 'fetches only the articles that are published' do
     @ability.can :read, Article, published: true
     article1 = Article.create!(published: true)
     Article.create!(published: false)
-    expect(Article.accessible_by(@ability)).to eq([article1])
+    expect(Article.accessible_by(@ability)).to match_array([article1])
   end
 
   it 'fetches any articles which are published or secret' do
@@ -142,7 +134,7 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
     article2 = Article.create!(published: true, secret: true)
     article3 = Article.create!(published: false, secret: true)
     Article.create!(published: false, secret: false)
-    expect(Article.accessible_by(@ability)).to eq([article1, article2, article3])
+    expect(Article.accessible_by(@ability)).to match_array([article1, article2, article3])
   end
 
   it 'fetches any articles which we are cited in' do
@@ -152,7 +144,7 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
     cited.mentioned_users << user
     @ability.can :read, Article, mentioned_users: { id: user.id }
     @ability.can :read, Article, mentions: { user_id: user.id }
-    expect(Article.accessible_by(@ability)).to eq([cited])
+    expect(Article.accessible_by(@ability)).to match_array([cited])
   end
 
   it 'fetches only the articles that are published and not secret' do
@@ -162,14 +154,14 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
     Article.create!(published: true, secret: true)
     Article.create!(published: false, secret: true)
     Article.create!(published: false, secret: false)
-    expect(Article.accessible_by(@ability)).to eq([article1])
+    expect(Article.accessible_by(@ability)).to match_array([article1])
   end
 
   it 'only reads comments for articles which are published' do
     @ability.can :read, Comment, article: { published: true }
     comment1 = Comment.create!(article: Article.create!(published: true))
     Comment.create!(article: Article.create!(published: false))
-    expect(Comment.accessible_by(@ability)).to eq([comment1])
+    expect(Comment.accessible_by(@ability)).to match_array([comment1])
   end
 
   it 'should only read articles which are published or in visible categories' do
@@ -178,7 +170,7 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
     article1 = Article.create!(published: true)
     Article.create!(published: false)
     article3 = Article.create!(published: false, category: Category.create!(visible: true))
-    expect(Article.accessible_by(@ability)).to eq([article1, article3])
+    expect(Article.accessible_by(@ability)).to match_array([article1, article3])
   end
 
   it 'should only read categories once even if they have multiple articles' do
@@ -187,14 +179,14 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
     category = Category.create!
     Article.create!(published: true, category: category)
     Article.create!(published: true, category: category)
-    expect(Category.accessible_by(@ability)).to eq([category])
+    expect(Category.accessible_by(@ability)).to match_array([category])
   end
 
   it 'only reads comments for visible categories through articles' do
     @ability.can :read, Comment, article: { category: { visible: true } }
     comment1 = Comment.create!(article: Article.create!(category: Category.create!(visible: true)))
     Comment.create!(article: Article.create!(category: Category.create!(visible: false)))
-    expect(Comment.accessible_by(@ability)).to eq([comment1])
+    expect(Comment.accessible_by(@ability)).to match_array([comment1])
   end
 
   it 'allows conditions in SQL and merge with hash conditions' do
@@ -204,14 +196,14 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
     article2 = Article.create!(published: true, secret: true)
     article3 = Article.create!(published: false, secret: true)
     Article.create!(published: false, secret: false)
-    expect(Article.accessible_by(@ability)).to eq([article1, article2, article3])
+    expect(Article.accessible_by(@ability)).to match_array([article1, article2, article3])
   end
 
   it 'allows a scope for conditions' do
     @ability.can :read, Article, Article.where(secret: true)
     article1 = Article.create!(secret: true)
     Article.create!(secret: false)
-    expect(Article.accessible_by(@ability)).to eq([article1])
+    expect(Article.accessible_by(@ability)).to match_array([article1])
   end
 
   it 'fetches only associated records when using with a scope for conditions' do
@@ -220,7 +212,7 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
     category2 = Category.create!(visible: true)
     article1 = Article.create!(secret: true, category: category1)
     Article.create!(secret: true, category: category2)
-    expect(category1.articles.accessible_by(@ability)).to eq([article1])
+    expect(category1.articles.accessible_by(@ability)).to match_array([article1])
   end
 
   it 'raises an exception when trying to merge scope with other conditions' do
@@ -419,7 +411,7 @@ WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
 
       table_x = Namespace::TableX.create!
       table_x.table_zs.create(user: user)
-      expect(Namespace::TableX.accessible_by(ability)).to eq([table_x])
+      expect(Namespace::TableX.accessible_by(ability)).to match_array([table_x])
     end
   end
 
@@ -440,7 +432,7 @@ WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
       Course.create!(start_at: 10.days.ago)
       valid_course = Course.create!(start_at: Time.now)
 
-      expect(Course.accessible_by(@ability)).to eq([valid_course])
+      expect(Course.accessible_by(@ability)).to match_array([valid_course])
     end
   end
 
@@ -468,7 +460,7 @@ WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
       ability = Ability.new(sender)
       ability.can :read, Transaction, sender: { id: sender.id }
       ability.can :read, Transaction, receiver: { id: sender.id }
-      expect(Transaction.accessible_by(ability)).to eq([t1, t2])
+      expect(Transaction.accessible_by(ability)).to match_array([t1, t2])
     end
   end
 
@@ -486,7 +478,7 @@ WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
       ability.can :read, Article, mentioned_users: { mentioned_articles: { id: a2.id } }
       ability.can :read, Article, mentioned_users: { articles: { user: { name: 'deep' } } }
       ability.can :read, Article, mentioned_users: { articles: { mentioned_users: { name: 'd2' } } }
-      expect(Article.accessible_by(ability)).to eq([a1])
+      expect(Article.accessible_by(ability)).to match_array([a1])
     end
   end
 end

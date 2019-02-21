@@ -9,6 +9,7 @@ gem "actionpack", "~> 5.0.2", require: "action_pack"
 platforms :jruby do
   gem "activerecord-jdbcsqlite3-adapter"
   gem "jdbc-sqlite3"
+  gem "jdbc-postgres"
 end
 
 platforms :ruby, :mswin, :mingw do

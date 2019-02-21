@@ -7,6 +7,7 @@ appraise 'activerecord_4.2.0' do
   gemfile.platforms :jruby do
     gem 'activerecord-jdbcsqlite3-adapter', '~> 1.3.24'
     gem 'jdbc-sqlite3'
+    gem 'jdbc-postgres'
   end
 
   gemfile.platforms :ruby, :mswin, :mingw do
@@ -23,6 +24,7 @@ appraise 'activerecord_5.0.2' do
   gemfile.platforms :jruby do
     gem 'activerecord-jdbcsqlite3-adapter'
     gem 'jdbc-sqlite3'
+    gem 'jdbc-postgres'
   end
 
   gemfile.platforms :ruby, :mswin, :mingw do
@@ -39,6 +41,7 @@ appraise 'activerecord_5.1.0' do
   gemfile.platforms :jruby do
     gem 'activerecord-jdbcsqlite3-adapter'
     gem 'jdbc-sqlite3'
+    gem 'jdbc-postgres'
   end
 
   gemfile.platforms :ruby, :mswin, :mingw do
@@ -55,6 +58,7 @@ appraise 'activerecord_5.2.2' do
   gemfile.platforms :jruby do
     gem 'activerecord-jdbcsqlite3-adapter'
     gem 'jdbc-sqlite3'
+    gem 'jdbc-postgres'
   end
 
   gemfile.platforms :ruby, :mswin, :mingw do
@@ -71,6 +75,7 @@ appraise 'activerecord_6.0.0' do
   platforms :jruby do
     gem 'activerecord-jdbcsqlite3-adapter'
     gem 'jdbc-sqlite3'
+    gem 'jdbc-postgres'
   end
 
   platforms :ruby, :mswin, :mingw do
