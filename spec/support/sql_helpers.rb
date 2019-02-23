@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SQLHelpers
   def normalized_sql(adapter)
     adapter.database_records.to_sql.strip.squeeze(' ')

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'controller_resource_loader.rb'
 module CanCan
   # Handle the load and authorization controller logic

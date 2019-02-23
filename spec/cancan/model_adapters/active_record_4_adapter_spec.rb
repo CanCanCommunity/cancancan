@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 if CanCan::ModelAdapters::ActiveRecordAdapter.version_lower?('5.0.0')

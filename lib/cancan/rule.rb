@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'conditions_matcher.rb'
 module CanCan
   # This class is used internally and should only be called through Ability.
@@ -31,13 +33,13 @@ module CanCan
 
     def inspect
       repr = "#<#{self.class.name}"
-      repr << "#{@base_behavior ? 'can' : 'cannot'} #{@actions.inspect}, #{@subjects.inspect}, #{@attributes.inspect}"
-      if with_scope?
-        repr << ", #{@conditions.where_values_hash}"
-      elsif [Hash, String].include?(@conditions.class)
-        repr << ", #{@conditions.inspect}"
-      end
-      repr << '>'
+      repr += "#{@base_behavior ? 'can' : 'cannot'} #{@actions.inspect}, #{@subjects.inspect}, #{@attributes.inspect}"
+      repr += if with_scope?
+                ", #{@conditions.where_values_hash}"
+              elsif [Hash, String].include?(@conditions.class)
+                ", #{@conditions.inspect}"
+              end
+      repr + '>'
     end
 
     def can_rule?

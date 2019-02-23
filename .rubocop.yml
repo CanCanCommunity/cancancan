@@ -4,9 +4,6 @@ Style/Documentation:
 Style/NonNilCheck:
   IncludeSemanticChanges: true
 
-Style/FrozenStringLiteralComment:
-  Enabled: false
-
 Style/EmptyMethod:
   Enabled: false
 

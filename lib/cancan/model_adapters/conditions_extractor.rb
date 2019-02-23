@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # this class is responsible of converting the hash of conditions
 # in "where conditions" to generate the sql query
 # it consists of a names_cache that helps calculating the next name given to the association

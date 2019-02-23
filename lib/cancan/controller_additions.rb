@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module CanCan
   # This module is automatically included into all controllers.
   # It also makes the "can?" and "cannot?" methods available to all views.

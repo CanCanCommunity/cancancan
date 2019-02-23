@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'ability/rules.rb'
 require_relative 'ability/actions.rb'
 require_relative 'unauthorized_message_resolver.rb'

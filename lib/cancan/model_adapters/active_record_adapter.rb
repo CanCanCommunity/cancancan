@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'conditions_extractor.rb'
 require 'cancan/rules_compressor'
 module CanCan
