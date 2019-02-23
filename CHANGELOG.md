@@ -3,11 +3,13 @@
 * [#560](https://github.com/CanCanCommunity/cancancan/pull/560): Add support for Rails 6.0. ([@coorasse][])
 * [#489](https://github.com/CanCanCommunity/cancancan/pull/489): Drop support for actions without a subject. ([@andrew-aladev][])
 * [#474](https://github.com/CanCanCommunity/cancancan/pull/474): Allow to add attribute-level rules. ([@phaedryx][])
-* [#512](https://github.com/CanCanCommunity/cancancan/pull/512): Removed eager loading of associations for ActiveRecord 5. ([@kaspernj][])
+* [#512](https://github.com/CanCanCommunity/cancancan/pull/512): Removed eager loading of associations for ActiveRecord >= 5.0. ([@kaspernj][])
 
 * [#444](https://github.com/CanCanCommunity/cancancan/issues/444): Allow to use symbols when defining conditions over enums. ([@s-mage][])
 * [#538](https://github.com/CanCanCommunity/cancancan/issues/538): Merge alias actions when merging abilities. ([@Jcambass][])
 * [#462](https://github.com/CanCanCommunity/cancancan/issues/462): Add support to translate the model name in messages. ([@nyamadori][])
+* [#567](https://github.com/CanCanCommunity/cancancan/issues/567): Extensively run tests on different databases (sqlite and postgres). ([@coorasse][])
+* [#566](https://github.com/CanCanCommunity/cancancan/issues/566): Avoid queries on session dumps (speed up error pages). ([@coorasse][])
 
 Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.com/CanCanCommunity/cancancan/wiki/Migrating-from-CanCanCan-2.x-to-3.0)
 
