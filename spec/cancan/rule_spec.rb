@@ -59,7 +59,6 @@ RSpec.describe CanCan::Rule do
     expect(rule2.conditions).to eq %i[foo bar]
   end
 
-
   unless RUBY_ENGINE == 'jruby'
     describe '#inspect' do
       def count_queries(&block)
