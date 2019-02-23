@@ -59,34 +59,37 @@ RSpec.describe CanCan::Rule do
     expect(rule2.conditions).to eq %i[foo bar]
   end
 
-  describe '#inspect' do
-    def count_queries(&block)
-      count = 0
-      counter_f = lambda { |_name, _started, _finished, _unique_id, payload|
-        count += 1 unless payload[:name].in? %w[CACHE SCHEMA]
-      }
-      ActiveSupport::Notifications.subscribed(counter_f, 'sql.active_record', &block)
-      count
-    end
 
-    before do
-      ActiveRecord::Base.establish_connection(adapter: 'sqlite3', database: ':memory:')
-      ActiveRecord::Migration.verbose = false
-      ActiveRecord::Schema.define do
-        create_table(:watermelons) do |t|
-          t.boolean :visible
+  unless RUBY_ENGINE == 'jruby'
+    describe '#inspect' do
+      def count_queries(&block)
+        count = 0
+        counter_f = lambda { |_name, _started, _finished, _unique_id, payload|
+          count += 1 unless payload[:name].in? %w[CACHE SCHEMA]
+        }
+        ActiveSupport::Notifications.subscribed(counter_f, 'sql.active_record', &block)
+        count
+      end
+
+      before do
+        ActiveRecord::Base.establish_connection(adapter: 'sqlite3', database: ':memory:')
+        ActiveRecord::Migration.verbose = false
+        ActiveRecord::Schema.define do
+          create_table(:watermelons) do |t|
+            t.boolean :visible
+          end
+        end
+
+        class Watermelon < ActiveRecord::Base
+          scope :visible, -> { where(visible: true) }
         end
       end
 
-      class Watermelon < ActiveRecord::Base
-        scope :visible, -> { where(visible: true) }
+      it 'does not evaluate the conditions when they are scopes' do
+        rule = CanCan::Rule.new(true, :read, Watermelon, Watermelon.visible, {}, {})
+        count = count_queries { rule.inspect }
+        expect(count).to eq 0
       end
-    end
-
-    it 'does not evaluate the conditions when they are scopes' do
-      rule = CanCan::Rule.new(true, :read, Watermelon, Watermelon.visible, {}, {})
-      count = count_queries { rule.inspect }
-      expect(count).to eq 0
     end
   end
 end
