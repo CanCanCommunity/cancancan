@@ -59,6 +59,12 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
         has_many :mentions
         has_many :mentioned_users, through: :mentions, source: :user
         belongs_to :user
+
+        scope :unpopular, lambda {
+          joins('LEFT OUTER JOIN comments ON (comments.post_id = posts.id)')
+            .group('articles.id')
+            .where('COUNT(comments.id) < 3')
+        }
       end
 
       class Mention < ActiveRecord::Base
@@ -113,6 +119,17 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       @ability.can :read, Article
       article = Article.create!
       expect(Article.accessible_by(@ability)).to eq([article])
+    end
+
+    it 'does not fires query with accessible_by() for abilities defined with association' do
+      user = User.create!
+      @ability.can :edit, Article, user.articles.unpopular
+      callback = ->(*) { raise 'No query expected' }
+
+      ActiveSupport::Notifications.subscribed(callback, 'sql.active_record') do
+        Article.accessible_by(@ability, :edit)
+        nil
+      end
     end
 
     it 'fetches only the articles that are published' do
