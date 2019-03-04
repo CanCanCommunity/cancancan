@@ -24,10 +24,10 @@ module CanCan
       raise Error, "Subject is required for #{action}" if action && subject.nil?
 
       @base_behavior = base_behavior
-      @actions = Array(action)
-      @subjects = Array(subject)
-      @attributes = Array(attributes)
-      @conditions = extra_args || {}
+      @actions = wrap(action)
+      @subjects = wrap(subject)
+      @attributes = wrap(attributes)
+      @conditions = conditions || {}
       @block = block
     end
 
@@ -129,6 +129,16 @@ module CanCan
 
       raise BlockAndConditionsError, 'A hash of conditions is mutually exclusive with a block. '\
         "Check \":#{action} #{subject}\" ability."
+    end
+
+    def wrap(object)
+      if object.nil?
+        []
+      elsif object.respond_to?(:to_ary)
+        object.to_ary || [object]
+      else
+        [object]
+      end
     end
   end
 end
