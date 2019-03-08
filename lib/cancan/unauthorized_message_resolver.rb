@@ -1,6 +1,7 @@
 module CanCan
   module UnauthorizedMessageResolver
     def unauthorized_message(action, subject)
+      subject = subject.values.last if subject.is_a?(Hash)
       keys = unauthorized_message_keys(action, subject)
       variables = { action: action.to_s }
       variables[:subject] = translate_subject(subject)
