@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 rspec_module = defined?(RSpec::Core) ? 'RSpec' : 'Spec' # RSpec 1 compatability
 
 if rspec_module == 'RSpec'

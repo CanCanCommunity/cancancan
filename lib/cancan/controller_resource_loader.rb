@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'controller_resource_finder.rb'
 require_relative 'controller_resource_name_finder.rb'
 require_relative 'controller_resource_builder.rb'

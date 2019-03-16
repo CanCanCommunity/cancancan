@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module CanCan
   module ParameterValidators
     def valid_attribute_param?(attribute)

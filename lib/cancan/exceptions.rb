@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module CanCan
   # A general CanCan exception
   class Error < StandardError; end

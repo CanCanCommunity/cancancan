@@ -26,6 +26,8 @@ env:
 matrix:
   fast_finish: true
   exclude:
+  - rvm: 2.2.6
+    gemfile: gemfiles/activerecord_6.0.0.gemfile
   - rvm: 2.3.5
     gemfile: gemfiles/activerecord_6.0.0.gemfile
   - rvm: 2.4.2
