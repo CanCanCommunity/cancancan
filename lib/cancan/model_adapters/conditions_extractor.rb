@@ -27,8 +27,6 @@ module CanCan
 
       def calculate_result_hash(key, model_class, path_to_key, result_hash, value)
         reflection = model_class.reflect_on_association(key)
-        raise WrongAssociationName, "association #{key} not defined in model #{model_class.name}" unless reflection
-
         nested_resulted = calculate_nested(model_class, result_hash, key, value.dup, path_to_key)
         association_class = reflection.klass.name.constantize
         tableize_conditions(nested_resulted, association_class, "#{path_to_key}_#{key}")
