@@ -4,6 +4,7 @@ module SQLHelpers
   end
 
   def connect_db
+    # ActiveRecord::Base.logger = Logger.new(STDOUT)
     ActiveRecord::Base.logger = nil
     if ENV['DB'] == 'sqlite'
       ActiveRecord::Base.establish_connection(adapter: 'sqlite3', database: ':memory:')

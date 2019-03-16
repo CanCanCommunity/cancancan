@@ -32,7 +32,11 @@ module CanCan
     def inspect
       repr = "#<#{self.class.name}"
       repr << "#{@base_behavior ? 'can' : 'cannot'} #{@actions.inspect}, #{@subjects.inspect}, #{@attributes.inspect}"
-      repr << @conditions.inspect.to_s if [Hash, String].include?(@conditions.class)
+      if with_scope?
+        repr << ", #{@conditions.where_values_hash}"
+      elsif [Hash, String].include?(@conditions.class)
+        repr << ", #{@conditions.inspect}"
+      end
       repr << '>'
     end
 
@@ -45,7 +49,8 @@ module CanCan
     end
 
     def catch_all?
-      [nil, false, [], {}, '', ' '].include? @conditions
+      (with_scope? && @conditions.where_values_hash.empty?) ||
+        (!with_scope? && [nil, false, [], {}, '', ' '].include?(@conditions))
     end
 
     # Matches both the action, subject, and attribute, not necessarily the conditions
@@ -62,9 +67,8 @@ module CanCan
       @block.nil? && !conditions_empty? && !@conditions.is_a?(Hash)
     end
 
-    def unmergeable?
-      @conditions.respond_to?(:keys) && @conditions.present? &&
-        (!@conditions.keys.first.is_a? Symbol)
+    def with_scope?
+      @conditions.is_a?(ActiveRecord::Relation)
     end
 
     def associations_hash(conditions = @conditions)
