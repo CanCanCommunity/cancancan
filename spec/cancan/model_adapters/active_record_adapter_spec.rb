@@ -308,8 +308,8 @@ WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
     @ability.cannot :read, Article, published: false, secret: true
     expect(@ability.model_adapter(Article, :read).conditions)
       .to orderlessly_match(
-            %["not (#{@article_table}"."published" = #{false_v} AND "#{@article_table}"."secret" = #{true_v})]
-          )
+        %["not (#{@article_table}"."published" = #{false_v} AND "#{@article_table}"."secret" = #{true_v})]
+      )
   end
 
   it 'returns appropriate sql conditions in complex case' do
@@ -537,6 +537,68 @@ WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
   LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
   WHERE (("users"."name" = 'paperino') OR ("users"."name" = 'pippo'))))
       end
+    end
+  end
+
+  context 'when STI is in use' do
+    before do
+      ActiveRecord::Schema.define do
+        create_table(:brands) do |t|
+          t.string :name
+        end
+
+        create_table(:vehicles) do |t|
+          t.references :brand
+          t.string :type
+        end
+      end
+
+      class ApplicationRecord < ActiveRecord::Base
+        self.abstract_class = true
+      end
+
+      class Brand < ApplicationRecord
+        has_many :vehicles
+      end
+
+      class Vehicle < ApplicationRecord
+        belongs_to :brand
+      end
+
+      class Car < Vehicle
+      end
+
+      class Motorbike < Vehicle
+      end
+    end
+
+    it 'recognises rules applied to the base class' do
+      u1 = User.create!(name: 'pippo')
+
+      brand = Brand.create!
+      car = Car.create!(brand: brand)
+      motorbike = Motorbike.create!(brand: brand)
+
+      ability = Ability.new(u1)
+      ability.can :read, Vehicle
+      # puts Vehicle.accessible_by(ability)
+      expect(Vehicle.accessible_by(ability)).to match_array([car, motorbike])
+      expect(Car.accessible_by(ability)).to match_array([car])
+      expect(Motorbike.accessible_by(ability)).to match_array([motorbike])
+    end
+
+    it 'recognises rules applied to subclasses' do
+      u1 = User.create!(name: 'pippo')
+
+      brand = Brand.create!
+      car = Car.create!(brand: brand)
+      Motorbike.create!(brand: brand)
+
+      ability = Ability.new(u1)
+      ability.can :read, [Car]
+      expect(Vehicle.accessible_by(ability)).to match_array([car])
+      expect(Car.accessible_by(ability)).to eq([car])
+      expect(Motorbike.accessible_by(ability)).to eq([])
     end
   end
 end

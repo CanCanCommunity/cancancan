@@ -8,7 +8,7 @@ module CanCan
   class Rule # :nodoc:
     include ConditionsMatcher
     include ParameterValidators
-    attr_reader :base_behavior, :subjects, :actions, :conditions, :attributes
+    attr_reader :base_behavior, :subjects, :actions, :conditions, :attributes, :block
     attr_writer :expanded_actions, :conditions
 
     # The first argument when initializing is the base_behavior which is a true/false
@@ -114,7 +114,7 @@ module CanCan
       @subjects.any? do |sub|
         sub.is_a?(Module) && (subject.is_a?(sub) ||
           subject.class.to_s == sub.to_s ||
-          (subject.is_a?(Module) && subject.ancestors.include?(sub)))
+          (subject.is_a?(Module) && subject.ancestors.include?(sub))) || subject.subclasses.include?(sub)
       end
     end
 
