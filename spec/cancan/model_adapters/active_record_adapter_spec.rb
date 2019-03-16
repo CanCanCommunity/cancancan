@@ -308,8 +308,8 @@ WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
     @ability.cannot :read, Article, published: false, secret: true
     expect(@ability.model_adapter(Article, :read).conditions)
       .to orderlessly_match(
-        %["not (#{@article_table}"."published" = #{false_v} AND "#{@article_table}"."secret" = #{true_v})]
-      )
+            %["not (#{@article_table}"."published" = #{false_v} AND "#{@article_table}"."secret" = #{true_v})]
+          )
   end
 
   it 'returns appropriate sql conditions in complex case' do
