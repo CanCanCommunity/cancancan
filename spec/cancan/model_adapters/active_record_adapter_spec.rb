@@ -224,6 +224,19 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
                         'Instead use a hash or SQL for read Article ability.')
   end
 
+  it 'does not raise an exception when the rule with scope is suppressed' do
+    @ability.can :read, Article, published: true
+    @ability.can :read, Article, Article.where(secret: true)
+    @ability.cannot :read, Article
+    expect(-> { Article.accessible_by(@ability) }).not_to raise_error
+  end
+
+  it 'recognises empty scopes and compresses them' do
+    @ability.can :read, Article, published: true
+    @ability.can :read, Article, Article.all
+    expect(-> { Article.accessible_by(@ability) }).not_to raise_error
+  end
+
   it 'does not allow to fetch records when ability with just block present' do
     @ability.can :read, Article do
       false
@@ -321,6 +334,14 @@ WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
 
   it 'has nil joins if no rules' do
     expect(@ability.model_adapter(Article, :read).joins).to be_nil
+  end
+
+  it 'has nil joins if rules got compressed' do
+    @ability.can :read, Comment, article: { category: { visible: true } }
+    @ability.can :read, Comment
+    expect(@ability.model_adapter(Comment, :read))
+      .to generate_sql("SELECT \"#{@comment_table}\".* FROM \"#{@comment_table}\"")
+    expect(@ability.model_adapter(Comment, :read).joins).to be_nil
   end
 
   it 'has nil joins if no nested hashes specified in conditions' do

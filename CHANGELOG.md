@@ -3,7 +3,8 @@
 * [#560](https://github.com/CanCanCommunity/cancancan/pull/560): Add support for Rails 6.0. ([@coorasse][])
 * [#489](https://github.com/CanCanCommunity/cancancan/pull/489): Drop support for actions without a subject. ([@andrew-aladev][])
 * [#474](https://github.com/CanCanCommunity/cancancan/pull/474): Allow to add attribute-level rules. ([@phaedryx][])
-* [#512](https://github.com/CanCanCommunity/cancancan/pull/512): Removed eager loading of associations for ActiveRecord >= 5.0. ([@kaspernj][])
+* [#512](https://github.com/CanCanCommunity/cancancan/pull/512): Removed automatic eager loading of associations for ActiveRecord >= 5.0. ([@kaspernj][])
+* [#575](https://github.com/CanCanCommunity/cancancan/pull/575): Use the rules compressor when generating joins in accessible_by. ([@coorasse][])
 
 * [#444](https://github.com/CanCanCommunity/cancancan/issues/444): Allow to use symbols when defining conditions over enums. ([@s-mage][])
 * [#538](https://github.com/CanCanCommunity/cancancan/issues/538): Merge alias actions when merging abilities. ([@Jcambass][])

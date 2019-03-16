@@ -43,10 +43,7 @@ module CanCan
 
         conditions.stringify_keys!
 
-        predicate_builder
-          .build_from_hash(conditions)
-          .map { |b| visit_nodes(b) }
-          .join(' AND ')
+        predicate_builder.build_from_hash(conditions).map { |b| visit_nodes(b) }.join(' AND ')
       end
 
       def visit_nodes(node)

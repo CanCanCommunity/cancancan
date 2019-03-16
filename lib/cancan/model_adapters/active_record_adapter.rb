@@ -11,6 +11,11 @@ module CanCan
         Gem::Version.new(ActiveRecord.version).release < Gem::Version.new(version)
       end
 
+      def initialize(model_class, rules)
+        super
+        @compressed_rules = RulesCompressor.new(@rules.reverse).rules_collapsed.reverse
+      end
+
       # Returns conditions intended to be used inside a database query. Normally you will not call this
       # method directly, but instead go through ModelAdditions#accessible_by.
       #
@@ -27,13 +32,12 @@ module CanCan
       #   query(:manage, User).conditions # => "not (self_managed = 't') AND ((manager_id = 1) OR (id = 1))"
       #
       def conditions
-        compressed_rules = RulesCompressor.new(@rules.reverse).rules_collapsed.reverse
         conditions_extractor = ConditionsExtractor.new(@model_class)
-        if compressed_rules.size == 1 && compressed_rules.first.base_behavior
+        if @compressed_rules.size == 1 && @compressed_rules.first.base_behavior
           # Return the conditions directly if there's just one definition
-          conditions_extractor.tableize_conditions(compressed_rules.first.conditions).dup
+          conditions_extractor.tableize_conditions(@compressed_rules.first.conditions).dup
         else
-          extract_multiple_conditions(conditions_extractor, compressed_rules)
+          extract_multiple_conditions(conditions_extractor, @compressed_rules)
         end
       end
 
@@ -47,7 +51,7 @@ module CanCan
         if override_scope
           @model_class.where(nil).merge(override_scope)
         elsif @model_class.respond_to?(:where) && @model_class.respond_to?(:joins)
-          mergeable_conditions? ? build_relation(conditions) : build_relation(*@rules.map(&:conditions))
+          build_relation(conditions)
         else
           @model_class.all(conditions: conditions, joins: joins)
         end
@@ -57,7 +61,7 @@ module CanCan
       # See ModelAdditions#accessible_by
       def joins
         joins_hash = {}
-        @rules.reverse_each do |rule|
+        @compressed_rules.reverse_each do |rule|
           deep_merge(joins_hash, rule.associations_hash)
         end
         deep_clean(joins_hash) unless joins_hash.empty?
@@ -81,12 +85,8 @@ module CanCan
         end
       end
 
-      def mergeable_conditions?
-        @rules.find(&:unmergeable?).blank?
-      end
-
       def override_scope
-        conditions = @rules.map(&:conditions).compact
+        conditions = @compressed_rules.map(&:conditions).compact
         return unless conditions.any? { |c| c.is_a?(ActiveRecord::Relation) }
         return conditions.first if conditions.size == 1
 
@@ -94,7 +94,7 @@ module CanCan
       end
 
       def raise_override_scope_error
-        rule_found = @rules.detect { |rule| rule.conditions.is_a?(ActiveRecord::Relation) }
+        rule_found = @compressed_rules.detect { |rule| rule.conditions.is_a?(ActiveRecord::Relation) }
         raise Error,
               'Unable to merge an Active Record scope with other conditions. '\
               "Instead use a hash or SQL for #{rule_found.actions.first} #{rule_found.subjects.first} ability."
