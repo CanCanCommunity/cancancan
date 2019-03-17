@@ -12,6 +12,7 @@
 * [#567](https://github.com/CanCanCommunity/cancancan/issues/567): Extensively run tests on different databases (sqlite and postgres). ([@coorasse][])
 * [#566](https://github.com/CanCanCommunity/cancancan/issues/566): Avoid queries on session dumps (speed up error pages). ([@coorasse][])
 * [#568](https://github.com/CanCanCommunity/cancancan/issues/568): Automatically freeze strings in all files. ([@coorasse][])
+* [#577](https://github.com/CanCanCommunity/cancancan/pull/577): Normalise rules traversing associations to reduce the number of joins. ([@coorasse][])
 
 Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.com/CanCanCommunity/cancancan/wiki/Migrating-from-CanCanCan-2.x-to-3.0)
 
