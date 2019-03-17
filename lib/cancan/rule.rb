@@ -9,7 +9,7 @@ module CanCan
     include ConditionsMatcher
     include ParameterValidators
     attr_reader :base_behavior, :subjects, :actions, :conditions, :attributes
-    attr_writer :expanded_actions
+    attr_writer :expanded_actions, :conditions
 
     # The first argument when initializing is the base_behavior which is a true/false
     # value. True for "can" and false for "cannot". The next two arguments are the action

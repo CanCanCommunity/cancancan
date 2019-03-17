@@ -27,6 +27,10 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
         t.timestamps null: false
       end
 
+      create_table(:companies) do |t|
+        t.boolean :admin
+      end
+
       create_table(:articles) do |t|
         t.string :name
         t.timestamps null: false
@@ -34,12 +38,14 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
         t.boolean :secret
         t.integer :priority
         t.integer :category_id
+        t.integer :project_id
         t.integer :user_id
       end
 
       create_table(:comments) do |t|
         t.boolean :spam
         t.integer :article_id
+        t.integer :project_id
         t.timestamps null: false
       end
 
@@ -56,18 +62,24 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
     end
 
     class Project < ActiveRecord::Base
+      has_many :comments
     end
 
     class Category < ActiveRecord::Base
       has_many :articles
     end
 
+    class Company < ActiveRecord::Base
+    end
+
     class Article < ActiveRecord::Base
       belongs_to :category
+      belongs_to :company
       has_many :comments
       has_many :mentions
       has_many :mentioned_users, through: :mentions, source: :user
       belongs_to :user
+      belongs_to :project
     end
 
     class Mention < ActiveRecord::Base
@@ -502,6 +514,29 @@ WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
       ability.can :read, Article, mentioned_users: { articles: { user: { name: 'deep' } } }
       ability.can :read, Article, mentioned_users: { articles: { mentioned_users: { name: 'd2' } } }
       expect(Article.accessible_by(ability)).to match_array([a1])
+    end
+  end
+
+  context 'has_many through is defined and referenced differently' do
+    it 'recognises it and simplifies the query' do
+      u1 = User.create!(name: 'pippo')
+      u2 = User.create!(name: 'paperino')
+
+      a1 = Article.create!(mentioned_users: [u1])
+      a2 = Article.create!(mentioned_users: [u2])
+
+      ability = Ability.new(u1)
+      ability.can :read, Article, mentioned_users: { name: u1.name }
+      ability.can :read, Article, mentions: { user: { name: u2.name } }
+      expect(Article.accessible_by(ability)).to match_array([a1, a2])
+      if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
+        expect(ability.model_adapter(Article, :read)).to generate_sql(%(
+  SELECT DISTINCT "articles".*
+  FROM "articles"
+  LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
+  LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
+  WHERE (("users"."name" = 'paperino') OR ("users"."name" = 'pippo'))))
+      end
     end
   end
 end

@@ -16,6 +16,7 @@ module CanCan
       def initialize(model_class, rules)
         super
         @compressed_rules = RulesCompressor.new(@rules.reverse).rules_collapsed.reverse
+        ConditionsNormalizer.normalize(model_class, @compressed_rules)
       end
 
       # Returns conditions intended to be used inside a database query. Normally you will not call this
