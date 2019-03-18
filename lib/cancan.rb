@@ -15,4 +15,5 @@ if defined? ActiveRecord
   require 'cancan/model_adapters/active_record_adapter'
   require 'cancan/model_adapters/active_record_4_adapter'
   require 'cancan/model_adapters/active_record_5_adapter'
+  require 'cancan/model_adapters/active_record_6_adapter'
 end

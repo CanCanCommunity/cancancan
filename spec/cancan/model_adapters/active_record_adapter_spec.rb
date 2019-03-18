@@ -84,7 +84,13 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
 
     it 'is for only active record classes' do
       if ActiveRecord.respond_to?(:version) &&
-         ActiveRecord.version > Gem::Version.new('5')
+         ActiveRecord.version >= Gem::Version.new('6.0.0.beta')
+        expect(CanCan::ModelAdapters::ActiveRecord6Adapter).to_not be_for_class(Object)
+        expect(CanCan::ModelAdapters::ActiveRecord6Adapter).to be_for_class(Article)
+        expect(CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article))
+          .to eq(CanCan::ModelAdapters::ActiveRecord6Adapter)
+      elsif ActiveRecord.respond_to?(:version) &&
+            ActiveRecord.version > Gem::Version.new('5')
         expect(CanCan::ModelAdapters::ActiveRecord5Adapter).to_not be_for_class(Object)
         expect(CanCan::ModelAdapters::ActiveRecord5Adapter).to be_for_class(Article)
         expect(CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article))
@@ -241,12 +247,12 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
     end
 
     it 'has false conditions if no abilities match' do
-      expect(@ability.model_adapter(Article, :read).conditions).to eq("'t'='f'")
+      expect(@ability.model_adapter(Article, :read).conditions).to eq("#{sqlite_true_value}=#{sqlite_false_value}")
     end
 
     it 'returns false conditions for cannot clause' do
       @ability.cannot :read, Article
-      expect(@ability.model_adapter(Article, :read).conditions).to eq("'t'='f'")
+      expect(@ability.model_adapter(Article, :read).conditions).to eq("#{sqlite_true_value}=#{sqlite_false_value}")
     end
 
     it 'returns SQL for single `can` definition in front of default `cannot` condition' do
@@ -255,7 +261,7 @@ if defined? CanCan::ModelAdapters::ActiveRecordAdapter
       expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
 SELECT "articles".*
 FROM "articles"
-WHERE "articles"."published" = 'f' AND "articles"."secret" = 't'))
+WHERE "articles"."published" = #{sqlite_false_value} AND "articles"."secret" = #{sqlite_true_value}))
     end
 
     it 'returns true condition for single `can` definition in front of default `can` condition' do
@@ -268,14 +274,14 @@ WHERE "articles"."published" = 'f' AND "articles"."secret" = 't'))
     it 'returns `false condition` for single `cannot` definition in front of default `cannot` condition' do
       @ability.cannot :read, Article
       @ability.cannot :read, Article, published: false, secret: true
-      expect(@ability.model_adapter(Article, :read).conditions).to eq("'t'='f'")
+      expect(@ability.model_adapter(Article, :read).conditions).to eq("#{sqlite_true_value}=#{sqlite_false_value}")
     end
 
     it 'returns `not (sql)` for single `cannot` definition in front of default `can` condition' do
       @ability.can :read, Article
       @ability.cannot :read, Article, published: false, secret: true
       expect(@ability.model_adapter(Article, :read).conditions)
-        .to orderlessly_match(%["not (#{@article_table}"."published" = 'f' AND "#{@article_table}"."secret" = 't')])
+        .to orderlessly_match(%["not (#{@article_table}"."published" = #{sqlite_false_value} AND "#{@article_table}"."secret" = #{sqlite_true_value})])
     end
 
     it 'returns appropriate sql conditions in complex case' do
@@ -284,8 +290,8 @@ WHERE "articles"."published" = 'f' AND "articles"."secret" = 't'))
       @ability.can :update, Article, published: true
       @ability.cannot :update, Article, secret: true
       expect(@ability.model_adapter(Article, :update).conditions)
-        .to eq(%[not ("#{@article_table}"."secret" = 't') ] +
-                 %[AND (("#{@article_table}"."published" = 't') ] +
+        .to eq(%[not ("#{@article_table}"."secret" = #{sqlite_true_value}) ] +
+                 %[AND (("#{@article_table}"."published" = #{sqlite_true_value}) ] +
                  %[OR ("#{@article_table}"."id" = 1))])
       expect(@ability.model_adapter(Article, :manage).conditions).to eq(id: 1)
       expect(@ability.model_adapter(Article, :read).conditions).to eq({})
@@ -308,7 +314,7 @@ WHERE "articles"."published" = 'f' AND "articles"."secret" = 't'))
       @ability.can :read, Article, ['secret=?', false]
       adapter = @ability.model_adapter(Article, :read)
       2.times do
-        expect(adapter.conditions).to eq(%[(secret='f') OR ("#{@article_table}"."published" = 't')])
+        expect(adapter.conditions).to eq(%[(secret=#{sqlite_false_value}) OR ("#{@article_table}"."published" = #{sqlite_true_value})])
       end
     end
 
