@@ -62,3 +62,19 @@ appraise 'activerecord_5.2.2' do
     gem 'pg', '~> 0.21'
   end
 end
+
+appraise 'activerecord_6.0.0' do
+  gem 'activerecord', '~> 6.0.0.beta3', require: 'active_record'
+  gem 'activesupport', '~> 6.0.0.beta3', require: 'active_support/all'
+  gem 'actionpack', '~> 6.0.0.beta3', require: 'action_pack'
+
+  gemfile.platforms :jruby do
+    gem 'activerecord-jdbcsqlite3-adapter'
+    gem 'jdbc-sqlite3'
+  end
+
+  gemfile.platforms :ruby, :mswin, :mingw do
+    gem 'sqlite3', '~> 1.3.0'
+    gem 'pg', '~> 0.21'
+  end
+end
