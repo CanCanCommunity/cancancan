@@ -4,9 +4,6 @@ Style/Documentation:
 Style/NonNilCheck:
   IncludeSemanticChanges: true
 
-Style/FrozenStringLiteralComment:
-  Enabled: false
-
 Style/EmptyMethod:
   Enabled: false
 
@@ -41,5 +38,3 @@ AllCops:
   Exclude:
     - 'gemfiles/**/*'
     - 'Appraisals'
-
-inherit_from: .rubocop_todo.yml

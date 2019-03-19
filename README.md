@@ -222,8 +222,8 @@ Any help is greatly appreciated, feel free to submit pull-requests or open issue
 ## Questions?
 
 If you have any question or doubt regarding CanCanCan which you cannot find the solution to in the 
-[documentation](https://github.com/CanCanCommunity/cancancan/wiki) or our 
-[mailing list](http://groups.google.com/group/cancancan), please 
+[documentation](https://github.com/CanCanCommunity/cancancan/wiki) or our
+[mailing list](http://groups.google.com/group/cancancan), please
 [open a question on Stackoverflow](http://stackoverflow.com/questions/ask?tags=cancancan) with tag 
 [cancancan](http://stackoverflow.com/questions/tagged/cancancan)
 

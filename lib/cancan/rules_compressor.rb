@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'conditions_matcher.rb'
 module CanCan
   class RulesCompressor
