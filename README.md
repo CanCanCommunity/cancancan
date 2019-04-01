@@ -74,7 +74,7 @@ def show
 end
 ```
 
-### 3.1 Loaders
+### 3.2 Loaders
 
 Setting this for every action can be tedious, therefore the `load_and_authorize_resource` method is provided to 
 automatically authorize all actions in a RESTful style resource controller. 
@@ -94,7 +94,7 @@ See [Authorizing Controller Actions](https://github.com/CanCanCommunity/cancanca
 for more information.
 
 
-### 3.2 Strong Parameters
+### 3.3 Strong Parameters
 
 You have to sanitize inputs before saving the record, in actions such as `:create` and `:update`.
 
