@@ -38,6 +38,25 @@ User permissions are defined in an `Ability` class.
 
     rails g cancan:ability
 
+Here follows an example of rules defined to read a Post model.
+```ruby
+class Ability
+  include CanCan::Ability
+
+  def initialize(user)
+    can :read, Post, public: true
+
+    if user.present?  # additional permissions for logged in users (they can read their own posts)
+      can :read, Post, user_id: user.id
+
+      if user.admin?  # additional permissions for administrators
+        can :read, post
+      end
+    end
+  end
+end
+```
+
 See [Defining Abilities](https://github.com/CanCanCommunity/cancancan/wiki/defining-abilities) for details on how to
 define your rules.
 
@@ -47,13 +66,26 @@ define your rules.
 The current user's permissions can then be checked using the `can?` and `cannot?` methods in views and controllers.
 
 ```erb
-<% if can? :update, @article %>
-  <%= link_to "Edit", edit_article_path(@article) %>
+<% if can? :read, @post %>
+  <%= link_to "View", @post %>
 <% end %>
 ```
 
 See [Checking Abilities](https://github.com/CanCanCommunity/cancancan/wiki/checking-abilities) for more information
 on how you can use these helpers.
+
+## Fetching records
+
+One of the key features of CanCanCan, compared to other authorization libraries,
+is the possibility to retrieve all the objects that the user is authorized to, for example, read.
+The following:
+
+```ruby
+  Post.accessible_by(current_ability)
+```
+
+will reuse your previously defined rules to ensure that the user retrieves only a list of posts he can read.
+See [Fetching records](https://github.com/CanCanCommunity/cancancan/wiki/Fetching-Records) for details.
 
 ## Controller helpers
 
@@ -67,8 +99,8 @@ The `authorize!` method in the controller will raise an exception if the user is
 
 ```ruby
 def show
-  @article = Article.find(params[:id])
-  authorize! :read, @article
+  @post = Post.find(params[:id])
+  authorize! :read, @post
 end
 ```
 
@@ -79,15 +111,15 @@ automatically authorize all actions in a RESTful style resource controller.
 It will use a before action to load the resource into an instance variable and authorize it for every action.
 
 ```ruby
-class ArticlesController < ApplicationController
+class PostsController < ApplicationController
   load_and_authorize_resource
 
   def show
-    # @article is already loaded and authorized
+    # @post is already loaded and authorized
   end
 
   def index
-    # @articles is already loaded with all articles the user is authorized to read
+    # @posts is already loaded with all posts the user is authorized to read
   end
 end
 ```
@@ -104,7 +136,7 @@ For the `:update` action, CanCanCan will load and authorize the resource but *no
 
 ```ruby
 def update
-  if @article.update(article_params)
+  if @post.update(post_params)
     # hurray
   else
     render :edit
@@ -112,8 +144,8 @@ def update
 end
 ...
 
-def article_params
-  params.require(:article).permit(:body)
+def post_params
+  params.require(:post).permit(:body)
 end
 ```
 
@@ -121,7 +153,7 @@ For the `:create` action, CanCanCan will try to initialize a new instance with s
 controller will respond to the following methods (in order):
 
 1. `create_params`
-2. `<model_name>_params` such as `article_params` (this is the default convention in rails for naming your param method)
+2. `<model_name>_params` such as `post_params` (this is the default convention in rails for naming your param method)
 3. `resource_params` (a generically named method you could specify in each controller)
 
 Additionally, `load_and_authorize_resource` can now take a `param_method` option to specify a custom method in the controller to run to sanitize input.
@@ -129,11 +161,11 @@ Additionally, `load_and_authorize_resource` can now take a `param_method` option
 You can associate the `param_method` option with a symbol corresponding to the name of a method that will get called:
 
 ```ruby
-class ArticlesController < ApplicationController
+class PostsController < ApplicationController
   load_and_authorize_resource param_method: :my_sanitizer
 
   def create
-    if @article.save
+    if @post.save
       # hurray
     else
       render :new
@@ -143,18 +175,18 @@ class ArticlesController < ApplicationController
   private
 
   def my_sanitizer
-    params.require(:article).permit(:name)
+    params.require(:post).permit(:name)
   end
 end
 ```
 
 You can also use a string that will be evaluated in the context of the controller using `instance_eval` and needs to contain valid Ruby code.
 
-    load_and_authorize_resource param_method: 'permitted_params.article'
+    load_and_authorize_resource param_method: 'permitted_params.post'
 
 Finally, it's possible to associate `param_method` with a Proc object which will be called with the controller as the only argument:
 
-    load_and_authorize_resource param_method: Proc.new { |c| c.params.require(:article).permit(:name) }
+    load_and_authorize_resource param_method: Proc.new { |c| c.params.require(:post).permit(:name) }
 
 See [Strong Parameters](https://github.com/CanCanCommunity/cancancan/wiki/Strong-Parameters) for more information.
 
