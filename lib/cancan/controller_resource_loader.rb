@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'controller_resource_finder.rb'
 require_relative 'controller_resource_name_finder.rb'
 require_relative 'controller_resource_builder.rb'
@@ -11,6 +13,7 @@ module CanCan
 
     def load_resource
       return if skip?(:load)
+
       if load_instance?
         self.resource_instance ||= load_resource_instance
       elsif load_collection?
@@ -26,6 +29,7 @@ module CanCan
 
     def resource_params_by_key(key)
       return unless @options[key] && @params.key?(extract_key(@options[key]))
+
       @params[extract_key(@options[key])]
     end
 

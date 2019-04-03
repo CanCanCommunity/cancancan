@@ -4,9 +4,6 @@ Style/Documentation:
 Style/NonNilCheck:
   IncludeSemanticChanges: true
 
-Style/FrozenStringLiteralComment:
-  Enabled: false
-
 Style/EmptyMethod:
   Enabled: false
 
@@ -27,7 +24,7 @@ Metrics/BlockLength:
 # NamePrefix: is_, has_, have_
 # NamePrefixBlacklist: is_, has_, have_
 # NameWhitelist: is_a?
-Style/PredicateName:
+Naming/PredicateName:
   Exclude:
     - 'spec/**/*'
     - 'lib/cancan/ability.rb'
@@ -36,11 +33,8 @@ Style/PredicateName:
 Lint/AmbiguousBlockAssociation:
   Enabled: false
 
-
 AllCops:
   TargetRubyVersion: 2.2.0
   Exclude:
-    - 'gemfiles/vendor/bundle/**/*'
+    - 'gemfiles/**/*'
     - 'Appraisals'
-
-inherit_from: .rubocop_todo.yml

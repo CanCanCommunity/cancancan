@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module CanCan
   module Ability
     module Rules
@@ -31,6 +33,7 @@ module CanCan
       # This does not take into consideration any hash conditions or block statements
       def relevant_rules(action, subject)
         return [] unless @rules
+
         relevant = possible_relevant_rules(subject).select do |rule|
           rule.expanded_actions = expand_actions(rule.actions)
           rule.relevant? action, subject
@@ -53,19 +56,23 @@ module CanCan
       def relevant_rules_for_match(action, subject)
         relevant_rules(action, subject).each do |rule|
           next unless rule.only_raw_sql?
+
           raise Error,
                 "The can? and cannot? call cannot be used with a raw sql 'can' definition."\
-              " The checking code cannot be determined for #{action.inspect} #{subject.inspect}"
+                " The checking code cannot be determined for #{action.inspect} #{subject.inspect}"
         end
       end
 
       def relevant_rules_for_query(action, subject)
-        relevant_rules(action, subject).each do |rule|
-          if rule.only_block?
-            raise Error, "The accessible_by call cannot be used with a block 'can' definition."\
-                       " The SQL cannot be determined for #{action.inspect} #{subject.inspect}"
-          end
+        rules = relevant_rules(action, subject).reject do |rule|
+          # reject 'cannot' rules with attributes when doing queries
+          rule.base_behavior == false && rule.attributes.present?
         end
+        if rules.any?(&:only_block?)
+          raise Error, "The accessible_by call cannot be used with a block 'can' definition."\
+            "The SQL cannot be determined for #{action.inspect} #{subject.inspect}"
+        end
+        rules
       end
 
       # Optimizes the order of the rules, so that rules with the :all subject are evaluated first.
@@ -75,6 +82,7 @@ module CanCan
           (first_can_in_group = -1) && next unless rule.base_behavior
           (first_can_in_group = i) && next if first_can_in_group == -1
           next unless rule.subjects == [:all]
+
           rules[i] = rules[first_can_in_group]
           rules[first_can_in_group] = rule
           first_can_in_group += 1

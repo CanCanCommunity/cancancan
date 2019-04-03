@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # this class is responsible of converting the hash of conditions
 # in "where conditions" to generate the sql query
 # it consists of a names_cache that helps calculating the next name given to the association
@@ -12,6 +14,7 @@ module CanCan
 
       def tableize_conditions(conditions, model_class = @root_model_class, path_to_key = 0)
         return conditions unless conditions.is_a? Hash
+
         conditions.each_with_object({}) do |(key, value), result_hash|
           if value.is_a? Hash
             result_hash.merge!(calculate_result_hash(key, model_class, path_to_key, result_hash, value))
@@ -26,9 +29,6 @@ module CanCan
 
       def calculate_result_hash(key, model_class, path_to_key, result_hash, value)
         reflection = model_class.reflect_on_association(key)
-        unless reflection
-          raise WrongAssociationName, "association #{key} not defined in model #{model_class.name}"
-        end
         nested_resulted = calculate_nested(model_class, result_hash, key, value.dup, path_to_key)
         association_class = reflection.klass.name.constantize
         tableize_conditions(nested_resulted, association_class, "#{path_to_key}_#{key}")

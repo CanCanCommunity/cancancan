@@ -6,58 +6,88 @@
 [![Travis badge](https://travis-ci.org/CanCanCommunity/cancancan.svg?branch=develop)](https://travis-ci.org/CanCanCommunity/cancancan)
 [![Code Climate Badge](https://codeclimate.com/github/CanCanCommunity/cancancan.svg)](https://codeclimate.com/github/CanCanCommunity/cancancan)
 
-[Wiki](https://github.com/CanCanCommunity/cancancan/wiki) | 
-[RDocs](http://rdoc.info/projects/CanCanCommunity/cancancan) | 
+[Wiki](https://github.com/CanCanCommunity/cancancan/wiki) |
+[RDocs](http://rdoc.info/projects/CanCanCommunity/cancancan) |
 [Screencast 1](http://railscasts.com/episodes/192-authorization-with-cancan) |
 [Screencast 2](https://www.youtube.com/watch?v=cTYu-OjUgDw)
 
-CanCanCan is an authorization library for Ruby >= 2.2.0 and Ruby on Rails >= 4.2 which restricts what resources a given user is allowed to access. 
+CanCanCan is an authorization library for Ruby >= 2.2.0 and Ruby on Rails >= 4.2 which restricts what
+resources a given user is allowed to access.
 
-All permissions can be defined in one or multiple ability files and not duplicated across controllers, views, and database queries, keeping your permissions logic in one place.
+All permissions can be defined in one or multiple ability files and not duplicated across controllers, views,
+and database queries, keeping your permissions logic in one place for easy maintenance and testing.
 
 It consists of two main parts:
-1. **the authorizations definition library** that allows you to define the rules, for a user,
-to access different objects, and provides helpers to check for those permissions.
+1. **Authorizations library** that allows you to define the rules to access different objects,
+and provides helpers to check for those permissions.
 
-2. **controller helpers** that help to simplify the code in Rails Controllers by performing the loading and checking of permissions
-of models for you in the controllers.
+2. **Rails helpers** to simplify the code in Rails Controllers by performing the loading and checking of permissions
+of models automatically and reduce duplicated code.
 
 ## Installation
 
-Add this to your Gemfile: 
+Add this to your Gemfile:
 
-    gem 'cancancan', '~> 2.0'
-    
+    gem 'cancancan'
+
 and run the `bundle install` command.
 
-For Rails < 4.2 use:
-
-    gem 'cancancan', '~> 1.10'
-   
-## Getting Started
-
-### 1. Define Abilities
+## Define Abilities
 
 User permissions are defined in an `Ability` class.
 
     rails g cancan:ability
 
-See [Defining Abilities](https://github.com/CanCanCommunity/cancancan/wiki/defining-abilities) for details.
+Here follows an example of rules defined to read a Post model.
+```ruby
+class Ability
+  include CanCan::Ability
+
+  def initialize(user)
+    can :read, Post, public: true
+
+    if user.present?  # additional permissions for logged in users (they can read their own posts)
+      can :read, Post, user_id: user.id
+
+      if user.admin?  # additional permissions for administrators
+        can :read, post
+      end
+    end
+  end
+end
+```
+
+See [Defining Abilities](https://github.com/CanCanCommunity/cancancan/wiki/defining-abilities) for details on how to
+define your rules.
 
 
-### 2. Check Abilities
+## Check Abilities
 
 The current user's permissions can then be checked using the `can?` and `cannot?` methods in views and controllers.
 
 ```erb
-<% if can? :update, @article %>
-  <%= link_to "Edit", edit_article_path(@article) %>
+<% if can? :read, @post %>
+  <%= link_to "View", @post %>
 <% end %>
 ```
 
 See [Checking Abilities](https://github.com/CanCanCommunity/cancancan/wiki/checking-abilities) for more information
+on how you can use these helpers.
 
-### 3. Controller helpers
+## Fetching records
+
+One of the key features of CanCanCan, compared to other authorization libraries,
+is the possibility to retrieve all the objects that the user is authorized to access.
+The following:
+
+```ruby
+  Post.accessible_by(current_ability)
+```
+
+will use your rules to ensure that the user retrieves only a list of posts that can be read.
+See [Fetching records](https://github.com/CanCanCommunity/cancancan/wiki/Fetching-Records) for details.
+
+## Controller helpers
 
 CanCanCan expects a `current_user` method to exist in the controller.
 First, set up some authentication (such as [Devise](https://github.com/plataformatec/devise) or [Authlogic](https://github.com/binarylogic/authlogic)).
@@ -69,23 +99,27 @@ The `authorize!` method in the controller will raise an exception if the user is
 
 ```ruby
 def show
-  @article = Article.find(params[:id])
-  authorize! :read, @article
+  @post = Post.find(params[:id])
+  authorize! :read, @post
 end
 ```
 
-### 3.1 Loaders
+### 3.2 Loaders
 
-Setting this for every action can be tedious, therefore the `load_and_authorize_resource` method is provided to 
-automatically authorize all actions in a RESTful style resource controller. 
+Setting this for every action can be tedious, therefore the `load_and_authorize_resource` method is provided to
+automatically authorize all actions in a RESTful style resource controller.
 It will use a before action to load the resource into an instance variable and authorize it for every action.
 
 ```ruby
-class ArticlesController < ApplicationController
+class PostsController < ApplicationController
   load_and_authorize_resource
 
   def show
-    # @article is already loaded and authorized
+    # @post is already loaded and authorized
+  end
+
+  def index
+    # @posts is already loaded with all posts the user is authorized to read
   end
 end
 ```
@@ -94,7 +128,7 @@ See [Authorizing Controller Actions](https://github.com/CanCanCommunity/cancanca
 for more information.
 
 
-### 3.2 Strong Parameters
+### 3.3 Strong Parameters
 
 You have to sanitize inputs before saving the record, in actions such as `:create` and `:update`.
 
@@ -102,7 +136,7 @@ For the `:update` action, CanCanCan will load and authorize the resource but *no
 
 ```ruby
 def update
-  if @article.update_attributes(update_params)
+  if @post.update(post_params)
     # hurray
   else
     render :edit
@@ -110,16 +144,16 @@ def update
 end
 ...
 
-def update_params
-  params.require(:article).permit(:body)
+def post_params
+  params.require(:post).permit(:body)
 end
 ```
 
-For the `:create` action, CanCanCan will try to initialize a new instance with sanitized input by seeing if your 
+For the `:create` action, CanCanCan will try to initialize a new instance with sanitized input by seeing if your
 controller will respond to the following methods (in order):
 
 1. `create_params`
-2. `<model_name>_params` such as `article_params` (this is the default convention in rails for naming your param method)
+2. `<model_name>_params` such as `post_params` (this is the default convention in rails for naming your param method)
 3. `resource_params` (a generically named method you could specify in each controller)
 
 Additionally, `load_and_authorize_resource` can now take a `param_method` option to specify a custom method in the controller to run to sanitize input.
@@ -127,11 +161,11 @@ Additionally, `load_and_authorize_resource` can now take a `param_method` option
 You can associate the `param_method` option with a symbol corresponding to the name of a method that will get called:
 
 ```ruby
-class ArticlesController < ApplicationController
+class PostsController < ApplicationController
   load_and_authorize_resource param_method: :my_sanitizer
 
   def create
-    if @article.save
+    if @post.save
       # hurray
     else
       render :new
@@ -141,24 +175,24 @@ class ArticlesController < ApplicationController
   private
 
   def my_sanitizer
-    params.require(:article).permit(:name)
+    params.require(:post).permit(:name)
   end
 end
 ```
 
-You can also use a string that will be evaluated in the context of the controller using `instance_eval` and needs to contain valid Ruby code. 
+You can also use a string that will be evaluated in the context of the controller using `instance_eval` and needs to contain valid Ruby code.
 
-    load_and_authorize_resource param_method: 'permitted_params.article'
+    load_and_authorize_resource param_method: 'permitted_params.post'
 
 Finally, it's possible to associate `param_method` with a Proc object which will be called with the controller as the only argument:
 
-    load_and_authorize_resource param_method: Proc.new { |c| c.params.require(:article).permit(:name) }
+    load_and_authorize_resource param_method: Proc.new { |c| c.params.require(:post).permit(:name) }
 
 See [Strong Parameters](https://github.com/CanCanCommunity/cancancan/wiki/Strong-Parameters) for more information.
 
-### 4. Handle Unauthorized Access
+## Handle Unauthorized Access
 
-If the user authorization fails, a `CanCan::AccessDenied` exception will be raised. 
+If the user authorization fails, a `CanCan::AccessDenied` exception will be raised.
 You can catch this and modify its behavior in the `ApplicationController`.
 
 ```ruby
@@ -176,7 +210,7 @@ end
 See [Exception Handling](https://github.com/CanCanCommunity/cancancan/wiki/exception-handling) for more information.
 
 
-### 5. Lock It Down
+## Lock It Down
 
 If you want to ensure authorization happens on every action in your application, add `check_authorization` to your `ApplicationController`.
 
@@ -186,20 +220,9 @@ class ApplicationController < ActionController::Base
 end
 ```
 
-This will raise an exception if authorization is not performed in an action. 
-If you want to skip this, add `skip_authorization_check` to a controller subclass. 
+This will raise an exception if authorization is not performed in an action.
+If you want to skip this, add `skip_authorization_check` to a controller subclass.
 See [Ensure Authorization](https://github.com/CanCanCommunity/cancancan/wiki/Ensure-Authorization) for more information.
-
-## Version 2.0
-
-Version 2.0 drops support for Mongoid and Sequel. 
-
-Please use `gem 'cancancan', '~> 1.10'` for them.
-
-If you are interested in supporting them, contribute to the sibling gems `cancancan-sequel` and `cancancan-mongoid`.
-
-Version 2.0 drops also support for Rails < 4.2 and ruby < 2.2 so, again, use the version 1 of the Gem for these.
-
 
 ## Wiki Docs
 
@@ -212,8 +235,8 @@ Version 2.0 drops also support for Rails < 4.2 and ruby < 2.2 so, again, use the
 
 ## Mission
 
-This repo is a continuation of the dead [CanCan](https://github.com/ryanb/cancan) project. 
-Our mission is to keep CanCan alive and moving forward, with maintenance fixes and new features. 
+This repo is a continuation of the dead [CanCan](https://github.com/ryanb/cancan) project.
+Our mission is to keep CanCan alive and moving forward, with maintenance fixes and new features.
 Pull Requests are welcome!
 
 Any help is greatly appreciated, feel free to submit pull-requests or open issues.
@@ -221,10 +244,10 @@ Any help is greatly appreciated, feel free to submit pull-requests or open issue
 
 ## Questions?
 
-If you have any question or doubt regarding CanCanCan which you cannot find the solution to in the 
-[documentation](https://github.com/CanCanCommunity/cancancan/wiki) or our 
-[mailing list](http://groups.google.com/group/cancancan), please 
-[open a question on Stackoverflow](http://stackoverflow.com/questions/ask?tags=cancancan) with tag 
+If you have any question or doubt regarding CanCanCan which you cannot find the solution to in the
+[documentation](https://github.com/CanCanCommunity/cancancan/wiki) or our
+[mailing list](http://groups.google.com/group/cancancan), please
+[open a question on Stackoverflow](http://stackoverflow.com/questions/ask?tags=cancancan) with tag
 [cancancan](http://stackoverflow.com/questions/tagged/cancancan)
 
 ## Bugs?
@@ -234,14 +257,14 @@ If you find a bug please add an [issue on GitHub](https://github.com/CanCanCommu
 
 ## Development
 
-CanCanCan uses [appraisals](https://github.com/thoughtbot/appraisal) to test the code base against multiple versions 
+CanCanCan uses [appraisals](https://github.com/thoughtbot/appraisal) to test the code base against multiple versions
 of Rails, as well as the different model adapters.
 
 When first developing, you need to run `bundle install` and then `appraisal install`, to install the different sets.
 
 You can then run all appraisal files (like CI does), with `appraisal rake` or just run a specific set `appraisal activerecord_5.0 rake`.
 
-See the [CONTRIBUTING](https://github.com/CanCanCommunity/cancancan/blob/develop/CONTRIBUTING.md) and 
+See the [CONTRIBUTING](https://github.com/CanCanCommunity/cancancan/blob/develop/CONTRIBUTING.md) and
 [spec/README](https://github.com/CanCanCommunity/cancancan/blob/master/spec/README.rdoc) for more information.
 
 
@@ -251,10 +274,10 @@ See the [CONTRIBUTING](https://github.com/CanCanCommunity/cancancan/blob/develop
 
 Thanks to [Renuo AG](https://www.renuo.ch) for currently maintaining and supporting the project.
 
-Also many thanks to the [CanCanCan contributors](https://github.com/CanCanCommunity/cancancan/contributors). 
-See the [CHANGELOG](https://github.com/CanCanCommunity/cancancan/blob/master/CHANGELOG.rdoc) for the full list.
+Also many thanks to the [CanCanCan contributors](https://github.com/CanCanCommunity/cancancan/contributors).
+See the [CHANGELOG](https://github.com/CanCanCommunity/cancancan/blob/master/CHANGELOG.md) for the full list.
 
-CanCanCan was inspired by [declarative_authorization](https://github.com/stffn/declarative_authorization/) and 
-[aegis](https://github.com/makandra/aegis). 
+CanCanCan was inspired by [declarative_authorization](https://github.com/stffn/declarative_authorization/) and
+[aegis](https://github.com/makandra/aegis).
 
 

@@ -1,5 +1,10 @@
+# frozen_string_literal: true
+
 require_relative 'ability/rules.rb'
 require_relative 'ability/actions.rb'
+require_relative 'unauthorized_message_resolver.rb'
+require_relative 'ability/strong_parameter_support'
+
 module CanCan
   # This module is designed to be included into an Ability class. This will
   # provide the "can" methods for defining and checking abilities.
@@ -19,6 +24,8 @@ module CanCan
   module Ability
     include CanCan::Ability::Rules
     include CanCan::Ability::Actions
+    include CanCan::UnauthorizedMessageResolver
+    include StrongParameterSupport
 
     # Check if the user has permission to perform a given action on an object.
     #
@@ -64,10 +71,10 @@ module CanCan
     #   end
     #
     # Also see the RSpec Matchers to aid in testing.
-    def can?(action, subject, *extra_args)
+    def can?(action, subject, attribute = nil, *extra_args)
       match = extract_subjects(subject).lazy.map do |a_subject|
         relevant_rules_for_match(action, a_subject).detect do |rule|
-          rule.matches_conditions?(action, a_subject, extra_args)
+          rule.matches_conditions?(action, a_subject, attribute, *extra_args) && rule.matches_attributes?(attribute)
         end
       end.reject(&:nil?).first
       match ? match.base_behavior : false
@@ -134,8 +141,8 @@ module CanCan
     #     # check the database and return true/false
     #   end
     #
-    def can(action = nil, subject = nil, conditions = nil, &block)
-      add_rule(Rule.new(true, action, subject, conditions, block))
+    def can(action = nil, subject = nil, *attributes_and_conditions, &block)
+      add_rule(Rule.new(true, action, subject, *attributes_and_conditions, &block))
     end
 
     # Defines an ability which cannot be done. Accepts the same arguments as "can".
@@ -150,8 +157,8 @@ module CanCan
     #     product.invisible?
     #   end
     #
-    def cannot(action = nil, subject = nil, conditions = nil, &block)
-      add_rule(Rule.new(false, action, subject, conditions, block))
+    def cannot(action = nil, subject = nil, *attributes_and_conditions, &block)
+      add_rule(Rule.new(false, action, subject, *attributes_and_conditions, &block))
     end
 
     # User shouldn't specify targets with names of real actions or it will cause Seg fault
@@ -167,23 +174,12 @@ module CanCan
 
     # See ControllerAdditions#authorize! for documentation.
     def authorize!(action, subject, *args)
-      message = nil
-      if args.last.is_a?(Hash) && args.last.key?(:message)
-        message = args.pop[:message]
-      end
+      message = args.last.is_a?(Hash) && args.last.key?(:message) ? args.pop[:message] : nil
       if cannot?(action, subject, *args)
         message ||= unauthorized_message(action, subject)
         raise AccessDenied.new(message, action, subject, args)
       end
       subject
-    end
-
-    def unauthorized_message(action, subject)
-      keys = unauthorized_message_keys(action, subject)
-      variables = { action: action.to_s }
-      variables[:subject] = (subject.class == Class ? subject : subject.class).to_s.underscore.humanize.downcase
-      message = I18n.translate(keys.shift, variables.merge(scope: :unauthorized, default: keys + ['']))
-      message.blank? ? nil : message
     end
 
     def attributes_for(action, subject)
@@ -202,12 +198,13 @@ module CanCan
       relevant_rules(action, subject).any?(&:only_raw_sql?)
     end
 
-    # Copies all rules of the given +CanCan::Ability+ and adds them to +self+.
+    # Copies all rules and aliased actions of the given +CanCan::Ability+ and adds them to +self+.
     #   class ReadAbility
     #     include CanCan::Ability
     #
     #     def initialize
     #       can :read, User
+    #       alias_action :show, :index, to: :see
     #     end
     #   end
     #
@@ -216,6 +213,7 @@ module CanCan
     #
     #     def initialize
     #       can :edit, User
+    #       alias_action :create, :update, to: :modify
     #     end
     #   end
     #
@@ -223,11 +221,35 @@ module CanCan
     #   read_ability.can? :edit, User.new #=> false
     #   read_ability.merge(WritingAbility.new)
     #   read_ability.can? :edit, User.new #=> true
+    #   read_ability.aliased_actions #=> [:see => [:show, :index], :modify => [:create, :update]]
     #
+    # If there are collisions when merging the +aliased_actions+, the actions on +self+ will be
+    # overwritten.
+    #
+    # class ReadAbility
+    #   include CanCan::Ability
+    #
+    #   def initialize
+    #     alias_action :show, :index, to: :see
+    #   end
+    # end
+    #
+    # class ShowAbility
+    #   include CanCan::Ability
+    #
+    #   def initialize
+    #     alias_action :show, to: :see
+    #   end
+    # end
+    #
+    # read_ability = ReadAbility.new
+    # read_ability.merge(ShowAbility)
+    # read_ability.aliased_actions #=> [:see => [:show]]
     def merge(ability)
       ability.rules.each do |rule|
         add_rule(rule.dup)
       end
+      @aliased_actions = aliased_actions.merge(ability.aliased_actions)
       self
     end
 
@@ -239,10 +261,13 @@ module CanCan
     #
     # Where can_hash and cannot_hash are formatted thusly:
     #   {
-    #     action: array_of_objects
+    #     action: { subject: [attributes] }
     #   }
     def permissions
-      permissions_list = { can: {}, cannot: {} }
+      permissions_list = {
+        can: Hash.new { |actions, k1| actions[k1] = Hash.new { |subjects, k2| subjects[k2] = [] } },
+        cannot: Hash.new { |actions, k1| actions[k1] = Hash.new { |subjects, k2| subjects[k2] = [] } }
+      }
       rules.each { |rule| extract_rule_in_permissions(permissions_list, rule) }
       permissions_list
     end
@@ -250,8 +275,9 @@ module CanCan
     def extract_rule_in_permissions(permissions_list, rule)
       expand_actions(rule.actions).each do |action|
         container = rule.base_behavior ? :can : :cannot
-        permissions_list[container][action] ||= []
-        permissions_list[container][action] += rule.subjects.map(&:to_s)
+        rule.subjects.each do |subject|
+          permissions_list[container][action][subject.to_s] += rule.attributes
+        end
       end
     end
 
