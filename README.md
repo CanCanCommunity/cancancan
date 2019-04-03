@@ -77,14 +77,14 @@ on how you can use these helpers.
 ## Fetching records
 
 One of the key features of CanCanCan, compared to other authorization libraries,
-is the possibility to retrieve all the objects that the user is authorized to, for example, read.
+is the possibility to retrieve all the objects that the user is authorized to access.
 The following:
 
 ```ruby
   Post.accessible_by(current_ability)
 ```
 
-will reuse your previously defined rules to ensure that the user retrieves only a list of posts he can read.
+will use your rules to ensure that the user retrieves only a list of posts that can be read.
 See [Fetching records](https://github.com/CanCanCommunity/cancancan/wiki/Fetching-Records) for details.
 
 ## Controller helpers
