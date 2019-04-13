@@ -1,3 +1,7 @@
+## 3.0.1
+
+* [#583](https://github.com/CanCanCommunity/cancancan/pull/583): Fix regression when using a method reference block. ([@coorasse][])
+
 ## 3.0.0
 
 Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.com/CanCanCommunity/cancancan/wiki/Migrating-from-CanCanCan-2.x-to-3.0)

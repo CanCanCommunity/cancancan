@@ -441,6 +441,38 @@ describe CanCan::Ability do
     expect(@ability.attributes_for(:new, Range)).to eq(foo: 'foo', bar: 123, baz: 'baz')
   end
 
+  # rubocop:disable Style/SymbolProc
+  describe 'different usages of blocks and procs' do
+    class A
+      def active?
+        true
+      end
+    end
+    it 'can use a do...end block' do
+      @ability.can :read, A do |a|
+        a.active?
+      end
+      expect(@ability).to be_able_to(:read, A.new)
+    end
+
+    it 'can use a inline block' do
+      @ability.can(:read, A) { |a| a.active? }
+      expect(@ability).to be_able_to(:read, A.new)
+    end
+
+    it 'can use a method reference' do
+      @ability.can :read, A, &:active?
+      expect(@ability).to be_able_to(:read, A.new)
+    end
+
+    it 'can use a Proc' do
+      proc = Proc.new(&:active?)
+      @ability.can :read, A, &proc
+      expect(@ability).to be_able_to(:read, A.new)
+    end
+  end
+  # rubocop:enable Style/SymbolProc
+
   describe '#authorize!' do
     describe 'when ability is not authorized to perform an action' do
       it 'raises access denied exception' do
