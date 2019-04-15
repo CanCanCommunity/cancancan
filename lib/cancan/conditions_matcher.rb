@@ -21,7 +21,7 @@ module CanCan
     def matches_block_conditions(subject, *extra_args)
       return @base_behavior if subject_class?(subject)
 
-      @block.call(subject, *extra_args)
+      @block.call(subject, *extra_args.compact)
     end
 
     def matches_non_block_conditions(subject)
