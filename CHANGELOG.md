@@ -1,5 +1,6 @@
 ## 3.0.1
 
+* [#590](https://github.com/CanCanCommunity/cancancan/pull/590): Fix Rule#inspect when rule is created through a SQL array. ([@frostblooded][])
 * [#583](https://github.com/CanCanCommunity/cancancan/pull/583): Fix regression when using a method reference block. ([@coorasse][])
 
 ## 3.0.0
@@ -643,3 +644,4 @@ Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.co
 [@andrew-aladev]: https://github.com/andrew-aladev
 [@phaedryx]: https://github.com/phaedryx
 [@kaspernj]: https://github.com/kaspernj
+[@frostblooded]: https://github.com/frostblooded
