@@ -34,11 +34,13 @@ module CanCan
     def inspect
       repr = "#<#{self.class.name}"
       repr += "#{@base_behavior ? 'can' : 'cannot'} #{@actions.inspect}, #{@subjects.inspect}, #{@attributes.inspect}"
-      repr += if with_scope?
-                ", #{@conditions.where_values_hash}"
-              elsif [Hash, String].include?(@conditions.class)
-                ", #{@conditions.inspect}"
-              end
+
+      if with_scope?
+        repr += ", #{@conditions.where_values_hash}"
+      elsif [Hash, String].include?(@conditions.class)
+        repr += ", #{@conditions.inspect}"
+      end
+
       repr + '>'
     end
 
