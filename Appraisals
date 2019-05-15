@@ -80,6 +80,6 @@ appraise 'activerecord_6.0.0' do
 
   platforms :ruby, :mswin, :mingw do
     gem 'pg', '~> 1.1.4'
-    gem 'sqlite3', '~> 1.3.0'
+    gem 'sqlite3', '~> 1.4.0'
   end
 end
