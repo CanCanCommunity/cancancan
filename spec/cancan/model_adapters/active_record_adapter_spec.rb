@@ -530,12 +530,22 @@ WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
       ability.can :read, Article, mentions: { user: { name: u2.name } }
       expect(Article.accessible_by(ability)).to match_array([a1, a2])
       if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
-        expect(ability.model_adapter(Article, :read)).to generate_sql(%(
-  SELECT DISTINCT "articles".*
-  FROM "articles"
-  LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
-  LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
-  WHERE (("users"."name" = 'paperino') OR ("users"."name" = 'pippo'))))
+        sql = <<-SQL
+          SELECT
+            "articles"."id" AS t0_r0, "articles"."name" AS t0_r1, "articles"."created_at" AS t0_r2,
+            "articles"."updated_at" AS t0_r3, "articles"."published" AS t0_r4,
+            "articles"."secret" AS t0_r5, "articles"."priority" AS t0_r6,
+            "articles"."category_id" AS t0_r7, "articles"."project_id" AS t0_r8,
+            "articles"."user_id" AS t0_r9, "legacy_mentions"."id" AS t1_r0, "legacy_mentions"."user_id" AS t1_r1,
+            "legacy_mentions"."article_id" AS t1_r2, "legacy_mentions"."created_at" AS t1_r3,
+            "legacy_mentions"."updated_at" AS t1_r4, "users"."id" AS t2_r0, "users"."name" AS t2_r1,
+            "users"."created_at" AS t2_r2, "users"."updated_at" AS t2_r3
+          FROM "articles"
+          LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
+          LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
+          WHERE (("users"."name" = 'paperino') OR ("users"."name" = 'pippo'))
+        SQL
+        expect(ability.model_adapter(Article, :read)).to generate_sql(sql)
       end
     end
   end

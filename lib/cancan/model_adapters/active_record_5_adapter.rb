@@ -23,7 +23,7 @@ module CanCan
 
       def build_relation(*where_conditions)
         relation = @model_class.where(*where_conditions)
-        relation = relation.left_joins(joins).distinct if joins.present?
+        relation = relation.includes(joins).references(joins) if joins.present?
         relation
       end
 

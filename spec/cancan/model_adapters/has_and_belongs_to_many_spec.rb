@@ -53,12 +53,15 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecord5Adapter do
 
     if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
       it 'generates the correct query' do
-        expect(ability.model_adapter(House, :read))
-          .to generate_sql("SELECT DISTINCT \"houses\".*
-                          FROM \"houses\"
-                          LEFT OUTER JOIN \"houses_people\" ON \"houses_people\".\"house_id\" = \"houses\".\"id\"
-                          LEFT OUTER JOIN \"people\" ON \"people\".\"id\" = \"houses_people\".\"person_id\"
-                          WHERE \"people\".\"id\" = #{@person1.id}")
+        sql = <<-SQL
+          SELECT
+          "houses"."id" AS t0_r0, "houses"."restructured" AS t0_r1, "houses"."created_at" AS t0_r2,
+          "houses"."updated_at" AS t0_r3, "people"."id" AS t1_r0, "people"."name" AS t1_r1,
+          "people"."created_at" AS t1_r2, "people"."updated_at" AS t1_r3 FROM "houses"
+          LEFT OUTER JOIN "houses_people" ON "houses_people"."house_id" = "houses"."id"
+          LEFT OUTER JOIN "people" ON "people"."id" = "houses_people"."person_id" WHERE "people"."id" = #{@person1.id}
+        SQL
+        expect(ability.model_adapter(House, :read)).to generate_sql(sql)
       end
     end
   end
