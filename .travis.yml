@@ -51,6 +51,7 @@ notifications:
     on_success: change
     on_failure: change
 before_install:
+  - rvm get stable
   - gem update --system
   - gem install bundler
 script:
