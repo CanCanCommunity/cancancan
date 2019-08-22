@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # credits to https://github.com/rubocop-hq/rubocop for this CHANGELOG checker
 RSpec.describe 'changelog' do
   subject(:changelog) do

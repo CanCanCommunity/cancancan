@@ -1,8 +1,26 @@
-## Unreleased
+* [#592](https://github.com/CanCanCommunity/cancancan/pull/592): Prevent normalization of through polymorphic associations.([@eloyesp][])
+
+## 3.0.1
+
+* [#583](https://github.com/CanCanCommunity/cancancan/pull/583): Fix regression when using a method reference block. ([@coorasse][])
+
+## 3.0.0
+
+Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.com/CanCanCommunity/cancancan/wiki/Migrating-from-CanCanCan-2.x-to-3.0)
+
+* [#560](https://github.com/CanCanCommunity/cancancan/pull/560): Add support for Rails 6.0. ([@coorasse][])
+* [#489](https://github.com/CanCanCommunity/cancancan/pull/489): Drop support for actions without a subject. ([@andrew-aladev][])
+* [#474](https://github.com/CanCanCommunity/cancancan/pull/474): Allow to add attribute-level rules. ([@phaedryx][])
+* [#512](https://github.com/CanCanCommunity/cancancan/pull/512): Removed automatic eager loading of associations for ActiveRecord >= 5.0. ([@kaspernj][])
+* [#575](https://github.com/CanCanCommunity/cancancan/pull/575): Use the rules compressor when generating joins in accessible_by. ([@coorasse][])
 
 * [#444](https://github.com/CanCanCommunity/cancancan/issues/444): Allow to use symbols when defining conditions over enums. ([@s-mage][])
 * [#538](https://github.com/CanCanCommunity/cancancan/issues/538): Merge alias actions when merging abilities. ([@Jcambass][])
 * [#462](https://github.com/CanCanCommunity/cancancan/issues/462): Add support to translate the model name in messages. ([@nyamadori][])
+* [#567](https://github.com/CanCanCommunity/cancancan/issues/567): Extensively run tests on different databases (sqlite and postgres). ([@coorasse][])
+* [#566](https://github.com/CanCanCommunity/cancancan/issues/566): Avoid queries on session dumps (speed up error pages). ([@coorasse][])
+* [#568](https://github.com/CanCanCommunity/cancancan/issues/568): Automatically freeze strings in all files. ([@coorasse][])
+* [#577](https://github.com/CanCanCommunity/cancancan/pull/577): Normalise rules traversing associations to reduce the number of joins. ([@coorasse][])
 
 ## 2.3.0 (Sep 16th, 2018)
 
@@ -624,3 +642,7 @@
 [@s-mage]: https://github.com/s-mage
 [@Jcambass]: https://github.com/Jcambass
 [@nyamadori]: https://github.com/nyamadori
+[@andrew-aladev]: https://github.com/andrew-aladev
+[@phaedryx]: https://github.com/phaedryx
+[@kaspernj]: https://github.com/kaspernj
+[@eloyesp]: https://github.com/eloyesp
