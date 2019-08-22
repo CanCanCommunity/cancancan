@@ -68,9 +68,9 @@ appraise 'activerecord_5.2.2' do
 end
 
 appraise 'activerecord_6.0.0' do
-  gem 'actionpack', '~> 6.0.0.beta3', require: 'action_pack'
-  gem 'activerecord', '~> 6.0.0.beta3', require: 'active_record'
-  gem 'activesupport', '~> 6.0.0.beta3', require: 'active_support/all'
+  gem 'actionpack', '~> 6.0.0', require: 'action_pack'
+  gem 'activerecord', '~> 6.0.0', require: 'active_record'
+  gem 'activesupport', '~> 6.0.0', require: 'active_support/all'
 
   platforms :jruby do
     gem 'activerecord-jdbcsqlite3-adapter'
