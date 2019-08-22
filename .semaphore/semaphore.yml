@@ -1,0 +1,34 @@
+version: v1.0
+name: cancancan
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu1804
+auto_cancel:
+  running:
+    when: 'true'
+blocks:
+  - name: Tests
+    task:
+      jobs:
+      - name: Tests
+        matrix:
+          - env_var: RUBY_VERSION
+            values: [ '2.3.5' ]
+          - env_var: BUNDLE_GEMFILE
+            values: [ 'gemfiles/activerecord_4.2.0.gemfile', 'gemfiles/activerecord_5.0.2.gemfile', 'gemfiles/activerecord_5.1.0.gemfile', 'gemfiles/activerecord_5.2.2.gemfile', 'gemfiles/activerecord_6.0.0.gemfile' ]
+          - env_var: DB
+            values: [ 'sqlite', 'postgres' ]
+        commands:
+          - echo $APP_ENV
+          - echo $RUBY_VERSION
+          - checkout --use-cache
+          - cache restore
+          - sem-version ruby $RUBY_VERSION
+          - gem install bundler
+          - bundle install --jobs=3
+          - cache store
+          - if [ $DB == "postgres" ]; then sem-service start postgres; fi
+          - if [ $DB == "postgres" ]; then psql -U postgres -h localhost -c "CREATE USER semaphore;";  fi
+          - if [ $DB == "postgres" ]; then psql -U postgres -h localhost -c "ALTER USER semaphore WITH SUPERUSER;";  fi
+          - bundle exec rubocop && bundle exec rspec
