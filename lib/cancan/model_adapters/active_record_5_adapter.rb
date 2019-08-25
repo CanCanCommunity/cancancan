@@ -23,8 +23,20 @@ module CanCan
 
       def build_relation(*where_conditions)
         relation = @model_class.where(*where_conditions)
-        relation = relation.left_joins(joins).distinct if joins.present?
+        relation = add_joins_to_relation(relation)
         fix_order_select_distinct(relation)
+      end
+
+      def add_joins_to_relation(relation)
+        return relation unless joins.present?
+
+        # AR#left_joins doesn't play nicely in AR 5.0 and 5.1
+        # see https://github.com/CanCanCommunity/cancancan/pull/600#issuecomment-524672268
+        if self.class.version_greater_or_equal?('5.2')
+          relation.left_joins(joins).distinct
+        else
+          relation.includes(joins).references(joins)
+        end
       end
 
       # Rails 4.2 deprecates `sanitize_sql_hash_for_conditions`
