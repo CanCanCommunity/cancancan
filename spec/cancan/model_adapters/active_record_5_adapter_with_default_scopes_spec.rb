@@ -77,30 +77,35 @@ if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
           accessible = BlogPostComment.accessible_by(ability)
           expected_bodies_in_order = [p2c2, p2c1, p1c2, p1c1].map(&:body)
           expect(accessible.map(&:body)).to eq(expected_bodies_in_order)
+          expect(accessible.count).to eq(4)
         end
 
         it 'can get accessible records from a has_many' do
           accessible = p2.blog_post_comments.accessible_by(ability)
           expected_bodies_in_order = [p2c2, p2c1].map(&:body)
           expect(accessible.map(&:body)).to eq(expected_bodies_in_order)
+          expect(accessible.count).to eq(2)
         end
 
         it 'can get accessible records from a has_many - other post' do
           accessible = p1.blog_post_comments.accessible_by(ability)
           expected_bodies_in_order = [p1c2, p1c1].map(&:body)
           expect(accessible.map(&:body)).to eq(expected_bodies_in_order)
+          expect(accessible.count).to eq(2)
         end
 
         it 'can get accessible records from a has_many :through' do
           accessible = alex.blog_post_comments.accessible_by(ability)
           expected_bodies_in_order = [p2c2, p2c1].map(&:body)
           expect(accessible.map(&:body)).to eq(expected_bodies_in_order)
+          expect(accessible.count).to eq(2)
         end
 
         it 'can get accessible records from a has_many :through - other user' do
           accessible = josh.blog_post_comments.accessible_by(ability)
           expected_bodies_in_order = [p1c2, p1c1].map(&:body)
           expect(accessible.map(&:body)).to eq(expected_bodies_in_order)
+          expect(accessible.count).to eq(2)
         end
       end
 
@@ -115,30 +120,35 @@ if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
           accessible = BlogPostComment.accessible_by(ability)
           expected_bodies_in_order = [p2c2, p2c1].map(&:body)
           expect(accessible.map(&:body)).to eq(expected_bodies_in_order)
+          expect(accessible.count).to eq(2)
         end
 
         it 'can get accessible records from a has_many' do
           accessible = p2.blog_post_comments.accessible_by(ability)
           expected_bodies_in_order = [p2c2, p2c1].map(&:body)
           expect(accessible.map(&:body)).to eq(expected_bodies_in_order)
+          expect(accessible.count).to eq(2)
         end
 
         it 'can get accessible records from a has_many - none returned' do
           accessible = p1.blog_post_comments.accessible_by(ability)
           expected_bodies_in_order = []
           expect(accessible.map(&:body)).to eq(expected_bodies_in_order)
+          expect(accessible.count).to eq(0)
         end
 
         it 'can get accessible records from a has_many :through' do
           accessible = alex.blog_post_comments.accessible_by(ability)
           expected_bodies_in_order = [p2c2, p2c1].map(&:body)
           expect(accessible.map(&:body)).to eq(expected_bodies_in_order)
+          expect(accessible.count).to eq(2)
         end
 
         it 'can get accessible records from a has_many :through - none returned' do
           accessible = josh.blog_post_comments.accessible_by(ability)
           expected_bodies_in_order = []
           expect(accessible.map(&:body)).to eq(expected_bodies_in_order)
+          expect(accessible.count).to eq(0)
         end
       end
     end
