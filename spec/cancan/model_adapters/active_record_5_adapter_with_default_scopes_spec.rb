@@ -55,17 +55,17 @@ if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
 
       subject(:ability) { Ability.new(nil) }
 
-      let(:alex) { BlogAuthor.create!(name: "Alex") }
-      let(:josh) { BlogAuthor.create!(name: "Josh") }
+      let(:alex) { BlogAuthor.create!(name: 'Alex') }
+      let(:josh) { BlogAuthor.create!(name: 'Josh') }
 
-      let(:p1) { josh.blog_posts.create!(title: "p1") }
-      let(:p2) { alex.blog_posts.create!(title: "p2") }
+      let(:p1) { josh.blog_posts.create!(title: 'p1') }
+      let(:p2) { alex.blog_posts.create!(title: 'p2') }
 
-      let(:p1c1) { p1.blog_post_comments.create!(body: "p1c1", created_at: Time.new(2019, 8, 25, 1)) }
-      let(:p1c2) { p1.blog_post_comments.create!(body: "p1c2", created_at: Time.new(2019, 8, 25, 2)) }
+      let(:p1c1) { p1.blog_post_comments.create!(body: 'p1c1', created_at: Time.new(2019, 8, 25, 1)) }
+      let(:p1c2) { p1.blog_post_comments.create!(body: 'p1c2', created_at: Time.new(2019, 8, 25, 2)) }
 
-      let(:p2c1) { p2.blog_post_comments.create!(body: "p2c1", created_at: Time.new(2019, 8, 25, 3)) }
-      let(:p2c2) { p2.blog_post_comments.create!(body: "p2c2", created_at: Time.new(2019, 8, 25, 4)) }
+      let(:p2c1) { p2.blog_post_comments.create!(body: 'p2c1', created_at: Time.new(2019, 8, 25, 3)) }
+      let(:p2c2) { p2.blog_post_comments.create!(body: 'p2c2', created_at: Time.new(2019, 8, 25, 4)) }
 
       context 'when default scope sets an order, and abilities dont have extra checks' do
         before do

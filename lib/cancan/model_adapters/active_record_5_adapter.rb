@@ -60,6 +60,9 @@ module CanCan
       end
 
       #### METHODS BELOW FROM kaspernj/active_record_query_fixer ####
+      # I don't expect this to get merged without more tidying up.
+
+      # rubocop:disable Metrics/MethodLength,Metrics/AbcSize
 
       # from https://github.com/kaspernj/active_record_query_fixer/blob/master/lib/active_record_query_fixer.rb#L32
       def fix_order_select_distinct(query)
@@ -67,8 +70,9 @@ module CanCan
 
         @count_select ||= 0
         changed = false
-        query.values[:order]&.each do |order|
-          query = query.select("#{extract_table_and_column_from_expression(order)} AS active_record_query_fixer_#{@count_select}")
+        query.values[:order].each do |order|
+          select = "#{extract_table_and_column_from_expression(order)} AS active_record_query_fixer_#{@count_select}"
+          query = query.select(select)
           changed = true
           @count_select += 1
         end
@@ -91,6 +95,8 @@ module CanCan
           raise "Couldn't extract table and column from: #{order}"
         end
       end
+
+      # rubocop:enable Metrics/MethodLength,Metrics/AbcSize
 
       #### METHODS ABOVE FROM kaspernj/active_record_query_fixer ####
     end
