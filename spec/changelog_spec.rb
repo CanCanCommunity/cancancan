@@ -11,6 +11,8 @@ RSpec.describe 'changelog' do
     expect(changelog.end_with?("\n")).to be true
   end
 
+  # if this test fails it means you probably haven't added a link
+  # for your GH username at the bottom of the CHANGELOG
   it 'has link definitions for all implicit links' do
     implicit_link_names = changelog.scan(/\[([^\]]+)\]\[\]/).flatten.uniq
     implicit_link_names.each do |name|

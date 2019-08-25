@@ -1,7 +1,9 @@
 ## 3.0.2
 
 * [#590](https://github.com/CanCanCommunity/cancancan/pull/590): Fix Rule#inspect when rule is created through a SQL array. ([@frostblooded][])
-* [#592](https://github.com/CanCanCommunity/cancancan/pull/592): Prevent normalization of through polymorphic associations.([@eloyesp][])
+* [#592](https://github.com/CanCanCommunity/cancancan/pull/592): Prevent normalization of through polymorphic associations. ([@eloyesp][])
+* [#600](https://github.com/CanCanCommunity/cancancan/pull/600): Switch back to eagerly loading associations for ActiveRecord 5.0.x and 5.1.x. 5.2+ will still not automatically eager load. ([@ghiculescu][])
+* [#600](https://github.com/CanCanCommunity/cancancan/pull/600): Fix regression when using accessibl_by with default_scopes that set an order. ([@ghiculescu][])
 
 ## 3.0.1
 
@@ -650,3 +652,4 @@ Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.co
 [@kaspernj]: https://github.com/kaspernj
 [@frostblooded]: https://github.com/frostblooded
 [@eloyesp]: https://github.com/eloyesp
+[@ghiculescu]: https://github.com/ghiculescu
