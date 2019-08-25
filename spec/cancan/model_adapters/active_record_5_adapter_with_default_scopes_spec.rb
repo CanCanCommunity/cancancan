@@ -108,7 +108,7 @@ if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
         before do
           ability.can :read, BlogPost
           # this is the only change vs. the above context -- in this context we can *only* see alex's posts
-          ability.can :read, BlogPostComment, blog_post: { blog_author: { id: alex.id } }
+          ability.can :read, BlogPostComment, blog_post: { blog_author_id: alex.id }
         end
 
         it 'can get accessible records' do
