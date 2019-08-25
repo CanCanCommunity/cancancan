@@ -24,7 +24,7 @@ module CanCan
       def build_relation(*where_conditions)
         relation = @model_class.where(*where_conditions)
         relation = relation.left_joins(joins).distinct if joins.present?
-        relation
+        fix_order_select_distinct(relation)
       end
 
       # Rails 4.2 deprecates `sanitize_sql_hash_for_conditions`
@@ -58,6 +58,41 @@ module CanCan
           @model_class.send(:connection).visitor.compile(node)
         end
       end
+
+      #### METHODS BELOW FROM kaspernj/active_record_query_fixer ####
+
+      # from https://github.com/kaspernj/active_record_query_fixer/blob/master/lib/active_record_query_fixer.rb#L32
+      def fix_order_select_distinct(query)
+        return query unless query.values[:distinct].present? && query.values[:order].present?
+
+        @count_select ||= 0
+        changed = false
+        query.values[:order]&.each do |order|
+          query = query.select("#{extract_table_and_column_from_expression(order)} AS active_record_query_fixer_#{@count_select}")
+          changed = true
+          @count_select += 1
+        end
+
+        query = query.select("#{query.table_name}.*") if changed
+        query
+      end
+
+      # https://github.com/kaspernj/active_record_query_fixer/blob/master/lib/active_record_query_fixer.rb#L54
+      def extract_table_and_column_from_expression(order)
+        if order.is_a?(Arel::Nodes::Ascending) || order.is_a?(Arel::Nodes::Descending)
+          if order.expr.relation.respond_to?(:right)
+            "#{order.expr.relation.right}.#{order.expr.name}"
+          else
+            "#{order.expr.relation.table_name}.#{order.expr.name}"
+          end
+        elsif order.is_a?(String)
+          order
+        else
+          raise "Couldn't extract table and column from: #{order}"
+        end
+      end
+
+      #### METHODS ABOVE FROM kaspernj/active_record_query_fixer ####
     end
   end
 end
