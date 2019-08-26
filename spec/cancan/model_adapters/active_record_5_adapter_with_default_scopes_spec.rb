@@ -73,10 +73,12 @@ if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
           ability.can :read, BlogPostComment
         end
 
-        it 'generates pretty SQL' do
-          expect(ability.model_adapter(BlogPostComment, :read)).to generate_sql(%(
-            SELECT "blog_post_comments".* FROM "blog_post_comments" ORDER BY "blog_post_comments"."created_at" DESC
-          ))
+        if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.2.0')
+          it 'generates pretty SQL' do
+            expect(ability.model_adapter(BlogPostComment, :read)).to generate_sql(%(
+              SELECT "blog_post_comments".* FROM "blog_post_comments" ORDER BY "blog_post_comments"."created_at" DESC
+            ))
+          end
         end
 
         it 'can get accessible records' do
@@ -122,17 +124,19 @@ if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
           ability.can :read, BlogPostComment, blog_post: { blog_author_id: alex.id }
         end
 
-        it 'generates ugly SQL' do
-          # see comments in `ActiveRecord5Adapter#extract_ids_and_requery` for why this query is so funky
-          # if this test fails because you made the query nicer... that's great. please update the test!
-          expect(ability.model_adapter(BlogPostComment, :read)).to generate_sql(%(
-            SELECT "blog_post_comments".* FROM "blog_post_comments" WHERE "blog_post_comments"."id" IN
-            (SELECT DISTINCT "blog_post_comments"."id"
-            FROM "blog_post_comments"
-            LEFT OUTER JOIN "blog_posts" ON "blog_posts"."id" = "blog_post_comments"."blog_post_id"
-            WHERE "blog_posts"."blog_author_id" = 1)
-            ORDER BY "blog_post_comments"."created_at" DESC
-            ))
+        if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.2.0')
+          it 'generates ugly SQL' do
+            # see comments in `ActiveRecord5Adapter#extract_ids_and_requery` for why this query is so funky
+            # if this test fails because you made the query nicer... that's great. please update the test!
+            expect(ability.model_adapter(BlogPostComment, :read)).to generate_sql(%(
+              SELECT "blog_post_comments".* FROM "blog_post_comments" WHERE "blog_post_comments"."id" IN
+              (SELECT DISTINCT "blog_post_comments"."id"
+              FROM "blog_post_comments"
+              LEFT OUTER JOIN "blog_posts" ON "blog_posts"."id" = "blog_post_comments"."blog_post_id"
+              WHERE "blog_posts"."blog_author_id" = 1)
+              ORDER BY "blog_post_comments"."created_at" DESC
+              ))
+          end
         end
 
         it 'can get accessible records' do
