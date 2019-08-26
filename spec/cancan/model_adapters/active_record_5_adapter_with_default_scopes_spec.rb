@@ -132,8 +132,7 @@ if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
             LEFT OUTER JOIN "blog_posts" ON "blog_posts"."id" = "blog_post_comments"."blog_post_id"
             WHERE "blog_posts"."blog_author_id" = 1)
             ORDER BY "blog_post_comments"."created_at" DESC
-            )
-          )
+            ))
         end
 
         it 'can get accessible records' do
