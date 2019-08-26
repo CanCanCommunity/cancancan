@@ -194,6 +194,7 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
     Article.create!(published: true, category: category)
     Article.create!(published: true, category: category)
     expect(Category.accessible_by(@ability)).to match_array([category])
+    expect(Category.accessible_by(@ability).count).to eq(1)
   end
 
   it 'only reads comments for visible categories through articles' do

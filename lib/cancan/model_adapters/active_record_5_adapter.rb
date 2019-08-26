@@ -22,9 +22,34 @@ module CanCan
       private
 
       def build_relation(*where_conditions)
-        relation = @model_class.where(*where_conditions)
+        relation = @model_class.all
+        return relation unless where_conditions.any?(&:present?) || joins.present?
+
+        relation = relation.where(*where_conditions)
         relation = add_joins_to_relation(relation)
-        fix_order_select_distinct(relation)
+        extract_ids_and_requery(relation)
+      end
+
+      def extract_ids_and_requery(relation)
+        need_to_extract_ids = relation.values[:distinct].present? || relation.values[:order].present?
+
+        # we need to extract IDs if the query has a builtin `distinct` or `order`. an example of when
+        # would be a `default_scope` that adds either. this is because otherwise you'll call
+        # SELECT DISTINCT @model_class.* ORDER BY ___, but there's no guarantee that the columns you
+        # order by will be included in the SELECT. a previously attempted solution was to add
+        # SELECTs for all the ORDER depends on (see https://github.com/CanCanCommunity/cancancan/pull/600)
+        # but this breaks COUNT queries. the simplest general purpose solution is to get IDs for all
+        # records that match the cancan criteria, then do *another* query that re-adds the default scope.
+        # this is what we do here.
+        # the main downside is some queries cancan generates will now look a bit uglier.
+        if need_to_extract_ids
+          @model_class.where(id: relation.reorder(nil).select("id").distinct)
+        else
+          # if we don't already have a `distinct` (relation.values[:distinct].blank?)
+          # but we have added a join, we need to add our own `distinct`.
+          relation = relation.distinct if joins.present?
+          relation
+        end
       end
 
       def add_joins_to_relation(relation)
@@ -33,7 +58,7 @@ module CanCan
         # AR#left_joins doesn't play nicely in AR 5.0 and 5.1
         # see https://github.com/CanCanCommunity/cancancan/pull/600#issuecomment-524672268
         if self.class.version_greater_or_equal?('5.2')
-          relation.left_joins(joins).distinct
+          relation.left_joins(joins)
         else
           relation.includes(joins).references(joins)
         end
@@ -70,47 +95,6 @@ module CanCan
           @model_class.send(:connection).visitor.compile(node)
         end
       end
-
-      #### METHODS BELOW FROM kaspernj/active_record_query_fixer ####
-      # I don't expect this to get merged without more tidying up.
-
-      # rubocop:disable Metrics/MethodLength,Metrics/AbcSize
-
-      # from https://github.com/kaspernj/active_record_query_fixer/blob/master/lib/active_record_query_fixer.rb#L32
-      def fix_order_select_distinct(query)
-        return query unless query.values[:distinct].present? && query.values[:order].present?
-
-        @count_select ||= 0
-        changed = false
-        query.values[:order].each do |order|
-          select = "#{extract_table_and_column_from_expression(order)} AS active_record_query_fixer_#{@count_select}"
-          query = query.select(select)
-          changed = true
-          @count_select += 1
-        end
-
-        query = query.select("#{query.table_name}.*") if changed
-        query
-      end
-
-      # https://github.com/kaspernj/active_record_query_fixer/blob/master/lib/active_record_query_fixer.rb#L54
-      def extract_table_and_column_from_expression(order)
-        if order.is_a?(Arel::Nodes::Ascending) || order.is_a?(Arel::Nodes::Descending)
-          if order.expr.relation.respond_to?(:right)
-            "#{order.expr.relation.right}.#{order.expr.name}"
-          else
-            "#{order.expr.relation.table_name}.#{order.expr.name}"
-          end
-        elsif order.is_a?(String)
-          order
-        else
-          raise "Couldn't extract table and column from: #{order}"
-        end
-      end
-
-      # rubocop:enable Metrics/MethodLength,Metrics/AbcSize
-
-      #### METHODS ABOVE FROM kaspernj/active_record_query_fixer ####
     end
   end
 end
