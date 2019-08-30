@@ -43,7 +43,7 @@ module CanCan
         # this is what we do here.
         # the main downside is some queries cancan generates will now look a bit uglier.
         if need_to_extract_ids
-          @model_class.where(id: relation.reorder(nil).select(:id).distinct)
+          @model_class.where(id: relation.reorder(nil).pluck(:id).uniq)
         else
           # if we don't already have a `distinct` (relation.values[:distinct].blank?)
           # but we have added a join, we need to add our own `distinct`.
