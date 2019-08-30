@@ -87,7 +87,7 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecord5Adapter do
     end
   end
 
-  if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
+  if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.2.0')
     describe 'selecting custom columns' do
       it 'extracts custom columns correctly' do
         posts = Post.accessible_by(ability).select('title as mytitle')

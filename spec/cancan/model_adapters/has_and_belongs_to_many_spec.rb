@@ -51,7 +51,7 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecord5Adapter do
       expect(houses).to match_array [@house2, @house1]
     end
 
-    if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
+    if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.2.0')
       it 'generates the correct query' do
         expect(ability.model_adapter(House, :read))
           .to generate_sql("SELECT DISTINCT \"houses\".*

@@ -530,7 +530,8 @@ WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
       ability.can :read, Article, mentioned_users: { name: u1.name }
       ability.can :read, Article, mentions: { user: { name: u2.name } }
       expect(Article.accessible_by(ability)).to match_array([a1, a2])
-      if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
+
+      if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.2.0')
         expect(ability.model_adapter(Article, :read)).to generate_sql(%(
   SELECT DISTINCT "articles".*
   FROM "articles"
