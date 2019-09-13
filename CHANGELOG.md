@@ -1,3 +1,8 @@
+## 3.0.2
+
+* [#590](https://github.com/CanCanCommunity/cancancan/pull/590): Fix Rule#inspect when rule is created through a SQL array. ([@frostblooded][])
+* [#592](https://github.com/CanCanCommunity/cancancan/pull/592): Prevent normalization of through polymorphic associations.([@eloyesp][])
+
 ## 3.0.1
 
 * [#583](https://github.com/CanCanCommunity/cancancan/pull/583): Fix regression when using a method reference block. ([@coorasse][])
@@ -643,3 +648,5 @@ Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.co
 [@andrew-aladev]: https://github.com/andrew-aladev
 [@phaedryx]: https://github.com/phaedryx
 [@kaspernj]: https://github.com/kaspernj
+[@frostblooded]: https://github.com/frostblooded
+[@eloyesp]: https://github.com/eloyesp

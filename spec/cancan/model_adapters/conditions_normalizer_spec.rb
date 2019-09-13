@@ -24,6 +24,14 @@ RSpec.describe CanCan::ModelAdapters::ConditionsNormalizer do
         t.integer :user_id
         t.integer :article_id
       end
+
+      create_table(:attachments) do |t|
+        t.references :record, polymorphic: true
+        t.integer :blob_id
+      end
+
+      create_table(:blob) do |t|
+      end
     end
 
     class Article < ActiveRecord::Base
@@ -31,6 +39,7 @@ RSpec.describe CanCan::ModelAdapters::ConditionsNormalizer do
       has_many :comments, through: :spread_comments
       has_many :mentions
       has_many :mentioned_users, through: :mentions, source: :user
+      has_many :attachments, as: :record
     end
 
     class Comment < ActiveRecord::Base
@@ -53,12 +62,28 @@ RSpec.describe CanCan::ModelAdapters::ConditionsNormalizer do
       has_many :mentions
       has_many :mentioned_articles, through: :mentions, source: :article
     end
+
+    class Attachment < ActiveRecord::Base
+      belongs_to :record, polymorphic: true
+      belongs_to :blob
+    end
+
+    class Blob < ActiveRecord::Base
+      has_many :attachments
+      has_many :articles, through: :attachments, source: :record, source_type: 'Article'
+    end
   end
 
   it 'simplifies has_many through associations' do
     rule = CanCan::Rule.new(true, :read, Comment, articles: { mentioned_users: { name: 'pippo' } })
     CanCan::ModelAdapters::ConditionsNormalizer.normalize(Comment, [rule])
     expect(rule.conditions).to eq(spread_comments: { article: { mentions: { user: { name: 'pippo' } } } })
+  end
+
+  it 'does not simplifies has_many through polymorphic associations' do
+    rule = CanCan::Rule.new(true, :read, Blob, articles: { id: 11 })
+    CanCan::ModelAdapters::ConditionsNormalizer.normalize(Blob, [rule])
+    expect(rule.conditions).to eq(articles: { id: 11 })
   end
 
   it 'normalizes the has_one through associations' do
