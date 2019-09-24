@@ -1,5 +1,6 @@
 ## 3.0.2
 
+* [#505](https://github.com/CanCanCommunity/cancancan/issues/505): Implement negative expectation handler logic for `be_able_to` matcher. ([@stowersjoshua][])
 * [#590](https://github.com/CanCanCommunity/cancancan/pull/590): Fix Rule#inspect when rule is created through a SQL array. ([@frostblooded][])
 * [#592](https://github.com/CanCanCommunity/cancancan/pull/592): Prevent normalization of through polymorphic associations.([@eloyesp][])
 
@@ -650,3 +651,4 @@ Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.co
 [@kaspernj]: https://github.com/kaspernj
 [@frostblooded]: https://github.com/frostblooded
 [@eloyesp]: https://github.com/eloyesp
+[@stowersjoshua]: https://github.com/stowersjoshua
