@@ -22,9 +22,12 @@ module CanCan
       private
 
       def build_relation(*where_conditions)
-        relation = @model_class.where(*where_conditions)
-        relation = relation.left_joins(joins).distinct if joins.present?
-        relation
+        if joins.present?
+          inner = @model_class.left_joins(joins).where(*where_conditions)
+          @model_class.where(id: inner.reorder(nil).except(:select))
+        else
+          @model_class.where(*where_conditions)
+        end
       end
 
       # Rails 4.2 deprecates `sanitize_sql_hash_for_conditions`

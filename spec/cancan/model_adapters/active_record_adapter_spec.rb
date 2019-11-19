@@ -201,6 +201,14 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
     comment1 = Comment.create!(article: Article.create!(category: Category.create!(visible: true)))
     Comment.create!(article: Article.create!(category: Category.create!(visible: false)))
     expect(Comment.accessible_by(@ability)).to match_array([comment1])
+    expect(Comment.accessible_by(@ability).count).to eq(1)
+  end
+
+  it 'allows ordering via relations' do
+    @ability.can :read, Comment, article: { category: { visible: true } }
+    comment1 = Comment.create!(article: Article.create!(category: Category.create!(visible: true)))
+    Comment.create!(article: Article.create!(category: Category.create!(visible: false)))
+    expect(Comment.accessible_by(@ability).joins(:article).order('articles.id')).to match_array([comment1])
   end
 
   it 'allows conditions in SQL and merge with hash conditions' do
@@ -531,11 +539,15 @@ WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
       expect(Article.accessible_by(ability)).to match_array([a1, a2])
       if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
         expect(ability.model_adapter(Article, :read)).to generate_sql(%(
-  SELECT DISTINCT "articles".*
+  SELECT "articles".*
   FROM "articles"
-  LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
-  LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
-  WHERE (("users"."name" = 'paperino') OR ("users"."name" = 'pippo'))))
+  WHERE "articles"."id" IN
+  (SELECT "articles"."id"
+    FROM "articles"
+    LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
+    LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
+    WHERE (("users"."name" = 'paperino') OR ("users"."name" = 'pippo')))
+  ))
       end
     end
   end
