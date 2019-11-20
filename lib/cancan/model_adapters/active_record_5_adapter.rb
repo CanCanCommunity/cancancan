@@ -23,8 +23,10 @@ module CanCan
 
       def build_relation(*where_conditions)
         if joins.present?
-          inner = @model_class.left_joins(joins).where(*where_conditions)
-          @model_class.where(id: inner.reorder(nil).except(:select))
+          inner = @model_class.unscoped do
+            @model_class.left_joins(joins).where(*where_conditions)
+          end
+          @model_class.where(id: inner)
         else
           @model_class.where(*where_conditions)
         end

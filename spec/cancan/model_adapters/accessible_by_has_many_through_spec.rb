@@ -85,6 +85,10 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecord5Adapter do
       posts = Post.accessible_by(ability).where(published: true)
       expect(posts.length).to eq 1
     end
+    it 'adds the where clause correctly with joins' do
+      posts = Post.joins(:editors).where('editors.user_id': @user1.id).accessible_by(ability)
+      expect(posts.length).to eq 1
+    end
   end
 
   if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
