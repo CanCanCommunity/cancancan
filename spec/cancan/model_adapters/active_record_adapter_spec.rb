@@ -539,4 +539,35 @@ WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
       end
     end
   end
+
+  context 'when a table has json type colum' do
+    before do
+      json_supported =
+        ActiveRecord::Base.connection.respond_to?(:supports_json?) &&
+        ActiveRecord::Base.connection.supports_json?
+
+      skip "Adapter don't support JSON column type" unless json_supported
+
+      ActiveRecord::Schema.define do
+        create_table(:json_transactions) do |t|
+          t.integer :user_id
+          t.json :additional_data
+        end
+      end
+
+      class JsonTransaction < ActiveRecord::Base
+        belongs_to :user
+      end
+    end
+
+    it 'can filter correctly' do
+      user = User.create!
+      transaction = JsonTransaction.create!(user: user)
+
+      ability = Ability.new(user)
+      ability.can :read, JsonTransaction, user: { id: user.id }
+
+      expect(JsonTransaction.accessible_by(ability)).to match_array([transaction])
+    end
+  end
 end
