@@ -26,7 +26,7 @@ module CanCan
           inner = @model_class.unscoped do
             @model_class.left_joins(joins).where(*where_conditions)
           end
-          @model_class.where(id: inner)
+          @model_class.where(@model_class.primary_key => inner)
         else
           @model_class.where(*where_conditions)
         end
