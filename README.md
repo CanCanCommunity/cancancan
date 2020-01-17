@@ -50,7 +50,7 @@ class Ability
       can :read, Post, user_id: user.id
 
       if user.admin?  # additional permissions for administrators
-        can :read, post
+        can :read, Post
       end
     end
   end
