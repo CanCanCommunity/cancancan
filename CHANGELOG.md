@@ -1,3 +1,7 @@
+## Unreleased
+
+* [#612](https://github.com/CanCanCommunity/cancancan/pull/612): Suppress keyword arguments warning for Ruby 2.7.0. ([@koic][])
+
 ## 3.0.2
 
 * [#590](https://github.com/CanCanCommunity/cancancan/pull/590): Fix Rule#inspect when rule is created through a SQL array. ([@frostblooded][])
@@ -650,3 +654,4 @@ Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.co
 [@kaspernj]: https://github.com/kaspernj
 [@frostblooded]: https://github.com/frostblooded
 [@eloyesp]: https://github.com/eloyesp
+[@koic]: https://github.com/koic
