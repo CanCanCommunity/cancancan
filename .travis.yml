@@ -8,6 +8,7 @@ rvm:
   - 2.4.2
   - 2.5.1
   - 2.6.3
+  - 2.7.0
   - ruby-head
   - jruby-9.1.17.0
   - jruby-9.2.7.0
@@ -32,6 +33,8 @@ matrix:
     gemfile: gemfiles/activerecord_6.0.0.gemfile
   - rvm: 2.4.2
     gemfile: gemfiles/activerecord_6.0.0.gemfile
+  - rvm: 2.7.0
+    gemfile: gemfiles/activerecord_4.2.0.gemfile
   - rvm: jruby-9.1.17.0
     gemfile: gemfiles/activerecord_5.0.2.gemfile
   - rvm: jruby-9.1.17.0
