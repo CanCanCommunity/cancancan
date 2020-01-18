@@ -539,4 +539,42 @@ WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
       end
     end
   end
+
+  context 'when a model have renamed primary_key' do
+    before do
+      ActiveRecord::Schema.define do
+        create_table(:custom_pk_users, primary_key: :gid) do |t|
+          t.string :name
+        end
+
+        create_table(:custom_pk_transactions, primary_key: :gid) do |t|
+          t.integer :custom_pk_user_id
+          t.string :data
+        end
+      end
+
+      class CustomPkUser < ActiveRecord::Base
+        self.primary_key = 'gid'
+      end
+
+      class CustomPkTransaction < ActiveRecord::Base
+        self.primary_key = 'gid'
+
+        belongs_to :custom_pk_user
+      end
+    end
+
+    it 'can filter correctly' do
+      user1 = CustomPkUser.create!
+      user2 = CustomPkUser.create!
+
+      transaction1 = CustomPkTransaction.create!(custom_pk_user: user1)
+      CustomPkTransaction.create!(custom_pk_user: user2)
+
+      ability = Ability.new(user1)
+      ability.can :read, CustomPkTransaction, custom_pk_user: { gid: user1.gid }
+
+      expect(CustomPkTransaction.accessible_by(ability)).to match_array([transaction1])
+    end
+  end
 end
