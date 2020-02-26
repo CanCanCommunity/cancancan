@@ -411,6 +411,23 @@ WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
     expect(Article.accessible_by(ability)).to eq([article])
   end
 
+  it 'allows an empty array to be used as a condition' do
+    a1 = Article.create!
+    a2 = Article.create!
+    a2.comments = [Comment.create!]
+
+    @ability.can :read, Article, comment_ids: []
+
+    expect(@ability.can?(:read, a1)).to eq(true)
+    expect(@ability.can?(:read, a2)).to eq(false)
+
+    # ideally this would return [a1]. it doesn't because in ActiveRecord5Adapter#build_relation
+    # we call `@model_class.where(*where_conditions)`, and `@model_class.where(:comment_ids=>[]).to_sql`
+    # returns "SELECT \"articles\".* FROM \"articles\" WHERE 1=0". a proper solution would probably require
+    # left outer joins support in cancancan.
+    expect(Article.accessible_by(@ability)).to eq([])
+  end
+
   context 'with namespaced models' do
     before :each do
       ActiveRecord::Schema.define do

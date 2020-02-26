@@ -70,7 +70,11 @@ module CanCan
       when Range
         value.cover?(attribute)
       when Enumerable
-        value.include?(attribute)
+        if attribute.size == 0 # if we expect an empty array, return true if we are given one
+          value.size == 0
+        else
+          value.include?(attribute)
+        end
       else
         attribute == value
       end
