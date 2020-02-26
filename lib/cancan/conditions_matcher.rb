@@ -70,15 +70,19 @@ module CanCan
       when Range
         value.cover?(attribute)
       when Enumerable
-        if attribute.size == 0
-          # if we expect an empty array, return true if we are given one
-          # see https://github.com/CanCanCommunity/cancancan/pull/618
-          value.size == 0
-        else
-          value.include?(attribute)
-        end
+        enumerable_condition_match?(attribute, value)
       else
         attribute == value
+      end
+    end
+
+    def enumerable_condition_match?(attribute, value)
+      if attribute.empty?
+        # if we expect an empty array, return true if we are given one
+        # see https://github.com/CanCanCommunity/cancancan/pull/618
+        value.empty?
+      else
+        value.include?(attribute)
       end
     end
 
