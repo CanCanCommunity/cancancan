@@ -77,13 +77,13 @@ module CanCan
     end
 
     def enumerable_condition_match?(attribute, value)
-      if attribute.empty?
-        # if we expect an empty array, return true if we are given one
-        # see https://github.com/CanCanCommunity/cancancan/pull/618
-        value.empty?
-      else
-        value.include?(attribute)
-      end
+      return true if value.include?(attribute)
+
+      # if we expect an empty array, return true if we are given one
+      # see https://github.com/CanCanCommunity/cancancan/pull/618
+      return true if attribute.is_a?(Enumerable) && attribute.empty? && value.empty?
+
+      false
     end
 
     def hash_condition_match?(attribute, value)

@@ -411,7 +411,7 @@ WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
     expect(Article.accessible_by(ability)).to eq([article])
   end
 
-  it 'allows an empty array to be used as a condition' do
+  it 'allows an empty array to be used as a condition for a has_many' do
     a1 = Article.create!
     a2 = Article.create!
     a2.comments = [Comment.create!]
@@ -425,6 +425,19 @@ WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
     # we call `@model_class.where(*where_conditions)`, and `@model_class.where(:comment_ids=>[]).to_sql`
     # returns "SELECT \"articles\".* FROM \"articles\" WHERE 1=0". a proper solution would probably require
     # left outer joins support in cancancan.
+    expect(Article.accessible_by(@ability)).to eq([])
+  end
+
+  it 'allows an empty array to be used as a condition for a belongs_to; this never returns true' do
+    a1 = Article.create!
+    a2 = Article.create!
+    a2.project = Project.create!
+
+    @ability.can :read, Article, project_id: []
+
+    expect(@ability.can?(:read, a1)).to eq(false)
+    expect(@ability.can?(:read, a2)).to eq(false)
+
     expect(Article.accessible_by(@ability)).to eq([])
   end
 
