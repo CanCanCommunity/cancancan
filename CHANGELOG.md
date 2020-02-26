@@ -1,6 +1,7 @@
 ## Unreleased
 
 * [#612](https://github.com/CanCanCommunity/cancancan/pull/612): Suppress keyword arguments warning for Ruby 2.7.0. ([@koic][])
+* [#618](https://github.com/CanCanCommunity/cancancan/pull/618): Allow using an empty array as a condition. ([@ghiculescu][])
 
 ## 3.0.2
 
@@ -655,3 +656,4 @@ Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.co
 [@frostblooded]: https://github.com/frostblooded
 [@eloyesp]: https://github.com/eloyesp
 [@koic]: https://github.com/koic
+[@ghiculescu]: https://github.com/ghiculescu
