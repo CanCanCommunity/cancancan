@@ -2,6 +2,7 @@
 
 * [#605](https://github.com/CanCanCommunity/cancancan/pull/605): Generate inner queries instead of join+distinct. ([@fsateler][])
 * [#608](https://github.com/CanCanCommunity/cancancan/pull/608): Spec for json column regression. ([@aleksejleonov][])
+* [#571](https://github.com/CanCanCommunity/cancancan/pull/571): Allows to check ability even the object implements `#to_a`. ([@mtsmfm][])
 * [#612](https://github.com/CanCanCommunity/cancancan/pull/612): Suppress keyword arguments warning for Ruby 2.7.0. ([@koic][])
 
 ## 3.0.2
@@ -656,6 +657,7 @@ Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.co
 [@kaspernj]: https://github.com/kaspernj
 [@frostblooded]: https://github.com/frostblooded
 [@eloyesp]: https://github.com/eloyesp
+[@mtsmfm]: https://github.com/mtsmfm
 [@koic]: https://github.com/koic
 [@fsateler]: https://github.com/fsateler
 [@aleksejleonov]: https://github.com/aleksejleonov
