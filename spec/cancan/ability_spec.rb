@@ -441,6 +441,31 @@ describe CanCan::Ability do
     expect(@ability.attributes_for(:new, Range)).to eq(foo: 'foo', bar: 123, baz: 'baz')
   end
 
+  it 'allows to check ability even the object implements `#to_a`' do
+    stub_const('X', Class.new do
+      def self.to_a
+        []
+      end
+    end)
+
+    @ability.can :read, X
+    expect(@ability.can?(:read, X.new)).to be(true)
+  end
+
+  it 'respects `#to_ary`' do
+    stub_const('X', Class.new do
+      def self.to_ary
+        [Y]
+      end
+    end)
+
+    stub_const('Y', Class.new)
+
+    @ability.can :read, X
+    expect(@ability.can?(:read, X.new)).to be(false)
+    expect(@ability.can?(:read, Y.new)).to be(true)
+  end
+
   # rubocop:disable Style/SymbolProc
   describe 'different usages of blocks and procs' do
     class A
