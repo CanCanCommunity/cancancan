@@ -30,7 +30,7 @@ module CanCan
       @actions = wrap(action)
       @subjects = wrap(subject)
       @attributes = wrap(attributes)
-      @conditions = conditions || {}
+      @conditions = extra_args || {}
       @block = block
     end
 
