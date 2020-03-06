@@ -30,7 +30,7 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
       create_table(:companies) do |t|
         t.boolean :admin
       end
-      
+
       create_table(:articles) do |t|
         t.string :name
         t.timestamps null: false
@@ -71,7 +71,7 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
 
     class Company < ActiveRecord::Base
     end
-    
+
     class Article < ActiveRecord::Base
       belongs_to :category
       belongs_to :company
@@ -80,14 +80,14 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
       has_many :mentioned_users, through: :mentions, source: :user
       belongs_to :user
       belongs_to :project
-      
+
       scope :unpopular, lambda {
         joins('LEFT OUTER JOIN comments ON (comments.post_id = posts.id)')
           .group('articles.id')
           .where('COUNT(comments.id) < 3')
       }
     end
-    
+
     class Mention < ActiveRecord::Base
       self.table_name = 'legacy_mentions'
       belongs_to :user
@@ -108,7 +108,7 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
     @article_table = Article.table_name
     @comment_table = Comment.table_name
   end
-  
+
   it 'does not fires query with accessible_by() for abilities defined with association' do
     user = User.create!
     @ability.can :edit, Article, user.articles.unpopular
