@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 module CanCan
   module ModelAdapters
     class ActiveRecord5Adapter < ActiveRecord4Adapter
       AbstractAdapter.inherited(self)
 
       def self.for_class?(model_class)
-        ActiveRecord::VERSION::MAJOR == 5 && model_class <= ActiveRecord::Base
+        version_greater_or_equal?('5.0.0') && model_class <= ActiveRecord::Base
       end
 
       # rails 5 is capable of using strings in enum
@@ -19,6 +21,13 @@ module CanCan
 
       private
 
+      def build_relation(*where_conditions)
+        relation = @model_class.where(*where_conditions)
+        relation = relation.left_joins(joins).distinct if joins.present?
+        relation
+      end
+
+      # Rails 4.2 deprecates `sanitize_sql_hash_for_conditions`
       def sanitize_sql(conditions)
         if conditions.is_a?(Hash)
           sanitize_sql_activerecord5(conditions)
@@ -36,15 +45,12 @@ module CanCan
 
         conditions.stringify_keys!
 
-        predicate_builder
-          .build_from_hash(conditions)
-          .map { |b| visit_nodes(b) }
-          .join(' AND ')
+        predicate_builder.build_from_hash(conditions).map { |b| visit_nodes(b) }.join(' AND ')
       end
 
       def visit_nodes(node)
         # Rails 5.2 adds a BindParam node that prevents the visitor method from properly compiling the SQL query
-        if ActiveRecord::VERSION::MINOR >= 2
+        if self.class.version_greater_or_equal?('5.2.0')
           connection = @model_class.send(:connection)
           collector = Arel::Collectors::SubstituteBinds.new(connection, Arel::Collectors::SQLString.new)
           connection.visitor.accept(node, collector).value

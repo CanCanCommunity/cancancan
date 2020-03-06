@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module CanCan
   module Ability
     module Rules
@@ -57,17 +59,20 @@ module CanCan
 
           raise Error,
                 "The can? and cannot? call cannot be used with a raw sql 'can' definition."\
-              " The checking code cannot be determined for #{action.inspect} #{subject.inspect}"
+                " The checking code cannot be determined for #{action.inspect} #{subject.inspect}"
         end
       end
 
       def relevant_rules_for_query(action, subject)
-        relevant_rules(action, subject).each do |rule|
-          if rule.only_block?
-            raise Error, "The accessible_by call cannot be used with a block 'can' definition."\
-                       " The SQL cannot be determined for #{action.inspect} #{subject.inspect}"
-          end
+        rules = relevant_rules(action, subject).reject do |rule|
+          # reject 'cannot' rules with attributes when doing queries
+          rule.base_behavior == false && rule.attributes.present?
         end
+        if rules.any?(&:only_block?)
+          raise Error, "The accessible_by call cannot be used with a block 'can' definition."\
+            "The SQL cannot be determined for #{action.inspect} #{subject.inspect}"
+        end
+        rules
       end
 
       # Optimizes the order of the rules, so that rules with the :all subject are evaluated first.

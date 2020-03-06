@@ -1,11 +1,14 @@
+# frozen_string_literal: true
+
 module CanCan
   module ConditionsMatcher
     # Matches the block or conditions hash
-    def matches_conditions?(action, subject, extra_args)
+    def matches_conditions?(action, subject, attribute = nil, *extra_args)
       return call_block_with_all(action, subject, extra_args) if @match_all
-      return @block.call(subject, *extra_args) if @block && !subject_class?(subject)
+      return matches_block_conditions(subject, attribute, *extra_args) if @block
+      return matches_non_block_conditions(subject) unless conditions_empty?
 
-      matches_non_block_conditions(subject)
+      true
     end
 
     private
@@ -15,13 +18,18 @@ module CanCan
       [Class, Module].include? klass
     end
 
+    def matches_block_conditions(subject, *extra_args)
+      return @base_behavior if subject_class?(subject)
+
+      @block.call(subject, *extra_args.compact)
+    end
+
     def matches_non_block_conditions(subject)
-      if @conditions.is_a?(Hash)
-        return nested_subject_matches_conditions?(subject) if subject.class == Hash
-        return matches_conditions_hash?(subject) unless subject_class?(subject)
-      end
+      return nested_subject_matches_conditions?(subject) if subject.class == Hash
+      return matches_conditions_hash?(subject) unless subject_class?(subject)
+
       # Don't stop at "cannot" definitions when there are conditions.
-      conditions_empty? ? true : @base_behavior
+      @base_behavior
     end
 
     def nested_subject_matches_conditions?(subject_hash)
@@ -76,7 +84,7 @@ module CanCan
       end
     end
 
-    def call_block_with_all(action, subject, extra_args)
+    def call_block_with_all(action, subject, *extra_args)
       if subject.class == Class
         @block.call(action, subject, nil, *extra_args)
       else

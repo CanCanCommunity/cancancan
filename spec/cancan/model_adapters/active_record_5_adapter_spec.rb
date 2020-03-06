@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
-if ActiveRecord::VERSION::MAJOR == 5 && defined?(CanCan::ModelAdapters::ActiveRecord5Adapter)
+if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
   describe CanCan::ModelAdapters::ActiveRecord5Adapter do
     context 'with sqlite3' do
       before :each do
-        ActiveRecord::Base.establish_connection(adapter: 'sqlite3', database: ':memory:')
+        connect_db
         ActiveRecord::Migration.verbose = false
 
         ActiveRecord::Schema.define do
