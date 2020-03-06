@@ -4,6 +4,7 @@
 * [#608](https://github.com/CanCanCommunity/cancancan/pull/608): Spec for json column regression. ([@aleksejleonov][])
 * [#571](https://github.com/CanCanCommunity/cancancan/pull/571): Allows to check ability even the object implements `#to_a`. ([@mtsmfm][])
 * [#612](https://github.com/CanCanCommunity/cancancan/pull/612): Suppress keyword arguments warning for Ruby 2.7.0. ([@koic][])
+* [#569](https://github.com/CanCanCommunity/cancancan/pull/569): Fix accessible_by fires query for rules using association as condition. ([@albb0920][])
 
 ## 3.0.2
 
@@ -661,3 +662,4 @@ Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.co
 [@koic]: https://github.com/koic
 [@fsateler]: https://github.com/fsateler
 [@aleksejleonov]: https://github.com/aleksejleonov
+[@albb0920]: https://github.com/albb0920
