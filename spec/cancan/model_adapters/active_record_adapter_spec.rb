@@ -201,6 +201,14 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
     comment1 = Comment.create!(article: Article.create!(category: Category.create!(visible: true)))
     Comment.create!(article: Article.create!(category: Category.create!(visible: false)))
     expect(Comment.accessible_by(@ability)).to match_array([comment1])
+    expect(Comment.accessible_by(@ability).count).to eq(1)
+  end
+
+  it 'allows ordering via relations' do
+    @ability.can :read, Comment, article: { category: { visible: true } }
+    comment1 = Comment.create!(article: Article.create!(category: Category.create!(visible: true)))
+    Comment.create!(article: Article.create!(category: Category.create!(visible: false)))
+    expect(Comment.accessible_by(@ability).joins(:article).order('articles.id')).to match_array([comment1])
   end
 
   it 'allows conditions in SQL and merge with hash conditions' do
@@ -531,12 +539,85 @@ WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
       expect(Article.accessible_by(ability)).to match_array([a1, a2])
       if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
         expect(ability.model_adapter(Article, :read)).to generate_sql(%(
-  SELECT DISTINCT "articles".*
+  SELECT "articles".*
   FROM "articles"
-  LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
-  LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
-  WHERE (("users"."name" = 'paperino') OR ("users"."name" = 'pippo'))))
+  WHERE "articles"."id" IN
+  (SELECT "articles"."id"
+    FROM "articles"
+    LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
+    LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
+    WHERE (("users"."name" = 'paperino') OR ("users"."name" = 'pippo')))
+  ))
       end
+    end
+  end
+
+  context 'when a model have renamed primary_key' do
+    before do
+      ActiveRecord::Schema.define do
+        create_table(:custom_pk_users, primary_key: :gid) do |t|
+          t.string :name
+        end
+
+        create_table(:custom_pk_transactions, primary_key: :gid) do |t|
+          t.integer :custom_pk_user_id
+          t.string :data
+        end
+      end
+
+      class CustomPkUser < ActiveRecord::Base
+        self.primary_key = 'gid'
+      end
+
+      class CustomPkTransaction < ActiveRecord::Base
+        self.primary_key = 'gid'
+
+        belongs_to :custom_pk_user
+      end
+    end
+
+    it 'can filter correctly' do
+      user1 = CustomPkUser.create!
+      user2 = CustomPkUser.create!
+
+      transaction1 = CustomPkTransaction.create!(custom_pk_user: user1)
+      CustomPkTransaction.create!(custom_pk_user: user2)
+
+      ability = Ability.new(user1)
+      ability.can :read, CustomPkTransaction, custom_pk_user: { gid: user1.gid }
+
+      expect(CustomPkTransaction.accessible_by(ability)).to match_array([transaction1])
+    end
+  end
+
+  context 'when a table has json type colum' do
+    before do
+      json_supported =
+        ActiveRecord::Base.connection.respond_to?(:supports_json?) &&
+        ActiveRecord::Base.connection.supports_json?
+
+      skip "Adapter don't support JSON column type" unless json_supported
+
+      ActiveRecord::Schema.define do
+        create_table(:json_transactions) do |t|
+          t.integer :user_id
+          t.json :additional_data
+        end
+      end
+
+      class JsonTransaction < ActiveRecord::Base
+        belongs_to :user
+      end
+    end
+
+    it 'can filter correctly' do
+      user = User.create!
+      transaction = JsonTransaction.create!(user: user)
+
+      ability = Ability.new(user)
+      ability.can :read, JsonTransaction, user: { id: user.id }
+
+      expect(JsonTransaction.accessible_by(ability)).to match_array([transaction])
     end
   end
 end
