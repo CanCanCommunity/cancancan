@@ -1,12 +1,15 @@
 # frozen_string_literal: true
 
 require_relative 'conditions_matcher.rb'
+require_relative 'relevant.rb'
+
 module CanCan
   # This class is used internally and should only be called through Ability.
   # it holds the information about a "can" call made on Ability and provides
   # helpful methods to determine permission checking and conditions hash generation.
   class Rule # :nodoc:
     include ConditionsMatcher
+    include Relevant
     include ParameterValidators
     attr_reader :base_behavior, :subjects, :actions, :conditions, :attributes
     attr_writer :expanded_actions, :conditions
@@ -24,9 +27,9 @@ module CanCan
       raise Error, "Subject is required for #{action}" if action && subject.nil?
 
       @base_behavior = base_behavior
-      @actions = Array(action)
-      @subjects = Array(subject)
-      @attributes = Array(attributes)
+      @actions = wrap(action)
+      @subjects = wrap(subject)
+      @attributes = wrap(attributes)
       @conditions = extra_args || {}
       @block = block
     end
@@ -55,12 +58,6 @@ module CanCan
     def catch_all?
       (with_scope? && @conditions.where_values_hash.empty?) ||
         (!with_scope? && [nil, false, [], {}, '', ' '].include?(@conditions))
-    end
-
-    # Matches both the action, subject, and attribute, not necessarily the conditions
-    def relevant?(action, subject)
-      subject = subject.values.first if subject.class == Hash
-      @match_all || (matches_action?(action) && matches_subject?(subject))
     end
 
     def only_block?
@@ -104,22 +101,6 @@ module CanCan
 
     private
 
-    def matches_action?(action)
-      @expanded_actions.include?(:manage) || @expanded_actions.include?(action)
-    end
-
-    def matches_subject?(subject)
-      @subjects.include?(:all) || @subjects.include?(subject) || matches_subject_class?(subject)
-    end
-
-    def matches_subject_class?(subject)
-      @subjects.any? do |sub|
-        sub.is_a?(Module) && (subject.is_a?(sub) ||
-          subject.class.to_s == sub.to_s ||
-          (subject.is_a?(Module) && subject.ancestors.include?(sub)))
-      end
-    end
-
     def parse_attributes_from_extra_args(args)
       attributes = args.shift if valid_attribute_param?(args.first)
       extra_args = args.shift
@@ -131,6 +112,16 @@ module CanCan
 
       raise BlockAndConditionsError, 'A hash of conditions is mutually exclusive with a block. '\
         "Check \":#{action} #{subject}\" ability."
+    end
+
+    def wrap(object)
+      if object.nil?
+        []
+      elsif object.respond_to?(:to_ary)
+        object.to_ary || [object]
+      else
+        [object]
+      end
     end
   end
 end
