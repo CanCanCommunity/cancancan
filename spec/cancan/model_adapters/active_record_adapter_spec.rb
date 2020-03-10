@@ -455,8 +455,50 @@ WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
 
     # ideally this would return [a1]. it doesn't because in ActiveRecord5Adapter#build_relation
     # we call `@model_class.where(*where_conditions)`, and `@model_class.where(:comment_ids=>[]).to_sql`
-    # returns "SELECT \"articles\".* FROM \"articles\" WHERE 1=0". a proper solution would probably require
-    # left outer joins support in cancancan.
+    # returns "SELECT \"articles\".* FROM \"articles\" WHERE 1=0".
+    #
+    # a better solution is write the abilty as follows:
+    # @ability.can :read, Article, comments: { id: nil }
+    # see next test.
+    expect(Article.accessible_by(@ability)).to eq([])
+  end
+
+  it 'allows a nil to be used as a condition for a has_many - with join' do
+    a1 = Article.create!
+    a2 = Article.create!
+    a2.comments = [Comment.create!]
+
+    @ability.can :read, Article, comments: { id: nil }
+
+    expect(@ability.can?(:read, a1)).to eq(true)
+    expect(@ability.can?(:read, a2)).to eq(false)
+
+    expect(Article.accessible_by(@ability)).to eq([a1])
+  end
+
+  it 'allows several nils to be used as a condition for a has_many - with join' do
+    a1 = Article.create!
+    a2 = Article.create!
+    a2.comments = [Comment.create!]
+
+    @ability.can :read, Article, comments: { id: nil, spam: nil }
+
+    expect(@ability.can?(:read, a1)).to eq(true)
+    expect(@ability.can?(:read, a2)).to eq(false)
+
+    expect(Article.accessible_by(@ability)).to eq([a1])
+  end
+
+  it 'doesn\'t allow a nil to be used as a condition for a has_many alongside other attributes' do
+    a1 = Article.create!
+    a2 = Article.create!
+    a2.comments = [Comment.create!]
+
+    @ability.can :read, Article, comments: { id: nil, spam: true }
+
+    expect(@ability.can?(:read, a1)).to eq(false)
+    expect(@ability.can?(:read, a2)).to eq(false)
+
     expect(Article.accessible_by(@ability)).to eq([])
   end
 
