@@ -76,7 +76,7 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecord5Adapter do
 
   describe 'preloading of associatons' do
     it 'preloads associations correctly' do
-      posts = Post.accessible_by(ability).includes(likes: :user)
+      posts = Post.accessible_by(ability).where(published: true).includes(likes: :user)
       expect(posts[0].association(:likes)).to be_loaded
       expect(posts[0].likes[0].association(:user)).to be_loaded
     end
@@ -92,7 +92,7 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecord5Adapter do
   if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
     describe 'selecting custom columns' do
       it 'extracts custom columns correctly' do
-        posts = Post.accessible_by(ability).select('title as mytitle')
+        posts = Post.accessible_by(ability).where(published: true).select('title as mytitle')
         expect(posts[0].mytitle).to eq 'post1'
       end
     end
