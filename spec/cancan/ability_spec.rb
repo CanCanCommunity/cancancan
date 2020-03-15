@@ -733,6 +733,20 @@ describe CanCan::Ability do
       expect(@ability.unauthorized_message(:has, :cheezburger)).to eq('Nom nom nom. I eated it.')
     end
 
+    it 'uses correct i18n keys when hashes are used' do
+      # Hashes are sent as subject when using:
+      # load_and_authorize_resource :blog
+      # load_and_authorize_resource through: :blog
+      # And subject for collection actions (ie: index) returns: { <Blog id:1> => Post(id:integer) }
+      I18n.backend.store_translations :en, unauthorized: { update: { all: 'all', array: 'foo' } }
+      expect(@ability.unauthorized_message(:update, Hash => Array)).to eq('foo')
+    end
+
+    it 'uses correct subject when hashes are used' do
+      I18n.backend.store_translations :en, unauthorized: { manage: { all: '%<action>s %<subject>s' } }
+      expect(@ability.unauthorized_message(:update, Hash => Array)).to eq('update array')
+    end
+
     it "falls back to 'manage' and 'all'" do
       I18n.backend.store_translations :en, unauthorized: {
         manage: { all: 'manage all', array: 'manage array' },
