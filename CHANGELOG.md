@@ -1,4 +1,4 @@
-## Unreleased
+## 3.1.0
 
 * [#605](https://github.com/CanCanCommunity/cancancan/pull/605): Generate inner queries instead of join+distinct. ([@fsateler][])
 * [#608](https://github.com/CanCanCommunity/cancancan/pull/608): Spec for json column regression. ([@aleksejleonov][])
