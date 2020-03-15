@@ -3,10 +3,12 @@
 module CanCan
   module UnauthorizedMessageResolver
     def unauthorized_message(action, subject)
+      subject = subject.values.last if subject.is_a?(Hash)
       keys = unauthorized_message_keys(action, subject)
-      variables = { action: action.to_s }
+      variables = {}
+      variables[:action] = I18n.translate("actions.#{action}", default: action.to_s)
       variables[:subject] = translate_subject(subject)
-      message = I18n.translate(keys.shift, variables.merge(scope: :unauthorized, default: keys + ['']))
+      message = I18n.translate(keys.shift, **variables.merge(scope: :unauthorized, default: keys + ['']))
       message.blank? ? nil : message
     end
 
