@@ -25,7 +25,7 @@ describe CanCan::Ability do
     expect(@ability.can?(:read, :some_symbol)).to be(true)
   end
 
-  it 'passes nothing to a block when no instance is passed' do
+  it 'does not call a block when no instance is passed, and returns false' do
     @block_called = false
     @ability.can :read, Symbol do |sym|
       @block_called = true
@@ -837,7 +837,7 @@ describe CanCan::Ability do
       @ability.can :index, user_class do |_object|
         @block_called = true
       end
-      expect(@ability.can?(:preview, user_class)).to be(false)
+      expect(@ability.can?(:index, user_class)).to be(false)
       expect(@block_called).to be(false)
     end
   end
