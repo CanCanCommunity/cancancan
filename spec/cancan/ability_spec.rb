@@ -25,12 +25,14 @@ describe CanCan::Ability do
     expect(@ability.can?(:read, :some_symbol)).to be(true)
   end
 
-  it 'passes nil to a block when no instance is passed' do
+  it 'passes nothing to a block when no instance is passed' do
+    @block_called = false
     @ability.can :read, Symbol do |sym|
-      expect(sym).to be_nil
+      @block_called = true
       true
     end
-    expect(@ability.can?(:read, Symbol)).to be(true)
+    expect(@block_called).to be(false)
+    expect(@ability.can?(:read, Symbol)).to be(false)
   end
 
   it 'passes to previous rule, if block returns false or nil' do
@@ -79,12 +81,12 @@ describe CanCan::Ability do
     expect(@block_called).to be(true)
   end
 
-  it 'does not call block when only class is passed, only return true' do
+  it 'does not call block when only class is passed, only return false' do
     @block_called = false
     @ability.can :preview, :all do |_object|
       @block_called = true
     end
-    expect(@ability.can?(:preview, Hash)).to be(true)
+    expect(@ability.can?(:preview, Hash)).to be(false)
     expect(@block_called).to be(false)
   end
 
@@ -296,7 +298,7 @@ describe CanCan::Ability do
 
     expect(@ability.can?(:read, 1..3)).to be(true)
     expect(@ability.can?(:read, 1..4)).to be(false)
-    expect(@ability.can?(:read, Range)).to be(true)
+    expect(@ability.can?(:read, Range)).to be(false)
     expect(@ability.can?(:read, any: [1..3, 1..4])).to be(true)
     expect(@ability.can?(:read, any: [1..4, 2..4])).to be(false)
   end
@@ -401,8 +403,8 @@ describe CanCan::Ability do
       expect(sym).to be_nil
       true
     end
-    expect(@ability.can?(:read, B)).to be(true)
-    expect(@ability.can?(:read, A)).to be(true)
+    expect(@ability.can?(:read, B)).to be(false)
+    expect(@ability.can?(:read, A)).to be(false)
   end
 
   it 'checks permissions through association when passing a hash of subjects' do
@@ -635,8 +637,8 @@ describe CanCan::Ability do
     expect(@ability.can?(:update, 2..4, :notname)).to be(false)
     expect(@ability.can?(:update, 2..4, :name)).to be(true)
     expect(@ability.can?(:update, 3..5, :name)).to be(false)
-    expect(@ability.can?(:update, Range)).to be(true)
-    expect(@ability.can?(:update, Range, :name)).to be(true)
+    expect(@ability.can?(:update, Range)).to be(false)
+    expect(@ability.can?(:update, Range, :name)).to be(false)
   end
 
   it 'returns an array of permitted attributes for a given action and subject' do
@@ -819,6 +821,24 @@ describe CanCan::Ability do
 
       @ability.merge(another_ability)
       expect(@ability.send(:rules).size).to eq(0)
+    end
+  end
+
+  describe ':index' do
+    it 'handles index action for Class subject in rules' do
+      user_class = Class.new(ActiveRecord::Base)
+      @ability.can :index, user_class
+      expect(@ability.can?(:index, user_class)).to be(true)
+    end
+
+    it 'does not call block when only class is passed, only returns false' do
+      user_class = Class.new(ActiveRecord::Base)
+      @block_called = false
+      @ability.can :index, user_class do |_object|
+        @block_called = true
+      end
+      expect(@ability.can?(:preview, user_class)).to be(false)
+      expect(@block_called).to be(false)
     end
   end
 end

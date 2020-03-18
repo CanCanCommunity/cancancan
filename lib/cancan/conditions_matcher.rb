@@ -19,7 +19,8 @@ module CanCan
     end
 
     def matches_block_conditions(subject, *extra_args)
-      return @base_behavior if subject_class?(subject)
+      # we cannot process block for class subject (block is working with instance), so if we don't know what is result of block we are returning false
+      return false if subject_class?(subject)
 
       @block.call(subject, *extra_args.compact)
     end
@@ -28,8 +29,8 @@ module CanCan
       return nested_subject_matches_conditions?(subject) if subject.class == Hash
       return matches_conditions_hash?(subject) unless subject_class?(subject)
 
-      # Don't stop at "cannot" definitions when there are conditions.
-      @base_behavior
+      # we did not match conditions, so if condition is not true we are returning false
+      false
     end
 
     def nested_subject_matches_conditions?(subject_hash)
