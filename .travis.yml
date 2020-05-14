@@ -1,6 +1,5 @@
 language: ruby
 cache: bundler
-sudo: false
 addons:
   postgresql: "9.6"
 rvm:
