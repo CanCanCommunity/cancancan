@@ -1,3 +1,5 @@
+# Ability Precedence
+
 An ability rule will override a previous one. 
 For example, let's say we want the user to be able to do everything to projects except destroy them. 
 
@@ -35,13 +37,13 @@ if user.role? :admin
 end
 ```
 
-Here it is important the admin role be after the moderator so it can override the `cannot` behavior to give the admin more permissions. See [[Role Based Authorization]].
+Here it is important the admin role be after the moderator so it can override the `cannot` behavior to give the admin more permissions. See [Role Based Authorization](./Role-Based-Authorization.md).
 
-If you are not getting the behavior you expect, please [[post an issue|https://github.com/CanCanCommunity/cancancan/issues]].
+If you are not getting the behavior you expect, please [post an issue](https://github.com/CanCanCommunity/cancancan/issues).
 
 ## Additional Docs
 
-* [[Defining Abilities]]
-* [[Checking Abilities]]
-* [[Debugging Abilities]]
-* [[Testing Abilities]]
+* [Defining Abilities](./Defining-Abilities.md)
+* [Checking Abilities](./Checking-Abilities.md)
+* [Debugging Abilities](./Debugging-Abilities.md)
+* [Testing Abilities](./Testing-Abilities.md)
