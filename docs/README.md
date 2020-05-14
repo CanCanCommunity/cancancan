@@ -1,6 +1,5 @@
 ### Getting Started
 
-* [[README|https://github.com/CanCanCommunity/cancancan#readme]]
 * [[Defining Abilities]], [Best Practices](https://github.com/CanCanCommunity/cancancan/wiki/Defining-Abilities%3A-Best-Practices)
 * [[Checking Abilities]]
 * [[Authorizing Controller Actions]]
@@ -33,10 +32,10 @@
 
 * [[Inherited Resources]]
 * [[Mongoid]]
-* [[Rails Admin|https://github.com/sferik/rails_admin/wiki/CanCanCan]]
+* [Rails Admin](https://github.com/sferik/rails_admin/wiki/CanCanCan)
 * [[Devise]]
 * [[Accessing Request Data]]
-* [[Abilities in Database]]
+* [Abilities in Database](./Abilities-in-Database.md)
 * [[Ability for Other Users]]
 * [[Other Authorization Solutions]]
 
