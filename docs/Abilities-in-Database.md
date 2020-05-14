@@ -1,3 +1,5 @@
+# Abilities in Database
+
 What if you or a client, wants to change permissions without having to re-deploy the application? 
 In that case, it may be best to store the permission logic in a database: it is very easy to use the database records when defining abilities.
 
