@@ -1,6 +1,6 @@
 # CanCanCan
 
-![CanCanCan Logo](/logo/cancancan.jpg)
+<img src="./logo/cancancan.png" width="200" />
 
 [![Gem Version](https://badge.fury.io/rb/cancancan.svg)](http://badge.fury.io/rb/cancancan)
 [![Travis badge](https://travis-ci.org/CanCanCommunity/cancancan.svg?branch=develop)](https://travis-ci.org/CanCanCommunity/cancancan)
@@ -11,7 +11,7 @@
 [Screencast 1](http://railscasts.com/episodes/192-authorization-with-cancan) |
 [Screencast 2](https://www.youtube.com/watch?v=cTYu-OjUgDw)
 
-CanCanCan is an authorization library for Ruby >= 2.2.0 and Ruby on Rails >= 4.2 which restricts what
+CanCanCan is an authorization library for Ruby and Ruby on Rails which restricts what
 resources a given user is allowed to access.
 
 All permissions can be defined in one or multiple ability files and not duplicated across controllers, views,
@@ -23,6 +23,10 @@ and provides helpers to check for those permissions.
 
 2. **Rails helpers** to simplify the code in Rails Controllers by performing the loading and checking of permissions
 of models automatically and reduce duplicated code.
+
+## Sponsored by
+
+[![Renuo AG](./logo/renuo.png)](https://www.renuo.ch)
 
 ## Installation
 
@@ -254,7 +258,6 @@ If you have any question or doubt regarding CanCanCan which you cannot find the 
 
 If you find a bug please add an [issue on GitHub](https://github.com/CanCanCommunity/cancancan/issues) or fork the project and send a pull request.
 
-
 ## Development
 
 CanCanCan uses [appraisals](https://github.com/thoughtbot/appraisal) to test the code base against multiple versions
@@ -262,21 +265,13 @@ of Rails, as well as the different model adapters.
 
 When first developing, you need to run `bundle install` and then `appraisal install`, to install the different sets.
 
-You can then run all appraisal files (like CI does), with `appraisal rake` or just run a specific set `appraisal activerecord_5.0 rake`.
+You can then run all appraisal files (like CI does), with `appraisal rake` or just run a specific set `DB='sqlite' bundle exec appraisal activerecord_5.2.2 rake`.
 
 See the [CONTRIBUTING](https://github.com/CanCanCommunity/cancancan/blob/develop/CONTRIBUTING.md) for more information.
 
-
 ## Special Thanks
-
-[![Renuo AG](/logo/renuo.png)](https://www.renuo.ch)
 
 Thanks to [Renuo AG](https://www.renuo.ch) for currently maintaining and supporting the project.
 
-Also many thanks to the [CanCanCan contributors](https://github.com/CanCanCommunity/cancancan/contributors).
+Many thanks to the [CanCanCan contributors](https://github.com/CanCanCommunity/cancancan/contributors).
 See the [CHANGELOG](https://github.com/CanCanCommunity/cancancan/blob/master/CHANGELOG.md) for the full list.
-
-CanCanCan was inspired by [declarative_authorization](https://github.com/stffn/declarative_authorization/) and
-[aegis](https://github.com/makandra/aegis).
-
-
