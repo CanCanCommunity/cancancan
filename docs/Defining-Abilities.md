@@ -1,3 +1,5 @@
+# Defining Abilities
+
 The `Ability` class is where all user permissions are defined. An example class looks like this.
 
 ```ruby
