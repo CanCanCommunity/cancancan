@@ -27,13 +27,15 @@ of models automatically and reduce duplicated code.
 ## Sponsored by
 
 <a href="https://www.renuo.ch" target="_blank">
-  <img src="./logo/renuo.png" alt="Renuo AG"/>
+  <img src="https://github.com/CanCanCommunity/cancancan/raw/develop/logo/renuo.png" alt="Renuo AG" width="200"/>
 </a>
-
-<a href="https://www.moderntreasury.com" target="_blank">
-  <img src="./logo/modern_treasury.svg" alt="Modern Treasury"/>
+<br/>
+<br/>
+<a href="https://www.moderntreasury.com" target="_blank"  style="display:inline">
+  <img src="https://github.com/CanCanCommunity/cancancan/raw/develop/logo/modern_treasury.svg" alt="Modern Treasury" width="400"/>
 </a>
-
+<br/>
+<br/>
 Do you want to sponsor CanCanCan and show your logo here? 
 Check our [Sponsors page](https://github.com/sponsors/coorasse/).
 
