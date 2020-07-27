@@ -26,16 +26,7 @@ of models automatically and reduce duplicated code.
 
 ## Sponsored by
 
-<a href="https://www.renuo.ch" target="_blank">
-  <img src="./logo/renuo.png" alt="Renuo AG"/>
-</a>
-
-<a href="https://www.moderntreasury.com" target="_blank">
-  <img src="./logo/modern_treasury.svg" alt="Modern Treasury"/>
-</a>
-
-Do you want to sponsor CanCanCan and show your logo here? 
-Check our [Sponsors page](https://github.com/sponsors/coorasse/).
+[![Renuo AG](./logo/renuo.png)](https://www.renuo.ch)
 
 ## Installation
 
