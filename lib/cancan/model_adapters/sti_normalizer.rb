@@ -9,7 +9,8 @@ module CanCan
         def normalize(rules)
           rules.delete_if.with_index do |rule, index|
             subjects = rule.subjects.select do |subject|
-              next if subject.descends_from_active_record?
+              next if subject == :all
+              next if subject.base_class == subject
 
               new_rule = build_new_rule(rule, subject)
               rules.insert(index + 1, new_rule)

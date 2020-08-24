@@ -302,7 +302,11 @@ module CanCan
 
     def alternative_subjects(subject)
       subject = subject.class unless subject.is_a?(Module)
-      [:all, *(subject.ancestors + subject.subclasses), subject.class.to_s]
+      begin
+        [:all, *(subject.ancestors + subject.subclasses), subject.class.to_s]
+      rescue StandardError
+        [:all, *subject.ancestors, subject.class.to_s]
+      end
     end
   end
 end

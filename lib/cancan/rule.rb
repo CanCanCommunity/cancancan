@@ -112,9 +112,15 @@ module CanCan
 
     def matches_subject_class?(subject)
       @subjects.any? do |sub|
-        sub.is_a?(Module) && (subject.is_a?(sub) ||
-          subject.class.to_s == sub.to_s ||
-          (subject.is_a?(Module) && subject.ancestors.include?(sub))) || subject.subclasses.include?(sub)
+        if subject.is_a?(Range)
+          sub.is_a?(Module) && (subject.is_a?(sub) ||
+            subject.class.to_s == sub.to_s ||
+            (subject.is_a?(Module) && subject.ancestors.include?(sub)))
+        else
+          sub.is_a?(Module) && (subject.is_a?(sub) ||
+            subject.class.to_s == sub.to_s ||
+            (subject.is_a?(Module) && subject.ancestors.include?(sub))) || subject.subclasses.include?(sub)
+        end
       end
     end
 
