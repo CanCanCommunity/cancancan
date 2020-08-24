@@ -1,3 +1,7 @@
+## Unreleased
+
+* [#532](https://github.com/CanCanCommunity/cancancan/issues/532): Generate inner queries instead of join+distinct. ([@mraidel][], [@gabsi20][])
+
 ## 3.1.0
 
 * [#605](https://github.com/CanCanCommunity/cancancan/pull/605): Generate inner queries instead of join+distinct. ([@fsateler][])
@@ -665,3 +669,4 @@ Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.co
 [@aleksejleonov]: https://github.com/aleksejleonov
 [@albb0920]: https://github.com/albb0920
 [@ayumu838]: https://github.com/ayumu838
+[@liberatys]: https://github.com/liberatys
