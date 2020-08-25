@@ -1,4 +1,24 @@
+## 3.1.0
+
+* [#605](https://github.com/CanCanCommunity/cancancan/pull/605): Generate inner queries instead of join+distinct. ([@fsateler][])
+* [#608](https://github.com/CanCanCommunity/cancancan/pull/608): Spec for json column regression. ([@aleksejleonov][])
+* [#571](https://github.com/CanCanCommunity/cancancan/pull/571): Allows to check ability even the object implements `#to_a`. ([@mtsmfm][])
+* [#612](https://github.com/CanCanCommunity/cancancan/pull/612): Suppress keyword arguments warning for Ruby 2.7.0. ([@koic][])
+* [#569](https://github.com/CanCanCommunity/cancancan/pull/569): Fix accessible_by fires query for rules using association as condition. ([@albb0920][])
+* [#594](https://github.com/CanCanCommunity/cancancan/pull/594): Support translation of action name. ([@ayumu838][])
+
+## 3.0.2
+
+* [#590](https://github.com/CanCanCommunity/cancancan/pull/590): Fix Rule#inspect when rule is created through a SQL array. ([@frostblooded][])
+* [#592](https://github.com/CanCanCommunity/cancancan/pull/592): Prevent normalization of through polymorphic associations.([@eloyesp][])
+
+## 3.0.1
+
+* [#583](https://github.com/CanCanCommunity/cancancan/pull/583): Fix regression when using a method reference block. ([@coorasse][])
+
 ## 3.0.0
+
+Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.com/CanCanCommunity/cancancan/wiki/Migrating-from-CanCanCan-2.x-to-3.0)
 
 * [#560](https://github.com/CanCanCommunity/cancancan/pull/560): Add support for Rails 6.0. ([@coorasse][])
 * [#489](https://github.com/CanCanCommunity/cancancan/pull/489): Drop support for actions without a subject. ([@andrew-aladev][])
@@ -13,8 +33,6 @@
 * [#566](https://github.com/CanCanCommunity/cancancan/issues/566): Avoid queries on session dumps (speed up error pages). ([@coorasse][])
 * [#568](https://github.com/CanCanCommunity/cancancan/issues/568): Automatically freeze strings in all files. ([@coorasse][])
 * [#577](https://github.com/CanCanCommunity/cancancan/pull/577): Normalise rules traversing associations to reduce the number of joins. ([@coorasse][])
-
-Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.com/CanCanCommunity/cancancan/wiki/Migrating-from-CanCanCan-2.x-to-3.0)
 
 ## 2.3.0 (Sep 16th, 2018)
 
@@ -639,3 +657,11 @@ Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.co
 [@andrew-aladev]: https://github.com/andrew-aladev
 [@phaedryx]: https://github.com/phaedryx
 [@kaspernj]: https://github.com/kaspernj
+[@frostblooded]: https://github.com/frostblooded
+[@eloyesp]: https://github.com/eloyesp
+[@mtsmfm]: https://github.com/mtsmfm
+[@koic]: https://github.com/koic
+[@fsateler]: https://github.com/fsateler
+[@aleksejleonov]: https://github.com/aleksejleonov
+[@albb0920]: https://github.com/albb0920
+[@ayumu838]: https://github.com/ayumu838

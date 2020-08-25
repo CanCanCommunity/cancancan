@@ -31,13 +31,17 @@ module CanCan
             raise WrongAssociationName, "Association '#{key}' not defined in model '#{model_class.name}'"
           end
 
-          if reflection.options[:through].present?
+          if normalizable_association? reflection
             key = reflection.options[:through]
             value = { reflection.source_reflection_name => value }
             reflection = model_class.reflect_on_association(key)
           end
 
           { key => normalize_conditions(reflection.klass.name.constantize, value) }
+        end
+
+        def normalizable_association?(reflection)
+          reflection.options[:through].present? && !reflection.options[:source_type].present?
         end
       end
     end

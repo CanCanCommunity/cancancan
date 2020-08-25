@@ -12,8 +12,10 @@ module SQLHelpers
       ActiveRecord::Base.establish_connection(adapter: 'sqlite3', database: ':memory:')
     elsif ENV['DB'] == 'postgres'
       connect_postgres
+    elsif ENV['DB'].nil?
+      raise StandardError, "ENV['DB'] not specified"
     else
-      raise StandardError, 'database not supported'
+      raise StandardError, "database not supported: #{ENV['DB']}.  Try DB='sqlite' or DB='postgres'"
     end
   end
 
