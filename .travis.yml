@@ -1,16 +1,16 @@
 language: ruby
 cache: bundler
-sudo: false
 addons:
   postgresql: "9.6"
 rvm:
   - 2.3.5
   - 2.4.2
   - 2.5.1
-  - 2.6.0
+  - 2.6.3
+  - 2.7.0
   - ruby-head
-  - jruby-9.1.9.0
-  - jruby-9.2.5.0
+  - jruby-9.1.17.0
+  - jruby-9.2.11.1
   - jruby-head
 
 gemfile:
@@ -32,13 +32,15 @@ matrix:
     gemfile: gemfiles/activerecord_6.0.0.gemfile
   - rvm: 2.4.2
     gemfile: gemfiles/activerecord_6.0.0.gemfile
-  - rvm: jruby-9.1.9.0
+  - rvm: 2.7.0
+    gemfile: gemfiles/activerecord_4.2.0.gemfile
+  - rvm: jruby-9.1.17.0
     gemfile: gemfiles/activerecord_5.0.2.gemfile
-  - rvm: jruby-9.1.9.0
+  - rvm: jruby-9.1.17.0
     gemfile: gemfiles/activerecord_6.0.0.gemfile
-  - rvm: jruby-9.2.5.0
+  - rvm: jruby-9.2.11.1
     gemfile: gemfiles/activerecord_5.0.2.gemfile
-  - rvm: jruby-9.2.5.0
+  - rvm: jruby-9.2.11.1
     gemfile: gemfiles/activerecord_6.0.0.gemfile
   allow_failures:
     - rvm: ruby-head
@@ -51,6 +53,7 @@ notifications:
     on_success: change
     on_failure: change
 before_install:
+  - rvm get stable
   - gem update --system
   - gem install bundler
 script:
