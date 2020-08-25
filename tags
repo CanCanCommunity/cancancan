@@ -1,0 +1,376 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+A	spec/cancan/ability_spec.rb	/^    class A$/;"	c
+Ability	lib/cancan/ability.rb	/^  module Ability$/;"	m	class:CanCan
+Ability	lib/cancan/ability/actions.rb	/^  module Ability$/;"	m	class:CanCan
+Ability	lib/cancan/ability/rules.rb	/^  module Ability$/;"	m	class:CanCan
+Ability	lib/cancan/ability/strong_parameter_support.rb	/^  module Ability$/;"	m	class:CanCan
+Ability	lib/generators/cancan/ability/templates/ability.rb	/^class Ability$/;"	c
+Ability	spec/support/ability.rb	/^class Ability$/;"	c
+AbilityGenerator	lib/generators/cancan/ability/ability_generator.rb	/^    class AbilityGenerator < Rails::Generators::Base$/;"	c	class:Cancan.Generators
+AbstractAdapter	lib/cancan/model_adapters/abstract_adapter.rb	/^    class AbstractAdapter$/;"	c	class:CanCan.ModelAdapters
+AccessDenied	lib/cancan/exceptions.rb	/^  class AccessDenied < Error$/;"	c	class:CanCan
+Account	spec/cancan/ability_spec.rb	/^      class Account$/;"	c
+AccountHistory	spec/cancan/model_adapters/conditions_normalizer_spec.rb	/^    class AccountHistory < ActiveRecord::Base$/;"	c
+Accountant	spec/cancan/model_adapters/conditions_normalizer_spec.rb	/^    class Accountant < ActiveRecord::Base$/;"	c
+Action	spec/cancan/controller_resource_spec.rb	/^      class Action$/;"	c
+Actions	lib/cancan/ability/actions.rb	/^    module Actions$/;"	m	class:CanCan.Ability
+ActiveRecord4Adapter	lib/cancan/model_adapters/active_record_4_adapter.rb	/^    class ActiveRecord4Adapter < ActiveRecordAdapter$/;"	c	class:CanCan.ModelAdapters
+ActiveRecord5Adapter	lib/cancan/model_adapters/active_record_5_adapter.rb	/^    class ActiveRecord5Adapter < ActiveRecord4Adapter$/;"	c	class:CanCan.ModelAdapters
+ActiveRecordAdapter	lib/cancan/model_adapters/active_record_adapter.rb	/^    class ActiveRecordAdapter < AbstractAdapter$/;"	c	class:CanCan.ModelAdapters
+Admin	spec/cancan/controller_resource_spec.rb	/^      class Admin::Dashboard; end$/;"	c
+Admin	spec/cancan/controller_resource_spec.rb	/^      module Admin$/;"	m
+Admin	spec/cancan/controller_resource_spec.rb	/^      module Admin; end$/;"	m
+ApplicationRecord	spec/cancan/model_adapters/active_record_adapter_spec.rb	/^      class ApplicationRecord < ActiveRecord::Base$/;"	c
+Article	spec/cancan/model_adapters/active_record_adapter_spec.rb	/^    class Article < ActiveRecord::Base$/;"	c
+Article	spec/cancan/model_adapters/conditions_extractor_spec.rb	/^    class Article < ActiveRecord::Base$/;"	c
+Article	spec/cancan/model_adapters/conditions_normalizer_spec.rb	/^    class Article < ActiveRecord::Base$/;"	c
+Attachment	spec/cancan/model_adapters/conditions_normalizer_spec.rb	/^    class Attachment < ActiveRecord::Base$/;"	c
+AttributeArgumentError	lib/cancan/exceptions.rb	/^  class AttributeArgumentError < Error; end$/;"	c	class:CanCan
+AuthorizationNotPerformed	lib/cancan/exceptions.rb	/^  class AuthorizationNotPerformed < Error; end$/;"	c	class:CanCan
+B	spec/cancan/ability_spec.rb	/^    module B$/;"	m
+Blob	spec/cancan/model_adapters/conditions_normalizer_spec.rb	/^    class Blob < ActiveRecord::Base$/;"	c
+BlockAndConditionsError	lib/cancan/exceptions.rb	/^  class BlockAndConditionsError < Error; end$/;"	c	class:CanCan
+Blog	spec/cancan/rule_compressor_spec.rb	/^    class Blog$/;"	c
+Brand	spec/cancan/model_adapters/active_record_adapter_spec.rb	/^      class Brand < ApplicationRecord$/;"	c
+CanCan	lib/cancan/ability.rb	/^module CanCan$/;"	m
+CanCan	lib/cancan/ability/actions.rb	/^module CanCan$/;"	m
+CanCan	lib/cancan/ability/rules.rb	/^module CanCan$/;"	m
+CanCan	lib/cancan/ability/strong_parameter_support.rb	/^module CanCan$/;"	m
+CanCan	lib/cancan/conditions_matcher.rb	/^module CanCan$/;"	m
+CanCan	lib/cancan/controller_additions.rb	/^module CanCan$/;"	m
+CanCan	lib/cancan/controller_resource.rb	/^module CanCan$/;"	m
+CanCan	lib/cancan/controller_resource_builder.rb	/^module CanCan$/;"	m
+CanCan	lib/cancan/controller_resource_finder.rb	/^module CanCan$/;"	m
+CanCan	lib/cancan/controller_resource_loader.rb	/^module CanCan$/;"	m
+CanCan	lib/cancan/controller_resource_name_finder.rb	/^module CanCan$/;"	m
+CanCan	lib/cancan/controller_resource_sanitizer.rb	/^module CanCan$/;"	m
+CanCan	lib/cancan/exceptions.rb	/^module CanCan$/;"	m
+CanCan	lib/cancan/model_adapters/abstract_adapter.rb	/^module CanCan$/;"	m
+CanCan	lib/cancan/model_adapters/active_record_4_adapter.rb	/^module CanCan$/;"	m
+CanCan	lib/cancan/model_adapters/active_record_5_adapter.rb	/^module CanCan$/;"	m
+CanCan	lib/cancan/model_adapters/active_record_adapter.rb	/^module CanCan$/;"	m
+CanCan	lib/cancan/model_adapters/conditions_extractor.rb	/^module CanCan$/;"	m
+CanCan	lib/cancan/model_adapters/conditions_normalizer.rb	/^module CanCan$/;"	m
+CanCan	lib/cancan/model_adapters/default_adapter.rb	/^module CanCan$/;"	m
+CanCan	lib/cancan/model_adapters/sti_normalizer.rb	/^module CanCan$/;"	m
+CanCan	lib/cancan/model_additions.rb	/^module CanCan$/;"	m
+CanCan	lib/cancan/parameter_validators.rb	/^module CanCan$/;"	m
+CanCan	lib/cancan/relevant.rb	/^module CanCan$/;"	m
+CanCan	lib/cancan/rule.rb	/^module CanCan$/;"	m
+CanCan	lib/cancan/rules_compressor.rb	/^module CanCan$/;"	m
+CanCan	lib/cancan/unauthorized_message_resolver.rb	/^module CanCan$/;"	m
+CanCan	lib/cancan/version.rb	/^module CanCan$/;"	m
+CanCanCan	lib/cancancan.rb	/^module CanCanCan$/;"	m
+Cancan	lib/generators/cancan/ability/ability_generator.rb	/^module Cancan$/;"	m
+Car	spec/cancan/model_adapters/active_record_adapter_spec.rb	/^      class Car < Vehicle$/;"	c
+Category	spec/cancan/model_adapters/active_record_adapter_spec.rb	/^    class Category < ActiveRecord::Base$/;"	c
+Category	spec/cancan/model_adapters/conditions_extractor_spec.rb	/^    class Category < ActiveRecord::Base$/;"	c
+Child	spec/cancan/model_adapters/active_record_4_adapter_spec.rb	/^        class Child < ActiveRecord::Base$/;"	c
+ClassMethods	lib/cancan/controller_additions.rb	/^    module ClassMethods$/;"	m	class:CanCan.ControllerAdditions
+ClassMethods	lib/cancan/model_additions.rb	/^    module ClassMethods$/;"	m	class:CanCan.ModelAdditions
+Comment	spec/cancan/model_adapters/active_record_adapter_spec.rb	/^    class Comment < ActiveRecord::Base$/;"	c
+Comment	spec/cancan/model_adapters/conditions_extractor_spec.rb	/^    class Comment < ActiveRecord::Base$/;"	c
+Comment	spec/cancan/model_adapters/conditions_normalizer_spec.rb	/^    class Comment < ActiveRecord::Base$/;"	c
+Company	spec/cancan/model_adapters/active_record_adapter_spec.rb	/^    class Company < ActiveRecord::Base$/;"	c
+ConditionsExtractor	lib/cancan/model_adapters/conditions_extractor.rb	/^    class ConditionsExtractor$/;"	c	class:CanCan.ModelAdapters
+ConditionsMatcher	lib/cancan/conditions_matcher.rb	/^  module ConditionsMatcher$/;"	m	class:CanCan
+ConditionsNormalizer	lib/cancan/model_adapters/conditions_normalizer.rb	/^    class ConditionsNormalizer$/;"	c	class:CanCan.ModelAdapters
+Container	spec/cancan/ability_spec.rb	/^    class Container < Hash$/;"	c
+ControllerAdditions	lib/cancan/controller_additions.rb	/^  module ControllerAdditions$/;"	m	class:CanCan
+ControllerResource	lib/cancan/controller_resource.rb	/^  class ControllerResource # :nodoc:$/;"	c	class:CanCan
+ControllerResourceBuilder	lib/cancan/controller_resource_builder.rb	/^  module ControllerResourceBuilder$/;"	m	class:CanCan
+ControllerResourceFinder	lib/cancan/controller_resource_finder.rb	/^  module ControllerResourceFinder$/;"	m	class:CanCan
+ControllerResourceLoader	lib/cancan/controller_resource_loader.rb	/^  module ControllerResourceLoader$/;"	m	class:CanCan
+ControllerResourceNameFinder	lib/cancan/controller_resource_name_finder.rb	/^  module ControllerResourceNameFinder$/;"	m	class:CanCan
+ControllerResourceSanitizer	lib/cancan/controller_resource_sanitizer.rb	/^  module ControllerResourceSanitizer$/;"	m	class:CanCan
+Course	spec/cancan/model_adapters/active_record_adapter_spec.rb	/^      class Course < ActiveRecord::Base$/;"	c
+CustomPkTransaction	spec/cancan/model_adapters/active_record_adapter_spec.rb	/^      class CustomPkTransaction < ActiveRecord::Base$/;"	c
+CustomPkUser	spec/cancan/model_adapters/active_record_adapter_spec.rb	/^      class CustomPkUser < ActiveRecord::Base$/;"	c
+Dashboard	spec/cancan/controller_resource_spec.rb	/^        class Dashboard; end$/;"	c	class:Admin
+DefaultAdapter	lib/cancan/model_adapters/default_adapter.rb	/^    class DefaultAdapter < AbstractAdapter$/;"	c	class:CanCan.ModelAdapters
+Disc	spec/cancan/model_adapters/active_record_4_adapter_spec.rb	/^          class Disc < ActiveRecord::Base$/;"	c
+Disc	spec/cancan/model_adapters/active_record_5_adapter_spec.rb	/^          class Disc < ActiveRecord::Base$/;"	c
+Editor	spec/cancan/model_adapters/accessible_by_has_many_through_spec.rb	/^    class Editor < ActiveRecord::Base$/;"	c
+Editor	spec/cancan/model_adapters/accessible_by_integration_spec.rb	/^    class Editor < ActiveRecord::Base$/;"	c
+Error	lib/cancan/exceptions.rb	/^  class Error < StandardError; end$/;"	c	class:CanCan
+Generators	lib/generators/cancan/ability/ability_generator.rb	/^  module Generators$/;"	m	class:Cancan
+HiddenModel	spec/cancan/controller_resource_spec.rb	/^          class HiddenModel < ::Model; end$/;"	c	class:Admin.SubModule
+House	spec/cancan/model_adapters/has_and_belongs_to_many_spec.rb	/^    class House < ActiveRecord::Base$/;"	c
+ImplementationRemoved	lib/cancan/exceptions.rb	/^  class ImplementationRemoved < Error; end$/;"	c	class:CanCan
+JsonTransaction	spec/cancan/model_adapters/active_record_adapter_spec.rb	/^      class JsonTransaction < ActiveRecord::Base$/;"	c
+Like	spec/cancan/model_adapters/accessible_by_has_many_through_spec.rb	/^    class Like < ActiveRecord::Base$/;"	c
+Like	spec/cancan/model_adapters/accessible_by_integration_spec.rb	/^    class Like < ActiveRecord::Base$/;"	c
+Mention	spec/cancan/model_adapters/active_record_adapter_spec.rb	/^    class Mention < ActiveRecord::Base$/;"	c
+Mention	spec/cancan/model_adapters/conditions_extractor_spec.rb	/^    class Mention < ActiveRecord::Base$/;"	c
+Mention	spec/cancan/model_adapters/conditions_normalizer_spec.rb	/^    class Mention < ActiveRecord::Base$/;"	c
+Model	spec/cancan/controller_resource_spec.rb	/^        class Model < ::Model; end$/;"	c	class:MyEngine
+Model	spec/cancan/controller_resource_spec.rb	/^        class Model < ::Model; end$/;"	c	class:Sub
+Model	spec/cancan/controller_resource_spec.rb	/^    class Model$/;"	c
+ModelAdapters	lib/cancan/model_adapters/abstract_adapter.rb	/^  module ModelAdapters$/;"	m	class:CanCan
+ModelAdapters	lib/cancan/model_adapters/active_record_4_adapter.rb	/^  module ModelAdapters$/;"	m	class:CanCan
+ModelAdapters	lib/cancan/model_adapters/active_record_5_adapter.rb	/^  module ModelAdapters$/;"	m	class:CanCan
+ModelAdapters	lib/cancan/model_adapters/active_record_adapter.rb	/^  module ModelAdapters$/;"	m	class:CanCan
+ModelAdapters	lib/cancan/model_adapters/conditions_extractor.rb	/^  module ModelAdapters$/;"	m	class:CanCan
+ModelAdapters	lib/cancan/model_adapters/conditions_normalizer.rb	/^  module ModelAdapters$/;"	m	class:CanCan
+ModelAdapters	lib/cancan/model_adapters/default_adapter.rb	/^  module ModelAdapters$/;"	m	class:CanCan
+ModelAdapters	lib/cancan/model_adapters/sti_normalizer.rb	/^  module ModelAdapters$/;"	m	class:CanCan
+ModelAdditions	lib/cancan/model_additions.rb	/^  module ModelAdditions$/;"	m	class:CanCan
+Motorbike	spec/cancan/model_adapters/active_record_adapter_spec.rb	/^      class Motorbike < Vehicle$/;"	c
+MyEngine	spec/cancan/controller_resource_spec.rb	/^      module MyEngine$/;"	m
+Namespace	spec/cancan/model_adapters/active_record_adapter_spec.rb	/^      class Namespace::TableX < ActiveRecord::Base$/;"	c
+Namespace	spec/cancan/model_adapters/active_record_adapter_spec.rb	/^      class Namespace::TableZ < ActiveRecord::Base$/;"	c
+Namespace	spec/cancan/model_adapters/active_record_adapter_spec.rb	/^      module Namespace$/;"	m
+NotImplemented	lib/cancan/exceptions.rb	/^  class NotImplemented < Error; end$/;"	c	class:CanCan
+ParameterValidators	lib/cancan/parameter_validators.rb	/^  module ParameterValidators$/;"	m	class:CanCan
+Parent	spec/cancan/model_adapters/active_record_4_adapter_spec.rb	/^        class Parent < ActiveRecord::Base$/;"	c
+Person	spec/cancan/model_adapters/has_and_belongs_to_many_spec.rb	/^    class Person < ActiveRecord::Base$/;"	c
+Post	spec/cancan/model_adapters/accessible_by_has_many_through_spec.rb	/^    class Post < ActiveRecord::Base$/;"	c
+Post	spec/cancan/model_adapters/accessible_by_integration_spec.rb	/^    class Post < ActiveRecord::Base$/;"	c
+Project	spec/cancan/model_adapters/active_record_adapter_spec.rb	/^    class Project < ActiveRecord::Base$/;"	c
+Project	spec/cancan/model_adapters/conditions_extractor_spec.rb	/^    class Project < ActiveRecord::Base$/;"	c
+Relevant	lib/cancan/relevant.rb	/^  module Relevant$/;"	m	class:CanCan
+Rule	lib/cancan/rule.rb	/^  class Rule # :nodoc:$/;"	c	class:CanCan
+Rules	lib/cancan/ability/rules.rb	/^    module Rules$/;"	m	class:CanCan.Ability
+RulesCompressor	lib/cancan/rules_compressor.rb	/^  class RulesCompressor$/;"	c	class:CanCan
+SQLHelpers	spec/support/sql_helpers.rb	/^module SQLHelpers$/;"	m
+Section	spec/cancan/controller_resource_spec.rb	/^    class Section; end$/;"	c
+Shape	spec/cancan/model_adapters/active_record_4_adapter_spec.rb	/^          class Shape < ActiveRecord::Base$/;"	c
+Shape	spec/cancan/model_adapters/active_record_5_adapter_spec.rb	/^          class Shape < ActiveRecord::Base$/;"	c
+SpreadComment	spec/cancan/model_adapters/conditions_normalizer_spec.rb	/^    class SpreadComment < ActiveRecord::Base$/;"	c
+StiNormalizer	lib/cancan/model_adapters/sti_normalizer.rb	/^    class StiNormalizer$/;"	c	class:CanCan.ModelAdapters
+StrongParameterSupport	lib/cancan/ability/strong_parameter_support.rb	/^    module StrongParameterSupport$/;"	m	class:CanCan.Ability
+Sub	spec/cancan/controller_resource_spec.rb	/^      module Sub$/;"	m
+SubModule	spec/cancan/controller_resource_spec.rb	/^        module SubModule$/;"	m	class:Admin
+SubjectClassMatcher	lib/cancan/rule.rb	/^class SubjectClassMatcher$/;"	c
+Supplier	spec/cancan/model_adapters/conditions_normalizer_spec.rb	/^    class Supplier < ActiveRecord::Base$/;"	c
+Thing	spec/cancan/model_adapters/active_record_5_adapter_spec.rb	/^          class Thing < ActiveRecord::Base$/;"	c
+Transaction	spec/cancan/model_adapters/active_record_adapter_spec.rb	/^      class Transaction < ActiveRecord::Base$/;"	c
+Transaction	spec/cancan/model_adapters/conditions_extractor_spec.rb	/^    class Transaction < ActiveRecord::Base$/;"	c
+UnauthorizedMessageResolver	lib/cancan/unauthorized_message_resolver.rb	/^  module UnauthorizedMessageResolver$/;"	m	class:CanCan
+User	spec/cancan/model_adapters/accessible_by_has_many_through_spec.rb	/^    class User < ActiveRecord::Base$/;"	c
+User	spec/cancan/model_adapters/accessible_by_integration_spec.rb	/^    class User < ActiveRecord::Base$/;"	c
+User	spec/cancan/model_adapters/active_record_adapter_spec.rb	/^    class User < ActiveRecord::Base$/;"	c
+User	spec/cancan/model_adapters/conditions_extractor_spec.rb	/^    class User < ActiveRecord::Base$/;"	c
+User	spec/cancan/model_adapters/conditions_normalizer_spec.rb	/^    class User < ActiveRecord::Base$/;"	c
+Vehicle	spec/cancan/model_adapters/active_record_adapter_spec.rb	/^      class Vehicle < ApplicationRecord$/;"	c
+Watermelon	spec/cancan/rule_spec.rb	/^        class Watermelon < ActiveRecord::Base$/;"	c
+WrongAssociationName	lib/cancan/exceptions.rb	/^  class WrongAssociationName < Error; end$/;"	c	class:CanCan
+accessible_by	lib/cancan/model_additions.rb	/^      def accessible_by(ability, action = :index)$/;"	f	class:CanCan.ModelAdditions.ClassMethods
+action_exists_in?	lib/cancan/controller_resource.rb	/^    def action_exists_in?(options)$/;"	f	class:CanCan.ControllerResource
+active?	spec/cancan/ability_spec.rb	/^      def active?$/;"	f	class:A
+adapter	lib/cancan/controller_resource.rb	/^    def adapter$/;"	f	class:CanCan.ControllerResource
+adapter_class	lib/cancan/model_adapters/abstract_adapter.rb	/^      def self.adapter_class(model_class)$/;"	F	class:CanCan.ModelAdapters.AbstractAdapter
+add_before_action	lib/cancan/controller_resource.rb	/^    def self.add_before_action(controller_class, method, *args)$/;"	F	class:CanCan.ControllerResource
+add_rule	lib/cancan/ability/rules.rb	/^      def add_rule(rule)$/;"	f	class:CanCan.Ability.Rules
+add_rule_to_index	lib/cancan/ability/rules.rb	/^      def add_rule_to_index(rule, position)$/;"	f	class:CanCan.Ability.Rules
+add_to_cache	lib/cancan/model_adapters/conditions_extractor.rb	/^      def add_to_cache(table_alias, relation_name, path_to_key)$/;"	f	class:CanCan.ModelAdapters.ConditionsExtractor
+alias_action	lib/cancan/ability/actions.rb	/^      def alias_action(*args)$/;"	f	class:CanCan.Ability.Actions
+aliased_actions	lib/cancan/ability/actions.rb	/^      def aliased_actions$/;"	f	class:CanCan.Ability.Actions
+aliases_for_action	lib/cancan/ability/actions.rb	/^      def aliases_for_action(action)$/;"	f	class:CanCan.Ability.Actions
+alredy_used?	lib/cancan/model_adapters/conditions_extractor.rb	/^      def alredy_used?(table_alias, relation_name, path_to_key)$/;"	f	class:CanCan.ModelAdapters.ConditionsExtractor
+alternative_subjects	lib/cancan/ability.rb	/^    def alternative_subjects(subject)$/;"	f	class:CanCan.Ability.can?
+assign_attributes	lib/cancan/controller_resource_builder.rb	/^    def assign_attributes(resource)$/;"	f	class:CanCan.ControllerResourceBuilder
+associations_hash	lib/cancan/rule.rb	/^    def associations_hash(conditions = @conditions)$/;"	f	class:CanCan.Rule
+attributes_for	lib/cancan/ability.rb	/^    def attributes_for(action, subject)$/;"	f	class:CanCan.Ability.can?
+attributes_from_conditions	lib/cancan/rule.rb	/^    def attributes_from_conditions$/;"	f	class:CanCan.Rule
+authorization_action	lib/cancan/controller_resource_loader.rb	/^    def authorization_action$/;"	f	class:CanCan.ControllerResourceLoader
+authorize!	lib/cancan/ability.rb	/^    def authorize!(action, subject, *args)$/;"	f	class:CanCan.Ability.can?
+authorize!	lib/cancan/controller_additions.rb	/^    def authorize!(*args)$/;"	f	class:CanCan.ControllerAdditions
+authorize_resource	lib/cancan/controller_additions.rb	/^      def authorize_resource(*args)$/;"	f	class:CanCan.ControllerAdditions.ClassMethods
+authorize_resource	lib/cancan/controller_resource.rb	/^    def authorize_resource$/;"	f	class:CanCan.ControllerResource
+before_callback_name	lib/cancan/controller_resource.rb	/^    def self.before_callback_name(options)$/;"	F	class:CanCan.ControllerResource
+build_new_rule	lib/cancan/model_adapters/sti_normalizer.rb	/^        def build_new_rule(rule, subject)$/;"	f	class:CanCan.ModelAdapters.StiNormalizer
+build_relation	lib/cancan/model_adapters/active_record_4_adapter.rb	/^      def build_relation(*where_conditions)$/;"	f	class:CanCan.ModelAdapters
+build_relation	lib/cancan/model_adapters/active_record_5_adapter.rb	/^      def build_relation(*where_conditions)$/;"	f	class:CanCan.ModelAdapters.ActiveRecord5Adapter
+build_resource	lib/cancan/controller_resource_builder.rb	/^    def build_resource$/;"	f	class:CanCan.ControllerResourceBuilder
+calculate_nested	lib/cancan/model_adapters/conditions_extractor.rb	/^      def calculate_nested(model_class, result_hash, relation_name, value, path_to_key)$/;"	f	class:CanCan.ModelAdapters.ConditionsExtractor
+calculate_result_hash	lib/cancan/model_adapters/conditions_extractor.rb	/^      def calculate_result_hash(key, model_class, path_to_key, result_hash, value)$/;"	f	class:CanCan.ModelAdapters.ConditionsExtractor
+calculate_result_hash	lib/cancan/model_adapters/conditions_normalizer.rb	/^        def calculate_result_hash(model_class, key, value)$/;"	f	class:CanCan.ModelAdapters.ConditionsNormalizer
+call_block_with_all	lib/cancan/conditions_matcher.rb	/^    def call_block_with_all(action, subject, *extra_args)$/;"	f	class:CanCan.ConditionsMatcher
+can	lib/cancan/ability.rb	/^    def can(action = nil, subject = nil, *attributes_and_conditions, &block)$/;"	f	class:CanCan.Ability.can?
+can	spec/cancan/rule_compressor_spec.rb	/^  def can(action, subject, args = nil)$/;"	f
+can?	lib/cancan/ability.rb	/^    def can?(action, subject, attribute = nil, *extra_args)$/;"	f	class:CanCan.Ability
+can?	lib/cancan/controller_additions.rb	/^    def can?(*args)$/;"	f	class:CanCan.ControllerAdditions
+can_rule?	lib/cancan/rule.rb	/^    def can_rule?$/;"	f	class:CanCan.Rule
+cancan_resource_class	lib/cancan/controller_additions.rb	/^      def cancan_resource_class$/;"	f	class:CanCan.ControllerAdditions.ClassMethods
+cancan_skipper	lib/cancan/controller_additions.rb	/^      def cancan_skipper$/;"	f	class:CanCan.ControllerAdditions.ClassMethods
+cannot	lib/cancan/ability.rb	/^    def cannot(action = nil, subject = nil, *attributes_and_conditions, &block)$/;"	f	class:CanCan.Ability.can?
+cannot	spec/cancan/rule_compressor_spec.rb	/^  def cannot(action, subject, args = nil)$/;"	f
+cannot?	lib/cancan/ability.rb	/^    def cannot?(*args)$/;"	f	class:CanCan.Ability.can?
+cannot?	lib/cancan/controller_additions.rb	/^    def cannot?(*args)$/;"	f	class:CanCan.ControllerAdditions
+cannot_catch_all?	lib/cancan/rule.rb	/^    def cannot_catch_all?$/;"	f	class:CanCan.Rule
+catch_all?	lib/cancan/rule.rb	/^    def catch_all?$/;"	f	class:CanCan.Rule
+check_authorization	lib/cancan/controller_additions.rb	/^      def check_authorization(options = {})$/;"	f	class:CanCan.ControllerAdditions.ClassMethods
+clear_aliased_actions	lib/cancan/ability/actions.rb	/^      def clear_aliased_actions$/;"	f	class:CanCan.Ability.Actions
+collection_actions	lib/cancan/controller_resource.rb	/^    def collection_actions$/;"	f	class:CanCan.ControllerResource
+collection_instance	lib/cancan/controller_resource.rb	/^    def collection_instance$/;"	f	class:CanCan.ControllerResource
+collection_instance=	lib/cancan/controller_resource.rb	/^    def collection_instance=(instance)$/;"	f	class:CanCan.ControllerResource
+compress	lib/cancan/rules_compressor.rb	/^    def compress(array)$/;"	f	class:CanCan.RulesCompressor
+condition_and_block_check	lib/cancan/rule.rb	/^    def condition_and_block_check(conditions, block, action, subject)$/;"	f	class:CanCan.Rule
+condition_match?	lib/cancan/conditions_matcher.rb	/^    def condition_match?(attribute, value)$/;"	f	class:CanCan.ConditionsMatcher
+conditions	lib/cancan/model_adapters/active_record_adapter.rb	/^      def conditions$/;"	f	class:CanCan.ModelAdapters.ActiveRecordAdapter
+conditions_empty?	lib/cancan/conditions_matcher.rb	/^    def conditions_empty?$/;"	f	class:CanCan.ConditionsMatcher
+connect_db	spec/support/sql_helpers.rb	/^  def connect_db$/;"	f	class:SQLHelpers
+connect_postgres	spec/support/sql_helpers.rb	/^  def connect_postgres$/;"	f	class:SQLHelpers
+count_queries	spec/cancan/rule_spec.rb	/^      def count_queries(&block)$/;"	f
+current_ability	lib/cancan/controller_additions.rb	/^    def current_ability$/;"	f	class:CanCan.ControllerAdditions
+current_ability	lib/cancan/controller_resource.rb	/^    def current_ability$/;"	f	class:CanCan.ControllerResource
+database_records	lib/cancan/model_adapters/abstract_adapter.rb	/^      def database_records$/;"	f	class:CanCan.ModelAdapters.AbstractAdapter
+database_records	lib/cancan/model_adapters/active_record_adapter.rb	/^      def database_records$/;"	f	class:CanCan.ModelAdapters.ActiveRecordAdapter
+deep_clean	lib/cancan/model_adapters/active_record_adapter.rb	/^      def deep_clean(joins_hash)$/;"	f	class:CanCan.ModelAdapters.ActiveRecordAdapter
+deep_merge	lib/cancan/model_adapters/active_record_adapter.rb	/^      def deep_merge(base_hash, added_hash)$/;"	f	class:CanCan.ModelAdapters.ActiveRecordAdapter
+default_alias_actions	lib/cancan/ability/actions.rb	/^      def default_alias_actions$/;"	f	class:CanCan.Ability.Actions
+expand_actions	lib/cancan/ability/actions.rb	/^      def expand_actions(actions)$/;"	f	class:CanCan.Ability.Actions
+expanded_actions	lib/cancan/ability/actions.rb	/^      def expanded_actions$/;"	f	class:CanCan.Ability.Actions
+extract_key	lib/cancan/controller_resource_loader.rb	/^    def extract_key(value)$/;"	f	class:CanCan.ControllerResourceLoader
+extract_multiple_conditions	lib/cancan/model_adapters/active_record_adapter.rb	/^      def extract_multiple_conditions(conditions_extractor, rules)$/;"	f	class:CanCan.ModelAdapters.ActiveRecordAdapter
+extract_rule_in_permissions	lib/cancan/ability.rb	/^    def extract_rule_in_permissions(permissions_list, rule)$/;"	f	class:CanCan.Ability.can?
+extract_subjects	lib/cancan/ability.rb	/^    def extract_subjects(subject)$/;"	f	class:CanCan.Ability.can?
+false_sql	lib/cancan/model_adapters/active_record_adapter.rb	/^      def false_sql$/;"	f	class:CanCan.ModelAdapters.ActiveRecordAdapter
+fetch_parent	lib/cancan/controller_resource_loader.rb	/^    def fetch_parent(name)$/;"	f	class:CanCan.ControllerResourceLoader
+find	lib/cancan/model_adapters/abstract_adapter.rb	/^      def self.find(model_class, id)$/;"	F	class:CanCan.ModelAdapters.AbstractAdapter
+find_by_dynamic_finder	lib/cancan/controller_resource_finder.rb	/^    def find_by_dynamic_finder$/;"	f	class:CanCan.ControllerResourceFinder
+find_by_find_by_finder	lib/cancan/controller_resource_finder.rb	/^    def find_by_find_by_finder$/;"	f	class:CanCan.ControllerResourceFinder
+find_resource	lib/cancan/controller_resource_finder.rb	/^    def find_resource$/;"	f	class:CanCan.ControllerResourceFinder
+find_resource_using_find_by	lib/cancan/controller_resource_finder.rb	/^    def find_resource_using_find_by$/;"	f	class:CanCan.ControllerResourceFinder
+for_class	lib/cancan/model_adapters/abstract_adapter.rb	/^      def self.for_class?(_member_class)$/;"	F	class:CanCan.ModelAdapters.AbstractAdapter
+for_class	lib/cancan/model_adapters/active_record_5_adapter.rb	/^      def self.for_class?(model_class)$/;"	F	class:CanCan.ModelAdapters.ActiveRecord5Adapter
+for_class?	lib/cancan/model_adapters/active_record_4_adapter.rb	/^        def for_class?(model_class)$/;"	f	class:CanCan.ModelAdapters.ActiveRecord4Adapter
+generate_ability	lib/generators/cancan/ability/ability_generator.rb	/^      def generate_ability$/;"	f	class:Cancan.Generators.AbilityGenerator
+generate_table_alias	lib/cancan/model_adapters/conditions_extractor.rb	/^      def generate_table_alias(model_class, relation_name, path_to_key)$/;"	f	class:CanCan.ModelAdapters.ConditionsExtractor
+get_attributes	lib/cancan/ability/strong_parameter_support.rb	/^      def get_attributes(rule, subject)$/;"	f	class:CanCan.Ability.StrongParameterSupport.permitted_attributes
+has_block?	lib/cancan/ability.rb	/^    def has_block?(action, subject)$/;"	f	class:CanCan.Ability.can?
+has_raw_sql?	lib/cancan/ability.rb	/^    def has_raw_sql?(action, subject)$/;"	f	class:CanCan.Ability.can?
+hash_condition_match?	lib/cancan/conditions_matcher.rb	/^    def hash_condition_match?(attribute, value)$/;"	f	class:CanCan.ConditionsMatcher
+id_param	lib/cancan/controller_resource_finder.rb	/^    def id_param$/;"	f	class:CanCan.ControllerResourceFinder
+id_param_key	lib/cancan/controller_resource_finder.rb	/^    def id_param_key$/;"	f	class:CanCan.ControllerResourceFinder
+included	lib/cancan/controller_additions.rb	/^    def self.included(base)$/;"	F	class:CanCan.ControllerAdditions
+included	lib/cancan/model_additions.rb	/^    def self.included(base)$/;"	F	class:CanCan.ModelAdditions
+inherited	lib/cancan/model_adapters/abstract_adapter.rb	/^      def self.inherited(subclass)$/;"	F	class:CanCan.ModelAdapters.AbstractAdapter
+initial_attributes	lib/cancan/controller_resource_builder.rb	/^    def initial_attributes$/;"	f	class:CanCan.ControllerResourceBuilder
+initialize	lib/cancan/controller_resource.rb	/^    def initialize(controller, *args)$/;"	f	class:CanCan.ControllerResource
+initialize	lib/cancan/exceptions.rb	/^    def initialize(message = nil, action = nil, subject = nil, conditions = nil)$/;"	f	class:CanCan.AccessDenied
+initialize	lib/cancan/model_adapters/abstract_adapter.rb	/^      def initialize(model_class, rules)$/;"	f	class:CanCan.ModelAdapters.AbstractAdapter
+initialize	lib/cancan/model_adapters/active_record_adapter.rb	/^      def initialize(model_class, rules)$/;"	f	class:CanCan.ModelAdapters.ActiveRecordAdapter
+initialize	lib/cancan/model_adapters/conditions_extractor.rb	/^      def initialize(model_class)$/;"	f	class:CanCan.ModelAdapters.ConditionsExtractor
+initialize	lib/cancan/rule.rb	/^    def initialize(base_behavior, action, subject, *extra_args, &block)$/;"	f	class:CanCan.Rule
+initialize	lib/cancan/rules_compressor.rb	/^    def initialize(rules)$/;"	f	class:CanCan.RulesCompressor
+initialize	lib/generators/cancan/ability/templates/ability.rb	/^  def initialize(user)$/;"	f	class:Ability
+initialize	spec/cancan/controller_resource_spec.rb	/^        def initialize(attributes = {})$/;"	f	class:Action
+initialize	spec/cancan/controller_resource_spec.rb	/^      def initialize(attributes = {})$/;"	f	class:Model
+initialize	spec/support/ability.rb	/^  def initialize(user)$/;"	f	class:Ability
+inspect	lib/cancan/rule.rb	/^    def inspect$/;"	f	class:CanCan.Rule
+instance_name	lib/cancan/controller_resource.rb	/^    def instance_name$/;"	f	class:CanCan.ControllerResource
+joins	lib/cancan/model_adapters/active_record_adapter.rb	/^      def joins$/;"	f	class:CanCan.ModelAdapters.ActiveRecordAdapter
+load_and_authorize_resource	lib/cancan/controller_additions.rb	/^      def load_and_authorize_resource(*args)$/;"	f	class:CanCan.ControllerAdditions.ClassMethods
+load_and_authorize_resource	lib/cancan/controller_resource.rb	/^    def load_and_authorize_resource$/;"	f	class:CanCan.ControllerResource
+load_collection	lib/cancan/controller_resource_loader.rb	/^    def load_collection$/;"	f	class:CanCan.ControllerResourceLoader
+load_collection?	lib/cancan/controller_resource.rb	/^    def load_collection?$/;"	f	class:CanCan.ControllerResource
+load_instance?	lib/cancan/controller_resource.rb	/^    def load_instance?$/;"	f	class:CanCan.ControllerResource
+load_resource	lib/cancan/controller_additions.rb	/^      def load_resource(*args)$/;"	f	class:CanCan.ControllerAdditions.ClassMethods
+load_resource	lib/cancan/controller_resource_loader.rb	/^    def load_resource$/;"	f	class:CanCan.ControllerResourceLoader
+load_resource_instance	lib/cancan/controller_resource_loader.rb	/^    def load_resource_instance$/;"	f	class:CanCan.ControllerResourceLoader
+matches_action?	lib/cancan/relevant.rb	/^    def matches_action?(action)$/;"	f	class:CanCan.Relevant
+matches_action?	lib/cancan/rule.rb	/^    def matches_action?(action)$/;"	f	class:CanCan.Rule
+matches_all_conditions?	lib/cancan/conditions_matcher.rb	/^    def matches_all_conditions?(adapter, conditions, subject)$/;"	f	class:CanCan.ConditionsMatcher
+matches_attributes?	lib/cancan/rule.rb	/^    def matches_attributes?(attribute)$/;"	f	class:CanCan.Rule
+matches_block_conditions	lib/cancan/conditions_matcher.rb	/^    def matches_block_conditions(subject, *extra_args)$/;"	f	class:CanCan.ConditionsMatcher
+matches_class_or_is_related	lib/cancan/rule.rb	/^  def self.matches_class_or_is_related(subject, sub)$/;"	F	class:SubjectClassMatcher
+matches_condition	lib/cancan/model_adapters/abstract_adapter.rb	/^      def self.matches_condition?(_subject, _name, _value)$/;"	F	class:CanCan.ModelAdapters.AbstractAdapter
+matches_condition	lib/cancan/model_adapters/active_record_5_adapter.rb	/^      def self.matches_condition?(subject, name, value)$/;"	F	class:CanCan.ModelAdapters.ActiveRecord5Adapter
+matches_condition?	lib/cancan/model_adapters/active_record_4_adapter.rb	/^        def matches_condition?(subject, name, value)$/;"	f	class:CanCan.ModelAdapters.ActiveRecord4Adapter
+matches_conditions?	lib/cancan/conditions_matcher.rb	/^    def matches_conditions?(action, subject, attribute = nil, *extra_args)$/;"	f	class:CanCan.ConditionsMatcher
+matches_conditions_hash	lib/cancan/model_adapters/abstract_adapter.rb	/^      def self.matches_conditions_hash?(_subject, _conditions)$/;"	F	class:CanCan.ModelAdapters.AbstractAdapter
+matches_conditions_hash?	lib/cancan/conditions_matcher.rb	/^    def matches_conditions_hash?(subject, conditions = @conditions)$/;"	f	class:CanCan.ConditionsMatcher
+matches_non_block_conditions	lib/cancan/conditions_matcher.rb	/^    def matches_non_block_conditions(subject)$/;"	f	class:CanCan.ConditionsMatcher
+matches_subject?	lib/cancan/relevant.rb	/^    def matches_subject?(subject)$/;"	f	class:CanCan.Relevant
+matches_subject?	lib/cancan/rule.rb	/^    def matches_subject?(subject)$/;"	f	class:CanCan.Rule
+matches_subject_class	lib/cancan/rule.rb	/^  def self.matches_subject_class?(subjects, subject)$/;"	F	class:SubjectClassMatcher
+matches_subject_class?	lib/cancan/relevant.rb	/^    def matches_subject_class?(subject)$/;"	f	class:CanCan.Relevant
+matches_subject_class?	lib/cancan/rule.rb	/^    def matches_subject_class?(subject)$/;"	f	class:CanCan.Rule
+matching_class_check	lib/cancan/rule.rb	/^  def self.matching_class_check(subject, sub, has_subclasses)$/;"	F	class:SubjectClassMatcher
+member_action?	lib/cancan/controller_resource.rb	/^    def member_action?$/;"	f	class:CanCan.ControllerResource
+merge	lib/cancan/ability.rb	/^    def merge(ability)$/;"	f	class:CanCan.Ability.can?
+merge_conditions	lib/cancan/model_adapters/active_record_adapter.rb	/^      def merge_conditions(sql, conditions_hash, behavior)$/;"	f	class:CanCan.ModelAdapters.ActiveRecordAdapter
+merge_non_empty_conditions	lib/cancan/model_adapters/active_record_adapter.rb	/^      def merge_non_empty_conditions(behavior, conditions_hash, sql)$/;"	f	class:CanCan.ModelAdapters.ActiveRecordAdapter
+model_adapter	lib/cancan/ability.rb	/^    def model_adapter(model_class, action)$/;"	f	class:CanCan.Ability.can?
+model_adapter	lib/cancan/conditions_matcher.rb	/^    def model_adapter(subject)$/;"	f	class:CanCan.ConditionsMatcher
+name	lib/cancan/controller_resource_name_finder.rb	/^    def name$/;"	f	class:CanCan.ControllerResourceNameFinder
+name_from_controller	lib/cancan/controller_resource_name_finder.rb	/^    def name_from_controller$/;"	f	class:CanCan.ControllerResourceNameFinder
+namespace	lib/cancan/controller_resource_name_finder.rb	/^    def namespace$/;"	f	class:CanCan.ControllerResourceNameFinder
+namespaced_name	lib/cancan/controller_resource_name_finder.rb	/^    def namespaced_name$/;"	f	class:CanCan.ControllerResourceNameFinder
+nested_subject_matches_conditions?	lib/cancan/conditions_matcher.rb	/^    def nested_subject_matches_conditions?(subject_hash)$/;"	f	class:CanCan.ConditionsMatcher
+new_actions	lib/cancan/controller_resource_loader.rb	/^    def new_actions$/;"	f	class:CanCan.ControllerResourceLoader
+normalizable_association?	lib/cancan/model_adapters/conditions_normalizer.rb	/^        def normalizable_association?(reflection)$/;"	f	class:CanCan.ModelAdapters.ConditionsNormalizer
+normalize	lib/cancan/model_adapters/conditions_normalizer.rb	/^        def normalize(model_class, rules)$/;"	f	class:CanCan.ModelAdapters.ConditionsNormalizer
+normalize	lib/cancan/model_adapters/sti_normalizer.rb	/^        def normalize(rules)$/;"	f	class:CanCan.ModelAdapters.StiNormalizer
+normalize_conditions	lib/cancan/model_adapters/conditions_normalizer.rb	/^        def normalize_conditions(model_class, conditions)$/;"	f	class:CanCan.ModelAdapters.ConditionsNormalizer
+normalized_sql	spec/support/sql_helpers.rb	/^  def normalized_sql(adapter)$/;"	f	class:SQLHelpers
+only_block?	lib/cancan/rule.rb	/^    def only_block?$/;"	f	class:CanCan.Rule
+only_raw_sql?	lib/cancan/rule.rb	/^    def only_raw_sql?$/;"	f	class:CanCan.Rule
+optimize_order!	lib/cancan/ability/rules.rb	/^      def optimize_order!(rules)$/;"	f	class:CanCan.Ability.Rules
+override_condition_matching	lib/cancan/model_adapters/abstract_adapter.rb	/^      def self.override_condition_matching?(_subject, _name, _value)$/;"	F	class:CanCan.ModelAdapters.AbstractAdapter
+override_condition_matching?	lib/cancan/model_adapters/active_record_4_adapter.rb	/^        def override_condition_matching?(subject, name, _value)$/;"	f	class:CanCan.ModelAdapters.ActiveRecord4Adapter
+override_conditions_hash_matching	lib/cancan/model_adapters/abstract_adapter.rb	/^      def self.override_conditions_hash_matching?(_subject, _conditions)$/;"	F	class:CanCan.ModelAdapters.AbstractAdapter
+override_scope	lib/cancan/model_adapters/active_record_adapter.rb	/^      def override_scope$/;"	f	class:CanCan.ModelAdapters.ActiveRecordAdapter
+parameters_require_sanitizing?	lib/cancan/controller_resource.rb	/^    def parameters_require_sanitizing?$/;"	f	class:CanCan.ControllerResource
+params_method	lib/cancan/controller_resource_sanitizer.rb	/^    def params_method$/;"	f	class:CanCan.ControllerResourceSanitizer
+params_methods	lib/cancan/controller_resource_sanitizer.rb	/^    def params_methods$/;"	f	class:CanCan.ControllerResourceSanitizer
+parent?	lib/cancan/controller_resource.rb	/^    def parent?$/;"	f	class:CanCan.ControllerResource
+parent_authorization_action	lib/cancan/controller_resource_loader.rb	/^    def parent_authorization_action$/;"	f	class:CanCan.ControllerResourceLoader
+parent_name	lib/cancan/controller_resource_loader.rb	/^    def parent_name$/;"	f	class:CanCan.ControllerResourceLoader
+parent_resource	lib/cancan/controller_resource_loader.rb	/^    def parent_resource$/;"	f	class:CanCan.ControllerResourceLoader
+parse_attributes_from_extra_args	lib/cancan/rule.rb	/^    def parse_attributes_from_extra_args(args)$/;"	f	class:CanCan.Rule
+permissions	lib/cancan/ability.rb	/^    def permissions$/;"	f	class:CanCan.Ability.can?
+permitted_attributes	lib/cancan/ability/strong_parameter_support.rb	/^      def permitted_attributes(action, subject)$/;"	f	class:CanCan.Ability.StrongParameterSupport
+possible_relevant_rules	lib/cancan/ability/rules.rb	/^      def possible_relevant_rules(subject)$/;"	f	class:CanCan.Ability.Rules
+raise_override_scope_error	lib/cancan/model_adapters/active_record_adapter.rb	/^      def raise_override_scope_error$/;"	f	class:CanCan.ModelAdapters.ActiveRecordAdapter
+relevant?	lib/cancan/relevant.rb	/^    def relevant?(action, subject)$/;"	f	class:CanCan.Relevant
+relevant_rules	lib/cancan/ability/rules.rb	/^      def relevant_rules(action, subject)$/;"	f	class:CanCan.Ability.Rules
+relevant_rules_for_match	lib/cancan/ability/rules.rb	/^      def relevant_rules_for_match(action, subject)$/;"	f	class:CanCan.Ability.Rules
+relevant_rules_for_query	lib/cancan/ability/rules.rb	/^      def relevant_rules_for_query(action, subject)$/;"	f	class:CanCan.Ability.Rules
+resource_base	lib/cancan/controller_resource_loader.rb	/^    def resource_base$/;"	f	class:CanCan.ControllerResourceLoader
+resource_base_through	lib/cancan/controller_resource_loader.rb	/^    def resource_base_through$/;"	f	class:CanCan.ControllerResourceLoader
+resource_base_through_parent_resource	lib/cancan/controller_resource_loader.rb	/^    def resource_base_through_parent_resource$/;"	f	class:CanCan.ControllerResourceLoader
+resource_class	lib/cancan/controller_resource.rb	/^    def resource_class$/;"	f	class:CanCan.ControllerResource
+resource_class_with_parent	lib/cancan/controller_resource.rb	/^    def resource_class_with_parent$/;"	f	class:CanCan.ControllerResource
+resource_instance	lib/cancan/controller_resource.rb	/^    def resource_instance$/;"	f	class:CanCan.ControllerResource
+resource_instance=	lib/cancan/controller_resource.rb	/^    def resource_instance=(instance)$/;"	f	class:CanCan.ControllerResource
+resource_params	lib/cancan/controller_resource_loader.rb	/^    def resource_params$/;"	f	class:CanCan.ControllerResourceLoader
+resource_params_by_key	lib/cancan/controller_resource_loader.rb	/^    def resource_params_by_key(key)$/;"	f	class:CanCan.ControllerResourceLoader
+resource_params_by_namespaced_name	lib/cancan/controller_resource_loader.rb	/^    def resource_params_by_namespaced_name$/;"	f	class:CanCan.ControllerResourceLoader
+rules	lib/cancan/ability/rules.rb	/^      def rules$/;"	f	class:CanCan.Ability.Rules
+sanitize_parameters	lib/cancan/controller_resource_sanitizer.rb	/^    def sanitize_parameters$/;"	f	class:CanCan.ControllerResourceSanitizer
+sanitize_sql	lib/cancan/model_adapters/active_record_4_adapter.rb	/^      def sanitize_sql(conditions)$/;"	f	class:CanCan.ModelAdapters
+sanitize_sql	lib/cancan/model_adapters/active_record_5_adapter.rb	/^      def sanitize_sql(conditions)$/;"	f	class:CanCan.ModelAdapters.ActiveRecord5Adapter
+sanitize_sql	lib/cancan/model_adapters/active_record_adapter.rb	/^      def sanitize_sql(conditions)$/;"	f	class:CanCan.ModelAdapters.ActiveRecordAdapter
+sanitize_sql_activerecord4	lib/cancan/model_adapters/active_record_4_adapter.rb	/^      def sanitize_sql_activerecord4(conditions)$/;"	f	class:CanCan.ModelAdapters
+sanitize_sql_activerecord5	lib/cancan/model_adapters/active_record_5_adapter.rb	/^      def sanitize_sql_activerecord5(conditions)$/;"	f	class:CanCan.ModelAdapters.ActiveRecord5Adapter
+save_actions	lib/cancan/controller_resource.rb	/^    def save_actions$/;"	f	class:CanCan.ControllerResource
+skip?	lib/cancan/controller_resource.rb	/^    def skip?(behavior)$/;"	f	class:CanCan.ControllerResource
+skip_authorization_check	lib/cancan/controller_additions.rb	/^      def skip_authorization_check(*args)$/;"	f	class:CanCan.ControllerAdditions.ClassMethods
+skip_authorize_resource	lib/cancan/controller_additions.rb	/^      def skip_authorize_resource(*args)$/;"	f	class:CanCan.ControllerAdditions.ClassMethods
+skip_load_and_authorize_resource	lib/cancan/controller_additions.rb	/^      def skip_load_and_authorize_resource(*args)$/;"	f	class:CanCan.ControllerAdditions.ClassMethods
+skip_load_resource	lib/cancan/controller_additions.rb	/^      def skip_load_resource(*args)$/;"	f	class:CanCan.ControllerAdditions.ClassMethods
+subject_class?	lib/cancan/ability/strong_parameter_support.rb	/^      def subject_class?(subject)$/;"	f	class:CanCan.Ability.StrongParameterSupport.permitted_attributes
+subject_class?	lib/cancan/conditions_matcher.rb	/^    def subject_class?(subject)$/;"	f	class:CanCan.ConditionsMatcher
+tableize_conditions	lib/cancan/model_adapters/conditions_extractor.rb	/^      def tableize_conditions(conditions, model_class = @root_model_class, path_to_key = 0)$/;"	f	class:CanCan.ModelAdapters.ConditionsExtractor
+to_a	spec/cancan/ability_spec.rb	/^      def self.to_a$/;"	F
+to_ary	spec/cancan/ability_spec.rb	/^      def self.to_ary$/;"	F
+to_s	lib/cancan/exceptions.rb	/^    def to_s$/;"	f	class:CanCan.AccessDenied
+translate_subject	lib/cancan/unauthorized_message_resolver.rb	/^    def translate_subject(subject)$/;"	f	class:CanCan.UnauthorizedMessageResolver
+true_sql	lib/cancan/model_adapters/active_record_adapter.rb	/^      def true_sql$/;"	f	class:CanCan.ModelAdapters.ActiveRecordAdapter
+unauthorized_message	lib/cancan/unauthorized_message_resolver.rb	/^    def unauthorized_message(action, subject)$/;"	f	class:CanCan.UnauthorizedMessageResolver
+unauthorized_message_keys	lib/cancan/ability.rb	/^    def unauthorized_message_keys(action, subject)$/;"	f	class:CanCan.Ability.can?
+valid_attribute_param?	lib/cancan/parameter_validators.rb	/^    def valid_attribute_param?(attribute)$/;"	f	class:CanCan.ParameterValidators
+validate_target	lib/cancan/ability.rb	/^    def validate_target(target)$/;"	f	class:CanCan.Ability.can?
+version_greater_or_equal	lib/cancan/model_adapters/active_record_adapter.rb	/^      def self.version_greater_or_equal?(version)$/;"	F	class:CanCan.ModelAdapters.ActiveRecordAdapter
+version_lower	lib/cancan/model_adapters/active_record_adapter.rb	/^      def self.version_lower?(version)$/;"	F	class:CanCan.ModelAdapters.ActiveRecordAdapter
+visit_nodes	lib/cancan/model_adapters/active_record_5_adapter.rb	/^      def visit_nodes(node)$/;"	f	class:CanCan.ModelAdapters.ActiveRecord5Adapter
+with_scope?	lib/cancan/rule.rb	/^    def with_scope?$/;"	f	class:CanCan.Rule
+wrap	lib/cancan/rule.rb	/^    def wrap(object)$/;"	f	class:CanCan.Rule

@@ -147,8 +147,6 @@ class SubjectClassMatcher
     end
   end
 
-  private
-
   def self.matching_class_check(subject, sub, has_subclasses)
     matches = matches_class_or_is_related(subject, sub)
     if has_subclasses
