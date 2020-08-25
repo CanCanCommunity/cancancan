@@ -111,17 +111,7 @@ module CanCan
     end
 
     def matches_subject_class?(subject)
-      @subjects.any? do |sub|
-        if subject.is_a?(Range)
-          sub.is_a?(Module) && (subject.is_a?(sub) ||
-            subject.class.to_s == sub.to_s ||
-            (subject.is_a?(Module) && subject.ancestors.include?(sub)))
-        else
-          sub.is_a?(Module) && (subject.is_a?(sub) ||
-            subject.class.to_s == sub.to_s ||
-            (subject.is_a?(Module) && subject.ancestors.include?(sub))) || subject.subclasses.include?(sub)
-        end
-      end
+      SubjectClassMatcher.matches_subject_class?(@subjects, subject)
     end
 
     def parse_attributes_from_extra_args(args)
@@ -136,5 +126,32 @@ module CanCan
       raise BlockAndConditionsError, 'A hash of conditions is mutually exclusive with a block. '\
         "Check \":#{action} #{subject}\" ability."
     end
+  end
+end
+
+class SubjectClassMatcher
+  def self.matches_subject_class?(subjects, subject)
+    subjects.any? do |sub|
+      has_subclasses = true
+      has_subclasses = false if subject.is_a?(Range)
+      matching_class_check(subject, sub, has_subclasses)
+    end
+  end
+
+  private
+
+  def self.matching_class_check(subject, sub, has_subclasses)
+    matches = matches_class_or_is_related(subject, sub)
+    if has_subclasses
+      matches || subject.subclasses.include?(sub)
+    else
+      matches
+    end
+  end
+
+  def self.matches_class_or_is_related(subject, sub)
+    sub.is_a?(Module) && (subject.is_a?(sub) ||
+        subject.class.to_s == sub.to_s ||
+        (subject.is_a?(Module) && subject.ancestors.include?(sub)))
   end
 end
