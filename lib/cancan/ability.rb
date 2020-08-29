@@ -305,7 +305,7 @@ module CanCan
       if subject.methods.include? :subclasses
         [:all, *(subject.ancestors + subject.subclasses), subject.class.to_s]
       else
-        [:all, *subject.ancestors ,subject.class.to_s]
+        [:all, *subject.ancestors, subject.class.to_s]
       end
     end
   end
