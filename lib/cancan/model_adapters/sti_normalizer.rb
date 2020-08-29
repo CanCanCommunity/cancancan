@@ -7,16 +7,20 @@ module CanCan
     class StiNormalizer
       class << self
         def normalize(rules)
+          rulesCache = []
           rules.delete_if.with_index do |rule, index|
             subjects = rule.subjects.select do |subject|
+              next if subject == :all
+
               next if subject.descends_from_active_record?
 
               new_rule = build_new_rule(rule, subject)
-              rules.insert(index + 1, new_rule)
+              rulesCache.push(new_rule)
               true
             end
             subjects.length == rule.subjects.length
           end
+          rulesCache.each { |rule| rules.push(rule)}
         end
 
         private
