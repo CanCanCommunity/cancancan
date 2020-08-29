@@ -79,6 +79,11 @@ RSpec.describe CanCan::Rule do
         count = count_queries { rule.inspect }
         expect(count).to eq 0
       end
+
+      it 'displays the rule correctly when it is constructed through sql array' do
+        rule = CanCan::Rule.new(true, :read, Watermelon, ['visible=?', true], {}, {})
+        expect(rule.inspect).not_to be_blank
+      end
     end
   end
 end
