@@ -1,9 +1,9 @@
+# Model Adapter
+
 CanCan includes a model adapter layer which allows it to change behavior depending on the model used. The current adapters are.
 
-* ActiveRecord
-* [[Mongoid]]
-
-See [[spec/README|https://github.com/CanCanCommunity/cancancan/blob/master/spec/README.rdoc]] for how to run specs for a given adapter.
+* ActiveRecord (native in `cancancan` gem)
+* [Mongoid](https://github.com/CanCanCommunity/cancancan-mongoid)
 
 ## Creating a Model Adapter
 
@@ -11,7 +11,8 @@ It is easy to make your own adapter if one is not provided. Here I'll walk you t
 
 ### The Specs
 
-First, fork the CanCan GitHub project and clone that repo. Next, add the necessary gems to the Gemfile for working with the adapter in the specs.
+
+First, fork the CanCanCan GitHub project and clone that repo. Next, add the necessary gems to the Gemfile for working with the adapter in the specs.
 
 ```ruby
 case ENV["MODEL_ADAPTER"]
