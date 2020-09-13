@@ -19,6 +19,12 @@ describe CanCan::AccessDenied do
       @exception.default_message = 'Unauthorized!'
       expect(@exception.message).to eq('Unauthorized!')
     end
+
+    it 'has debug information on inspect' do
+      expect(@exception.inspect).to eq(
+        '#<CanCan::AccessDenied action: :some_action, subject: :some_subject, conditions: :some_conditions>'
+      )
+    end
   end
 
   describe 'with only a message' do
