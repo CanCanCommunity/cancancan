@@ -1,7 +1,5 @@
-# this class is responsible of normalizing the hash of conditions
-# by exploding has_many through associations
-# when a condition is defined with an has_many through association this is exploded in all its parts
-# TODO: it could identify STI and normalize it
+# this class is responsible for detecting sti classes and creating new rules for the 
+# relevant subclasses, using the inheritance_column as a merger
 module CanCan
   module ModelAdapters
     class StiNormalizer
@@ -12,7 +10,7 @@ module CanCan
             subjects = rule.subjects.select do |subject|
               next if subject == :all || subject.descends_from_active_record?
 
-              rules_cache.push(build_new_rule(rule, subject))
+              rules_cache.push(build_rule_for_subclass(rule, subject))
               true
             end
             subjects.length == rule.subjects.length
@@ -22,7 +20,8 @@ module CanCan
 
         private
 
-        def build_new_rule(rule, subject)
+        # create a new rule for the subclasses that links on the inheritance_column
+        def build_rule_for_subclass(rule, subject)
           CanCan::Rule.new(rule.base_behavior, rule.actions, subject.superclass,
                            rule.conditions.merge(subject.inheritance_column => subject.name), rule.block)
         end

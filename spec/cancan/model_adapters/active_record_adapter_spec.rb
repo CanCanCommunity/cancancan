@@ -653,17 +653,12 @@ WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
         end
 
         create_table(:vehicles) do |t|
-          t.references :brand
           t.string :type
         end
       end
 
       class ApplicationRecord < ActiveRecord::Base
         self.abstract_class = true
-      end
-
-      class Brand < ApplicationRecord
-        has_many :vehicles
       end
 
       class Vehicle < ApplicationRecord
@@ -675,18 +670,20 @@ WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
 
       class Motorbike < Vehicle
       end
+
+      class Suzuki < Motorbike
+
+      end
     end
 
     it 'recognises rules applied to the base class' do
       u1 = User.create!(name: 'pippo')
 
-      brand = Brand.create!
-      car = Car.create!(brand: brand)
-      motorbike = Motorbike.create!(brand: brand)
+      car = Car.create!()
+      motorbike = Motorbike.create!()
 
       ability = Ability.new(u1)
       ability.can :read, Vehicle
-      # puts Vehicle.accessible_by(ability)
       expect(Vehicle.accessible_by(ability)).to match_array([car, motorbike])
       expect(Car.accessible_by(ability)).to match_array([car])
       expect(Motorbike.accessible_by(ability)).to match_array([motorbike])
@@ -695,9 +692,20 @@ WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
     it 'recognises rules applied to subclasses' do
       u1 = User.create!(name: 'pippo')
 
-      brand = Brand.create!
-      car = Car.create!(brand: brand)
-      Motorbike.create!(brand: brand)
+      car = Car.create!()
+      Motorbike.create!()
+
+      ability = Ability.new(u1)
+      ability.can :read, [Car]
+      expect(Vehicle.accessible_by(ability)).to match_array([car])
+      expect(Car.accessible_by(ability)).to eq([car])
+      expect(Motorbike.accessible_by(ability)).to eq([])
+    end
+    it 'recognises rules applied to subclasses' do
+      u1 = User.create!(name: 'pippo')
+
+      car = Car.create!()
+      Motorbike.create!()
 
       ability = Ability.new(u1)
       ability.can :read, [Car]

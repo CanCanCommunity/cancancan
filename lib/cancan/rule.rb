@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'conditions_matcher.rb'
+require_relative 'class_matcher.rb'
 require_relative 'relevant.rb'
 
 module CanCan
@@ -138,27 +139,3 @@ module CanCan
   end
 end
 
-class SubjectClassMatcher
-  def self.matches_subject_class?(subjects, subject)
-    subjects.any? do |sub|
-      has_subclasses = true
-      has_subclasses = false if subject.is_a?(Range)
-      matching_class_check(subject, sub, has_subclasses)
-    end
-  end
-
-  def self.matching_class_check(subject, sub, has_subclasses)
-    matches = matches_class_or_is_related(subject, sub)
-    if has_subclasses
-      matches || subject.subclasses.include?(sub)
-    else
-      matches
-    end
-  end
-
-  def self.matches_class_or_is_related(subject, sub)
-    sub.is_a?(Module) && (subject.is_a?(sub) ||
-        subject.class.to_s == sub.to_s ||
-        (subject.is_a?(Module) && subject.ancestors.include?(sub)))
-  end
-end
