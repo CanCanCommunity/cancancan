@@ -1,4 +1,4 @@
-# this class is responsible for detecting sti classes and creating new rules for the 
+# this class is responsible for detecting sti classes and creating new rules for the
 # relevant subclasses, using the inheritance_column as a merger
 module CanCan
   module ModelAdapters

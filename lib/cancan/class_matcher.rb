@@ -4,8 +4,7 @@
 class SubjectClassMatcher
   def self.matches_subject_class?(subjects, subject)
     subjects.any? do |sub|
-      has_subclasses = true
-      has_subclasses = false if subject.is_a?(Range)
+      has_subclasses = subject.respond_to?(:subclasses)
       matching_class_check(subject, sub, has_subclasses)
     end
   end

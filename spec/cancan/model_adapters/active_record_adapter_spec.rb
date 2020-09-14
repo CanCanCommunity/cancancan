@@ -662,7 +662,6 @@ WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
       end
 
       class Vehicle < ApplicationRecord
-        belongs_to :brand
       end
 
       class Car < Vehicle
@@ -679,8 +678,8 @@ WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
     it 'recognises rules applied to the base class' do
       u1 = User.create!(name: 'pippo')
 
-      car = Car.create!()
-      motorbike = Motorbike.create!()
+      car = Car.create!
+      motorbike = Motorbike.create!
 
       ability = Ability.new(u1)
       ability.can :read, Vehicle
@@ -689,11 +688,26 @@ WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
       expect(Motorbike.accessible_by(ability)).to match_array([motorbike])
     end
 
-    it 'recognises rules applied to subclasses' do
+
+    it 'recognises rules applied to the base class multiple classes deep' do
       u1 = User.create!(name: 'pippo')
 
-      car = Car.create!()
-      Motorbike.create!()
+      car = Car.create!
+      motorbike = Motorbike.create!
+      suzuki = Suzuki.create!
+
+      ability = Ability.new(u1)
+      ability.can :read, Vehicle
+      expect(Vehicle.accessible_by(ability)).to match_array([suzuki, car, motorbike])
+      expect(Car.accessible_by(ability)).to match_array([car])
+      expect(Motorbike.accessible_by(ability)).to match_array([suzuki, motorbike])
+      expect(Suzuki.accessible_by(ability)).to match_array([suzuki])
+    end
+
+    it 'recognises rules applied to subclasses' do
+      u1 = User.create!(name: 'pippo')
+      car = Car.create!
+      Motorbike.create!
 
       ability = Ability.new(u1)
       ability.can :read, [Car]
@@ -701,17 +715,23 @@ WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
       expect(Car.accessible_by(ability)).to eq([car])
       expect(Motorbike.accessible_by(ability)).to eq([])
     end
+
     it 'recognises rules applied to subclasses' do
       u1 = User.create!(name: 'pippo')
-
-      car = Car.create!()
-      Motorbike.create!()
-
+      suzuki = Suzuki.create!
+      Motorbike.create!
       ability = Ability.new(u1)
-      ability.can :read, [Car]
-      expect(Vehicle.accessible_by(ability)).to match_array([car])
-      expect(Car.accessible_by(ability)).to eq([car])
-      expect(Motorbike.accessible_by(ability)).to eq([])
+      ability.can :read, [Suzuki]
+      expect(Motorbike.accessible_by(ability)).to eq([suzuki])
+    end
+
+    it 'recognises rules applied to subclass of subclass even with be_able_to' do
+      u1 = User.create!(name: 'pippo')
+      motorbike = Motorbike.create!
+      ability = Ability.new(u1)
+      ability.can :read, [Motorbike]
+      expect(ability).to be_able_to(:read, motorbike)
+      expect(ability).to be_able_to(:read, Suzuki.new)
     end
   end
 end
