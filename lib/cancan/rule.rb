@@ -138,4 +138,3 @@ module CanCan
     end
   end
 end
-

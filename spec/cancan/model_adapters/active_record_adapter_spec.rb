@@ -671,7 +671,6 @@ WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
       end
 
       class Suzuki < Motorbike
-
       end
     end
 
@@ -687,7 +686,6 @@ WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
       expect(Car.accessible_by(ability)).to match_array([car])
       expect(Motorbike.accessible_by(ability)).to match_array([motorbike])
     end
-
 
     it 'recognises rules applied to the base class multiple classes deep' do
       u1 = User.create!(name: 'pippo')
@@ -716,7 +714,7 @@ WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
       expect(Motorbike.accessible_by(ability)).to eq([])
     end
 
-    it 'recognises rules applied to subclasses' do
+    it 'recognises rules applied to subclasses on 3 level' do
       u1 = User.create!(name: 'pippo')
       suzuki = Suzuki.create!
       Motorbike.create!
