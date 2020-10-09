@@ -26,7 +26,19 @@ of models automatically and reduce duplicated code.
 
 ## Sponsored by
 
-[![Renuo AG](./logo/renuo.png)](https://www.renuo.ch)
+<a href="https://www.renuo.ch" target="_blank">
+  <img src="./logo/renuo.png" alt="Renuo AG" width="200"/>
+</a>
+<br/>
+<br/>
+<a href="https://www.moderntreasury.com" target="_blank"  style="display:inline">
+  <img src="./logo/modern_treasury.svg" alt="Modern Treasury" width="400"/>
+</a>
+<br/>
+<br/>
+
+Do you want to sponsor CanCanCan and show your logo here? 
+Check our [Sponsors Page](https://github.com/sponsors/coorasse).
 
 ## Installation
 
@@ -270,8 +282,6 @@ You can then run all appraisal files (like CI does), with `appraisal rake` or ju
 See the [CONTRIBUTING](https://github.com/CanCanCommunity/cancancan/blob/develop/CONTRIBUTING.md) for more information.
 
 ## Special Thanks
-
-Thanks to [Renuo AG](https://www.renuo.ch) for currently maintaining and supporting the project.
 
 Many thanks to the [CanCanCan contributors](https://github.com/CanCanCommunity/cancancan/contributors).
 See the [CHANGELOG](https://github.com/CanCanCommunity/cancancan/blob/master/CHANGELOG.md) for the full list.

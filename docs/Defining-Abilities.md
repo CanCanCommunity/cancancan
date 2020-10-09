@@ -1,3 +1,5 @@
+# Defining Abilities
+
 The `Ability` class is where all user permissions are defined. An example class looks like this.
 
 ```ruby
@@ -50,7 +52,7 @@ can :manage, User
 can :invite, User
 ```
 
-you can get rid of the second line and the `:invite` permissions, because because `:manage` represents **any** action on object and `:manage` is not just `:create`, `:read`, `:update`, `:destroy` on object.
+you can get rid of the second line and the `:invite` permissions, because `:manage` represents **any** action on object and `:manage` is not just `:create`, `:read`, `:update`, `:destroy` on object.
 
 If you want only CRUD actions on object, you should create custom action that called `:crud` for example, and use it instead of `:manage`:
 

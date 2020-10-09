@@ -76,10 +76,10 @@ load_resource :event
 load_and_authorize_resource :task, through: [:project, :event]
 ```
 
-Here it will check both the `@project` and `@event` variables and fetch the task through whichever one exists. Note that this is only loading the parent model, if you want to authorize the parent you will need to do it through a before_filter because there is special logic involved.
+Here it will check both the `@project` and `@event` variables and fetch the task through whichever one exists. Note that this is only loading the parent model, if you want to authorize the parent you will need to do it through a before_action because there is special logic involved.
 
 ```ruby
-before_filter :authorize_parent
+before_action :authorize_parent
 
 private
 
