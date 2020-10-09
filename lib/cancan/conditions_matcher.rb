@@ -91,10 +91,12 @@ module CanCan
       else
         # you can use `nil`s in your ability definition to tell cancancan to find
         # objects that *don't* have any children in a has_many relationship.
+        #
         # for example, given ability:
         # => can :read, Article, comments: { id: nil }
         # cancancan will return articles where `article.comments == []`
-        # this is implemented here. `attribute` is `article.comments`, and it's empty.
+        #
+        # this is implemented here. `attribute` is `article.comments`, and it's an empty array.
         # the expression below returns true if this was expected.
         !value.values.empty? && value.values.all?(&:nil?)
       end
