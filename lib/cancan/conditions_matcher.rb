@@ -70,20 +70,10 @@ module CanCan
       when Range
         value.cover?(attribute)
       when Enumerable
-        enumerable_condition_match?(attribute, value)
+        value.include?(attribute)
       else
         attribute == value
       end
-    end
-
-    def enumerable_condition_match?(attribute, value)
-      return true if value.include?(attribute)
-
-      # if we expect an empty array, return true if we are given one
-      # see https://github.com/CanCanCommunity/cancancan/pull/618
-      return true if attribute.is_a?(Enumerable) && attribute.empty? && value.empty?
-
-      false
     end
 
     def hash_condition_match?(attribute, value)

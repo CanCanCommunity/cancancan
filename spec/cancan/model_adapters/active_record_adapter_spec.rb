@@ -443,23 +443,16 @@ WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
     expect(Article.accessible_by(ability)).to eq([article])
   end
 
-  it 'allows an empty array to be used as a condition for a has_many' do
+  it 'allows an empty array to be used as a condition for a has_many, but this is never a passing condition' do
     a1 = Article.create!
     a2 = Article.create!
     a2.comments = [Comment.create!]
 
     @ability.can :read, Article, comment_ids: []
 
-    expect(@ability.can?(:read, a1)).to eq(true)
+    expect(@ability.can?(:read, a1)).to eq(false)
     expect(@ability.can?(:read, a2)).to eq(false)
 
-    # ideally this would return [a1]. it doesn't because in ActiveRecord5Adapter#build_relation
-    # we call `@model_class.where(*where_conditions)`, and `@model_class.where(:comment_ids=>[]).to_sql`
-    # returns "SELECT \"articles\".* FROM \"articles\" WHERE 1=0".
-    #
-    # a better solution is write the abilty as follows:
-    # @ability.can :read, Article, comments: { id: nil }
-    # see next test.
     expect(Article.accessible_by(@ability)).to eq([])
   end
 
