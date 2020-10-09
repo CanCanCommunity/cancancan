@@ -5,7 +5,7 @@
 * [#571](https://github.com/CanCanCommunity/cancancan/pull/571): Allows to check ability even the object implements `#to_a`. ([@mtsmfm][])
 * [#612](https://github.com/CanCanCommunity/cancancan/pull/612): Suppress keyword arguments warning for Ruby 2.7.0. ([@koic][])
 * [#569](https://github.com/CanCanCommunity/cancancan/pull/569): Fix accessible_by fires query for rules using association as condition. ([@albb0920][])
-* [#618](https://github.com/CanCanCommunity/cancancan/pull/618): Allow using an empty array as a condition. ([@ghiculescu][])
+* [#618](https://github.com/CanCanCommunity/cancancan/pull/618): Add support for using an nil relation as a condition. ([@ghiculescu][])
 * [#594](https://github.com/CanCanCommunity/cancancan/pull/594): Support translation of action name. ([@ayumu838][])
 
 ## 3.0.2
