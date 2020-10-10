@@ -1,6 +1,6 @@
 ### Getting Started
 
-* [[Defining Abilities]], [Best Practices](https://github.com/CanCanCommunity/cancancan/wiki/Defining-Abilities%3A-Best-Practices)
+* [Defining Abilities](./Defining-Abilities.md), [Best Practices](https://github.com/CanCanCommunity/cancancan/wiki/Defining-Abilities%3A-Best-Practices)
 * [[Checking Abilities]]
 * [[Authorizing Controller Actions]]
 * [[Exception Handling]]
