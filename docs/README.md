@@ -5,7 +5,7 @@
 * [[Authorizing Controller Actions]]
 * [[Exception Handling]]
 * [[Ensure Authorization]]
-* [[Changing Defaults]]
+* [Changing Defaults](./Changing-Defaults.md)
 * [[Translations (i18n)]]
 
 ### More about Abilities
@@ -34,7 +34,7 @@
 * [[Mongoid]]
 * [Rails Admin](https://github.com/sferik/rails_admin/wiki/CanCanCan)
 * [[Devise]]
-* [[Accessing Request Data]]
+* [Accessing Request Data](./Accessing-request-data.md)
 * [Abilities in Database](./Abilities-in-Database.md)
 * [[Ability for Other Users]]
 * [[Other Authorization Solutions]]
