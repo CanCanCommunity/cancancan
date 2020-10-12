@@ -504,12 +504,18 @@ WHERE "articles"."id" IN (SELECT "articles"."id" FROM "articles"
   it 'doesn\'t allow a nil to be used as a condition for a has_many alongside other attributes' do
     a1 = Article.create!
     a2 = Article.create!
-    a2.comments = [Comment.create!]
+    a2.comments = [Comment.create!(spam: true)]
+    a3 = Article.create!
+    a3.comments = [Comment.create!(spam: false)]
 
+    # if we are checking for `id: nil` and any other criteria, we should never return any Article.
+    # either the Article has Comments, which means `id: nil` fails.
+    # or the Article has no Comments, which means `spam: true` fails.
     @ability.can :read, Article, comments: { id: nil, spam: true }
 
     expect(@ability.can?(:read, a1)).to eq(false)
     expect(@ability.can?(:read, a2)).to eq(false)
+    expect(@ability.can?(:read, a3)).to eq(false)
 
     expect(Article.accessible_by(@ability)).to eq([])
 
@@ -519,6 +525,32 @@ FROM "articles"
 WHERE "articles"."id" IN (SELECT "articles"."id" FROM "articles"
   LEFT OUTER JOIN "comments" ON "comments"."article_id" = "articles"."id"
   WHERE "comments"."id" IS NULL AND "comments"."spam" = 1)))
+  end
+
+  it 'doesn\'t allow a nil to be used as a condition for a has_many alongside other attributes - false case' do
+    a1 = Article.create!
+    a2 = Article.create!
+    a2.comments = [Comment.create!(spam: true)]
+    a3 = Article.create!
+    a3.comments = [Comment.create!(spam: false)]
+
+    # if we are checking for `id: nil` and any other criteria, we should never return any Article.
+    # either the Article has Comments, which means `id: nil` fails.
+    # or the Article has no Comments, which means `spam: false` fails.
+    @ability.can :read, Article, comments: { id: nil, spam: false }
+
+    expect(@ability.can?(:read, a1)).to eq(false)
+    expect(@ability.can?(:read, a2)).to eq(false)
+    expect(@ability.can?(:read, a3)).to eq(false)
+
+    expect(Article.accessible_by(@ability)).to eq([])
+
+    expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
+SELECT "articles".*
+FROM "articles"
+WHERE "articles"."id" IN (SELECT "articles"."id" FROM "articles"
+  LEFT OUTER JOIN "comments" ON "comments"."article_id" = "articles"."id"
+  WHERE "comments"."id" IS NULL AND "comments"."spam" = 0)))
   end
 
   it 'allows an empty array to be used as a condition for a belongs_to; this never returns true' do
