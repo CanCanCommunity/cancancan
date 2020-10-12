@@ -455,10 +455,12 @@ WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
 
     expect(Article.accessible_by(@ability)).to eq([])
 
-    expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
-SELECT "articles".*
-FROM "articles"
-WHERE 1=0))
+    if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
+      expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
+  SELECT "articles".*
+  FROM "articles"
+  WHERE 1=0))
+    end
   end
 
   it 'allows a nil to be used as a condition for a has_many - with join' do
@@ -473,12 +475,14 @@ WHERE 1=0))
 
     expect(Article.accessible_by(@ability)).to eq([a1])
 
-    expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
-SELECT "articles".*
-FROM "articles"
-WHERE "articles"."id" IN (SELECT "articles"."id" FROM "articles"
-  LEFT OUTER JOIN "comments" ON "comments"."article_id" = "articles"."id"
-  WHERE "comments"."id" IS NULL)))
+    if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
+      expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
+  SELECT "articles".*
+  FROM "articles"
+  WHERE "articles"."id" IN (SELECT "articles"."id" FROM "articles"
+    LEFT OUTER JOIN "comments" ON "comments"."article_id" = "articles"."id"
+    WHERE "comments"."id" IS NULL)))
+    end
   end
 
   it 'allows several nils to be used as a condition for a has_many - with join' do
@@ -493,12 +497,14 @@ WHERE "articles"."id" IN (SELECT "articles"."id" FROM "articles"
 
     expect(Article.accessible_by(@ability)).to eq([a1])
 
-    expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
-SELECT "articles".*
-FROM "articles"
-WHERE "articles"."id" IN (SELECT "articles"."id" FROM "articles"
-  LEFT OUTER JOIN "comments" ON "comments"."article_id" = "articles"."id"
-  WHERE "comments"."id" IS NULL AND "comments"."spam" IS NULL)))
+    if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
+      expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
+  SELECT "articles".*
+  FROM "articles"
+  WHERE "articles"."id" IN (SELECT "articles"."id" FROM "articles"
+    LEFT OUTER JOIN "comments" ON "comments"."article_id" = "articles"."id"
+    WHERE "comments"."id" IS NULL AND "comments"."spam" IS NULL)))
+    end
   end
 
   it 'doesn\'t allow a nil to be used as a condition for a has_many alongside other attributes' do
@@ -519,12 +525,14 @@ WHERE "articles"."id" IN (SELECT "articles"."id" FROM "articles"
 
     expect(Article.accessible_by(@ability)).to eq([])
 
-    expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
-SELECT "articles".*
-FROM "articles"
-WHERE "articles"."id" IN (SELECT "articles"."id" FROM "articles"
-  LEFT OUTER JOIN "comments" ON "comments"."article_id" = "articles"."id"
-  WHERE "comments"."id" IS NULL AND "comments"."spam" = #{true_v})))
+    if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
+      expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
+  SELECT "articles".*
+  FROM "articles"
+  WHERE "articles"."id" IN (SELECT "articles"."id" FROM "articles"
+    LEFT OUTER JOIN "comments" ON "comments"."article_id" = "articles"."id"
+    WHERE "comments"."id" IS NULL AND "comments"."spam" = #{true_v})))
+    end
   end
 
   it 'doesn\'t allow a nil to be used as a condition for a has_many alongside other attributes - false case' do
@@ -545,12 +553,14 @@ WHERE "articles"."id" IN (SELECT "articles"."id" FROM "articles"
 
     expect(Article.accessible_by(@ability)).to eq([])
 
-    expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
-SELECT "articles".*
-FROM "articles"
-WHERE "articles"."id" IN (SELECT "articles"."id" FROM "articles"
-  LEFT OUTER JOIN "comments" ON "comments"."article_id" = "articles"."id"
-  WHERE "comments"."id" IS NULL AND "comments"."spam" = #{false_v})))
+    if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
+      expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
+  SELECT "articles".*
+  FROM "articles"
+  WHERE "articles"."id" IN (SELECT "articles"."id" FROM "articles"
+    LEFT OUTER JOIN "comments" ON "comments"."article_id" = "articles"."id"
+    WHERE "comments"."id" IS NULL AND "comments"."spam" = #{false_v})))
+    end
   end
 
   it 'allows a nil to be used as a condition for a has_many alongside other attributes on the parent' do
@@ -570,12 +580,14 @@ WHERE "articles"."id" IN (SELECT "articles"."id" FROM "articles"
 
     expect(Article.accessible_by(@ability)).to eq([a1])
 
-    expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
-SELECT "articles".*
-FROM "articles"
-WHERE "articles"."id" IN (SELECT "articles"."id" FROM "articles"
-  LEFT OUTER JOIN "comments" ON "comments"."article_id" = "articles"."id"
-  WHERE "articles"."secret" = #{true_v} AND "comments"."id" IS NULL)))
+    if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
+      expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
+  SELECT "articles".*
+  FROM "articles"
+  WHERE "articles"."id" IN (SELECT "articles"."id" FROM "articles"
+    LEFT OUTER JOIN "comments" ON "comments"."article_id" = "articles"."id"
+    WHERE "articles"."secret" = #{true_v} AND "comments"."id" IS NULL)))
+    end
   end
 
   it 'allows an empty array to be used as a condition for a belongs_to; this never returns true' do
@@ -590,10 +602,12 @@ WHERE "articles"."id" IN (SELECT "articles"."id" FROM "articles"
 
     expect(Article.accessible_by(@ability)).to eq([])
 
-    expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
-SELECT "articles".*
-FROM "articles"
-WHERE 1=0))
+    if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
+      expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
+  SELECT "articles".*
+  FROM "articles"
+  WHERE 1=0))
+    end
   end
 
   context 'with namespaced models' do
