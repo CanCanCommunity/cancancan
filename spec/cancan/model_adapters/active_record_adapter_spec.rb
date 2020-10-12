@@ -454,6 +454,11 @@ WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
     expect(@ability.can?(:read, a2)).to eq(false)
 
     expect(Article.accessible_by(@ability)).to eq([])
+
+    expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
+SELECT "articles".*
+FROM "articles"
+WHERE 1=0))
   end
 
   it 'allows a nil to be used as a condition for a has_many - with join' do
@@ -467,6 +472,13 @@ WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
     expect(@ability.can?(:read, a2)).to eq(false)
 
     expect(Article.accessible_by(@ability)).to eq([a1])
+
+    expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
+SELECT "articles".*
+FROM "articles"
+WHERE "articles"."id" IN (SELECT "articles"."id" FROM "articles"
+  LEFT OUTER JOIN "comments" ON "comments"."article_id" = "articles"."id"
+  WHERE "comments"."id" IS NULL)))
   end
 
   it 'allows several nils to be used as a condition for a has_many - with join' do
@@ -480,6 +492,13 @@ WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
     expect(@ability.can?(:read, a2)).to eq(false)
 
     expect(Article.accessible_by(@ability)).to eq([a1])
+
+    expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
+SELECT "articles".*
+FROM "articles"
+WHERE "articles"."id" IN (SELECT "articles"."id" FROM "articles"
+  LEFT OUTER JOIN "comments" ON "comments"."article_id" = "articles"."id"
+  WHERE "comments"."id" IS NULL AND "comments"."spam" IS NULL)))
   end
 
   it 'doesn\'t allow a nil to be used as a condition for a has_many alongside other attributes' do
@@ -493,6 +512,13 @@ WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
     expect(@ability.can?(:read, a2)).to eq(false)
 
     expect(Article.accessible_by(@ability)).to eq([])
+
+    expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
+SELECT "articles".*
+FROM "articles"
+WHERE "articles"."id" IN (SELECT "articles"."id" FROM "articles"
+  LEFT OUTER JOIN "comments" ON "comments"."article_id" = "articles"."id"
+  WHERE "comments"."id" IS NULL AND "comments"."spam" = 1)))
   end
 
   it 'allows an empty array to be used as a condition for a belongs_to; this never returns true' do
@@ -506,6 +532,11 @@ WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
     expect(@ability.can?(:read, a2)).to eq(false)
 
     expect(Article.accessible_by(@ability)).to eq([])
+
+    expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
+SELECT "articles".*
+FROM "articles"
+WHERE 1=0))
   end
 
   context 'with namespaced models' do
