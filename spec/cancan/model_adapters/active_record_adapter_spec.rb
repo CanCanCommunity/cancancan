@@ -524,7 +524,7 @@ SELECT "articles".*
 FROM "articles"
 WHERE "articles"."id" IN (SELECT "articles"."id" FROM "articles"
   LEFT OUTER JOIN "comments" ON "comments"."article_id" = "articles"."id"
-  WHERE "comments"."id" IS NULL AND "comments"."spam" = 1)))
+  WHERE "comments"."id" IS NULL AND "comments"."spam" = #{true_v})))
   end
 
   it 'doesn\'t allow a nil to be used as a condition for a has_many alongside other attributes - false case' do
@@ -550,7 +550,7 @@ SELECT "articles".*
 FROM "articles"
 WHERE "articles"."id" IN (SELECT "articles"."id" FROM "articles"
   LEFT OUTER JOIN "comments" ON "comments"."article_id" = "articles"."id"
-  WHERE "comments"."id" IS NULL AND "comments"."spam" = 0)))
+  WHERE "comments"."id" IS NULL AND "comments"."spam" = #{false_v})))
   end
 
   it 'allows a nil to be used as a condition for a has_many alongside other attributes on the parent' do
@@ -575,7 +575,7 @@ SELECT "articles".*
 FROM "articles"
 WHERE "articles"."id" IN (SELECT "articles"."id" FROM "articles"
   LEFT OUTER JOIN "comments" ON "comments"."article_id" = "articles"."id"
-  WHERE "articles"."secret" = 1 AND "comments"."id" IS NULL)))
+  WHERE "articles"."secret" = #{true_v} AND "comments"."id" IS NULL)))
   end
 
   it 'allows an empty array to be used as a condition for a belongs_to; this never returns true' do
