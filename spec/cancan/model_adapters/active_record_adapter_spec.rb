@@ -709,4 +709,92 @@ WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
       expect(JsonTransaction.accessible_by(ability)).to match_array([transaction])
     end
   end
+
+  context 'when STI is in use' do
+    before do
+      ActiveRecord::Schema.define do
+        create_table(:brands) do |t|
+          t.string :name
+        end
+
+        create_table(:vehicles) do |t|
+          t.string :type
+        end
+      end
+
+      class ApplicationRecord < ActiveRecord::Base
+        self.abstract_class = true
+      end
+
+      class Vehicle < ApplicationRecord
+      end
+
+      class Car < Vehicle
+      end
+
+      class Motorbike < Vehicle
+      end
+
+      class Suzuki < Motorbike
+      end
+    end
+
+    it 'recognises rules applied to the base class' do
+      u1 = User.create!(name: 'pippo')
+
+      car = Car.create!
+      motorbike = Motorbike.create!
+
+      ability = Ability.new(u1)
+      ability.can :read, Vehicle
+      expect(Vehicle.accessible_by(ability)).to match_array([car, motorbike])
+      expect(Car.accessible_by(ability)).to match_array([car])
+      expect(Motorbike.accessible_by(ability)).to match_array([motorbike])
+    end
+
+    it 'recognises rules applied to the base class multiple classes deep' do
+      u1 = User.create!(name: 'pippo')
+
+      car = Car.create!
+      motorbike = Motorbike.create!
+      suzuki = Suzuki.create!
+
+      ability = Ability.new(u1)
+      ability.can :read, Vehicle
+      expect(Vehicle.accessible_by(ability)).to match_array([suzuki, car, motorbike])
+      expect(Car.accessible_by(ability)).to match_array([car])
+      expect(Motorbike.accessible_by(ability)).to match_array([suzuki, motorbike])
+      expect(Suzuki.accessible_by(ability)).to match_array([suzuki])
+    end
+
+    it 'recognises rules applied to subclasses' do
+      u1 = User.create!(name: 'pippo')
+      car = Car.create!
+      Motorbike.create!
+
+      ability = Ability.new(u1)
+      ability.can :read, [Car]
+      expect(Vehicle.accessible_by(ability)).to match_array([car])
+      expect(Car.accessible_by(ability)).to eq([car])
+      expect(Motorbike.accessible_by(ability)).to eq([])
+    end
+
+    it 'recognises rules applied to subclasses on 3 level' do
+      u1 = User.create!(name: 'pippo')
+      suzuki = Suzuki.create!
+      Motorbike.create!
+      ability = Ability.new(u1)
+      ability.can :read, [Suzuki]
+      expect(Motorbike.accessible_by(ability)).to eq([suzuki])
+    end
+
+    it 'recognises rules applied to subclass of subclass even with be_able_to' do
+      u1 = User.create!(name: 'pippo')
+      motorbike = Motorbike.create!
+      ability = Ability.new(u1)
+      ability.can :read, [Motorbike]
+      expect(ability).to be_able_to(:read, motorbike)
+      expect(ability).to be_able_to(:read, Suzuki.new)
+    end
+  end
 end

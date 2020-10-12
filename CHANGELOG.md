@@ -1,3 +1,7 @@
+## Unreleased
+
+* [#649](https://github.com/CanCanCommunity/cancancan/pull/649): Add support for Single Table Inheritance. ([@Liberatys][])
+
 ## 3.1.0
 
 * [#605](https://github.com/CanCanCommunity/cancancan/pull/605): Generate inner queries instead of join+distinct. ([@fsateler][])
@@ -667,3 +671,4 @@ Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.co
 [@aleksejleonov]: https://github.com/aleksejleonov
 [@albb0920]: https://github.com/albb0920
 [@ayumu838]: https://github.com/ayumu838
+[@Liberatys]: https://github.com/Liberatys
