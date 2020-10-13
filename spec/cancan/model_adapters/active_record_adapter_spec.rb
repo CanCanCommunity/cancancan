@@ -477,10 +477,11 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
       skip unless postgres?
 
       @ability.can :read, Comment, article: { category: { visible: true } }
-      comment1 = Comment.create!(article: Article.create!(category: Category.create!(visible: true)))
+      Comment.create!(article: Article.create!(category: Category.create!(visible: true)))
       Comment.create!(article: Article.create!(category: Category.create!(visible: false)))
 
-      expect { Comment.accessible_by(@ability).joins(:article).order('articles.id') }.to raise_error(ActiveRecord::StatementInvalid)
+      expect { Comment.accessible_by(@ability).joins(:article).order('articles.id') }
+        .to raise_error(ActiveRecord::StatementInvalid)
     end
   end
 
@@ -697,7 +698,7 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
     end
   end
 
-  context "when a table has json type column" do
+  context 'when a table has json type column' do
     before do
       json_supported =
         ActiveRecord::Base.connection.respond_to?(:supports_json?) &&
@@ -736,12 +737,13 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
       CanCan.accessible_by_strategy = :left_join
 
       user = User.create!
-      transaction = JsonTransaction.create!(user: user)
+      JsonTransaction.create!(user: user)
 
       ability = Ability.new(user)
       ability.can :read, JsonTransaction, user: { id: user.id }
 
-      expect { JsonTransaction.accessible_by(ability) }.to raise_error(ActiveRecord::StatementInvalid)
+      expect { JsonTransaction.accessible_by(ability) }
+        .to raise_error(ActiveRecord::StatementInvalid)
     end
   end
 
