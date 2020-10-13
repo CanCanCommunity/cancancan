@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'cancan/version'
+require 'cancan/config'
 require 'cancan/parameter_validators'
 require 'cancan/ability'
 require 'cancan/rule'

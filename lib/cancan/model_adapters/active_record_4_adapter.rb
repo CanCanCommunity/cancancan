@@ -36,8 +36,21 @@ module CanCan
       # in addition to `includes()` to force the outer join.
       def build_relation(*where_conditions)
         relation = @model_class.where(*where_conditions)
-        relation = relation.includes(joins).references(joins) if joins.present?
-        relation
+
+        if joins.present?
+          case CanCan.accessible_by_strategy
+          when :subquery
+            inner = @model_class.unscoped do
+              relation.includes(joins).references(joins)
+            end
+            @model_class.where(@model_class.primary_key => inner)
+
+          when :left_join
+            relation.includes(joins).references(joins)
+          end
+        else
+          relation
+        end
       end
 
       # Rails 4.2 deprecates `sanitize_sql_hash_for_conditions`
