@@ -21,22 +21,16 @@ module CanCan
 
       private
 
-      def build_relation(*where_conditions)
-        relation = @model_class.where(*where_conditions)
-
-        if joins.present?
-          case CanCan.accessible_by_strategy
-          when :subquery
-            inner = @model_class.unscoped do
-              relation.left_joins(joins)
-            end
-            @model_class.where(@model_class.primary_key => inner)
-
-          when :left_join
-            relation.left_joins(joins).distinct
+      def build_joins_relation(relation)
+        case CanCan.accessible_by_strategy
+        when :subquery
+          inner = @model_class.unscoped do
+            relation.left_joins(joins)
           end
-        else
-          relation
+          @model_class.where(@model_class.primary_key => inner)
+
+        when :left_join
+          relation.left_joins(joins).distinct
         end
       end
 

@@ -34,22 +34,16 @@ module CanCan
       # look inside the where clause to decide to outer join tables
       # you're using in the where. Instead, `references()` is required
       # in addition to `includes()` to force the outer join.
-      def build_relation(*where_conditions)
-        relation = @model_class.where(*where_conditions)
-
-        if joins.present?
-          case CanCan.accessible_by_strategy
-          when :subquery
-            inner = @model_class.unscoped do
-              relation.includes(joins).references(joins)
-            end
-            @model_class.where(@model_class.primary_key => inner)
-
-          when :left_join
+      def build_joins_relation(relation)
+        case CanCan.accessible_by_strategy
+        when :subquery
+          inner = @model_class.unscoped do
             relation.includes(joins).references(joins)
           end
-        else
-          relation
+          @model_class.where(@model_class.primary_key => inner)
+
+        when :left_join
+          relation.includes(joins).references(joins)
         end
       end
 
