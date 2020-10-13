@@ -27,6 +27,11 @@ RSpec.configure do |config|
   end
 
   config.include SQLHelpers
+
+  config.after :each do
+    # set default values for all config
+    CanCan.accessible_by_strategy = :subquery
+  end
 end
 
 RSpec::Matchers.define :generate_sql do |expected|

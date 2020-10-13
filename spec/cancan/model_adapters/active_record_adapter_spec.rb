@@ -109,338 +109,346 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
     @comment_table = Comment.table_name
   end
 
-  it 'does not fires query with accessible_by() for abilities defined with association' do
-    user = User.create!
-    @ability.can :edit, Article, user.articles.unpopular
-    callback = ->(*) { raise 'No query expected' }
+  CanCan::VALID_ACCESSIBLE_BY_STRATEGIES.each do |strategy|
+    context "base functionality with #{strategy} strategy" do
+      before :each do
+        CanCan.accessible_by_strategy = strategy
+      end
 
-    ActiveSupport::Notifications.subscribed(callback, 'sql.active_record') do
-      Article.accessible_by(@ability, :edit)
-      nil
+      it 'does not fires query with accessible_by() for abilities defined with association' do
+        user = User.create!
+        @ability.can :edit, Article, user.articles.unpopular
+        callback = ->(*) { raise 'No query expected' }
+
+        ActiveSupport::Notifications.subscribed(callback, 'sql.active_record') do
+          Article.accessible_by(@ability, :edit)
+          nil
+        end
+      end
+
+      it 'fetches only the articles that are published' do
+        @ability.can :read, Article, published: true
+        article1 = Article.create!(published: true)
+        Article.create!(published: false)
+        expect(Article.accessible_by(@ability)).to eq([article1])
+      end
+
+      it 'is for only active record classes' do
+        if ActiveRecord.version > Gem::Version.new('5')
+          expect(CanCan::ModelAdapters::ActiveRecord5Adapter).to_not be_for_class(Object)
+          expect(CanCan::ModelAdapters::ActiveRecord5Adapter).to be_for_class(Article)
+          expect(CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article))
+            .to eq(CanCan::ModelAdapters::ActiveRecord5Adapter)
+        elsif ActiveRecord.version > Gem::Version.new('4')
+          expect(CanCan::ModelAdapters::ActiveRecord4Adapter).to_not be_for_class(Object)
+          expect(CanCan::ModelAdapters::ActiveRecord4Adapter).to be_for_class(Article)
+          expect(CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article))
+            .to eq(CanCan::ModelAdapters::ActiveRecord4Adapter)
+        end
+      end
+
+      it 'finds record' do
+        article = Article.create!
+        adapter = CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article)
+        expect(adapter.find(Article, article.id)).to eq(article)
+      end
+
+      it 'does not fetch any records when no abilities are defined' do
+        Article.create!
+        expect(Article.accessible_by(@ability)).to be_empty
+      end
+
+      it 'fetches all articles when one can read all' do
+        @ability.can :read, Article
+        article = Article.create!
+        expect(Article.accessible_by(@ability)).to match_array([article])
+      end
+
+      it 'fetches only the articles that are published' do
+        @ability.can :read, Article, published: true
+        article1 = Article.create!(published: true)
+        Article.create!(published: false)
+        expect(Article.accessible_by(@ability)).to match_array([article1])
+      end
+
+      it 'fetches any articles which are published or secret' do
+        @ability.can :read, Article, published: true
+        @ability.can :read, Article, secret: true
+        article1 = Article.create!(published: true, secret: false)
+        article2 = Article.create!(published: true, secret: true)
+        article3 = Article.create!(published: false, secret: true)
+        Article.create!(published: false, secret: false)
+        expect(Article.accessible_by(@ability)).to match_array([article1, article2, article3])
+      end
+
+      it 'fetches any articles which we are cited in' do
+        user = User.create!
+        cited = Article.create!
+        Article.create!
+        cited.mentioned_users << user
+        @ability.can :read, Article, mentioned_users: { id: user.id }
+        @ability.can :read, Article, mentions: { user_id: user.id }
+        expect(Article.accessible_by(@ability)).to match_array([cited])
+      end
+
+      it 'fetches only the articles that are published and not secret' do
+        @ability.can :read, Article, published: true
+        @ability.cannot :read, Article, secret: true
+        article1 = Article.create!(published: true, secret: false)
+        Article.create!(published: true, secret: true)
+        Article.create!(published: false, secret: true)
+        Article.create!(published: false, secret: false)
+        expect(Article.accessible_by(@ability)).to match_array([article1])
+      end
+
+      it 'only reads comments for articles which are published' do
+        @ability.can :read, Comment, article: { published: true }
+        comment1 = Comment.create!(article: Article.create!(published: true))
+        Comment.create!(article: Article.create!(published: false))
+        expect(Comment.accessible_by(@ability)).to match_array([comment1])
+      end
+
+      it 'should only read articles which are published or in visible categories' do
+        @ability.can :read, Article, category: { visible: true }
+        @ability.can :read, Article, published: true
+        article1 = Article.create!(published: true)
+        Article.create!(published: false)
+        article3 = Article.create!(published: false, category: Category.create!(visible: true))
+        expect(Article.accessible_by(@ability)).to match_array([article1, article3])
+      end
+
+      it 'should only read categories once even if they have multiple articles' do
+        @ability.can :read, Category, articles: { published: true }
+        @ability.can :read, Article, published: true
+        category = Category.create!
+        Article.create!(published: true, category: category)
+        Article.create!(published: true, category: category)
+        expect(Category.accessible_by(@ability)).to match_array([category])
+      end
+
+      it 'only reads comments for visible categories through articles' do
+        @ability.can :read, Comment, article: { category: { visible: true } }
+        comment1 = Comment.create!(article: Article.create!(category: Category.create!(visible: true)))
+        Comment.create!(article: Article.create!(category: Category.create!(visible: false)))
+        expect(Comment.accessible_by(@ability)).to match_array([comment1])
+        expect(Comment.accessible_by(@ability).count).to eq(1)
+      end
+
+      it 'allows ordering via relations' do
+        @ability.can :read, Comment, article: { category: { visible: true } }
+        comment1 = Comment.create!(article: Article.create!(category: Category.create!(visible: true)))
+        Comment.create!(article: Article.create!(category: Category.create!(visible: false)))
+        expect(Comment.accessible_by(@ability).joins(:article).order('articles.id')).to match_array([comment1])
+      end
+
+      it 'allows conditions in SQL and merge with hash conditions' do
+        @ability.can :read, Article, published: true
+        @ability.can :read, Article, ['secret=?', true]
+        article1 = Article.create!(published: true, secret: false)
+        article2 = Article.create!(published: true, secret: true)
+        article3 = Article.create!(published: false, secret: true)
+        Article.create!(published: false, secret: false)
+        expect(Article.accessible_by(@ability)).to match_array([article1, article2, article3])
+      end
+
+      it 'allows a scope for conditions' do
+        @ability.can :read, Article, Article.where(secret: true)
+        article1 = Article.create!(secret: true)
+        Article.create!(secret: false)
+        expect(Article.accessible_by(@ability)).to match_array([article1])
+      end
+
+      it 'fetches only associated records when using with a scope for conditions' do
+        @ability.can :read, Article, Article.where(secret: true)
+        category1 = Category.create!(visible: false)
+        category2 = Category.create!(visible: true)
+        article1 = Article.create!(secret: true, category: category1)
+        Article.create!(secret: true, category: category2)
+        expect(category1.articles.accessible_by(@ability)).to match_array([article1])
+      end
+
+      it 'raises an exception when trying to merge scope with other conditions' do
+        @ability.can :read, Article, published: true
+        @ability.can :read, Article, Article.where(secret: true)
+        expect(-> { Article.accessible_by(@ability) })
+          .to raise_error(CanCan::Error,
+                          'Unable to merge an Active Record scope with other conditions. '\
+                            'Instead use a hash or SQL for read Article ability.')
+      end
+
+      it 'does not raise an exception when the rule with scope is suppressed' do
+        @ability.can :read, Article, published: true
+        @ability.can :read, Article, Article.where(secret: true)
+        @ability.cannot :read, Article
+        expect(-> { Article.accessible_by(@ability) }).not_to raise_error
+      end
+
+      it 'recognises empty scopes and compresses them' do
+        @ability.can :read, Article, published: true
+        @ability.can :read, Article, Article.all
+        expect(-> { Article.accessible_by(@ability) }).not_to raise_error
+      end
+
+      it 'does not allow to fetch records when ability with just block present' do
+        @ability.can :read, Article do
+          false
+        end
+        expect(-> { Article.accessible_by(@ability) }).to raise_error(CanCan::Error)
+      end
+
+      it 'should support more than one deeply nested conditions' do
+        @ability.can :read, Comment, article: {
+          category: {
+            name: 'foo', visible: true
+          }
+        }
+        expect { Comment.accessible_by(@ability) }.to_not raise_error
+      end
+
+      it 'does not allow to check ability on object against SQL conditions without block' do
+        @ability.can :read, Article, ['secret=?', true]
+        expect(-> { @ability.can? :read, Article.new }).to raise_error(CanCan::Error)
+      end
+
+      it 'has false conditions if no abilities match' do
+        expect(@ability.model_adapter(Article, :read).conditions).to eq(false_condition)
+      end
+
+      it 'returns false conditions for cannot clause' do
+        @ability.cannot :read, Article
+        expect(@ability.model_adapter(Article, :read).conditions).to eq(false_condition)
+      end
+
+      it 'returns SQL for single `can` definition in front of default `cannot` condition' do
+        @ability.cannot :read, Article
+        @ability.can :read, Article, published: false, secret: true
+        expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
+    SELECT "articles".*
+    FROM "articles"
+    WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
+      end
+
+      it 'returns true condition for single `can` definition in front of default `can` condition' do
+        @ability.can :read, Article
+        @ability.can :read, Article, published: false, secret: true
+        expect(@ability.model_adapter(Article, :read).conditions).to eq({})
+        expect(@ability.model_adapter(Article, :read)).to generate_sql(%(SELECT "articles".* FROM "articles"))
+      end
+
+      it 'returns `false condition` for single `cannot` definition in front of default `cannot` condition' do
+        @ability.cannot :read, Article
+        @ability.cannot :read, Article, published: false, secret: true
+        expect(@ability.model_adapter(Article, :read).conditions).to eq(false_condition)
+      end
+
+      it 'returns `not (sql)` for single `cannot` definition in front of default `can` condition' do
+        @ability.can :read, Article
+        @ability.cannot :read, Article, published: false, secret: true
+        expect(@ability.model_adapter(Article, :read).conditions)
+          .to orderlessly_match(
+            %["not (#{@article_table}"."published" = #{false_v} AND "#{@article_table}"."secret" = #{true_v})]
+          )
+      end
+
+      it 'returns appropriate sql conditions in complex case' do
+        @ability.can :read, Article
+        @ability.can :manage, Article, id: 1
+        @ability.can :update, Article, published: true
+        @ability.cannot :update, Article, secret: true
+        expect(@ability.model_adapter(Article, :update).conditions)
+          .to eq(%[not ("#{@article_table}"."secret" = #{true_v}) ] +
+                   %[AND (("#{@article_table}"."published" = #{true_v}) ] +
+                   %[OR ("#{@article_table}"."id" = 1))])
+        expect(@ability.model_adapter(Article, :manage).conditions).to eq(id: 1)
+        expect(@ability.model_adapter(Article, :read).conditions).to eq({})
+        expect(@ability.model_adapter(Article, :read)).to generate_sql(%(SELECT "articles".* FROM "articles"))
+      end
+
+      it 'returns appropriate sql conditions in complex case with nested joins' do
+        @ability.can :read, Comment, article: { category: { visible: true } }
+        expect(@ability.model_adapter(Comment, :read).conditions).to eq(Category.table_name.to_sym => { visible: true })
+      end
+
+      it 'returns appropriate sql conditions in complex case with nested joins of different depth' do
+        @ability.can :read, Comment, article: { published: true, category: { visible: true } }
+        expect(@ability.model_adapter(Comment, :read).conditions)
+          .to eq(Article.table_name.to_sym => { published: true }, Category.table_name.to_sym => { visible: true })
+      end
+
+      it 'does not forget conditions when calling with SQL string' do
+        @ability.can :read, Article, published: true
+        @ability.can :read, Article, ['secret = ?', false]
+        adapter = @ability.model_adapter(Article, :read)
+        2.times do
+          expect(adapter.conditions).to eq(%[(secret = #{false_v}) OR ("#{@article_table}"."published" = #{true_v})])
+        end
+      end
+
+      it 'has nil joins if no rules' do
+        expect(@ability.model_adapter(Article, :read).joins).to be_nil
+      end
+
+      it 'has nil joins if rules got compressed' do
+        @ability.can :read, Comment, article: { category: { visible: true } }
+        @ability.can :read, Comment
+        expect(@ability.model_adapter(Comment, :read))
+          .to generate_sql("SELECT \"#{@comment_table}\".* FROM \"#{@comment_table}\"")
+        expect(@ability.model_adapter(Comment, :read).joins).to be_nil
+      end
+
+      it 'has nil joins if no nested hashes specified in conditions' do
+        @ability.can :read, Article, published: false
+        @ability.can :read, Article, secret: true
+        expect(@ability.model_adapter(Article, :read).joins).to be_nil
+      end
+
+      it 'merges separate joins into a single array' do
+        @ability.can :read, Article, project: { blocked: false }
+        @ability.can :read, Article, company: { admin: true }
+        expect(@ability.model_adapter(Article, :read).joins.inspect).to orderlessly_match(%i[company project].inspect)
+      end
+
+      it 'merges same joins into a single array' do
+        @ability.can :read, Article, project: { blocked: false }
+        @ability.can :read, Article, project: { admin: true }
+        expect(@ability.model_adapter(Article, :read).joins).to eq([:project])
+      end
+
+      it 'merges nested and non-nested joins' do
+        @ability.can :read, Article, project: { blocked: false }
+        @ability.can :read, Article, project: { comments: { spam: true } }
+        expect(@ability.model_adapter(Article, :read).joins).to eq([{ project: [:comments] }])
+      end
+
+      it 'merges :all conditions with other conditions' do
+        user = User.create!
+        article = Article.create!(user: user)
+        ability = Ability.new(user)
+        ability.can :manage, :all
+        ability.can :manage, Article, user_id: user.id
+        expect(Article.accessible_by(ability)).to eq([article])
+      end
+
+      it 'should not execute a scope when checking ability on the class' do
+        relation = Article.where(secret: true)
+        @ability.can :read, Article, relation do |article|
+          article.secret == true
+        end
+
+        allow(relation).to receive(:count).and_raise('Unexpected scope execution.')
+
+        expect { @ability.can? :read, Article }.not_to raise_error
+      end
+
+      it 'should ignore cannot rules with attributes when querying' do
+        user = User.create!
+        article = Article.create!(user: user)
+        ability = Ability.new(user)
+        ability.can :read, Article
+        ability.cannot :read, Article, :secret
+        expect(Article.accessible_by(ability)).to eq([article])
+      end
     end
-  end
-
-  it 'fetches only the articles that are published' do
-    @ability.can :read, Article, published: true
-    article1 = Article.create!(published: true)
-    Article.create!(published: false)
-    expect(Article.accessible_by(@ability)).to eq([article1])
-  end
-
-  it 'is for only active record classes' do
-    if ActiveRecord.version > Gem::Version.new('5')
-      expect(CanCan::ModelAdapters::ActiveRecord5Adapter).to_not be_for_class(Object)
-      expect(CanCan::ModelAdapters::ActiveRecord5Adapter).to be_for_class(Article)
-      expect(CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article))
-        .to eq(CanCan::ModelAdapters::ActiveRecord5Adapter)
-    elsif ActiveRecord.version > Gem::Version.new('4')
-      expect(CanCan::ModelAdapters::ActiveRecord4Adapter).to_not be_for_class(Object)
-      expect(CanCan::ModelAdapters::ActiveRecord4Adapter).to be_for_class(Article)
-      expect(CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article))
-        .to eq(CanCan::ModelAdapters::ActiveRecord4Adapter)
-    end
-  end
-
-  it 'finds record' do
-    article = Article.create!
-    adapter = CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article)
-    expect(adapter.find(Article, article.id)).to eq(article)
-  end
-
-  it 'does not fetch any records when no abilities are defined' do
-    Article.create!
-    expect(Article.accessible_by(@ability)).to be_empty
-  end
-
-  it 'fetches all articles when one can read all' do
-    @ability.can :read, Article
-    article = Article.create!
-    expect(Article.accessible_by(@ability)).to match_array([article])
-  end
-
-  it 'fetches only the articles that are published' do
-    @ability.can :read, Article, published: true
-    article1 = Article.create!(published: true)
-    Article.create!(published: false)
-    expect(Article.accessible_by(@ability)).to match_array([article1])
-  end
-
-  it 'fetches any articles which are published or secret' do
-    @ability.can :read, Article, published: true
-    @ability.can :read, Article, secret: true
-    article1 = Article.create!(published: true, secret: false)
-    article2 = Article.create!(published: true, secret: true)
-    article3 = Article.create!(published: false, secret: true)
-    Article.create!(published: false, secret: false)
-    expect(Article.accessible_by(@ability)).to match_array([article1, article2, article3])
-  end
-
-  it 'fetches any articles which we are cited in' do
-    user = User.create!
-    cited = Article.create!
-    Article.create!
-    cited.mentioned_users << user
-    @ability.can :read, Article, mentioned_users: { id: user.id }
-    @ability.can :read, Article, mentions: { user_id: user.id }
-    expect(Article.accessible_by(@ability)).to match_array([cited])
-  end
-
-  it 'fetches only the articles that are published and not secret' do
-    @ability.can :read, Article, published: true
-    @ability.cannot :read, Article, secret: true
-    article1 = Article.create!(published: true, secret: false)
-    Article.create!(published: true, secret: true)
-    Article.create!(published: false, secret: true)
-    Article.create!(published: false, secret: false)
-    expect(Article.accessible_by(@ability)).to match_array([article1])
-  end
-
-  it 'only reads comments for articles which are published' do
-    @ability.can :read, Comment, article: { published: true }
-    comment1 = Comment.create!(article: Article.create!(published: true))
-    Comment.create!(article: Article.create!(published: false))
-    expect(Comment.accessible_by(@ability)).to match_array([comment1])
-  end
-
-  it 'should only read articles which are published or in visible categories' do
-    @ability.can :read, Article, category: { visible: true }
-    @ability.can :read, Article, published: true
-    article1 = Article.create!(published: true)
-    Article.create!(published: false)
-    article3 = Article.create!(published: false, category: Category.create!(visible: true))
-    expect(Article.accessible_by(@ability)).to match_array([article1, article3])
-  end
-
-  it 'should only read categories once even if they have multiple articles' do
-    @ability.can :read, Category, articles: { published: true }
-    @ability.can :read, Article, published: true
-    category = Category.create!
-    Article.create!(published: true, category: category)
-    Article.create!(published: true, category: category)
-    expect(Category.accessible_by(@ability)).to match_array([category])
-  end
-
-  it 'only reads comments for visible categories through articles' do
-    @ability.can :read, Comment, article: { category: { visible: true } }
-    comment1 = Comment.create!(article: Article.create!(category: Category.create!(visible: true)))
-    Comment.create!(article: Article.create!(category: Category.create!(visible: false)))
-    expect(Comment.accessible_by(@ability)).to match_array([comment1])
-    expect(Comment.accessible_by(@ability).count).to eq(1)
-  end
-
-  it 'allows ordering via relations' do
-    @ability.can :read, Comment, article: { category: { visible: true } }
-    comment1 = Comment.create!(article: Article.create!(category: Category.create!(visible: true)))
-    Comment.create!(article: Article.create!(category: Category.create!(visible: false)))
-    expect(Comment.accessible_by(@ability).joins(:article).order('articles.id')).to match_array([comment1])
-  end
-
-  it 'allows conditions in SQL and merge with hash conditions' do
-    @ability.can :read, Article, published: true
-    @ability.can :read, Article, ['secret=?', true]
-    article1 = Article.create!(published: true, secret: false)
-    article2 = Article.create!(published: true, secret: true)
-    article3 = Article.create!(published: false, secret: true)
-    Article.create!(published: false, secret: false)
-    expect(Article.accessible_by(@ability)).to match_array([article1, article2, article3])
-  end
-
-  it 'allows a scope for conditions' do
-    @ability.can :read, Article, Article.where(secret: true)
-    article1 = Article.create!(secret: true)
-    Article.create!(secret: false)
-    expect(Article.accessible_by(@ability)).to match_array([article1])
-  end
-
-  it 'fetches only associated records when using with a scope for conditions' do
-    @ability.can :read, Article, Article.where(secret: true)
-    category1 = Category.create!(visible: false)
-    category2 = Category.create!(visible: true)
-    article1 = Article.create!(secret: true, category: category1)
-    Article.create!(secret: true, category: category2)
-    expect(category1.articles.accessible_by(@ability)).to match_array([article1])
-  end
-
-  it 'raises an exception when trying to merge scope with other conditions' do
-    @ability.can :read, Article, published: true
-    @ability.can :read, Article, Article.where(secret: true)
-    expect(-> { Article.accessible_by(@ability) })
-      .to raise_error(CanCan::Error,
-                      'Unable to merge an Active Record scope with other conditions. '\
-                        'Instead use a hash or SQL for read Article ability.')
-  end
-
-  it 'does not raise an exception when the rule with scope is suppressed' do
-    @ability.can :read, Article, published: true
-    @ability.can :read, Article, Article.where(secret: true)
-    @ability.cannot :read, Article
-    expect(-> { Article.accessible_by(@ability) }).not_to raise_error
-  end
-
-  it 'recognises empty scopes and compresses them' do
-    @ability.can :read, Article, published: true
-    @ability.can :read, Article, Article.all
-    expect(-> { Article.accessible_by(@ability) }).not_to raise_error
-  end
-
-  it 'does not allow to fetch records when ability with just block present' do
-    @ability.can :read, Article do
-      false
-    end
-    expect(-> { Article.accessible_by(@ability) }).to raise_error(CanCan::Error)
-  end
-
-  it 'should support more than one deeply nested conditions' do
-    @ability.can :read, Comment, article: {
-      category: {
-        name: 'foo', visible: true
-      }
-    }
-    expect { Comment.accessible_by(@ability) }.to_not raise_error
-  end
-
-  it 'does not allow to check ability on object against SQL conditions without block' do
-    @ability.can :read, Article, ['secret=?', true]
-    expect(-> { @ability.can? :read, Article.new }).to raise_error(CanCan::Error)
-  end
-
-  it 'has false conditions if no abilities match' do
-    expect(@ability.model_adapter(Article, :read).conditions).to eq(false_condition)
-  end
-
-  it 'returns false conditions for cannot clause' do
-    @ability.cannot :read, Article
-    expect(@ability.model_adapter(Article, :read).conditions).to eq(false_condition)
-  end
-
-  it 'returns SQL for single `can` definition in front of default `cannot` condition' do
-    @ability.cannot :read, Article
-    @ability.can :read, Article, published: false, secret: true
-    expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
-SELECT "articles".*
-FROM "articles"
-WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
-  end
-
-  it 'returns true condition for single `can` definition in front of default `can` condition' do
-    @ability.can :read, Article
-    @ability.can :read, Article, published: false, secret: true
-    expect(@ability.model_adapter(Article, :read).conditions).to eq({})
-    expect(@ability.model_adapter(Article, :read)).to generate_sql(%(SELECT "articles".* FROM "articles"))
-  end
-
-  it 'returns `false condition` for single `cannot` definition in front of default `cannot` condition' do
-    @ability.cannot :read, Article
-    @ability.cannot :read, Article, published: false, secret: true
-    expect(@ability.model_adapter(Article, :read).conditions).to eq(false_condition)
-  end
-
-  it 'returns `not (sql)` for single `cannot` definition in front of default `can` condition' do
-    @ability.can :read, Article
-    @ability.cannot :read, Article, published: false, secret: true
-    expect(@ability.model_adapter(Article, :read).conditions)
-      .to orderlessly_match(
-        %["not (#{@article_table}"."published" = #{false_v} AND "#{@article_table}"."secret" = #{true_v})]
-      )
-  end
-
-  it 'returns appropriate sql conditions in complex case' do
-    @ability.can :read, Article
-    @ability.can :manage, Article, id: 1
-    @ability.can :update, Article, published: true
-    @ability.cannot :update, Article, secret: true
-    expect(@ability.model_adapter(Article, :update).conditions)
-      .to eq(%[not ("#{@article_table}"."secret" = #{true_v}) ] +
-               %[AND (("#{@article_table}"."published" = #{true_v}) ] +
-               %[OR ("#{@article_table}"."id" = 1))])
-    expect(@ability.model_adapter(Article, :manage).conditions).to eq(id: 1)
-    expect(@ability.model_adapter(Article, :read).conditions).to eq({})
-    expect(@ability.model_adapter(Article, :read)).to generate_sql(%(SELECT "articles".* FROM "articles"))
-  end
-
-  it 'returns appropriate sql conditions in complex case with nested joins' do
-    @ability.can :read, Comment, article: { category: { visible: true } }
-    expect(@ability.model_adapter(Comment, :read).conditions).to eq(Category.table_name.to_sym => { visible: true })
-  end
-
-  it 'returns appropriate sql conditions in complex case with nested joins of different depth' do
-    @ability.can :read, Comment, article: { published: true, category: { visible: true } }
-    expect(@ability.model_adapter(Comment, :read).conditions)
-      .to eq(Article.table_name.to_sym => { published: true }, Category.table_name.to_sym => { visible: true })
-  end
-
-  it 'does not forget conditions when calling with SQL string' do
-    @ability.can :read, Article, published: true
-    @ability.can :read, Article, ['secret = ?', false]
-    adapter = @ability.model_adapter(Article, :read)
-    2.times do
-      expect(adapter.conditions).to eq(%[(secret = #{false_v}) OR ("#{@article_table}"."published" = #{true_v})])
-    end
-  end
-
-  it 'has nil joins if no rules' do
-    expect(@ability.model_adapter(Article, :read).joins).to be_nil
-  end
-
-  it 'has nil joins if rules got compressed' do
-    @ability.can :read, Comment, article: { category: { visible: true } }
-    @ability.can :read, Comment
-    expect(@ability.model_adapter(Comment, :read))
-      .to generate_sql("SELECT \"#{@comment_table}\".* FROM \"#{@comment_table}\"")
-    expect(@ability.model_adapter(Comment, :read).joins).to be_nil
-  end
-
-  it 'has nil joins if no nested hashes specified in conditions' do
-    @ability.can :read, Article, published: false
-    @ability.can :read, Article, secret: true
-    expect(@ability.model_adapter(Article, :read).joins).to be_nil
-  end
-
-  it 'merges separate joins into a single array' do
-    @ability.can :read, Article, project: { blocked: false }
-    @ability.can :read, Article, company: { admin: true }
-    expect(@ability.model_adapter(Article, :read).joins.inspect).to orderlessly_match(%i[company project].inspect)
-  end
-
-  it 'merges same joins into a single array' do
-    @ability.can :read, Article, project: { blocked: false }
-    @ability.can :read, Article, project: { admin: true }
-    expect(@ability.model_adapter(Article, :read).joins).to eq([:project])
-  end
-
-  it 'merges nested and non-nested joins' do
-    @ability.can :read, Article, project: { blocked: false }
-    @ability.can :read, Article, project: { comments: { spam: true } }
-    expect(@ability.model_adapter(Article, :read).joins).to eq([{ project: [:comments] }])
-  end
-
-  it 'merges :all conditions with other conditions' do
-    user = User.create!
-    article = Article.create!(user: user)
-    ability = Ability.new(user)
-    ability.can :manage, :all
-    ability.can :manage, Article, user_id: user.id
-    expect(Article.accessible_by(ability)).to eq([article])
-  end
-
-  it 'should not execute a scope when checking ability on the class' do
-    relation = Article.where(secret: true)
-    @ability.can :read, Article, relation do |article|
-      article.secret == true
-    end
-
-    allow(relation).to receive(:count).and_raise('Unexpected scope execution.')
-
-    expect { @ability.can? :read, Article }.not_to raise_error
-  end
-
-  it 'should ignore cannot rules with attributes when querying' do
-    user = User.create!
-    article = Article.create!(user: user)
-    ability = Ability.new(user)
-    ability.can :read, Article
-    ability.cannot :read, Article, :secret
-    expect(Article.accessible_by(ability)).to eq([article])
   end
 
   context 'with namespaced models' do
@@ -531,25 +539,34 @@ WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
     end
   end
 
-  context 'when a table is references multiple times' do
-    it 'can filter correctly on the different associations' do
-      u1 = User.create!(name: 'pippo')
-      u2 = User.create!(name: 'paperino')
+  CanCan::VALID_ACCESSIBLE_BY_STRATEGIES.each do |strategy|
+    context "when a table is referenced multiple times with #{strategy} strategy" do
+      before :each do
+        CanCan.accessible_by_strategy = strategy
+      end
+      it 'can filter correctly on the different associations' do
+        u1 = User.create!(name: 'pippo')
+        u2 = User.create!(name: 'paperino')
 
-      a1 = Article.create!(user: u1)
-      a2 = Article.create!(user: u2)
+        a1 = Article.create!(user: u1)
+        a2 = Article.create!(user: u2)
 
-      ability = Ability.new(u1)
-      ability.can :read, Article, user: { id: u1.id }
-      ability.can :read, Article, mentioned_users: { name: u1.name }
-      ability.can :read, Article, mentioned_users: { mentioned_articles: { id: a2.id } }
-      ability.can :read, Article, mentioned_users: { articles: { user: { name: 'deep' } } }
-      ability.can :read, Article, mentioned_users: { articles: { mentioned_users: { name: 'd2' } } }
-      expect(Article.accessible_by(ability)).to match_array([a1])
+        ability = Ability.new(u1)
+        ability.can :read, Article, user: { id: u1.id }
+        ability.can :read, Article, mentioned_users: { name: u1.name }
+        ability.can :read, Article, mentioned_users: { mentioned_articles: { id: a2.id } }
+        ability.can :read, Article, mentioned_users: { articles: { user: { name: 'deep' } } }
+        ability.can :read, Article, mentioned_users: { articles: { mentioned_users: { name: 'd2' } } }
+        expect(Article.accessible_by(ability)).to match_array([a1])
+      end
     end
   end
 
-  context 'has_many through is defined and referenced differently' do
+  context 'has_many through is defined and referenced differently - subquery strategy' do
+    before do
+      CanCan.accessible_by_strategy = :subquery
+    end
+
     it 'recognises it and simplifies the query' do
       u1 = User.create!(name: 'pippo')
       u2 = User.create!(name: 'paperino')
@@ -576,72 +593,110 @@ WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
     end
   end
 
-  context 'when a model have renamed primary_key' do
+  context 'has_many through is defined and referenced differently - left_join strategy' do
     before do
-      ActiveRecord::Schema.define do
-        create_table(:custom_pk_users, primary_key: :gid) do |t|
-          t.string :name
-        end
-
-        create_table(:custom_pk_transactions, primary_key: :gid) do |t|
-          t.integer :custom_pk_user_id
-          t.string :data
-        end
-      end
-
-      class CustomPkUser < ActiveRecord::Base
-        self.primary_key = 'gid'
-      end
-
-      class CustomPkTransaction < ActiveRecord::Base
-        self.primary_key = 'gid'
-
-        belongs_to :custom_pk_user
-      end
+      CanCan.accessible_by_strategy = :left_join
     end
 
-    it 'can filter correctly' do
-      user1 = CustomPkUser.create!
-      user2 = CustomPkUser.create!
+    it 'recognises it and simplifies the query' do
+      u1 = User.create!(name: 'pippo')
+      u2 = User.create!(name: 'paperino')
 
-      transaction1 = CustomPkTransaction.create!(custom_pk_user: user1)
-      CustomPkTransaction.create!(custom_pk_user: user2)
+      a1 = Article.create!(mentioned_users: [u1])
+      a2 = Article.create!(mentioned_users: [u2])
 
-      ability = Ability.new(user1)
-      ability.can :read, CustomPkTransaction, custom_pk_user: { gid: user1.gid }
+      ability = Ability.new(u1)
+      ability.can :read, Article, mentioned_users: { name: u1.name }
+      ability.can :read, Article, mentions: { user: { name: u2.name } }
+      expect(Article.accessible_by(ability)).to match_array([a1, a2])
 
-      expect(CustomPkTransaction.accessible_by(ability)).to match_array([transaction1])
+      if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
+        expect(ability.model_adapter(Article, :read)).to generate_sql(%(
+  SELECT DISTINCT "articles".*
+  FROM "articles"
+  LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
+  LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
+  WHERE (("users"."name" = 'paperino') OR ("users"."name" = 'pippo'))))
+      end
     end
   end
 
-  context 'when a table has json type colum' do
-    before do
-      json_supported =
-        ActiveRecord::Base.connection.respond_to?(:supports_json?) &&
-        ActiveRecord::Base.connection.supports_json?
+  CanCan::VALID_ACCESSIBLE_BY_STRATEGIES.each do |strategy|
+    context "when a model has renamed primary_key with #{strategy} strategy" do
+      before :each do
+        CanCan.accessible_by_strategy = strategy
+      end
+      before do
+        ActiveRecord::Schema.define do
+          create_table(:custom_pk_users, primary_key: :gid) do |t|
+            t.string :name
+          end
 
-      skip "Adapter don't support JSON column type" unless json_supported
+          create_table(:custom_pk_transactions, primary_key: :gid) do |t|
+            t.integer :custom_pk_user_id
+            t.string :data
+          end
+        end
 
-      ActiveRecord::Schema.define do
-        create_table(:json_transactions) do |t|
-          t.integer :user_id
-          t.json :additional_data
+        class CustomPkUser < ActiveRecord::Base
+          self.primary_key = 'gid'
+        end
+
+        class CustomPkTransaction < ActiveRecord::Base
+          self.primary_key = 'gid'
+
+          belongs_to :custom_pk_user
         end
       end
 
-      class JsonTransaction < ActiveRecord::Base
-        belongs_to :user
+      it 'can filter correctly' do
+        user1 = CustomPkUser.create!
+        user2 = CustomPkUser.create!
+
+        transaction1 = CustomPkTransaction.create!(custom_pk_user: user1)
+        CustomPkTransaction.create!(custom_pk_user: user2)
+
+        ability = Ability.new(user1)
+        ability.can :read, CustomPkTransaction, custom_pk_user: { gid: user1.gid }
+
+        expect(CustomPkTransaction.accessible_by(ability)).to match_array([transaction1])
       end
     end
+  end
 
-    it 'can filter correctly' do
-      user = User.create!
-      transaction = JsonTransaction.create!(user: user)
+  CanCan::VALID_ACCESSIBLE_BY_STRATEGIES.each do |strategy|
+    context "when a table has json type column with #{strategy} strategy" do
+      before :each do
+        CanCan.accessible_by_strategy = strategy
+      end
+      before do
+        json_supported =
+          ActiveRecord::Base.connection.respond_to?(:supports_json?) &&
+          ActiveRecord::Base.connection.supports_json?
 
-      ability = Ability.new(user)
-      ability.can :read, JsonTransaction, user: { id: user.id }
+        skip "Adapter don't support JSON column type" unless json_supported
 
-      expect(JsonTransaction.accessible_by(ability)).to match_array([transaction])
+        ActiveRecord::Schema.define do
+          create_table(:json_transactions) do |t|
+            t.integer :user_id
+            t.json :additional_data
+          end
+        end
+
+        class JsonTransaction < ActiveRecord::Base
+          belongs_to :user
+        end
+      end
+
+      it 'can filter correctly' do
+        user = User.create!
+        transaction = JsonTransaction.create!(user: user)
+
+        ability = Ability.new(user)
+        ability.can :read, JsonTransaction, user: { id: user.id }
+
+        expect(JsonTransaction.accessible_by(ability)).to match_array([transaction])
+      end
     end
   end
 
