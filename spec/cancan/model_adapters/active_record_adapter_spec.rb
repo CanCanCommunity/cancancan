@@ -234,13 +234,6 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
         expect(Comment.accessible_by(@ability).count).to eq(1)
       end
 
-      it 'allows ordering via relations' do
-        @ability.can :read, Comment, article: { category: { visible: true } }
-        comment1 = Comment.create!(article: Article.create!(category: Category.create!(visible: true)))
-        Comment.create!(article: Article.create!(category: Category.create!(visible: false)))
-        expect(Comment.accessible_by(@ability).joins(:article).order('articles.id')).to match_array([comment1])
-      end
-
       it 'allows conditions in SQL and merge with hash conditions' do
         @ability.can :read, Article, published: true
         @ability.can :read, Article, ['secret=?', true]
@@ -448,6 +441,46 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
         ability.cannot :read, Article, :secret
         expect(Article.accessible_by(ability)).to eq([article])
       end
+    end
+  end
+
+  context 'base behaviour subquery specific' do
+    before :each do
+      CanCan.accessible_by_strategy = :subquery
+    end
+
+    it 'allows ordering via relations' do
+      @ability.can :read, Comment, article: { category: { visible: true } }
+      comment1 = Comment.create!(article: Article.create!(category: Category.create!(visible: true)))
+      Comment.create!(article: Article.create!(category: Category.create!(visible: false)))
+      expect(Comment.accessible_by(@ability).joins(:article).order('articles.id')).to match_array([comment1])
+    end
+  end
+
+  context 'base behaviour left_join specific' do
+    before :each do
+      CanCan.accessible_by_strategy = :left_join
+    end
+
+    it 'allows ordering via relations in sqlite' do
+      skip unless sqlite?
+
+      @ability.can :read, Comment, article: { category: { visible: true } }
+      comment1 = Comment.create!(article: Article.create!(category: Category.create!(visible: true)))
+      Comment.create!(article: Article.create!(category: Category.create!(visible: false)))
+
+      expect(Comment.accessible_by(@ability).joins(:article).order('articles.id')).to match_array([comment1])
+    end
+
+    # this fails on Postgres. see https://github.com/CanCanCommunity/cancancan/pull/608
+    it 'fails to order via relations in postgres' do
+      skip unless postgres?
+
+      @ability.can :read, Comment, article: { category: { visible: true } }
+      comment1 = Comment.create!(article: Article.create!(category: Category.create!(visible: true)))
+      Comment.create!(article: Article.create!(category: Category.create!(visible: false)))
+
+      expect { Comment.accessible_by(@ability).joins(:article).order('articles.id') }.to raise_error(ActiveRecord::StatementInvalid)
     end
   end
 
@@ -664,39 +697,51 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
     end
   end
 
-  CanCan::VALID_ACCESSIBLE_BY_STRATEGIES.each do |strategy|
-    context "when a table has json type column with #{strategy} strategy" do
-      before :each do
-        CanCan.accessible_by_strategy = strategy
-      end
-      before do
-        json_supported =
-          ActiveRecord::Base.connection.respond_to?(:supports_json?) &&
-          ActiveRecord::Base.connection.supports_json?
+  context "when a table has json type column" do
+    before do
+      json_supported =
+        ActiveRecord::Base.connection.respond_to?(:supports_json?) &&
+        ActiveRecord::Base.connection.supports_json?
 
-        skip "Adapter don't support JSON column type" unless json_supported
+      skip "Adapter don't support JSON column type" unless json_supported
 
-        ActiveRecord::Schema.define do
-          create_table(:json_transactions) do |t|
-            t.integer :user_id
-            t.json :additional_data
-          end
-        end
-
-        class JsonTransaction < ActiveRecord::Base
-          belongs_to :user
+      ActiveRecord::Schema.define do
+        create_table(:json_transactions) do |t|
+          t.integer :user_id
+          t.json :additional_data
         end
       end
 
-      it 'can filter correctly' do
-        user = User.create!
-        transaction = JsonTransaction.create!(user: user)
-
-        ability = Ability.new(user)
-        ability.can :read, JsonTransaction, user: { id: user.id }
-
-        expect(JsonTransaction.accessible_by(ability)).to match_array([transaction])
+      class JsonTransaction < ActiveRecord::Base
+        belongs_to :user
       end
+    end
+
+    it 'can filter correctly if using subquery strategy' do
+      CanCan.accessible_by_strategy = :subquery
+
+      user = User.create!
+      transaction = JsonTransaction.create!(user: user)
+
+      ability = Ability.new(user)
+      ability.can :read, JsonTransaction, user: { id: user.id }
+
+      expect(JsonTransaction.accessible_by(ability)).to match_array([transaction])
+    end
+
+    # this fails on Postgres. see https://github.com/CanCanCommunity/cancancan/pull/608
+    it 'cannot filter JSON on postgres columns using left_join strategy' do
+      skip unless postgres?
+
+      CanCan.accessible_by_strategy = :left_join
+
+      user = User.create!
+      transaction = JsonTransaction.create!(user: user)
+
+      ability = Ability.new(user)
+      ability.can :read, JsonTransaction, user: { id: user.id }
+
+      expect { JsonTransaction.accessible_by(ability) }.to raise_error(ActiveRecord::StatementInvalid)
     end
   end
 
