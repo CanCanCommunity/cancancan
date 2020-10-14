@@ -765,7 +765,7 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
       ability = Ability.new(user)
       ability.can :read, JsonTransaction, user: { id: user.id }
 
-      expect { JsonTransaction.accessible_by(ability) }
+      expect { JsonTransaction.accessible_by(ability).to_a }
         .to raise_error(ActiveRecord::StatementInvalid)
     end
   end
