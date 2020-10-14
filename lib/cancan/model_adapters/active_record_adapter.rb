@@ -3,6 +3,10 @@
 module CanCan
   module ModelAdapters
     class ActiveRecordAdapter < AbstractAdapter
+      def self.supports_subqueries?
+        version_greater_or_equal?("5.0.0")
+      end
+
       def self.version_greater_or_equal?(version)
         Gem::Version.new(ActiveRecord.version).release >= Gem::Version.new(version)
       end

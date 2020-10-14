@@ -37,10 +37,9 @@ module CanCan
       def build_joins_relation(relation, *_where_conditions)
         case CanCan.accessible_by_strategy
         when :subquery
-          inner = @model_class.unscoped do
-            relation.includes(joins).references(joins)
-          end
-          @model_class.where(@model_class.primary_key => inner)
+          # subquery mode doesn't work with Rails 4.x
+          # see CanCan::ModelAdapters::ActiveRecordAdapter.supports_subqueries?
+          relation.includes(joins).references(joins)
 
         when :left_join
           relation.includes(joins).references(joins)

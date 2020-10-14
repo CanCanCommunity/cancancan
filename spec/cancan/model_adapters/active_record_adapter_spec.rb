@@ -455,9 +455,14 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
       comment2 = Comment.create!(article: Article.create!(name: 'A', category: Category.create!(visible: true)))
       Comment.create!(article: Article.create!(category: Category.create!(visible: false)))
 
-      # doesn't work without explicitly calling a join
-      expect { Comment.accessible_by(@ability).order('articles.name').to_a }
-        .to raise_error(ActiveRecord::StatementInvalid)
+      # doesn't work without explicitly calling a join on AR 5+, but does before that (where we don't use subqueries at all)
+      if CanCan::ModelAdapters::ActiveRecordAdapter.supports_subqueries?
+        expect { Comment.accessible_by(@ability).order('articles.name').to_a }
+          .to raise_error(ActiveRecord::StatementInvalid)
+      else
+        expect(Comment.accessible_by(@ability).order('articles.name'))
+          .to match_array([comment2, comment1])
+      end
 
       # works with the explicit join
       expect(Comment.accessible_by(@ability).joins(:article).order('articles.name'))
@@ -481,30 +486,40 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
       # works without explicitly calling a join
       expect(Comment.accessible_by(@ability).order('articles.name')).to match_array([comment2, comment1])
 
-      # works with the explicit join in AR 5.2+
+      # works with the explicit join in AR 5.2+ and AR 4.2
       if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.2.0')
         expect(Comment.accessible_by(@ability).joins(:article).order('articles.name'))
           .to match_array([comment2, comment1])
-      else
+      elsif CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
         expect { Comment.accessible_by(@ability).joins(:article).order('articles.name').to_a }
           .to raise_error(ActiveRecord::StatementInvalid)
+      else
+        expect(Comment.accessible_by(@ability).joins(:article).order('articles.name'))
+          .to match_array([comment2, comment1])
       end
     end
 
     # this fails on Postgres. see https://github.com/CanCanCommunity/cancancan/pull/608
-    it 'fails to order via relations in postgres' do
+    it 'fails to order via relations in postgres on AR 5+' do
       skip unless postgres?
 
       @ability.can :read, Comment, article: { category: { visible: true } }
-      Comment.create!(article: Article.create!(name: 'B', category: Category.create!(visible: true)))
-      Comment.create!(article: Article.create!(name: 'A', category: Category.create!(visible: true)))
+      comment1 = Comment.create!(article: Article.create!(name: 'B', category: Category.create!(visible: true)))
+      comment2 = Comment.create!(article: Article.create!(name: 'A', category: Category.create!(visible: true)))
       Comment.create!(article: Article.create!(category: Category.create!(visible: false)))
 
-      # doesn't work with or without the join
-      expect { Comment.accessible_by(@ability).order('articles.name').to_a }
-        .to raise_error(ActiveRecord::StatementInvalid)
-      expect { Comment.accessible_by(@ability).joins(:article).order('articles.name').to_a }
-        .to raise_error(ActiveRecord::StatementInvalid)
+      if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
+        # doesn't work with or without the join
+        expect { Comment.accessible_by(@ability).order('articles.name').to_a }
+          .to raise_error(ActiveRecord::StatementInvalid)
+        expect { Comment.accessible_by(@ability).joins(:article).order('articles.name').to_a }
+          .to raise_error(ActiveRecord::StatementInvalid)
+      else
+        expect(Comment.accessible_by(@ability).order('articles.name'))
+          .to match_array([comment2, comment1])
+        expect(Comment.accessible_by(@ability).joins(:article).order('articles.name'))
+          .to match_array([comment2, comment1])
+      end
     end
   end
 
