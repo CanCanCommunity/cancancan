@@ -120,8 +120,15 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecord5Adapter do
       CanCan.accessible_by_strategy = :left_join
     end
 
-    it 'adds the where clause correctly with joins' do
-      posts = Post.joins(:editors).where('editors.user_id': @user1.id).accessible_by(ability)
+    if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.2.0')
+      it 'adds the where clause correctly with joins on AR 5.2+' do
+        posts = Post.joins(:editors).where('editors.user_id': @user1.id).accessible_by(ability)
+        expect(posts.length).to eq 1
+      end
+    end
+
+    it 'adds the where clause correctly without joins' do
+      posts = Post.where('editors.user_id': @user1.id).accessible_by(ability)
       expect(posts.length).to eq 1
     end
   end
