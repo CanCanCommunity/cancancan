@@ -38,7 +38,6 @@ module CanCan
         case CanCan.accessible_by_strategy
         when :subquery
           # subquery mode doesn't work with Rails 4.x
-          # see CanCan::ModelAdapters::ActiveRecordAdapter.supports_subqueries?
           relation.includes(joins).references(joins)
 
         when :left_join

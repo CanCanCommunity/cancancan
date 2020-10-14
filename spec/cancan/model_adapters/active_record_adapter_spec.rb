@@ -455,8 +455,9 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
       comment2 = Comment.create!(article: Article.create!(name: 'A', category: Category.create!(visible: true)))
       Comment.create!(article: Article.create!(category: Category.create!(visible: false)))
 
-      # doesn't work without explicitly calling a join on AR 5+, but does before that (where we don't use subqueries at all)
-      if CanCan::ModelAdapters::ActiveRecordAdapter.supports_subqueries?
+      # doesn't work without explicitly calling a join on AR 5+,
+      # but does before that (where we don't use subqueries at all)
+      if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
         expect { Comment.accessible_by(@ability).order('articles.name').to_a }
           .to raise_error(ActiveRecord::StatementInvalid)
       else
