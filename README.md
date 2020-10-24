@@ -37,7 +37,7 @@ of models automatically and reduce duplicated code.
 <br/>
 <br/>
 
-Do you want to sponsor CanCanCan and show your logo here? 
+Do you want to sponsor CanCanCan and show your logo here?
 Check our [Sponsors Page](https://github.com/sponsors/coorasse).
 
 ## Installation
@@ -242,11 +242,11 @@ See [Ensure Authorization](https://github.com/CanCanCommunity/cancancan/wiki/Ens
 
 ## Wiki Docs
 
-* [Defining Abilities](https://github.com/CanCanCommunity/cancancan/wiki/Defining-Abilities)
+* [Defining Abilities](https://github.com/CanCanCommunity/cancancan/blob/develop/docs/Defining-Abilities.md)
 * [Checking Abilities](https://github.com/CanCanCommunity/cancancan/wiki/Checking-Abilities)
 * [Authorizing Controller Actions](https://github.com/CanCanCommunity/cancancan/wiki/Authorizing-Controller-Actions)
 * [Exception Handling](https://github.com/CanCanCommunity/cancancan/wiki/Exception-Handling)
-* [Changing Defaults](https://github.com/CanCanCommunity/cancancan/wiki/Changing-Defaults)
+* [Changing Defaults](https://github.com/CanCanCommunity/cancancan/blob/develop/docs/Changing-Defaults.md)
 * [See more](https://github.com/CanCanCommunity/cancancan/wiki)
 
 ## Mission
