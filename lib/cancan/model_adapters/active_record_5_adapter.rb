@@ -32,7 +32,6 @@ module CanCan
         end
       end
 
-      # Rails 4.2 deprecates `sanitize_sql_hash_for_conditions`
       def sanitize_sql(conditions)
         if conditions.is_a?(Hash)
           sanitize_sql_activerecord5(conditions)
@@ -46,11 +45,7 @@ module CanCan
         table_metadata = ActiveRecord::TableMetadata.new(@model_class, table)
         predicate_builder = ActiveRecord::PredicateBuilder.new(table_metadata)
 
-        conditions = predicate_builder.resolve_column_aliases(conditions)
-
-        conditions.stringify_keys!
-
-        predicate_builder.build_from_hash(conditions).map { |b| visit_nodes(b) }.join(' AND ')
+        predicate_builder.build_from_hash(conditions.stringify_keys).map { |b| visit_nodes(b) }.join(' AND ')
       end
 
       def visit_nodes(node)
