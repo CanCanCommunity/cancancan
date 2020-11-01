@@ -1,3 +1,5 @@
+# Accessing request data
+
 What if you need to modify the permissions based on something outside of the User object? For example, let's say you want to blacklist certain IP addresses from creating comments. The IP address is accessible through request.remote_ip but the Ability class does not have access to this. It's easy to modify what you pass to the Ability object by overriding the current_ability method in ApplicationController.
 
 ```ruby

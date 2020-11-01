@@ -1,3 +1,5 @@
+# Changing Defaults
+
 CanCanCan makes two assumptions about your application.
 
 * You have an `Ability` class which defines the permissions.
@@ -41,4 +43,4 @@ class ApplicationController < ActionController::Base
 end
 ```
 
-That's it! See [[Accessing Request Data]] for a more complex example of what you can do here.
+That's it! See [Accessing Request Data](https://github.com/CanCanCommunity/cancancan/blob/develop/docs/Accessing-request-data.md) for a more complex example of what you can do here.
