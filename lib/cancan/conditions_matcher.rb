@@ -78,7 +78,8 @@ module CanCan
 
     def hash_condition_match?(attribute, value)
       if attribute.is_a?(Array) || (defined?(ActiveRecord) && attribute.is_a?(ActiveRecord::Relation))
-        attribute.any? { |element| matches_conditions_hash?(element, value) }
+        match_results = attribute.map { |element| matches_conditions_hash?(element, value) }
+        match_results.any?
       else
         attribute && matches_conditions_hash?(attribute, value)
       end
