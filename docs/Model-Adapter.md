@@ -39,7 +39,7 @@ Otherwise the adapter will be skipped and the other subclasses of the abstract a
 
 #### database_records
 
-Is used to get all records from the database. This has to be overwritten as the abstract adapter 
+Used to get all records from the database. This has to be overwritten as the abstract adapter 
 does not know about your model or use-case.
 
 
@@ -126,8 +126,10 @@ File specific tests can be run with:
 
 First add a line to lib/cancan.rb for including the adapter only when Mongoid is present.
 
+```ruby
 require 'cancan/model_adapters/mongoid_adapter' if defined? Mongoid
-
+```
+And after that create a new adapter in model_adapters:
 
 ```ruby
 module CanCan
@@ -169,7 +171,7 @@ And in ```database_records``` we define the way data is loaded from the storage 
 This message is used in ```accessible_by```. In this example we fetch all entries for a model that match
 a given rule.
 
-**If no rules for an object are defined, we run a query that will returns without any results.**
+**If no rules for an object are defined, a query will be run that returns no results**
 
 If rules are present, we apply each of the rule conditions to them. The rule.base_behavior defines whether
 the rule should be additive or subtractive. It will result in false for :cannot and true for :can.
@@ -178,8 +180,6 @@ Some model types add additional features to the conditions hash. With Mongoid, f
 you can do something like :age.gt => 13.
 Because the abstract adapter has no knowledge of this, we have to overwrite the provided methods
 in the new adapter.
-
-
 
 ```ruby
 def self.override_conditions_hash_matching?(subject, conditions)
@@ -190,7 +190,6 @@ def self.matches_conditions_hash?(subject, conditions)
   subject.matches? subject.class.where(conditions).selector
 end
 ```
-
 
 ### Additional Examples
 
@@ -213,3 +212,5 @@ a better overview how a battle tested adapter is structured and implemented.
 * [ActiveRecord Base](https://github.com/CanCanCommunity/cancancan/blob/develop/spec/cancan/model_adapters/active_record_4_adapter_spec.rb)
 * [ActiveRecord 4](https://github.com/CanCanCommunity/cancancan/blob/develop/spec/cancan/model_adapters/active_record_5_adapter_spec.rb)
 * [ActiveRecord 5](https://github.com/CanCanCommunity/cancancan/blob/develop/spec/cancan/model_adapters/active_record_adapter_spec.rb)
+
+
