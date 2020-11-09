@@ -507,7 +507,7 @@ WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
     end
   end
 
-  it 'doesn\'t allow a nil to be used as a condition for a has_many alongside other attributes' do
+  it 'doesn\'t permit anything if a nil is used as a condition for a has_many alongside other attributes' do
     a1 = Article.create!
     a2 = Article.create!
     a2.comments = [Comment.create!(spam: true)]
@@ -535,7 +535,7 @@ WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
     end
   end
 
-  it 'doesn\'t allow a nil to be used as a condition for a has_many alongside other attributes - false case' do
+  it 'doesn\'t permit anything if a nil is used as a condition for a has_many alongside other attributes - false case' do
     a1 = Article.create!
     a2 = Article.create!
     a2.comments = [Comment.create!(spam: true)]
