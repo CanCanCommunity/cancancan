@@ -563,6 +563,32 @@ WHERE "articles"."published" = #{false_v} AND "articles"."secret" = #{true_v}))
     end
   end
 
+  it 'allows a nil to be used as a condition for a has_many when combined with other conditions' do
+    a1 = Article.create!
+    a2 = Article.create!
+    a2.comments = [Comment.create!(spam: true)]
+    a3 = Article.create!
+    a3.comments = [Comment.create!(spam: false)]
+
+    @ability.can :read, Article, comments: { spam: true }
+    @ability.can :read, Article, comments: { id: nil }
+
+    expect(@ability.can?(:read, a1)).to eq(true) # true because no comments
+    expect(@ability.can?(:read, a2)).to eq(true) # true because has comments but they have spam=true
+    expect(@ability.can?(:read, a3)).to eq(false) # false because has comments but none with spam=true
+
+    expect(Article.accessible_by(@ability)).to eq([a1, a2])
+
+    if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
+      expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
+  SELECT "articles".*
+  FROM "articles"
+  WHERE "articles"."id" IN (SELECT "articles"."id" FROM "articles"
+    LEFT OUTER JOIN "comments" ON "comments"."article_id" = "articles"."id"
+    WHERE (("comments"."id" IS NULL) OR ("comments"."spam" = #{true_v})))))
+    end
+  end
+
   it 'allows a nil to be used as a condition for a has_many alongside other attributes on the parent' do
     a1 = Article.create!(secret: true)
     a2 = Article.create!(secret: true)
