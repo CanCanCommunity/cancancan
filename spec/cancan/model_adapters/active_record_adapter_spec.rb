@@ -109,7 +109,7 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
     @comment_table = Comment.table_name
   end
 
-  CanCan::VALID_ACCESSIBLE_BY_STRATEGIES.each do |strategy|
+  CanCan.valid_accessible_by_strategies.each do |strategy|
     context "base functionality with #{strategy} strategy" do
       before :each do
         CanCan.accessible_by_strategy = strategy
@@ -444,30 +444,32 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
     end
   end
 
-  context 'base behaviour subquery specific' do
-    before :each do
-      CanCan.accessible_by_strategy = :subquery
-    end
-
-    it 'allows ordering via relations' do
-      @ability.can :read, Comment, article: { category: { visible: true } }
-      comment1 = Comment.create!(article: Article.create!(name: 'B', category: Category.create!(visible: true)))
-      comment2 = Comment.create!(article: Article.create!(name: 'A', category: Category.create!(visible: true)))
-      Comment.create!(article: Article.create!(category: Category.create!(visible: false)))
-
-      # doesn't work without explicitly calling a join on AR 5+,
-      # but does before that (where we don't use subqueries at all)
-      if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
-        expect { Comment.accessible_by(@ability).order('articles.name').to_a }
-          .to raise_error(ActiveRecord::StatementInvalid)
-      else
-        expect(Comment.accessible_by(@ability).order('articles.name'))
-          .to match_array([comment2, comment1])
+  unless CanCan::ModelAdapters::ActiveRecordAdapter.version_lower?('5.0.0')
+    context 'base behaviour subquery specific' do
+      before :each do
+        CanCan.accessible_by_strategy = :subquery
       end
 
-      # works with the explicit join
-      expect(Comment.accessible_by(@ability).joins(:article).order('articles.name'))
-        .to match_array([comment2, comment1])
+      it 'allows ordering via relations' do
+        @ability.can :read, Comment, article: { category: { visible: true } }
+        comment1 = Comment.create!(article: Article.create!(name: 'B', category: Category.create!(visible: true)))
+        comment2 = Comment.create!(article: Article.create!(name: 'A', category: Category.create!(visible: true)))
+        Comment.create!(article: Article.create!(category: Category.create!(visible: false)))
+
+        # doesn't work without explicitly calling a join on AR 5+,
+        # but does before that (where we don't use subqueries at all)
+        if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
+          expect { Comment.accessible_by(@ability).order('articles.name').to_a }
+            .to raise_error(ActiveRecord::StatementInvalid)
+        else
+          expect(Comment.accessible_by(@ability).order('articles.name'))
+            .to match_array([comment2, comment1])
+        end
+
+        # works with the explicit join
+        expect(Comment.accessible_by(@ability).joins(:article).order('articles.name'))
+          .to match_array([comment2, comment1])
+      end
     end
   end
 
@@ -612,7 +614,7 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
     end
   end
 
-  CanCan::VALID_ACCESSIBLE_BY_STRATEGIES.each do |strategy|
+  CanCan.valid_accessible_by_strategies.each do |strategy|
     context "when a table is referenced multiple times with #{strategy} strategy" do
       before :each do
         CanCan.accessible_by_strategy = strategy
@@ -635,33 +637,35 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
     end
   end
 
-  context 'has_many through is defined and referenced differently - subquery strategy' do
-    before do
-      CanCan.accessible_by_strategy = :subquery
-    end
+  unless CanCan::ModelAdapters::ActiveRecordAdapter.version_lower?('5.0.0')
+    context 'has_many through is defined and referenced differently - subquery strategy' do
+      before do
+        CanCan.accessible_by_strategy = :subquery
+      end
 
-    it 'recognises it and simplifies the query' do
-      u1 = User.create!(name: 'pippo')
-      u2 = User.create!(name: 'paperino')
+      it 'recognises it and simplifies the query' do
+        u1 = User.create!(name: 'pippo')
+        u2 = User.create!(name: 'paperino')
 
-      a1 = Article.create!(mentioned_users: [u1])
-      a2 = Article.create!(mentioned_users: [u2])
+        a1 = Article.create!(mentioned_users: [u1])
+        a2 = Article.create!(mentioned_users: [u2])
 
-      ability = Ability.new(u1)
-      ability.can :read, Article, mentioned_users: { name: u1.name }
-      ability.can :read, Article, mentions: { user: { name: u2.name } }
-      expect(Article.accessible_by(ability)).to match_array([a1, a2])
-      if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
-        expect(ability.model_adapter(Article, :read)).to generate_sql(%(
-  SELECT "articles".*
-  FROM "articles"
-  WHERE "articles"."id" IN
-  (SELECT "articles"."id"
+        ability = Ability.new(u1)
+        ability.can :read, Article, mentioned_users: { name: u1.name }
+        ability.can :read, Article, mentions: { user: { name: u2.name } }
+        expect(Article.accessible_by(ability)).to match_array([a1, a2])
+        if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
+          expect(ability.model_adapter(Article, :read)).to generate_sql(%(
+    SELECT "articles".*
     FROM "articles"
-    LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
-    LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
-    WHERE (("users"."name" = 'paperino') OR ("users"."name" = 'pippo')))
-  ))
+    WHERE "articles"."id" IN
+    (SELECT "articles"."id"
+      FROM "articles"
+      LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
+      LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
+      WHERE (("users"."name" = 'paperino') OR ("users"."name" = 'pippo')))
+    ))
+        end
       end
     end
   end
@@ -694,7 +698,7 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
     end
   end
 
-  CanCan::VALID_ACCESSIBLE_BY_STRATEGIES.each do |strategy|
+  CanCan.valid_accessible_by_strategies.each do |strategy|
     context "when a model has renamed primary_key with #{strategy} strategy" do
       before :each do
         CanCan.accessible_by_strategy = strategy

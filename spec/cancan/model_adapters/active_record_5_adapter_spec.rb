@@ -4,7 +4,7 @@ require 'spec_helper'
 
 if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
   describe CanCan::ModelAdapters::ActiveRecord5Adapter do
-    CanCan::VALID_ACCESSIBLE_BY_STRATEGIES.each do |strategy|
+    CanCan.valid_accessible_by_strategies.each do |strategy|
       context "with sqlite3 and #{strategy} strategy" do
         before :each do
           CanCan.accessible_by_strategy = strategy

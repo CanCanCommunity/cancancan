@@ -35,14 +35,7 @@ module CanCan
       # you're using in the where. Instead, `references()` is required
       # in addition to `includes()` to force the outer join.
       def build_joins_relation(relation, *_where_conditions)
-        case CanCan.accessible_by_strategy
-        when :subquery
-          # subquery mode doesn't work with Rails 4.x
-          relation.includes(joins).references(joins)
-
-        when :left_join
-          relation.includes(joins).references(joins)
-        end
+        relation.includes(joins).references(joins)
       end
 
       # Rails 4.2 deprecates `sanitize_sql_hash_for_conditions`

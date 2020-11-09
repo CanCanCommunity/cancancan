@@ -29,8 +29,7 @@ RSpec.configure do |config|
   config.include SQLHelpers
 
   config.after :each do
-    # set default values for all config
-    CanCan.accessible_by_strategy = :subquery
+    CanCan.accessible_by_strategy = CanCan.default_accessible_by_strategy
   end
 end
 

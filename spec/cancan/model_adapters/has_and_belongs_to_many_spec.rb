@@ -45,28 +45,30 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecord5Adapter do
     ability.can :read, House, people: { id: @person1.id }
   end
 
-  describe 'fetching of records - subquery strategy' do
-    before do
-      CanCan.accessible_by_strategy = :subquery
-    end
+  unless CanCan::ModelAdapters::ActiveRecordAdapter.version_lower?('5.0.0')
+    describe 'fetching of records - subquery strategy' do
+      before do
+        CanCan.accessible_by_strategy = :subquery
+      end
 
-    it 'it retreives the records correctly' do
-      houses = House.accessible_by(ability)
-      expect(houses).to match_array [@house2, @house1]
-    end
+      it 'it retreives the records correctly' do
+        houses = House.accessible_by(ability)
+        expect(houses).to match_array [@house2, @house1]
+      end
 
-    if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
-      it 'generates the correct query' do
-        expect(ability.model_adapter(House, :read))
-          .to generate_sql("SELECT \"houses\".*
-                          FROM \"houses\"
-                          WHERE \"houses\".\"id\" IN
-                            (SELECT \"houses\".\"id\"
+      if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
+        it 'generates the correct query' do
+          expect(ability.model_adapter(House, :read))
+            .to generate_sql("SELECT \"houses\".*
                             FROM \"houses\"
-                            LEFT OUTER JOIN \"houses_people\" ON \"houses_people\".\"house_id\" = \"houses\".\"id\"
-                            LEFT OUTER JOIN \"people\" ON \"people\".\"id\" = \"houses_people\".\"person_id\"
-                            WHERE \"people\".\"id\" = #{@person1.id})
-                          ")
+                            WHERE \"houses\".\"id\" IN
+                              (SELECT \"houses\".\"id\"
+                              FROM \"houses\"
+                              LEFT OUTER JOIN \"houses_people\" ON \"houses_people\".\"house_id\" = \"houses\".\"id\"
+                              LEFT OUTER JOIN \"people\" ON \"people\".\"id\" = \"houses_people\".\"person_id\"
+                              WHERE \"people\".\"id\" = #{@person1.id})
+                            ")
+        end
       end
     end
   end

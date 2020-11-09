@@ -72,7 +72,7 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecord5Adapter do
     ability.can :read, Post, editors: { user_id: @user1 }
   end
 
-  CanCan::VALID_ACCESSIBLE_BY_STRATEGIES.each do |strategy|
+  CanCan.valid_accessible_by_strategies.each do |strategy|
     context "using #{strategy} strategy" do
       before :each do
         CanCan.accessible_by_strategy = strategy
@@ -104,14 +104,16 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecord5Adapter do
     end
   end
 
-  describe 'filtering of results - subquery' do
-    before :each do
-      CanCan.accessible_by_strategy = :subquery
-    end
+  unless CanCan::ModelAdapters::ActiveRecordAdapter.version_lower?('5.0.0')
+    describe 'filtering of results - subquery' do
+      before :each do
+        CanCan.accessible_by_strategy = :subquery
+      end
 
-    it 'adds the where clause correctly with joins' do
-      posts = Post.joins(:editors).where('editors.user_id': @user1.id).accessible_by(ability)
-      expect(posts.length).to eq 1
+      it 'adds the where clause correctly with joins' do
+        posts = Post.joins(:editors).where('editors.user_id': @user1.id).accessible_by(ability)
+        expect(posts.length).to eq 1
+      end
     end
   end
 

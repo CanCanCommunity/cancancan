@@ -4,7 +4,8 @@ require 'spec_helper'
 
 if CanCan::ModelAdapters::ActiveRecordAdapter.version_lower?('5.0.0')
   describe CanCan::ModelAdapters::ActiveRecord4Adapter do
-    CanCan::VALID_ACCESSIBLE_BY_STRATEGIES.each do |strategy|
+    # only the `left_join` strategy works in AR4
+    CanCan.valid_accessible_by_strategies.each do |strategy|
       context "with sqlite3 and #{strategy} strategy" do
         before :each do
           CanCan.accessible_by_strategy = strategy
