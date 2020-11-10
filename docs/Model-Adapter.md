@@ -17,12 +17,13 @@ if the currently provided adapters do not suffice.
 
 To facilitate an easy implementation of a new adapter CanCanCan provides you with an 
 [abstract adapter](https://github.com/CanCanCommunity/cancancan/blob/develop/lib/cancan/model_adapters/abstract_adapter.rb) 
-you can extend and build upon.
+you can extend and build upon. This design allows for dynamic adapter handling and a decoupled
+handling of information.
 
 ## The Abstract Adapter
 
-The abstract adapter has multiple methods that you overwrite in order to 
-match the behaviour you expect. It is used by the system to delegate the handling of fetching entries
+The abstract adapter has multiple methods that one has to overwrite in order to 
+match the behaviour that is expected. It is used by the system to delegate the handling of fetching entries
 base on defined rules and conditions.
 
 #### for_class
@@ -32,16 +33,15 @@ in your adapter.
 
 This method is used to determine whether a model should be passed to the adapter or not.
 
-If your ```for_class?``` implementation returns true, the adapter will provided 
+If your ```for_class?``` implementation returns true, the adapter will be provided 
 with the model to build and match the rules defined.
 
 Otherwise the adapter will be skipped and the other subclasses of the abstract adapter will be checked.
 
 #### database_records
 
-Used to get all records from the database. This has to be overwritten as the abstract adapter 
-does not know about your model or use-case.
-
+Used to implement the loading of entries from the database, by a developer defined handling of the
+given rules for a model.
 
 ### Dependencies
 
@@ -70,7 +70,7 @@ appraise 'cancancan_custom_adapter' do
 end
 ```
 
-You would have to replace the dependencies with dependencies that fit your custom adapter.
+You would have to replace the dependencies with ones that fit your custom adapter.
 
 After creating your dependency definition run
 
@@ -82,7 +82,7 @@ to install dependencies for your adapter.
 
 To illustrate what a test for an adapter could look like, we will use [Mongoid](https://github.com/CanCanCommunity/cancancan-mongoid) as an example.
 
-In good TDD fashion we create a spec for our adapter to later confirm our implementation.
+In good TDD fashion we create a spec / test for the new adapter to later confirm our implementation.
 
 ```ruby
 
@@ -107,6 +107,10 @@ RSpec.describe CanCan::ModelAdapters::MongoidAdapter do
 
 end
 ```
+In this case ```MonoidProject``` is a decendant of ```MogoidDocument```. The implementation of this class
+will not be shown as it only acts as an example.
+
+### Running tests
 
 You can run tests for the project by running
 
@@ -120,11 +124,12 @@ File specific tests can be run with:
 
     bundle exec appraisal adpater_name rspec spec/cancan/model_adapters/adapter_name.rb
 
-**Because we haven't implemented any functionality yet, your tests will fail.**
+**Because we haven't implemented any functionality yet, the tests will fail.**
 
 ### The Implementation
 
-First add a line to lib/cancan.rb for including the adapter only when Mongoid is present.
+First add a line to lib/cancan.rb to include the adapter if a condition is met. In this case 
+we check if Mongoid is present.
 
 ```ruby
 require 'cancan/model_adapters/mongoid_adapter' if defined? Mongoid
@@ -165,7 +170,6 @@ As mentioned before, there are methods that have to be overwritten in order to p
 
 In this case we overwrite the ```for_class?``` method to validate that the given model is a 
 descendant of MogoidDocument. The adapter will only be used if ```for_class?``` evalues to true.
-
 
 And in ```database_records``` we define the way data is loaded from the storage device.
 This message is used in ```accessible_by```. In this example we fetch all entries for a model that match
@@ -213,4 +217,6 @@ a better overview how a battle tested adapter is structured and implemented.
 * [ActiveRecord 4](https://github.com/CanCanCommunity/cancancan/blob/develop/spec/cancan/model_adapters/active_record_5_adapter_spec.rb)
 * [ActiveRecord 5](https://github.com/CanCanCommunity/cancancan/blob/develop/spec/cancan/model_adapters/active_record_adapter_spec.rb)
 
+**Mondoid, the adapter used in this entry as an example, can be found at:**
+* [Mongoid](https://github.com/CanCanCommunity/cancancan-mongoid)
 
