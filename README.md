@@ -6,7 +6,7 @@
 [![Travis badge](https://travis-ci.org/CanCanCommunity/cancancan.svg?branch=develop)](https://travis-ci.org/CanCanCommunity/cancancan)
 [![Code Climate Badge](https://codeclimate.com/github/CanCanCommunity/cancancan.svg)](https://codeclimate.com/github/CanCanCommunity/cancancan)
 
-[Wiki](https://github.com/CanCanCommunity/cancancan/wiki) |
+[Wiki](./docs) |
 [RDocs](http://rdoc.info/projects/CanCanCommunity/cancancan) |
 [Screencast 1](http://railscasts.com/episodes/192-authorization-with-cancan) |
 [Screencast 2](https://www.youtube.com/watch?v=cTYu-OjUgDw)
@@ -37,7 +37,7 @@ of models automatically and reduce duplicated code.
 <br/>
 <br/>
 
-Do you want to sponsor CanCanCan and show your logo here? 
+Do you want to sponsor CanCanCan and show your logo here?
 Check our [Sponsors Page](https://github.com/sponsors/coorasse).
 
 ## Installation
@@ -73,7 +73,7 @@ class Ability
 end
 ```
 
-See [Defining Abilities](https://github.com/CanCanCommunity/cancancan/wiki/defining-abilities) for details on how to
+See [Defining Abilities](./docs/Defining-Abilities.md) for details on how to
 define your rules.
 
 
@@ -87,7 +87,7 @@ The current user's permissions can then be checked using the `can?` and `cannot?
 <% end %>
 ```
 
-See [Checking Abilities](https://github.com/CanCanCommunity/cancancan/wiki/checking-abilities) for more information
+See [Checking Abilities](./docs/Checking-Abilities.md) for more information
 on how you can use these helpers.
 
 ## Fetching records
@@ -101,13 +101,13 @@ The following:
 ```
 
 will use your rules to ensure that the user retrieves only a list of posts that can be read.
-See [Fetching records](https://github.com/CanCanCommunity/cancancan/wiki/Fetching-Records) for details.
+See [Fetching records](./docs/Fetching-Records.md) for details.
 
 ## Controller helpers
 
 CanCanCan expects a `current_user` method to exist in the controller.
 First, set up some authentication (such as [Devise](https://github.com/plataformatec/devise) or [Authlogic](https://github.com/binarylogic/authlogic)).
-See [Changing Defaults](https://github.com/CanCanCommunity/cancancan/wiki/changing-defaults) if you need a different behavior.
+See [Changing Defaults](./docs/Changing-Defaults.md) if you need a different behavior.
 
 ### 3.1 Authorizations
 
@@ -140,7 +140,7 @@ class PostsController < ApplicationController
 end
 ```
 
-See [Authorizing Controller Actions](https://github.com/CanCanCommunity/cancancan/wiki/authorizing-controller-actions)
+See [Authorizing Controller Actions](./docs/Authorizing-controller-actions.md)
 for more information.
 
 
@@ -204,7 +204,7 @@ Finally, it's possible to associate `param_method` with a Proc object which will
 
     load_and_authorize_resource param_method: Proc.new { |c| c.params.require(:post).permit(:name) }
 
-See [Strong Parameters](https://github.com/CanCanCommunity/cancancan/wiki/Strong-Parameters) for more information.
+See [Strong Parameters](./docs/Strong-Parameters.md) for more information.
 
 ## Handle Unauthorized Access
 
@@ -223,7 +223,7 @@ class ApplicationController < ActionController::Base
 end
 ```
 
-See [Exception Handling](https://github.com/CanCanCommunity/cancancan/wiki/exception-handling) for more information.
+See [Exception Handling](./docs/Exception-Handling.md) for more information.
 
 
 ## Lock It Down
@@ -238,16 +238,16 @@ end
 
 This will raise an exception if authorization is not performed in an action.
 If you want to skip this, add `skip_authorization_check` to a controller subclass.
-See [Ensure Authorization](https://github.com/CanCanCommunity/cancancan/wiki/Ensure-Authorization) for more information.
+See [Ensure Authorization](./docs/Ensure-Authorization.md) for more information.
 
 ## Wiki Docs
 
-* [Defining Abilities](https://github.com/CanCanCommunity/cancancan/wiki/Defining-Abilities)
-* [Checking Abilities](https://github.com/CanCanCommunity/cancancan/wiki/Checking-Abilities)
-* [Authorizing Controller Actions](https://github.com/CanCanCommunity/cancancan/wiki/Authorizing-Controller-Actions)
-* [Exception Handling](https://github.com/CanCanCommunity/cancancan/wiki/Exception-Handling)
-* [Changing Defaults](https://github.com/CanCanCommunity/cancancan/wiki/Changing-Defaults)
-* [See more](https://github.com/CanCanCommunity/cancancan/wiki)
+* [Defining Abilities](./docs/Defining-Abilities.md)
+* [Checking Abilities](./docs/Checking-Abilities.md)
+* [Authorizing Controller Actions](./docs/Authorizing-controller-actions.md)
+* [Exception Handling](./docs/Exception-Handling.md)
+* [Changing Defaults](./docs/Changing-Defaults.md)
+* [See more](./docs)
 
 ## Mission
 
@@ -261,7 +261,7 @@ Any help is greatly appreciated, feel free to submit pull-requests or open issue
 ## Questions?
 
 If you have any question or doubt regarding CanCanCan which you cannot find the solution to in the
-[documentation](https://github.com/CanCanCommunity/cancancan/wiki) or our
+[documentation](./docs) or our
 [mailing list](http://groups.google.com/group/cancancan), please
 [open a question on Stackoverflow](http://stackoverflow.com/questions/ask?tags=cancancan) with tag
 [cancancan](http://stackoverflow.com/questions/tagged/cancancan)
@@ -279,7 +279,7 @@ When first developing, you need to run `bundle install` and then `appraisal inst
 
 You can then run all appraisal files (like CI does), with `appraisal rake` or just run a specific set `DB='sqlite' bundle exec appraisal activerecord_5.2.2 rake`.
 
-See the [CONTRIBUTING](https://github.com/CanCanCommunity/cancancan/blob/develop/CONTRIBUTING.md) for more information.
+See the [CONTRIBUTING](./CONTRIBUTING.md) for more information.
 
 ## Special Thanks
 
