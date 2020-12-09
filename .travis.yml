@@ -35,6 +35,8 @@ matrix:
     gemfile: gemfiles/activerecord_6.0.0.gemfile
   - rvm: 2.7.0
     gemfile: gemfiles/activerecord_4.2.0.gemfile
+  - rvm: truffleruby-head
+    gemfile: gemfiles/activerecord_4.2.0.gemfile
   - rvm: jruby-9.1.17.0
     gemfile: gemfiles/activerecord_5.0.2.gemfile
   - rvm: jruby-9.1.17.0
