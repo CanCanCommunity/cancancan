@@ -23,11 +23,13 @@ module SQLHelpers
 
   def connect_postgres
     ActiveRecord::Base.establish_connection(adapter: 'postgresql', host: 'localhost',
-                                            database: 'postgres', schema_search_path: 'public')
+                                            database: 'postgres', schema_search_path: 'public',
+                                            user: 'postgres', password: 'postgres')
     ActiveRecord::Base.connection.drop_database('cancan_postgresql_spec')
     ActiveRecord::Base.connection.create_database('cancan_postgresql_spec', 'encoding' => 'utf-8',
                                                                             'adapter' => 'postgresql')
     ActiveRecord::Base.establish_connection(adapter: 'postgresql', host: 'localhost',
-                                            database: 'cancan_postgresql_spec')
+                                            database: 'cancan_postgresql_spec',
+                                            user: 'postgres', password: 'postgres')
   end
 end
