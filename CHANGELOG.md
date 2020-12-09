@@ -1,6 +1,7 @@
 ## Unreleased
 
 * [#649](https://github.com/CanCanCommunity/cancancan/pull/649): Add support for Single Table Inheritance. ([@Liberatys][])
+* [#645](https://github.com/CanCanCommunity/cancancan/issues/645): Negated matcher for `be_able_to` only passes when no ability is eligible. ([@mraidel][], [@gabsi20][])
 
 ## 3.1.0
 
@@ -670,3 +671,5 @@ Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.co
 [@albb0920]: https://github.com/albb0920
 [@ayumu838]: https://github.com/ayumu838
 [@Liberatys]: https://github.com/Liberatys
+[@mraidel]: https://github.com/mraidel
+[@gabsi20]: https://github.com/gabsi20
