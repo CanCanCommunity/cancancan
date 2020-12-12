@@ -59,6 +59,14 @@ module CanCan
         end
       end
 
+      def build_relation(*where_conditions)
+        relation = @model_class.where(*where_conditions)
+        return relation unless joins.present?
+
+        # subclasses must implement `build_joins_relation`
+        build_joins_relation(relation, *where_conditions)
+      end
+
       # Returns the associations used in conditions for the :joins option of a search.
       # See ModelAdditions#accessible_by
       def joins

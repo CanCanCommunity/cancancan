@@ -5,12 +5,20 @@ module SQLHelpers
     adapter.database_records.to_sql.strip.squeeze(' ')
   end
 
+  def sqlite?
+    ENV['DB'] == 'sqlite'
+  end
+
+  def postgres?
+    ENV['DB'] == 'postgres'
+  end
+
   def connect_db
     # ActiveRecord::Base.logger = Logger.new(STDOUT)
     ActiveRecord::Base.logger = nil
-    if ENV['DB'] == 'sqlite'
+    if sqlite?
       ActiveRecord::Base.establish_connection(adapter: 'sqlite3', database: ':memory:')
-    elsif ENV['DB'] == 'postgres'
+    elsif postgres?
       connect_postgres
     elsif ENV['DB'].nil?
       raise StandardError, "ENV['DB'] not specified"
