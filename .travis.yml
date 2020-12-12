@@ -20,6 +20,7 @@ gemfile:
   - gemfiles/activerecord_5.1.0.gemfile
   - gemfiles/activerecord_5.2.2.gemfile
   - gemfiles/activerecord_6.0.0.gemfile
+  - gemfiles/activerecord_master.gemfile
 env:
   - DB=sqlite
   - DB=postgres
@@ -33,6 +34,12 @@ matrix:
     gemfile: gemfiles/activerecord_6.0.0.gemfile
   - rvm: 2.4.2
     gemfile: gemfiles/activerecord_6.0.0.gemfile
+  - rvm: 2.2.6
+    gemfile: gemfiles/activerecord_master.gemfile
+  - rvm: 2.3.5
+    gemfile: gemfiles/activerecord_master.gemfile
+  - rvm: 2.4.2
+    gemfile: gemfiles/activerecord_master.gemfile
   - rvm: 2.7.0
     gemfile: gemfiles/activerecord_4.2.0.gemfile
   - rvm: truffleruby-head
@@ -41,10 +48,14 @@ matrix:
     gemfile: gemfiles/activerecord_5.0.2.gemfile
   - rvm: jruby-9.1.17.0
     gemfile: gemfiles/activerecord_6.0.0.gemfile
+  - rvm: jruby-9.1.17.0
+    gemfile: gemfiles/activerecord_master.gemfile
   - rvm: jruby-9.2.11.1
     gemfile: gemfiles/activerecord_5.0.2.gemfile
   - rvm: jruby-9.2.11.1
     gemfile: gemfiles/activerecord_6.0.0.gemfile
+  - rvm: jruby-9.2.11.1
+    gemfile: gemfiles/activerecord_master.gemfile
   allow_failures:
     - rvm: ruby-head
     - rvm: jruby-head
