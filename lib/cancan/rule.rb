@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'conditions_matcher.rb'
+require_relative 'class_matcher.rb'
 require_relative 'relevant.rb'
 
 module CanCan
@@ -11,7 +12,7 @@ module CanCan
     include ConditionsMatcher
     include Relevant
     include ParameterValidators
-    attr_reader :base_behavior, :subjects, :actions, :conditions, :attributes
+    attr_reader :base_behavior, :subjects, :actions, :conditions, :attributes, :block
     attr_writer :expanded_actions, :conditions
 
     # The first argument when initializing is the base_behavior which is a true/false
@@ -100,6 +101,18 @@ module CanCan
     end
 
     private
+
+    def matches_action?(action)
+      @expanded_actions.include?(:manage) || @expanded_actions.include?(action)
+    end
+
+    def matches_subject?(subject)
+      @subjects.include?(:all) || @subjects.include?(subject) || matches_subject_class?(subject)
+    end
+
+    def matches_subject_class?(subject)
+      SubjectClassMatcher.matches_subject_class?(@subjects, subject)
+    end
 
     def parse_attributes_from_extra_args(args)
       attributes = args.shift if valid_attribute_param?(args.first)

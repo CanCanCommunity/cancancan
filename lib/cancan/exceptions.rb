@@ -58,5 +58,13 @@ module CanCan
     def to_s
       @message || @default_message
     end
+
+    def inspect
+      details = %i[action subject conditions message].map do |attribute|
+        value = instance_variable_get "@#{attribute}"
+        "#{attribute}: #{value.inspect}" if value.present?
+      end.compact.join(', ')
+      "#<#{self.class.name} #{details}>"
+    end
   end
 end

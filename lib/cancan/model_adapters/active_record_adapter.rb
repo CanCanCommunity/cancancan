@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative 'conditions_extractor.rb'
-require 'cancan/rules_compressor'
 module CanCan
   module ModelAdapters
     class ActiveRecordAdapter < AbstractAdapter
@@ -16,6 +14,7 @@ module CanCan
       def initialize(model_class, rules)
         super
         @compressed_rules = RulesCompressor.new(@rules.reverse).rules_collapsed.reverse
+        StiNormalizer.normalize(@compressed_rules)
         ConditionsNormalizer.normalize(model_class, @compressed_rules)
       end
 
@@ -58,6 +57,14 @@ module CanCan
         else
           @model_class.all(conditions: conditions, joins: joins)
         end
+      end
+
+      def build_relation(*where_conditions)
+        relation = @model_class.where(*where_conditions)
+        return relation unless joins.present?
+
+        # subclasses must implement `build_joins_relation`
+        build_joins_relation(relation, *where_conditions)
       end
 
       # Returns the associations used in conditions for the :joins option of a search.

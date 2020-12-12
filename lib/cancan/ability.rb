@@ -302,7 +302,11 @@ module CanCan
 
     def alternative_subjects(subject)
       subject = subject.class unless subject.is_a?(Module)
-      [:all, *subject.ancestors, subject.class.to_s]
+      if subject.respond_to?(:subclasses) && subject < ActiveRecord::Base
+        [:all, *(subject.ancestors + subject.subclasses), subject.class.to_s]
+      else
+        [:all, *subject.ancestors, subject.class.to_s]
+      end
     end
   end
 end
