@@ -72,31 +72,66 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecord5Adapter do
     ability.can :read, Post, editors: { user_id: @user1 }
   end
 
-  describe 'preloading of associations' do
-    it 'preloads associations correctly' do
-      posts = Post.accessible_by(ability).where(published: true).includes(likes: :user)
-      expect(posts[0].association(:likes)).to be_loaded
-      expect(posts[0].likes[0].association(:user)).to be_loaded
-    end
-  end
-
-  describe 'filtering of results' do
-    it 'adds the where clause correctly' do
-      posts = Post.accessible_by(ability).where(published: true)
-      expect(posts.length).to eq 1
-    end
-    it 'adds the where clause correctly with joins' do
-      posts = Post.joins(:editors).where('editors.user_id': @user1.id).accessible_by(ability)
-      expect(posts.length).to eq 1
-    end
-  end
-
-  if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
-    describe 'selecting custom columns' do
-      it 'extracts custom columns correctly' do
-        posts = Post.accessible_by(ability).where(published: true).select('title as mytitle')
-        expect(posts[0].mytitle).to eq 'post1'
+  CanCan.valid_accessible_by_strategies.each do |strategy|
+    context "using #{strategy} strategy" do
+      before :each do
+        CanCan.accessible_by_strategy = strategy
       end
+
+      describe 'preloading of associations' do
+        it 'preloads associations correctly' do
+          posts = Post.accessible_by(ability).where(published: true).includes(likes: :user)
+          expect(posts[0].association(:likes)).to be_loaded
+          expect(posts[0].likes[0].association(:user)).to be_loaded
+        end
+      end
+
+      if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
+        describe 'selecting custom columns' do
+          it 'extracts custom columns correctly' do
+            posts = Post.accessible_by(ability).where(published: true).select('title as mytitle')
+            expect(posts[0].mytitle).to eq 'post1'
+          end
+        end
+      end
+
+      describe 'filtering of results' do
+        it 'adds the where clause correctly' do
+          posts = Post.accessible_by(ability).where(published: true)
+          expect(posts.length).to eq 1
+        end
+      end
+    end
+  end
+
+  unless CanCan::ModelAdapters::ActiveRecordAdapter.version_lower?('5.0.0')
+    describe 'filtering of results - subquery' do
+      before :each do
+        CanCan.accessible_by_strategy = :subquery
+      end
+
+      it 'adds the where clause correctly with joins' do
+        posts = Post.joins(:editors).where('editors.user_id': @user1.id).accessible_by(ability)
+        expect(posts.length).to eq 1
+      end
+    end
+  end
+
+  describe 'filtering of results - left_joins' do
+    before :each do
+      CanCan.accessible_by_strategy = :left_join
+    end
+
+    if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.2.0')
+      it 'adds the where clause correctly with joins on AR 5.2+' do
+        posts = Post.joins(:editors).where('editors.user_id': @user1.id).accessible_by(ability)
+        expect(posts.length).to eq 1
+      end
+    end
+
+    it 'adds the where clause correctly without joins' do
+      posts = Post.where('editors.user_id': @user1.id).accessible_by(ability)
+      expect(posts.length).to eq 1
     end
   end
 end
