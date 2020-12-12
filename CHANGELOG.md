@@ -1,6 +1,9 @@
-## Unreleased
+## 3.2.0
 
 * [#649](https://github.com/CanCanCommunity/cancancan/pull/649): Add support for Single Table Inheritance. ([@Liberatys][])
+* [#640](https://github.com/CanCanCommunity/cancancan/pull/640): Simplify implementation of new model adapters. ([@ghiculescu][])
+* [#650](https://github.com/CanCanCommunity/cancancan/pull/650): Support associations in rules. ([@Liberatys][])
+* [#657](https://github.com/CanCanCommunity/cancancan/pull/657): Support for Rails 6.1. ([@ghiculescu][])
 * [#655](https://github.com/CanCanCommunity/cancancan/pull/655): Add option for `accessible_by` querying strategy. ([@ghiculescu][])
 
 ## 3.1.0

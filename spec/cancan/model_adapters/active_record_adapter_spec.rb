@@ -586,6 +586,125 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
     end
   end
 
+  context 'when an association is used to create a rule' do
+    before do
+      ActiveRecord::Schema.define do
+        create_table(:foos) do |t|
+          t.string :name
+        end
+        create_table(:bars) do |t|
+          t.string :name
+        end
+        create_table :roles do |t|
+          t.string :name
+
+          t.timestamps
+        end
+        create_table :user_roles do |t|
+          t.references :user, foreign_key: true
+          t.references :role, foreign_key: true
+          t.references :subject, polymorphic: true
+
+          t.timestamps
+        end
+      end
+
+      class Foo < ActiveRecord::Base
+        has_many :user_roles, as: :subject
+      end
+
+      class Bar < ActiveRecord::Base
+        has_many :user_roles, as: :subject
+      end
+
+      class Role < ActiveRecord::Base
+        has_many :user_roles
+        has_many :users, through: :user_roles
+        has_many :foos, through: :user_roles
+        has_many :bars, through: :user_roles
+      end
+
+      class UserRole < ActiveRecord::Base
+        belongs_to :user
+        belongs_to :role
+        belongs_to :subject, polymorphic: true, required: false
+      end
+    end
+
+    it 'allows for access with association' do
+      user = User.create!
+      foo = Foo.create(name: 'foo')
+      role = Role.create(name: 'adviser')
+      UserRole.create(user: user, role: role, subject: foo)
+      ability = Ability.new(user)
+      ability.can :read, Foo, user_roles: { user: user }
+      expect(ability.can?(:read, Foo)).to eq(true)
+    end
+
+    it 'allows for access with association with accesible_by' do
+      user = User.new
+      foo = Foo.create(name: 'foo')
+      bar = Bar.create(name: 'bar')
+      role = Role.create(name: 'adviser')
+      UserRole.create(user: user, role: role, subject: foo)
+      UserRole.create(user: user, role: role, subject: bar)
+      ability = Ability.new(user)
+      ability.can :read, Foo, user_roles: { user: user }
+      expect(Foo.accessible_by(ability)).to match_array([foo])
+      expect(Bar.accessible_by(ability)).to match_array([])
+    end
+
+    it 'blocks access with association' do
+      user = User.create!
+      foo = Foo.create(name: 'foo')
+      role = Role.create(name: 'adviser')
+      UserRole.create(user: user, role: role, subject: foo)
+      ability = Ability.new(user)
+      ability.cannot :read, Foo, user_roles: { user: user }
+      expect(ability.can?(:read, Foo)).to eq(false)
+    end
+
+    it 'blocks access with association for accesible_by' do
+      user = User.create!
+      foo = Foo.create(name: 'foo')
+      role = Role.create(name: 'adviser')
+      UserRole.create(user: user, role: role, subject: foo)
+      ability = Ability.new(user)
+      ability.cannot :read, Foo, user_roles: { user: user }
+      expect(Foo.accessible_by(ability)).to match_array([])
+      expect(ability.can?(:read, Foo)).to eq(false)
+    end
+
+    it 'manages access with multiple models and users' do
+      (0..5).each do |index|
+        user = User.create!
+        foo = Foo.create(name: 'foo')
+        role = Role.create(name: "adviser_#{index}")
+        UserRole.create(user: user, role: role, subject: foo)
+      end
+
+      user = User.first
+
+      Foo.all.each do |foo|
+        role = Role.create(name: 'new_user')
+        UserRole.create(user: user, role: role, subject: foo)
+      end
+
+      ability = Ability.new(user)
+      ability.can :read, Foo, user_roles: { user: user }
+      expect(Foo.accessible_by(ability).count).to eq(Foo.count)
+
+      User.where.not(id: user.id).each do |limited_permission_user|
+        ability = Ability.new(limited_permission_user)
+        expect(ability.can?(:read, Foo)).to eq(false)
+        expect(Foo.accessible_by(ability).count).to eq(0)
+        ability.can :read, Foo, user_roles: { user: limited_permission_user }
+        expect(ability.can?(:read, Foo)).to eq(true)
+        expect(Foo.accessible_by(ability).count).to eq(1)
+      end
+    end
+  end
+
   context 'when a table references another one twice' do
     before do
       ActiveRecord::Schema.define do
