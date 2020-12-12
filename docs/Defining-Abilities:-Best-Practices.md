@@ -1,3 +1,5 @@
+# Defining Abilities: Best Practices
+
 ## Use hash conditions as much as possible
 
 Here's why:
@@ -48,7 +50,7 @@ Here's why:
 
 **4. For complex object graphs, hash conditions accommodate `joins` easily.**
 
-  See https://github.com/CanCanCommunity/cancancan/wiki/defining-abilities#hash-of-conditions.
+  See https://github.com/CanCanCommunity/cancancan/blob/develop/docs/Defining-Abilities.md#hash-of-conditions.
 
 ## Give permissions, don't take them away
 

@@ -116,7 +116,7 @@ Almost anything that you can pass to a hash of conditions in Active Record will 
 can :manage, Project, group: { id: user.group_ids }
 ```
 
-If you have a complex case which cannot be done through a hash of conditions, see [[Defining Abilities with Blocks]].
+If you have a complex case which cannot be done through a hash of conditions, see [Defining Abilities with Blocks](./Defining-Abilities-with-Blocks.md).
 
 ## Traverse associations
 
@@ -161,13 +161,13 @@ can :manage, Project
 cannot :destroy, Project
 ```
 
-The order of these calls is important. See [[Ability Precedence]] for more details.
+The order of these calls is important. See [Ability Precedence](./Ability-Precedence.md) for more details.
 
 ## Additional Docs
 
-* [[Defining Abilities: Best Practices]]
-* [[Defining Abilities with Blocks]]
-* [[Checking Abilities]]
-* [[Testing Abilities]]
-* [[Debugging Abilities]]
-* [[Ability Precedence]]
+* [Defining Abilities: Best Practices](./Defining-Abilities:-Best-Practices.md)
+* [Defining Abilities with Blocks](./Defining-Abilities-with-Blocks.md)
+* [Checking Abilities](./Checking-Abilities.md)
+* [Testing Abilities](./Testing-Abilities.md)
+* [Debugging Abilities](./Debugging-Abilities.md)
+* [Ability Precedence](./Ability-Precedence.md)

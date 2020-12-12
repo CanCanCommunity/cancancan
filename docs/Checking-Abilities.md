@@ -1,4 +1,4 @@
-After [[abilities are defined|Defining Abilities]], you can use the `can?` method in the controller or view to check the user's permission for a given action and object.
+After [Defining Abilities](https://github.com/CanCanCommunity/cancancan/blob/develop/docs/Defining-Abilities.md), you can use the `can?` method in the controller or view to check the user's permission for a given action and object.
 
 ```ruby
 can? :destroy, @project
@@ -45,7 +45,7 @@ Article.accessible_by(current_ability).count == Article.count
 
 ## Additional Docs
 
-* [[Defining Abilities]]
-* [[Ability Precedence]]
-* [[Debugging Abilities]]
-* [[Testing Abilities]]
+* [Defining Abilities](https://github.com/CanCanCommunity/cancancan/blob/develop/docs/Defining-Abilities.md)
+* [Ability Precedence](https://github.com/CanCanCommunity/cancancan/blob/develop/docs/Ability-Precedence.md)
+* [Debugging Abilities](https://github.com/CanCanCommunity/cancancan/blob/develop/docs/Debugging-Abilities.md)
+* [Testing Abilities](https://github.com/CanCanCommunity/cancancan/blob/develop/docs/Testing-Abilities.md)
