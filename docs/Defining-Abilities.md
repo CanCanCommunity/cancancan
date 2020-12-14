@@ -116,6 +116,13 @@ Almost anything that you can pass to a hash of conditions in Active Record will 
 can :manage, Project, group: { id: user.group_ids }
 ```
 
+Or if you want to a negative match, you can pass in `nil`.
+
+```ruby
+# Can manage projects that don't have any members.
+can :manage, Project, members: { id: nil }
+```
+
 If you have a complex case which cannot be done through a hash of conditions, see [Defining Abilities with Blocks](./Defining-Abilities-with-Blocks.md).
 
 ## Traverse associations
