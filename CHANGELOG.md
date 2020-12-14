@@ -1,6 +1,10 @@
 ## Unreleased
 
-* [#618](https://github.com/CanCanCommunity/cancancan/pull/618): Add support for using an nil relation as a condition. ([@ghiculescu][])
+* [#653](https://github.com/CanCanCommunity/cancancan/pull/653): Add support for using an nil relation as a condition. ([@ghiculescu][])
+
+## 3.2.1
+
+* [#674](https://github.com/CanCanCommunity/cancancan/pull/674): Fix accidental dependency on ActiveRecord in 3.2.0. ([@ghiculescu][])
 
 ## 3.2.0
 
