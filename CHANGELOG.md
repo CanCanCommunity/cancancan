@@ -1,3 +1,7 @@
+## 3.2.1
+
+* [#674](https://github.com/CanCanCommunity/cancancan/pull/674): Fix accidental dependency on ActiveRecord in 3.2.0. ([@ghiculescu][])
+
 ## 3.2.0
 
 * [#649](https://github.com/CanCanCommunity/cancancan/pull/649): Add support for Single Table Inheritance. ([@Liberatys][])
