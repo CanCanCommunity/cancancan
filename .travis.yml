@@ -31,6 +31,12 @@ matrix:
   - rvm: 2.4.2
     gemfile: gemfiles/activerecord_6.0.0.gemfile
   - rvm: 2.2.6
+    gemfile: gemfiles/activerecord_6.1.0.gemfile
+  - rvm: 2.3.5
+    gemfile: gemfiles/activerecord_6.1.0.gemfile
+  - rvm: 2.4.2
+    gemfile: gemfiles/activerecord_6.1.0.gemfile
+  - rvm: 2.2.6
     gemfile: gemfiles/activerecord_master.gemfile
   - rvm: 2.3.5
     gemfile: gemfiles/activerecord_master.gemfile
