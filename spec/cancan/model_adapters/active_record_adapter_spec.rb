@@ -660,7 +660,7 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
     expect(@ability.can?(:read, a2)).to eq(true) # true because has comments but they have spam=true
     expect(@ability.can?(:read, a3)).to eq(false) # false because has comments but none with spam=true
 
-    expect(Article.accessible_by(@ability)).to eq([a1, a2])
+    expect(Article.accessible_by(@ability).sort_by(&:id)).to eq([a1, a2].sort_by(&:id))
 
     if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
       expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
