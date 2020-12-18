@@ -32,6 +32,9 @@ jobs:
           - gemfile: 'gemfiles/activerecord_master.gemfile'
             ruby: 'jruby' # this *should* work. it seems like there's an issue with rails 6 on jruby.
 
+    env:
+      BUNDLE_GEMFILE: ${{ matrix.gemfile }}
+
     services:
       postgres:
         image: postgres
@@ -66,13 +69,13 @@ jobs:
         if: ${{ matrix.ruby == 'truffleruby' }}
 
       - name: Install gems
-        run: BUNDLE_GEMFILE=${{ matrix.gemfile }} bundle install --jobs 2
+        run: bundle install --jobs 2
 
       - name: Run linter
-        run: BUNDLE_GEMFILE=${{ matrix.gemfile }} bundle exec rubocop
+        run: bundle exec rubocop
 
       - name: Run tests on sqlite
-        run: DB=sqlite BUNDLE_GEMFILE=${{ matrix.gemfile }} bundle exec rake
+        run: DB=sqlite bundle exec rake
 
       - name: Run tests on postgres
-        run: DB=postgres BUNDLE_GEMFILE=${{ matrix.gemfile }} bundle exec rake
+        run: DB=postgres bundle exec rake
