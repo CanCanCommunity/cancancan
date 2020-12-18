@@ -60,10 +60,9 @@ jobs:
       - name: Install bundler
         run: gem install bundler
 
-      # https://github.com/oracle/truffleruby/issues/62#issuecomment-362065726
-      # TODO: can't get this to work on Github actions. see comments in https://github.com/CanCanCommunity/cancancan/pull/669
+      # https://github.com/CanCanCommunity/cancancan/pull/669#issuecomment-748019539
       - name: Nokogiri support for Truffleruby
-        run: BUNDLE_GEMFILE=${{ matrix.gemfile }} bundle config build.nokogiri --use-system-libraries
+        run: sudo apt-get -yqq install libxml2-dev libxslt-dev
         if: ${{ matrix.ruby == 'truffleruby' }}
 
       - name: Install gems
