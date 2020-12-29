@@ -6,12 +6,11 @@ module CanCan
       class << self
         def normalize(rules)
           rules_cache = []
-          rules.delete_if.with_index do |rule, _index|
-            subjects = rule.subjects.select do |subject|
-              next if subject == :all || subject.descends_from_active_record?
+          return unless defined?(ActiveRecord::Base)
 
-              rules_cache.push(build_rule_for_subclass(rule, subject))
-              true
+          rules.delete_if do |rule|
+            subjects = rule.subjects.select do |subject|
+              update_rule(subject, rule, rules_cache)
             end
             subjects.length == rule.subjects.length
           end
@@ -19,6 +18,15 @@ module CanCan
         end
 
         private
+
+        def update_rule(subject, rule, rules_cache)
+          return false unless subject.respond_to?(:descends_from_active_record?)
+          return false if subject == :all || subject.descends_from_active_record?
+          return false unless subject < ActiveRecord::Base
+
+          rules_cache.push(build_rule_for_subclass(rule, subject))
+          true
+        end
 
         # create a new rule for the subclasses that links on the inheritance_column
         def build_rule_for_subclass(rule, subject)
