@@ -25,7 +25,7 @@ module CanCan
       attributes, extra_args = parse_attributes_from_extra_args(extra_args)
       condition_and_block_check(extra_args, block, action, subject)
       @match_all = action.nil? && subject.nil?
-      raise Error, "Subject is required for #{action}" if action && subject.nil?
+      return nil if action && subject.nil?
 
       @base_behavior = base_behavior
       @actions = wrap(action)

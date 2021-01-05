@@ -142,7 +142,8 @@ module CanCan
     #   end
     #
     def can(action = nil, subject = nil, *attributes_and_conditions, &block)
-      add_rule(Rule.new(true, action, subject, *attributes_and_conditions, &block))
+      role = Rule.new(true, action, subject, *attributes_and_conditions, &block)
+      add_rule(role) if role.present?
     end
 
     # Defines an ability which cannot be done. Accepts the same arguments as "can".

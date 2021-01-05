@@ -21,10 +21,10 @@ module CanCan
       def add_rule_to_index(rule, position)
         @rules_index ||= Hash.new { |h, k| h[k] = [] }
 
-        subjects = rule.subjects.compact
-        subjects << :all if subjects.empty?
+        subjects = rule.subjects&.compact
+        subjects << :all if subjects&.empty?
 
-        subjects.each do |subject|
+        subjects&.each do |subject|
           @rules_index[subject] << position
         end
       end
