@@ -36,6 +36,11 @@ of models automatically and reduce duplicated code.
 </a>
 <br/>
 <br/>
+<a href="https://bullettrain.co" target="_blank">
+  <img src="./logo/bullet_train.png" alt="Bullet Train" width="350"/>
+</a>
+<br/>
+<br/>
 
 Do you want to sponsor CanCanCan and show your logo here?
 Check our [Sponsors Page](https://github.com/sponsors/coorasse).
