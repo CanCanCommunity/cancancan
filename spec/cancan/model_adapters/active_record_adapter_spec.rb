@@ -966,14 +966,14 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
       expect(Suzuki.accessible_by(ability)).to match_array([suzuki])
     end
 
-    it 'recognises rules applied to subclasses' do
+    it 'does not recognise rules applied to subclasses' do
       u1 = User.create!(name: 'pippo')
       car = Car.create!
       Motorbike.create!
 
       ability = Ability.new(u1)
       ability.can :read, [Car]
-      expect(Vehicle.accessible_by(ability)).to match_array([car])
+      expect(Vehicle.accessible_by(ability)).to match_array([])
       expect(Car.accessible_by(ability)).to eq([car])
       expect(Motorbike.accessible_by(ability)).to eq([])
     end
@@ -984,7 +984,7 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
       Motorbike.create!
       ability = Ability.new(u1)
       ability.can :read, [Suzuki]
-      expect(Motorbike.accessible_by(ability)).to eq([suzuki])
+      expect(Motorbike.accessible_by(ability)).not_to eq([suzuki])
     end
 
     it 'recognises rules applied to subclass of subclass even with be_able_to' do
@@ -994,6 +994,13 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
       ability.can :read, [Motorbike]
       expect(ability).to be_able_to(:read, motorbike)
       expect(ability).to be_able_to(:read, Suzuki.new)
+    end
+    it 'does not effect parent definition with rules' do
+      u1 = User.create!(name: 'pippo')
+      ability = Ability.new(u1)
+      ability.can :manage, [Suzuki]
+      expect(ability).to be_able_to(:manage, Suzuki)
+      expect(ability).not_to be_able_to(:manage, Motorbike)
     end
   end
 end

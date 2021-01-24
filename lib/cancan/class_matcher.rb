@@ -4,22 +4,18 @@
 class SubjectClassMatcher
   def self.matches_subject_class?(subjects, subject)
     subjects.any? do |sub|
-      has_subclasses = subject.respond_to?(:subclasses)
-      matching_class_check(subject, sub, has_subclasses)
+      matching_class_check(subject, sub)
     end
   end
 
-  def self.matching_class_check(subject, sub, has_subclasses)
-    matches = matches_class_or_is_related(subject, sub)
-    if has_subclasses
-      matches || subject.subclasses.include?(sub)
-    else
-      matches
-    end
+  def self.matching_class_check(subject, sub)
+    matches_class_or_is_related(subject, sub)
   end
 
   def self.matches_class_or_is_related(subject, sub)
-    sub.is_a?(Module) && (subject.is_a?(sub) ||
+    return false unless sub.is_a?(Module)
+
+    (subject.is_a?(sub) ||
         subject.class.to_s == sub.to_s ||
         (subject.is_a?(Module) && subject.ancestors.include?(sub)))
   end
