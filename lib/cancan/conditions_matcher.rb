@@ -18,10 +18,14 @@ module CanCan
       [Class, Module].include? klass
     end
 
-    def matches_block_conditions(subject, *extra_args)
+    def matches_block_conditions(subject, attribute, *extra_args)
       return @base_behavior if subject_class?(subject)
 
-      @block.call(subject, *extra_args.compact)
+      if attribute
+        @block.call(subject, attribute, *extra_args)
+      else
+        @block.call(subject, *extra_args)
+      end
     end
 
     def matches_non_block_conditions(subject)

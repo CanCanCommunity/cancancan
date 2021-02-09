@@ -127,6 +127,17 @@ describe CanCan::Ability do
     expect(@block_called).to be(true)
   end
 
+  it 'allows passing nil as extra arguments' do
+    @ability.can :to_s, Integer do |integer, arg_1, arg_2|
+      expect(integer).to eq(42)
+      expect(arg_1).to eq(nil)
+      expect(arg_2).to eq(:foo)
+      @block_called = true
+    end
+    @ability.can?(:to_s, 42, nil, nil, :foo)
+    expect(@block_called).to be(true)
+  end
+
   it 'passes nil to object when comparing class with can check' do
     @ability.can do |action, object_class, object|
       expect(action).to eq(:foo)
