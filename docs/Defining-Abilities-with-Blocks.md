@@ -94,8 +94,8 @@ Here the block will be triggered for every `can?` check, even when only a class 
 
 ## Additional Docs
 
-* [[Defining Abilities]]
-* [[Checking Abilities]]
-* [[Testing Abilities]]
-* [[Debugging Abilities]]
-* [[Ability Precedence]]
+* [Defining Abilities](https://github.com/CanCanCommunity/cancancan/blob/develop/docs/Defining-Abilities.md)
+* [Checking Abilities](https://github.com/CanCanCommunity/cancancan/blob/develop/docs/Checking-Abilities.md)
+* [Testing Abilities](https://github.com/CanCanCommunity/cancancan/blob/develop/docs/Testing-Abilities.md)
+* [Debugging Abilities](https://github.com/CanCanCommunity/cancancan/blob/develop/docs/Debugging-Abilities.md)
+* [Ability Precedence](https://github.com/CanCanCommunity/cancancan/blob/develop/docs/Ability-Precedence.md)
