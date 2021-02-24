@@ -6,7 +6,7 @@ module CanCan
       AbstractAdapter.inherited(self)
 
       def self.for_class?(model_class)
-        version_greater_or_equal?('5.0.0') && model_class <= ActiveRecord::Base
+        version_greater_or_equal?('5.0.0') && version_lower?('6.1.0') && model_class <= ActiveRecord::Base
       end
 
       # rails 5 is capable of using strings in enum

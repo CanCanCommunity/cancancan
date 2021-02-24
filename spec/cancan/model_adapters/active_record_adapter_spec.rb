@@ -134,7 +134,12 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
       end
 
       it 'is for only active record classes' do
-        if ActiveRecord.version > Gem::Version.new('5')
+        if ActiveRecord.version > Gem::Version.new('6.1')
+          expect(CanCan::ModelAdapters::ActiveRecord61Adapter).to_not be_for_class(Object)
+          expect(CanCan::ModelAdapters::ActiveRecord61Adapter).to be_for_class(Article)
+          expect(CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article))
+            .to eq(CanCan::ModelAdapters::ActiveRecord61Adapter)
+        elsif ActiveRecord.version > Gem::Version.new('5')
           expect(CanCan::ModelAdapters::ActiveRecord5Adapter).to_not be_for_class(Object)
           expect(CanCan::ModelAdapters::ActiveRecord5Adapter).to be_for_class(Article)
           expect(CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article))
