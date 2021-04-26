@@ -7,11 +7,11 @@ def show
 end
 ```
 
-However that can be tedious to apply to each action. Instead you can use the `load_and_authorize_resource` method in your controller to load the resource into an instance variable and authorize it automatically for every action in that controller.
+However that can be tedious to apply to each action. Instead you can use the `load_and_authorize_resource!` method in your controller to load the resource into an instance variable and authorize it automatically for every action in that controller.
 
 ```ruby
 class ProductsController < ActionController::Base
-  load_and_authorize_resource
+  load_and_authorize_resource!
 end
 ```
 
@@ -24,22 +24,22 @@ class ProductsController < ActionController::Base
 end
 ```
 
-As of CanCan 1.5 you can use the `skip_load_and_authorize_resource`, `skip_load_resource` or `skip_authorize_resource` methods to skip any of the applied behavior and specify specific actions like in a before filter. For example.
+As of CanCan 1.5 you can use the `skip_load_and_authorize_resource!`, `skip_load_resource` or `skip_authorize_resource` methods to skip any of the applied behavior and specify specific actions like in a before filter. For example.
 
 ```ruby
 class ProductsController < ActionController::Base
-  load_and_authorize_resource
+  load_and_authorize_resource!
   skip_authorize_resource :only => :new
 end
 ```
 
 **important notice about `:manage` rules**
 
-Using `load_and_authorize_resource` with a rule like `can :manage, Article, id: 23` will allow rendering the `new` method of the ArticlesController, which is unexpected because this rule naively reads as _"the user can manage the existing article with id 23"_, which should have nothing to do with creating new articles.
+Using `load_and_authorize_resource!` with a rule like `can :manage, Article, id: 23` will allow rendering the `new` method of the ArticlesController, which is unexpected because this rule naively reads as _"the user can manage the existing article with id 23"_, which should have nothing to do with creating new articles.
 
 But in reality the rule means _"the user can manage any article object with an id field set to 23"_, which includes creating a new Article with the id set to 23 like `Article.new(id: 23)`.
 
-Thus `load_and_authorize_resource` will initialize a model in the `:new` action and set its id to 23, and happily render the page. Saving will not work though.
+Thus `load_and_authorize_resource!` will initialize a model in the `:new` action and set its id to 23, and happily render the page. Saving will not work though.
 
 The correct intended rule to avoid `new` being allowed would be:
 
@@ -56,7 +56,7 @@ By default this will apply to **every action** in the controller even if it is n
 
 ```ruby
 class ProductsController < ActionController::Base
-  load_and_authorize_resource
+  load_and_authorize_resource!
   def discontinue
     # Automatically does the following:
     # @product = Product.find(params[:id])
@@ -68,7 +68,7 @@ end
 You can specify which actions to affect using the `:except` and `:only` options, just like a `before_action`.
 
 ```ruby
-load_and_authorize_resource :only => [:index, :show]
+load_and_authorize_resource! :only => [:index, :show]
 ```
 ### Choosing actions on nested resources 
 
@@ -76,8 +76,8 @@ For this you can pass a name to skip_authorize_resource.
 For example:
 ```ruby
 class CommentsController < ApplicationController
-  load_and_authorize_resource :post
-  load_and_authorize_resource :through => :post
+  load_and_authorize_resource! :post
+  load_and_authorize_resource! :through => :post
 
   skip_authorize_resource :only => :show  
   skip_authorize_resource :post, :only => :show
@@ -142,7 +142,7 @@ If the model is named differently than the controller, then you may explicitly n
 
 ```ruby
 class ArticlesController < ApplicationController
-  load_and_authorize_resource :post, :parent => false
+  load_and_authorize_resource! :post, :parent => false
 end
 ```
 
@@ -150,7 +150,7 @@ If the model class is namespaced differently than the controller you will need t
 
 ```ruby
 class ProductsController < ApplicationController
-  load_and_authorize_resource :class => "Store::Product"
+  load_and_authorize_resource! :class => "Store::Product"
 end
 ```
 
@@ -171,7 +171,7 @@ The resource will only be loaded into an instance variable if it hasn't been alr
 ```ruby
 class BooksController < ApplicationController
   before_action :find_published_book, :only => :show
-  load_and_authorize_resource
+  load_and_authorize_resource!
 
   private
 
@@ -181,7 +181,7 @@ class BooksController < ApplicationController
 end
 ```
 
-It is important that any custom loading behavior happens **before** the call to `load_and_authorize_resource`. If you have `authorize_resource` in your `ApplicationController` then you need to use `prepend_before_action` to do the loading in the controller subclasses so it happens before authorization.
+It is important that any custom loading behavior happens **before** the call to `load_and_authorize_resource!`. If you have `authorize_resource` in your `ApplicationController` then you need to use `prepend_before_action` to do the loading in the controller subclasses so it happens before authorization.
 
 ## authorize_resource
 

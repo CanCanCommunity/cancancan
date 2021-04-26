@@ -1,8 +1,8 @@
-CanCan provides a convenient `load_and_authorize_resource` method in the controller, but what exactly is this doing? It sets up a before filter for every action to handle the loading and authorization of the controller. Let's say we have a typical RESTful controller with that line at the top.
+CanCan provides a convenient `load_and_authorize_resource!` method in the controller, but what exactly is this doing? It sets up a before filter for every action to handle the loading and authorization of the controller. Let's say we have a typical RESTful controller with that line at the top.
 
 ```ruby
 class ProjectsController < ApplicationController
-  load_and_authorize_resource
+  load_and_authorize_resource!
   # ...
 end
 ```
@@ -67,4 +67,4 @@ end
 
 The most complex behavior is inside the new and create actions. There it is setting some initial attribute values based on what the given user has permission to access. For example, if the user is only allowed to create projects where the "visible" attribute is true, then it would automatically set this upon building it.
 
-See [[Authorizing Controller Actions]] for details on what options you can pass to the `load_and_authorize_resource`.
+See [[Authorizing Controller Actions]] for details on what options you can pass to the `load_and_authorize_resource!`.

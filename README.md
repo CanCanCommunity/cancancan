@@ -127,13 +127,13 @@ end
 
 ### 3.2 Loaders
 
-Setting this for every action can be tedious, therefore the `load_and_authorize_resource` method is provided to
+Setting this for every action can be tedious, therefore the `load_and_authorize_resource!` method is provided to
 automatically authorize all actions in a RESTful style resource controller.
 It will use a before action to load the resource into an instance variable and authorize it for every action.
 
 ```ruby
 class PostsController < ApplicationController
-  load_and_authorize_resource
+  load_and_authorize_resource!
 
   def show
     # @post is already loaded and authorized
@@ -177,13 +177,13 @@ controller will respond to the following methods (in order):
 2. `<model_name>_params` such as `post_params` (this is the default convention in rails for naming your param method)
 3. `resource_params` (a generically named method you could specify in each controller)
 
-Additionally, `load_and_authorize_resource` can now take a `param_method` option to specify a custom method in the controller to run to sanitize input.
+Additionally, `load_and_authorize_resource!` can now take a `param_method` option to specify a custom method in the controller to run to sanitize input.
 
 You can associate the `param_method` option with a symbol corresponding to the name of a method that will get called:
 
 ```ruby
 class PostsController < ApplicationController
-  load_and_authorize_resource param_method: :my_sanitizer
+  load_and_authorize_resource! param_method: :my_sanitizer
 
   def create
     if @post.save
@@ -203,11 +203,11 @@ end
 
 You can also use a string that will be evaluated in the context of the controller using `instance_eval` and needs to contain valid Ruby code.
 
-    load_and_authorize_resource param_method: 'permitted_params.post'
+    load_and_authorize_resource! param_method: 'permitted_params.post'
 
 Finally, it's possible to associate `param_method` with a Proc object which will be called with the controller as the only argument:
 
-    load_and_authorize_resource param_method: Proc.new { |c| c.params.require(:post).permit(:name) }
+    load_and_authorize_resource! param_method: Proc.new { |c| c.params.require(:post).permit(:name) }
 
 See [Strong Parameters](./docs/Strong-Parameters.md) for more information.
 

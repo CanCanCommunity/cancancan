@@ -340,6 +340,13 @@ describe CanCan::ControllerResource do
       resource.load_and_authorize_resource
     end
 
+    it 'calls load_resource and authorize_resource for load_and_authorize_resource! (BANG)' do
+      resource = CanCan::ControllerResource.new(controller)
+      expect(resource).to receive(:load_resource)
+      expect(resource).to receive(:authorize_resource)
+      resource.load_and_authorize_resource!
+    end
+
     it 'loads resource through the association of another parent resource using instance variable' do
       category = double(models: {})
       controller.instance_variable_set(:@category, category)

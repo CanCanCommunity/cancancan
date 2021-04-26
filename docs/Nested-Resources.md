@@ -10,8 +10,8 @@ We can then tell CanCanCan to load the project and then load the task through th
 
 ```ruby
 class TasksController < ApplicationController
-  load_and_authorize_resource :project
-  load_and_authorize_resource :task, through: :project
+  load_and_authorize_resource! :project
+  load_and_authorize_resource! :task, through: :project
 end
 ```
 
@@ -21,8 +21,8 @@ If the name of the association doesn't match the resource name, for instance `ha
 
 ```ruby
   class TasksController < ApplicationController
-    load_and_authorize_resource :project
-    load_and_authorize_resource :task, through: :project, through_association: :issues
+    load_and_authorize_resource! :project
+    load_and_authorize_resource! :task, through: :project, through_association: :issues
   end
 ```
 
@@ -35,7 +35,7 @@ It's also possible to nest through a method, this is commonly the `current_user`
 
 ```ruby
 class ProjectsController < ApplicationController
-  load_and_authorize_resource through: :current_user
+  load_and_authorize_resource! through: :current_user
 end
 ```
 
@@ -48,8 +48,8 @@ If you want it to be optional (such as with shallow routes), add the `shallow: t
 
 ```ruby
 class TasksController < ApplicationController
-  load_and_authorize_resource :project
-  load_and_authorize_resource :task, through: :project, shallow: true
+  load_and_authorize_resource! :project
+  load_and_authorize_resource! :task, through: :project, shallow: true
 end
 ```
 
@@ -59,8 +59,8 @@ What if each project only had one task through a `has_one` association? To set u
 
 ```ruby
 class TasksController < ApplicationController
-  load_and_authorize_resource :project
-  load_and_authorize_resource :task, through: :project, singleton: true
+  load_and_authorize_resource! :project
+  load_and_authorize_resource! :task, through: :project, singleton: true
 end
 ```
 
@@ -73,7 +73,7 @@ Let's say tasks can either be assigned to a Project or an Event through a polymo
 ```ruby
 load_resource :project
 load_resource :event
-load_and_authorize_resource :task, through: [:project, :event]
+load_and_authorize_resource! :task, through: [:project, :event]
 ```
 
 Here it will check both the `@project` and `@event` variables and fetch the task through whichever one exists. Note that this is only loading the parent model, if you want to authorize the parent you will need to do it through a before_action because there is special logic involved.
@@ -143,8 +143,8 @@ and in the controller:
 
 ```ruby
 class UsersController < ApplicationController
-  load_and_authorize_resource :group
-  load_and_authorize_resource through: :group
+  load_and_authorize_resource! :group
+  load_and_authorize_resource! through: :group
 ```
 
 in ability.rb

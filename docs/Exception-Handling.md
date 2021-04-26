@@ -87,7 +87,7 @@ end
 
 Please read [this thread](https://github.com/CanCanCommunity/cancancan/issues/437) for more information.
 
-In a Rails application, if a record is not found during `load_and_authorize_resource` it raises `ActiveRecord::NotFound` before it checks _authentication_ in the `authorize` step.
+In a Rails application, if a record is not found during `load_and_authorize_resource!` it raises `ActiveRecord::NotFound` before it checks _authentication_ in the `authorize` step.
 
 This means that secured routes can have their resources discovered without even being signed in:
 

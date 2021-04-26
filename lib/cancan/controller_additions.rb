@@ -15,6 +15,7 @@ module CanCan
       def load_and_authorize_resource(*args)
         cancan_resource_class.add_before_action(self, :load_and_authorize_resource, *args)
       end
+      alias load_and_authorize_resource! load_and_authorize_resource
 
       # Sets up a before filter which loads the model resource into an instance variable.
       # For example, given an ArticlesController it will load the current article into the @article

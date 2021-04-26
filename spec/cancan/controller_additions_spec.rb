@@ -49,6 +49,11 @@ describe CanCan::ControllerAdditions do
     @controller_class.load_and_authorize_resource foo: :bar, prepend: true
   end
 
+  it 'load_and_authorize_resource is aliased by load_and_authorize_resource!' do
+    expect(@controller_class.method(:load_and_authorize_resource!))
+      .to be(@controller_class.method(:load_and_authorize_resource))
+  end
+
   it 'authorize_resource setups a before filter which passes call to ControllerResource' do
     expect(cancan_resource_class = double).to receive(:authorize_resource)
     allow(CanCan::ControllerResource).to receive(:new).with(@controller, nil, foo: :bar) { cancan_resource_class }
