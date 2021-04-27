@@ -1020,75 +1020,78 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
         self.abstract_class = true
       end
 
-      class Vehicle < ApplicationRecord
-      end
+      module StiTest
+        class Vehicle < ApplicationRecord
+          self.store_full_sti_class = false
+        end
 
-      class Car < Vehicle
-      end
+        class Car < Vehicle
+        end
 
-      class Motorbike < Vehicle
-      end
+        class Motorbike < Vehicle
+        end
 
-      class Suzuki < Motorbike
+        class Suzuki < Motorbike
+        end
       end
     end
 
     it 'recognises rules applied to the base class' do
       u1 = User.create!(name: 'pippo')
 
-      car = Car.create!
-      motorbike = Motorbike.create!
+      car = StiTest::Car.create!
+      motorbike = StiTest::Motorbike.create!
 
       ability = Ability.new(u1)
-      ability.can :read, Vehicle
-      expect(Vehicle.accessible_by(ability)).to match_array([car, motorbike])
-      expect(Car.accessible_by(ability)).to match_array([car])
-      expect(Motorbike.accessible_by(ability)).to match_array([motorbike])
+      ability.can :read, StiTest::Vehicle
+      expect(StiTest::Vehicle.accessible_by(ability)).to match_array([car, motorbike])
+      expect(StiTest::Car.accessible_by(ability)).to match_array([car])
+      expect(StiTest::Motorbike.accessible_by(ability)).to match_array([motorbike])
     end
 
     it 'recognises rules applied to the base class multiple classes deep' do
       u1 = User.create!(name: 'pippo')
 
-      car = Car.create!
-      motorbike = Motorbike.create!
-      suzuki = Suzuki.create!
+      car = StiTest::Car.create!
+      motorbike = StiTest::Motorbike.create!
+      suzuki = StiTest::Suzuki.create!
 
       ability = Ability.new(u1)
-      ability.can :read, Vehicle
-      expect(Vehicle.accessible_by(ability)).to match_array([suzuki, car, motorbike])
-      expect(Car.accessible_by(ability)).to match_array([car])
-      expect(Motorbike.accessible_by(ability)).to match_array([suzuki, motorbike])
-      expect(Suzuki.accessible_by(ability)).to match_array([suzuki])
+      ability.can :read, StiTest::Vehicle
+      expect(StiTest::Vehicle.accessible_by(ability)).to match_array([suzuki, car, motorbike])
+      expect(StiTest::Car.accessible_by(ability)).to match_array([car])
+      expect(StiTest::Motorbike.accessible_by(ability)).to match_array([suzuki, motorbike])
+      expect(StiTest::Suzuki.accessible_by(ability)).to match_array([suzuki])
     end
 
     it 'recognises rules applied to subclasses' do
       u1 = User.create!(name: 'pippo')
-      car = Car.create!
-      Motorbike.create!
+      car = StiTest::Car.create!
+      StiTest::Motorbike.create!
 
       ability = Ability.new(u1)
-      ability.can :read, [Car]
-      expect(Vehicle.accessible_by(ability)).to match_array([car])
-      expect(Car.accessible_by(ability)).to eq([car])
-      expect(Motorbike.accessible_by(ability)).to eq([])
+      ability.can :read, [StiTest::Car]
+      expect(StiTest::Vehicle.accessible_by(ability)).to match_array([car])
+      expect(StiTest::Car.accessible_by(ability)).to eq([car])
+      expect(StiTest::Motorbike.accessible_by(ability)).to eq([])
     end
 
     it 'recognises rules applied to subclasses on 3 level' do
       u1 = User.create!(name: 'pippo')
-      suzuki = Suzuki.create!
-      Motorbike.create!
+      suzuki = StiTest::Suzuki.create!
+      StiTest::Motorbike.create!
       ability = Ability.new(u1)
-      ability.can :read, [Suzuki]
-      expect(Motorbike.accessible_by(ability)).to eq([suzuki])
+      ability.can :read, [StiTest::Suzuki]
+      expect(StiTest::Motorbike.accessible_by(ability)).to eq([suzuki])
     end
 
     it 'recognises rules applied to subclass of subclass even with be_able_to' do
       u1 = User.create!(name: 'pippo')
-      motorbike = Motorbike.create!
+      motorbike = StiTest::Motorbike.create!
       ability = Ability.new(u1)
-      ability.can :read, [Motorbike]
+      ability.can :read, [StiTest::Motorbike]
       expect(ability).to be_able_to(:read, motorbike)
-      expect(ability).to be_able_to(:read, Suzuki.new)
+      expect(ability).to be_able_to(:read, StiTest::Suzuki.new)
     end
   end
 end
