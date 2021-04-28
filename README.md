@@ -3,7 +3,7 @@
 <img src="./logo/cancancan.png" width="200" />
 
 [![Gem Version](https://badge.fury.io/rb/cancancan.svg)](http://badge.fury.io/rb/cancancan)
-[![Travis badge](https://travis-ci.org/CanCanCommunity/cancancan.svg?branch=develop)](https://travis-ci.org/CanCanCommunity/cancancan)
+[![Github Actions badge](https://github.com/CanCanCommunity/cancancan/actions/workflows/test.yml/badge.svg)](https://github.com/CanCanCommunity/cancancan/actions/workflows/test.yml/badge.svg)
 [![Code Climate Badge](https://codeclimate.com/github/CanCanCommunity/cancancan.svg)](https://codeclimate.com/github/CanCanCommunity/cancancan)
 
 [Wiki](./docs) |

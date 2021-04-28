@@ -20,7 +20,11 @@ jobs:
           - gemfile: 'gemfiles/activerecord_4.2.0.gemfile'
             ruby: '2.7' # rails 4.2 can't run on ruby 2.7 due to BigDecimal API change
           - gemfile: 'gemfiles/activerecord_4.2.0.gemfile'
-            ruby: '2.7' # TruffleRuby 21.0 targets Ruby 2.7, same as above
+            ruby: 'truffleruby' # TruffleRuby 21.0 targets Ruby 2.7, same as above
+          - gemfile: 'gemfiles/activerecord_master.gemfile'
+            ruby: '2.6' # rails 7+ requires ruby 3.0+
+          - gemfile: 'gemfiles/activerecord_master.gemfile'
+            ruby: '2.5' # rails 7+ requires ruby 3.0+
           - gemfile: 'gemfiles/activerecord_6.0.0.gemfile'
             ruby: '2.4' # rails 6+ requires ruby 2.5+
           - gemfile: 'gemfiles/activerecord_6.1.0.gemfile'
