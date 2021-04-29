@@ -41,6 +41,11 @@ of models automatically and reduce duplicated code.
 </a>
 <br/>
 <br/>
+<a href="https://jobs.goboony.com/fullstack-ruby-on-rails-developer" target="_blank">
+  <img src="./logo/goboony.png" alt="Goboony" width="310"/>
+</a>
+<br />
+<br />
 
 Do you want to sponsor CanCanCan and show your logo here?
 Check our [Sponsors Page](https://github.com/sponsors/coorasse).
