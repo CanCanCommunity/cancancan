@@ -280,7 +280,7 @@ If you find a bug please add an [issue on GitHub](https://github.com/CanCanCommu
 CanCanCan uses [appraisals](https://github.com/thoughtbot/appraisal) to test the code base against multiple versions
 of Rails, as well as the different model adapters.
 
-When first developing, you need to run `bundle install` and then `appraisal install`, to install the different sets.
+When first developing, you need to run `bundle install` and then `bundle exec appraisal install`, to install the different sets.
 
 You can then run all appraisal files (like CI does), with `appraisal rake` or just run a specific set `DB='sqlite' bundle exec appraisal activerecord_5.2.2 rake`.
 
