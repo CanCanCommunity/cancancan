@@ -33,12 +33,14 @@ module CanCan
       load_resource
       authorize_resource
     end
+    alias load_and_authorize_resource! load_and_authorize_resource
 
     def authorize_resource
       return if skip?(:authorize)
 
       @controller.authorize!(authorization_action, resource_instance || resource_class_with_parent)
     end
+    alias authorize_resource! authorize_resource
 
     def parent?
       @options.key?(:parent) ? @options[:parent] : @name && @name != name_from_controller.to_sym

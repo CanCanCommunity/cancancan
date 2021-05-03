@@ -46,12 +46,12 @@ describe CanCan::ControllerAdditions do
 
   it 'load_and_authorize_resource with :prepend prepends the before filter' do
     expect(@controller_class).to receive(:prepend_before_action).with({})
-    @controller_class.load_and_authorize_resource foo: :bar, prepend: true
+    @controller_class.load_and_authorize_resource foo: :bar
   end
 
   it 'load_and_authorize_resource is aliased by load_and_authorize_resource!' do
-    expect(@controller_class.method(:load_and_authorize_resource!))
-      .to be(@controller_class.method(:load_and_authorize_resource))
+    expect(@controller_class).to receive(:prepend_before_action).with(:double)
+    @controller_class.load_and_authorize_resource! :double
   end
 
   it 'authorize_resource setups a before filter which passes call to ControllerResource' do
