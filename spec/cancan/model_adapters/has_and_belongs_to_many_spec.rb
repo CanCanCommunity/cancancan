@@ -46,6 +46,38 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecord5Adapter do
   end
 
   unless CanCan::ModelAdapters::ActiveRecordAdapter.version_lower?('5.0.0')
+    describe 'fetching of records - double_exist_subquery strategy' do
+      before do
+        CanCan.accessible_by_strategy = :double_exist_subquery
+      end
+
+      it 'it retreives the records correctly' do
+        houses = House.accessible_by(ability)
+        expect(houses).to match_array [@house2, @house1]
+      end
+
+      if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
+        it 'generates the correct query' do
+          expect(ability.model_adapter(House, :read))
+            .to generate_sql("SELECT \"houses\".*
+                            FROM \"houses\"
+                            WHERE (EXISTS (SELECT 1
+                              FROM \"houses\" AS \"aliased_table\"
+                              WHERE
+                                \"aliased_table\".\"id\" = \"houses\".\"id\" AND
+                                EXISTS (SELECT 1
+                                  FROM \"houses\"
+                                  LEFT OUTER JOIN \"houses_people\" ON
+                                    \"houses_people\".\"house_id\" = \"houses\".\"id\"
+                                  LEFT OUTER JOIN \"people\" ON \"people\".\"id\" = \"houses_people\".\"person_id\"
+                                  WHERE
+                                    \"people\".\"id\" = #{@person1.id} AND
+                                    (\"houses\".\"id\" = \"aliased_table\".\"id\"))))
+                            ")
+        end
+      end
+    end
+
     describe 'fetching of records - subquery strategy' do
       before do
         CanCan.accessible_by_strategy = :subquery

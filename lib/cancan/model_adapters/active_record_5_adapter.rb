@@ -21,17 +21,57 @@ module CanCan
 
       private
 
+      delegate :connection, :quoted_primary_key, to: :@model_class
+      delegate :quote_table_name, to: :connection
+
       def build_joins_relation(relation, *where_conditions)
         case CanCan.accessible_by_strategy
         when :subquery
-          inner = @model_class.unscoped do
-            @model_class.left_joins(joins).where(*where_conditions)
-          end
-          @model_class.where(@model_class.primary_key => inner)
-
+          build_joins_relation_subquery(where_conditions)
         when :left_join
           relation.left_joins(joins).distinct
+        when :double_exist_subquery
+          build_joins_relation_double_exist_subquery(where_conditions)
         end
+      end
+
+      def build_joins_relation_subquery(where_conditions)
+        inner = @model_class.unscoped do
+          @model_class.left_joins(joins).where(*where_conditions)
+        end
+        @model_class.where(@model_class.primary_key => inner)
+      end
+
+      def build_joins_relation_double_exist_subquery(where_conditions)
+        @model_class.where("EXISTS (#{double_exists_query_sql(where_conditions)})")
+      end
+
+      def double_exists_inner_query(where_conditions)
+        @model_class
+          .unscoped
+          .select('1')
+          .left_joins(joins)
+          .where(*where_conditions)
+          .where(
+            "#{quoted_table_name}.#{quoted_primary_key} = " \
+            "#{quoted_aliased_table_name}.#{quoted_primary_key}"
+          )
+      end
+
+      def double_exists_query_sql(where_conditions)
+        'SELECT 1 ' \
+        "FROM #{quoted_table_name} AS #{quoted_aliased_table_name} " \
+        'WHERE ' \
+        "#{quoted_aliased_table_name}.#{quoted_primary_key} = #{quoted_table_name}.#{quoted_primary_key} AND " \
+        "EXISTS (#{double_exists_inner_query(where_conditions).to_sql})"
+      end
+
+      def quoted_aliased_table_name
+        @quoted_aliased_table_name ||= quote_table_name('aliased_table')
+      end
+
+      def quoted_table_name
+        @quoted_table_name ||= quote_table_name(@model_class.table_name)
       end
 
       def sanitize_sql(conditions)
