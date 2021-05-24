@@ -3,7 +3,7 @@
 <img src="./logo/cancancan.png" width="200" />
 
 [![Gem Version](https://badge.fury.io/rb/cancancan.svg)](http://badge.fury.io/rb/cancancan)
-[![Travis badge](https://travis-ci.org/CanCanCommunity/cancancan.svg?branch=develop)](https://travis-ci.org/CanCanCommunity/cancancan)
+[![Github Actions badge](https://github.com/CanCanCommunity/cancancan/actions/workflows/test.yml/badge.svg)](https://github.com/CanCanCommunity/cancancan/actions/workflows/test.yml/badge.svg)
 [![Code Climate Badge](https://codeclimate.com/github/CanCanCommunity/cancancan.svg)](https://codeclimate.com/github/CanCanCommunity/cancancan)
 
 [Wiki](./docs) |
@@ -36,6 +36,16 @@ of models automatically and reduce duplicated code.
 </a>
 <br/>
 <br/>
+<a href="https://bullettrain.co" target="_blank">
+  <img src="./logo/bullet_train.png" alt="Bullet Train" width="400"/>
+</a>
+<br/>
+<br/>
+<a href="https://jobs.goboony.com/fullstack-ruby-on-rails-developer" target="_blank">
+  <img src="./logo/goboony.png" alt="Goboony" width="310"/>
+</a>
+<br />
+<br />
 
 Do you want to sponsor CanCanCan and show your logo here?
 Check our [Sponsors Page](https://github.com/sponsors/coorasse).
@@ -275,7 +285,7 @@ If you find a bug please add an [issue on GitHub](https://github.com/CanCanCommu
 CanCanCan uses [appraisals](https://github.com/thoughtbot/appraisal) to test the code base against multiple versions
 of Rails, as well as the different model adapters.
 
-When first developing, you need to run `bundle install` and then `appraisal install`, to install the different sets.
+When first developing, you need to run `bundle install` and then `bundle exec appraisal install`, to install the different sets.
 
 You can then run all appraisal files (like CI does), with `appraisal rake` or just run a specific set `DB='sqlite' bundle exec appraisal activerecord_5.2.2 rake`.
 

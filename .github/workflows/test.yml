@@ -1,5 +1,5 @@
 name: Test & lint
-on: [push]
+on: [push, pull_request]
 
 env:
   RAILS_ENV: test
@@ -19,6 +19,12 @@ jobs:
         exclude:
           - gemfile: 'gemfiles/activerecord_4.2.0.gemfile'
             ruby: '2.7' # rails 4.2 can't run on ruby 2.7 due to BigDecimal API change
+          - gemfile: 'gemfiles/activerecord_4.2.0.gemfile'
+            ruby: 'truffleruby' # TruffleRuby 21.0 targets Ruby 2.7, same as above
+          - gemfile: 'gemfiles/activerecord_master.gemfile'
+            ruby: '2.6' # rails 7+ requires ruby 3.0+
+          - gemfile: 'gemfiles/activerecord_master.gemfile'
+            ruby: '2.5' # rails 7+ requires ruby 3.0+
           - gemfile: 'gemfiles/activerecord_6.0.0.gemfile'
             ruby: '2.4' # rails 6+ requires ruby 2.5+
           - gemfile: 'gemfiles/activerecord_6.1.0.gemfile'
@@ -55,21 +61,16 @@ jobs:
         with:
           fetch-depth: '20'
 
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: ${{ matrix.ruby }}
-
-      - name: Install bundler
-        run: gem install bundler
-
       # https://github.com/CanCanCommunity/cancancan/pull/669#issuecomment-748019539
       - name: Nokogiri support for Truffleruby
         run: sudo apt-get -yqq install libxml2-dev libxslt-dev
         if: ${{ matrix.ruby == 'truffleruby' }}
 
-      - name: Install gems
-        run: bundle install --jobs 2
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
 
       - name: Run linter
         run: bundle exec rubocop
