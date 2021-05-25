@@ -18,7 +18,7 @@ class Ability
 end
 ```
 
-The `current_user` model is passed into the initialize method, so the permissions can be modified based on any user attributes. CanCanCan makes no assumption about how roles are handled in your application. See [[Role Based Authorization]] for an example.
+The `current_user` model is passed into the initialize method, so the permissions can be modified based on any user attributes. CanCanCan makes no assumption about how roles are handled in your application. See [Role Based Authorization](./Role-Based-Authorization.md) for an example.
 
 ## The `can` Method
 
@@ -36,7 +36,7 @@ can :read, :all       # user can read any object
 can :manage, :all     # user can perform any action on any object
 ```
 
-Common actions are `:read`, `:create`, `:update` and `:destroy` but it can be anything. See [[Action Aliases]] and [[Custom Actions]] for more information on actions.
+Common actions are `:read`, `:create`, `:update` and `:destroy` but it can be anything. See [Action Aliases](./Action-Aliases.md) and [Custom Actions](./Custom-Actions.md) for more information on actions.
 
 You can pass an array for either of these parameters to match any one. For example, here the user will have the ability to update or destroy both articles and comments.
 
@@ -74,7 +74,7 @@ A hash of conditions can be passed to further restrict which records this permis
 can :read, Project, active: true, user_id: user.id
 ```
 
-It is important to only use database columns for these conditions so it can be reused for [[Fetching Records]].
+It is important to only use database columns for these conditions so it can be reused for [Fetching Records](./Fetching-Records.md).
 
 You can use nested hashes to define conditions on associations. Here the project can only be read if the category it belongs to is visible.
 
