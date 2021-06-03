@@ -674,6 +674,14 @@ describe CanCan::Ability do
     expect(@ability.permitted_attributes(:read, Integer)).to eq([:to_s])
   end
 
+  it 'does not retain references to subjects that do not have direct rules' do
+    @ability.can :read, String
+
+    @ability.can?(:read, 'foo')
+
+    expect(@ability.instance_variable_get(:@rules_index)).not_to have_key('foo')
+  end
+
   describe 'unauthorized message' do
     after(:each) do
       I18n.backend = nil
