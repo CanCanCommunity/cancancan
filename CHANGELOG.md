@@ -684,3 +684,4 @@ Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.co
 [@ayumu838]: https://github.com/ayumu838
 [@Liberatys]: https://github.com/Liberatys
 [@ghiculescu]: https://github.com/ghiculescu
+[@mtoneil]: https://github.com/mtoneil
