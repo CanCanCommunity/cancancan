@@ -19,7 +19,7 @@ module CanCan
       end
 
       def add_rule_to_index(rule, position)
-        @rules_index ||= Hash.new
+        @rules_index ||= {}
 
         subjects = rule.subjects.compact
         subjects << :all if subjects.empty?
