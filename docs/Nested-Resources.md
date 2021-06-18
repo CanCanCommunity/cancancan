@@ -28,6 +28,46 @@ If the name of the association doesn't match the resource name, for instance `ha
 
 If the resource name (`:project` in this case) does not match the controller then it will be considered a parent resource. You can manually specify parent/child resources using the `parent: false` option.
 
+## Securing `through` changes
+
+If you are using `through` you need to be wary of potential changes to the parent model. For example, consider this controller:
+
+```ruby
+class TasksController < ApplicationController
+  load_and_authorize_resource :project
+  load_and_authorize_resource :task, through: :project
+  
+  def update
+    @task.update(task_params)
+  end
+  
+  private
+  
+  def task_params
+    params.require(:task).permit(:project_id)
+  end
+end
+```
+
+Now consider a request to `/projects/1/tasks/42` with params `{ task: { project_id: 2 } }`.
+
+- `load_and_authorize_resource :project` will load project 1 and authorize it.
+- `load_and_authorize_resource :task, through: :project` will load task 42 from project 1, and authorize it.
+- `@task.update(task_params)` will change the task's project ID from 1, to 2.
+- Project 2 is never authorized! An attacker could inject a project belonging to another customer here.
+
+How you handle this depends on your intended behavior.
+
+- If you don't want a task's project ID to ever change, don't permit it as a param.
+- If you allow tasks to be moved between projects, manually verify the ID change and avoid mass assigning it.
+
+```ruby
+  def update
+    @task.project = Project.find(task_params[:project_id])
+    authorize!(@task)
+    @task.assign(task_params.except(:project_id))
+  end
+```
 
 ## Nested through method
 
@@ -153,7 +193,7 @@ in ability.rb
 can :create, User, groups_users: {group: {CONDITION_ON_GROUP} }
 ```
 
-Don't forget the **inverse_of** option, is the trick to make it works correctly. 
+Don't forget the **inverse_of** option, it is the trick to make it work correctly. 
 
 Remember to define the ability through the **groups_users** model (i.e. don't write `can :create, User, groups: {CONDITION_ON_GROUP}`)
 
