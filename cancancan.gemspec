@@ -10,6 +10,7 @@ Gem::Specification.new do |s|
   s.authors     = ['Alessandro Rodi (Renuo AG)', 'Bryan Rite', 'Ryan Bates', 'Richard Wilson']
   s.email       = 'alessandro.rodi@renuo.ch'
   s.homepage    = 'https://github.com/CanCanCommunity/cancancan'
+  s.metadata = { 'funding_uri' => 'https://github.com/sponsors/coorasse' }
   s.summary     = 'Simple authorization solution for Rails.'
   s.description = 'Simple authorization solution for Rails. All permissions are stored in a single location.'
   s.platform    = Gem::Platform::RUBY
