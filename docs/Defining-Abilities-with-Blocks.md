@@ -94,8 +94,8 @@ Here the block will be triggered for every `can?` check, even when only a class 
 
 ## Additional Docs
 
-* [[Defining Abilities]]
-* [[Checking Abilities]]
-* [[Testing Abilities]]
-* [[Debugging Abilities]]
-* [[Ability Precedence]]
+* [Defining Abilities](./Defining-Abilities.md)
+* [Checking Abilities](./Checking-Abilities.md)
+* [Testing Abilities](./Testing-Abilities.md)
+* [Debugging Abilities](./Debugging-Abilities.md)
+* [Ability Precedence](./Ability-Precedence.md)

@@ -1,3 +1,12 @@
+## 3.3.0
+
+* [#675](https://github.com/CanCanCommunity/cancancan/pull/675): Support modifying the `accessible_by` querying strategy on a per-query basis. ([@ghiculescu][])
+* [#714](https://github.com/CanCanCommunity/cancancan/pull/714): Don't hold unnecessary references to subjects in @rules_index. ([@mtoneil][])
+
+## 3.2.2
+
+* Added funding metadata to Gemspec. ([@coorasse][])
+
 ## 3.2.1
 
 * [#674](https://github.com/CanCanCommunity/cancancan/pull/674): Fix accidental dependency on ActiveRecord in 3.2.0. ([@ghiculescu][])
@@ -679,3 +688,4 @@ Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.co
 [@ayumu838]: https://github.com/ayumu838
 [@Liberatys]: https://github.com/Liberatys
 [@ghiculescu]: https://github.com/ghiculescu
+[@mtoneil]: https://github.com/mtoneil
