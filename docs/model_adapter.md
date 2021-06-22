@@ -16,7 +16,7 @@ Due to it's flexible and extendable system of adapters, it is easy to implement 
 if the currently provided adapters do not suffice.
 
 To facilitate an easy implementation of a new adapter CanCanCan provides you with an 
-[abstract adapter](https://github.com/CanCanCommunity/cancancan/blob/develop/lib/cancan/model_adapters/abstract_adapter.rb) 
+[Abstract Adapter](https://github.com/CanCanCommunity/cancancan/blob/develop/lib/cancan/model_adapters/abstract_adapter.rb) 
 you can extend and build upon. This design allows for dynamic adapter handling and a decoupled
 handling of information.
 
@@ -206,16 +206,15 @@ a better overview how a battle tested adapter is structured and implemented.
 
 #### Implementation
 
-
-* [ActiveRecord Base](https://github.com/CanCanCommunity/cancancan/blob/develop/lib/cancan/model_adapters/active_record_adapter.rb)
-* [ActiveRecord 4](https://github.com/CanCanCommunity/cancancan/blob/develop/lib/cancan/model_adapters/active_record_4_adapter.rb)
-* [ActiveRecord 5](https://github.com/CanCanCommunity/cancancan/blob/develop/lib/cancan/model_adapters/active_record_5_adapter.rb)
+* [ActiveRecord Base](../lib/cancan/model_adapters/active_record_adapter.rb)
+* [ActiveRecord 4](../lib/cancan/model_adapters/active_record_4_adapter.rb)
+* [ActiveRecord 5](../lib/cancan/model_adapters/active_record_5_adapter.rb)
 
 #### Tests / Specs
 
-* [ActiveRecord Base](https://github.com/CanCanCommunity/cancancan/blob/develop/spec/cancan/model_adapters/active_record_4_adapter_spec.rb)
-* [ActiveRecord 4](https://github.com/CanCanCommunity/cancancan/blob/develop/spec/cancan/model_adapters/active_record_5_adapter_spec.rb)
-* [ActiveRecord 5](https://github.com/CanCanCommunity/cancancan/blob/develop/spec/cancan/model_adapters/active_record_adapter_spec.rb)
+* [ActiveRecord Base](../spec/cancan/model_adapters/active_record_adapter_spec.rb)
+* [ActiveRecord 4](../spec/cancan/model_adapters/active_record_4_adapter_spec.rb)
+* [ActiveRecord 5](../spec/cancan/model_adapters/active_record_5_adapter_spec.rb)
 
 **Mondoid, the adapter used in this entry as an example, can be found at:**
 * [Mongoid](https://github.com/CanCanCommunity/cancancan-mongoid)
