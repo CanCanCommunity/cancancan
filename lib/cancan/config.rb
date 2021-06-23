@@ -3,7 +3,7 @@
 module CanCan
   def self.valid_accessible_by_strategies
     strategies = [:left_join]
-    strategies.push(:double_exist_subquery, :subquery) unless does_not_support_subquery_strategy?
+    strategies.push(:double_exist_subquery, :each_rule_as_exists_subquery, :subquery) unless does_not_support_subquery_strategy?
     strategies
   end
 
