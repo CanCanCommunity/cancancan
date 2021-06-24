@@ -93,15 +93,18 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecord5Adapter do
           expect(ability.model_adapter(House, :read))
             .to generate_sql("SELECT \"houses\".*
                              FROM \"houses\"
-                             INNER JOIN \"houses\" AS \"houses_alias\" ON \"houses_alias\".\"id\" = \"houses\".\"id\"
                              WHERE (EXISTS (SELECT 1
-                               FROM \"houses\"
-                               INNER JOIN \"houses_people\" ON \"houses_people\".\"house_id\" = \"houses\".\"id\"
-                               INNER JOIN \"people\" ON \"people\".\"id\" = \"houses_people\".\"person_id\"
+                               FROM \"houses\" AS \"aliased_table\"
                                WHERE
-                                (\"houses\".\"id\" = \"houses_alias\".\"id\") AND
-                                (\"people\".\"id\" = #{@person1.id})
-                               LIMIT 1)))
+                                 \"aliased_table\".\"id\" = \"houses\".\"id\" AND
+                                 EXISTS (SELECT 1
+                                   FROM \"houses\"
+                                   LEFT OUTER JOIN \"houses_people\" ON
+                                     \"houses_people\".\"house_id\" = \"houses\".\"id\"
+                                   LEFT OUTER JOIN \"people\" ON \"people\".\"id\" = \"houses_people\".\"person_id\"
+                                   WHERE
+                                     \"people\".\"id\" = #{@person1.id} AND
+                                     (\"houses\".\"id\" = \"aliased_table\".\"id\"))))
                              ")
         end
       end
