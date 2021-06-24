@@ -26,36 +26,24 @@ module CanCan
 
       def build_joins_relation(relation, *where_conditions)
         case CanCan.accessible_by_strategy
-        when :each_rule_as_doubleexists_subquery
-          build_joins_each_rule_as_exists_subquery(where_conditions)
+        when :joined_alias_each_rule_as_exists_subquery
+          build_joined_alias_each_rule_as_exists_subquery(where_conditions)
+        when :joined_alias_exists_subquery
+          build_joined_alias_exists_subquery(where_conditions)
         when :subquery
           build_joins_relation_subquery(where_conditions)
         when :left_join
           relation.left_joins(joins).distinct
-        when :double_exist_subquery
-          build_joins_relation_double_exist_subquery(where_conditions)
         end
       end
 
-      def build_joins_each_rule_as_exists_subquery(where_conditions)
-        double_exists_sql =
-          'SELECT 1 ' \
-          "FROM #{quoted_table_name} AS #{quoted_aliased_table_name} " \
-          'WHERE ' \
-          "#{quoted_aliased_table_name}.#{quoted_primary_key} = #{quoted_table_name}.#{quoted_primary_key} AND " \
-          '(' +
-          ''
+      def build_joined_alias_each_rule_as_exists_subquery(where_conditions)
+        double_exists_sql = '' + ''
 
         @compressed_rules.each_with_index do |rule, index|
           conditions_extractor = ConditionsExtractor.new(@model_class)
           rule_where_conditions = extract_multiple_conditions(conditions_extractor, [rule])
           joins_hash, left_joins_hash = extract_joins_from_rule(rule)
-
-          # binding.pry if rule.conditions.length > 0
-
-          puts "Conditions: #{rule.conditions}"
-          puts "Joins hash: #{joins_hash}"
-          puts "Left joins hash: #{left_joins_hash}"
 
           sub_query = @model_class
             .select("1")
@@ -72,9 +60,13 @@ module CanCan
           double_exists_sql << "EXISTS (#{sub_query.to_sql})"
         end
 
-        double_exists_sql << ")"
-
-        @model_class.unscoped.where("EXISTS (#{double_exists_sql} LIMIT 1)")
+        @model_class
+          .unscoped
+          .joins(
+            "INNER JOIN #{quoted_table_name} AS #{quoted_aliased_table_name} ON " \
+            "#{quoted_aliased_table_name}.#{quoted_primary_key} = #{quoted_table_name}.#{quoted_primary_key}"
+          )
+          .where(double_exists_sql)
       end
 
       def extract_joins_from_rule(rule)
@@ -117,11 +109,17 @@ module CanCan
         @model_class.where(@model_class.primary_key => inner)
       end
 
-      def build_joins_relation_double_exist_subquery(where_conditions)
-        @model_class.where("EXISTS (#{double_exists_query_sql(where_conditions)})")
+      def build_joined_alias_exists_subquery(where_conditions)
+        @model_class
+          .unscoped
+          .joins(
+            "INNER JOIN #{quoted_table_name} AS #{quoted_aliased_table_name} ON " \
+            "#{quoted_aliased_table_name}.#{quoted_primary_key} = #{quoted_table_name}.#{quoted_primary_key}"
+          )
+          .where("EXISTS (#{joined_alias_exists_subquery_inner_query(where_conditions).to_sql})")
       end
 
-      def double_exists_inner_query(where_conditions)
+      def joined_alias_exists_subquery_inner_query(where_conditions)
         @model_class
           .unscoped
           .select('1')
@@ -131,14 +129,6 @@ module CanCan
             "#{quoted_table_name}.#{quoted_primary_key} = " \
             "#{quoted_aliased_table_name}.#{quoted_primary_key}"
           )
-      end
-
-      def double_exists_query_sql(where_conditions)
-        'SELECT 1 ' \
-        "FROM #{quoted_table_name} AS #{quoted_aliased_table_name} " \
-        'WHERE ' \
-        "#{quoted_aliased_table_name}.#{quoted_primary_key} = #{quoted_table_name}.#{quoted_primary_key} AND " \
-        "EXISTS (#{double_exists_inner_query(where_conditions).to_sql})"
       end
 
       def quoted_aliased_table_name
