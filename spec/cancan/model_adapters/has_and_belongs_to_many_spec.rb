@@ -68,7 +68,7 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecord5Adapter do
                                LEFT OUTER JOIN \"people\" ON \"people\".\"id\" = \"houses_people\".\"person_id\"
                                WHERE
                                  \"people\".\"id\" = #{@person1.id} AND
-                                 (\"houses\".\"id\" = \"houses_alias\".\"id\")))
+                                 (\"houses\".\"id\" = \"houses_alias\".\"id\")) LIMIT 1)
                             ")
         end
       end
