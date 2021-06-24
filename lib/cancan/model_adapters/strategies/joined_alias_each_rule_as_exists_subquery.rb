@@ -7,7 +7,7 @@ module CanCan
         def execute!
           model_class
             .joins(
-              "INNER JOIN #{quoted_table_name} AS #{quoted_aliased_table_name} ON " \
+              "JOIN #{quoted_table_name} AS #{quoted_aliased_table_name} ON " \
               "#{quoted_aliased_table_name}.#{quoted_primary_key} = #{quoted_table_name}.#{quoted_primary_key}"
             )
             .where(double_exists_sql)

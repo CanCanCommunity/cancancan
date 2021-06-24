@@ -89,7 +89,7 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecord5Adapter do
           expect(ability.model_adapter(House, :read))
             .to generate_sql("SELECT \"houses\".*
                              FROM \"houses\"
-                             INNER JOIN \"houses\" AS \"houses_alias\" ON \"houses_alias\".\"id\" = \"houses\".\"id\"
+                             JOIN \"houses\" AS \"houses_alias\" ON \"houses_alias\".\"id\" = \"houses\".\"id\"
                              WHERE (EXISTS (SELECT 1
                                FROM \"houses\"
                                INNER JOIN \"houses_people\" ON \"houses_people\".\"house_id\" = \"houses\".\"id\"
