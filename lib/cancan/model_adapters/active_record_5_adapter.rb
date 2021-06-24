@@ -22,27 +22,13 @@ module CanCan
       private
 
       def build_joins_relation(relation, *where_conditions)
-        case CanCan.accessible_by_strategy
-        when :subquery
-          build_joins_relation_subquery(where_conditions)
-        when :left_join
-          relation.left_joins(joins).distinct
-        else
-          strategy_class.new(adapter: self, where_conditions: where_conditions).execute!
-        end
+        strategy_class.new(adapter: self, where_conditions: where_conditions).execute!
       end
 
       def strategy_class
         require_relative "strategies/#{CanCan.accessible_by_strategy}"
         strategy_class_name = CanCan.accessible_by_strategy.to_s.camelize
         CanCan::ModelAdapters::Strategies.const_get(strategy_class_name)
-      end
-
-      def build_joins_relation_subquery(where_conditions)
-        inner = @model_class.unscoped do
-          @model_class.left_joins(joins).where(*where_conditions)
-        end
-        @model_class.where(@model_class.primary_key => inner)
       end
 
       def sanitize_sql(conditions)

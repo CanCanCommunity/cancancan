@@ -12,6 +12,7 @@ module CanCan
           :quoted_primary_key,
           :quoted_aliased_table_name,
           :quoted_table_name,
+          :relation,
           to: :adapter
         )
         delegate :connection, :quoted_primary_key, to: :model_class
