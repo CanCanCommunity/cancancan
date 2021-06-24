@@ -23,6 +23,7 @@ module CanCan
               "#{quoted_table_name}.#{quoted_primary_key} = " \
               "#{quoted_aliased_table_name}.#{quoted_primary_key}"
             )
+            .limit(1)
         end
       end
     end
