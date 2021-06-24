@@ -3,6 +3,8 @@
 module CanCan
   module ModelAdapters
     class AbstractAdapter
+      attr_reader :model_class
+
       def self.inherited(subclass)
         @subclasses ||= []
         @subclasses.insert(0, subclass)
