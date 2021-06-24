@@ -60,19 +60,13 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecord5Adapter do
         it 'generates the correct query' do
           expect(ability.model_adapter(House, :read))
             .to generate_sql("SELECT \"houses\".*
-                            FROM \"houses\"
-                            WHERE (EXISTS (SELECT 1
-                              FROM \"houses\" AS \"aliased_table\"
-                              WHERE
-                                \"aliased_table\".\"id\" = \"houses\".\"id\" AND
-                                EXISTS (SELECT 1
-                                  FROM \"houses\"
-                                  LEFT OUTER JOIN \"houses_people\" ON
-                                    \"houses_people\".\"house_id\" = \"houses\".\"id\"
-                                  LEFT OUTER JOIN \"people\" ON \"people\".\"id\" = \"houses_people\".\"person_id\"
-                                  WHERE
-                                    \"people\".\"id\" = #{@person1.id} AND
-                                    (\"houses\".\"id\" = \"aliased_table\".\"id\"))))
+                             FROM \"houses\"
+                             JOIN \"houses\" AS \"houses_alias\" ON \"houses_alias\".\"id\" = \"houses\".\"id\"
+                             WHERE (EXISTS (SELECT 1
+                               FROM \"houses\"
+                               LEFT OUTER JOIN \"houses_people\" ON \"houses_people\".\"house_id\" = \"houses\".\"id\"
+                               LEFT OUTER JOIN \"people\" ON \"people\".\"id\" = \"houses_people\".\"person_id\"
+                               WHERE \"people\".\"id\" = #{@person1.id} AND (\"houses\".\"id\" = \"houses_alias\".\"id\")))
                             ")
         end
       end
@@ -93,18 +87,12 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecord5Adapter do
           expect(ability.model_adapter(House, :read))
             .to generate_sql("SELECT \"houses\".*
                              FROM \"houses\"
+                             JOIN \"houses\" AS \"houses_alias\" ON \"houses_alias\".\"id\" = \"houses\".\"id\"
                              WHERE (EXISTS (SELECT 1
-                               FROM \"houses\" AS \"aliased_table\"
-                               WHERE
-                                 \"aliased_table\".\"id\" = \"houses\".\"id\" AND
-                                 EXISTS (SELECT 1
-                                   FROM \"houses\"
-                                   LEFT OUTER JOIN \"houses_people\" ON
-                                     \"houses_people\".\"house_id\" = \"houses\".\"id\"
-                                   LEFT OUTER JOIN \"people\" ON \"people\".\"id\" = \"houses_people\".\"person_id\"
-                                   WHERE
-                                     \"people\".\"id\" = #{@person1.id} AND
-                                     (\"houses\".\"id\" = \"aliased_table\".\"id\"))))
+                               FROM \"houses\"
+                               LEFT OUTER JOIN \"houses_people\" ON \"houses_people\".\"house_id\" = \"houses\".\"id\"
+                               LEFT OUTER JOIN \"people\" ON \"people\".\"id\" = \"houses_people\".\"person_id\"
+                               WHERE \"people\".\"id\" = #{@person1.id} AND (\"houses\".\"id\" = \"houses_alias\".\"id\")))
                              ")
         end
       end
