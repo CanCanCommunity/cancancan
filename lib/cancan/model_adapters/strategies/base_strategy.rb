@@ -2,7 +2,7 @@ module CanCan
   module ModelAdapters
     class Strategies
       class BaseStrategy
-        attr_reader :adapter, :where_conditions
+        attr_reader :adapter, :relation, :where_conditions
 
         delegate(
           :compressed_rules,
@@ -12,14 +12,14 @@ module CanCan
           :quoted_primary_key,
           :quoted_aliased_table_name,
           :quoted_table_name,
-          :relation,
           to: :adapter
         )
         delegate :connection, :quoted_primary_key, to: :model_class
         delegate :quote_table_name, to: :connection
 
-        def initialize(adapter:, where_conditions:)
+        def initialize(adapter:, relation:, where_conditions:)
           @adapter = adapter
+          @relation = relation
           @where_conditions = where_conditions
         end
 

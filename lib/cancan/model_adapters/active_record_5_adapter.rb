@@ -22,7 +22,7 @@ module CanCan
       private
 
       def build_joins_relation(relation, *where_conditions)
-        strategy_class.new(adapter: self, where_conditions: where_conditions).execute!
+        strategy_class.new(adapter: self, relation: relation, where_conditions: where_conditions).execute!
       end
 
       def strategy_class

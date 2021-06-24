@@ -29,7 +29,10 @@ module CanCan
           conditions_extractor = ConditionsExtractor.new(model_class)
           rule_where_conditions = extract_multiple_conditions(conditions_extractor, [rule])
           joins_hash, left_joins_hash = extract_joins_from_rule(rule)
+          sub_query_for_rules_and_join_hashes(rule_where_conditions, joins_hash, left_joins_hash)
+        end
 
+        def sub_query_for_rules_and_join_hashes(rule_where_conditions, joins_hash, left_joins_hash)
           model_class
             .select('1')
             .joins(joins_hash)
@@ -57,22 +60,33 @@ module CanCan
               extra_joins_recursive(current_path, value, joins, left_joins)
               current_path.pop
             else
-              hash_joins = {}
-              current_hash_joins = hash_joins
-
-              current_path.each do |path_part|
-                new_hash = {}
-                current_hash_joins[path_part] = new_hash
-                current_hash_joins = new_hash
-              end
-
-              if value.nil?
-                left_joins.deep_merge!(hash_joins)
-              else
-                joins.deep_merge!(hash_joins)
-              end
+              extra_joins_recursive_merge_joins(current_path, value, joins, left_joins)
             end
           end
+        end
+
+        def extra_joins_recursive_merge_joins(current_path, value, joins, left_joins)
+          hash_joins = current_path_to_hash(current_path)
+
+          if value.nil?
+            left_joins.deep_merge!(hash_joins)
+          else
+            joins.deep_merge!(hash_joins)
+          end
+        end
+
+        # Converts an array like [:child, :grand_child] into a hash like {child: {grand_child: {}}
+        def current_path_to_hash(current_path)
+          hash_joins = {}
+          current_hash_joins = hash_joins
+
+          current_path.each do |path_part|
+            new_hash = {}
+            current_hash_joins[path_part] = new_hash
+            current_hash_joins = new_hash
+          end
+
+          hash_joins
         end
       end
     end
