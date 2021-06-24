@@ -66,7 +66,9 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecord5Adapter do
                                FROM \"houses\"
                                LEFT OUTER JOIN \"houses_people\" ON \"houses_people\".\"house_id\" = \"houses\".\"id\"
                                LEFT OUTER JOIN \"people\" ON \"people\".\"id\" = \"houses_people\".\"person_id\"
-                               WHERE \"people\".\"id\" = #{@person1.id} AND (\"houses\".\"id\" = \"houses_alias\".\"id\")))
+                               WHERE
+                                 \"people\".\"id\" = #{@person1.id} AND
+                                 (\"houses\".\"id\" = \"houses_alias\".\"id\")))
                             ")
         end
       end
@@ -92,7 +94,9 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecord5Adapter do
                                FROM \"houses\"
                                LEFT OUTER JOIN \"houses_people\" ON \"houses_people\".\"house_id\" = \"houses\".\"id\"
                                LEFT OUTER JOIN \"people\" ON \"people\".\"id\" = \"houses_people\".\"person_id\"
-                               WHERE \"people\".\"id\" = #{@person1.id} AND (\"houses\".\"id\" = \"houses_alias\".\"id\")))
+                               WHERE
+                                 \"people\".\"id\" = #{@person1.id} AND
+                                 (\"houses\".\"id\" = \"houses_alias\".\"id\")))
                              ")
         end
       end
