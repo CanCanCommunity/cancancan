@@ -339,23 +339,23 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
       end
 
       it 'returns appropriate records in complex case' do
-        id1 = Article.create!(id: 1, secret: false)
+        priority1 = Article.create!(priority: 1, secret: false)
         Article.create!(published: false, secret: false)
         public_article = Article.create!(published: true, secret: false)
         Article.create!(secret: true)
         @ability.can :read, Article
-        @ability.can :manage, Article, id: 1
+        @ability.can :manage, Article, priority: 1
         @ability.can :update, Article, published: true
         @ability.cannot :update, Article, secret: true
         expect(@ability.model_adapter(Article, :update).database_records).to match_array(
           [
-            id1,
+            priority1,
             public_article
           ]
         )
         expect(@ability.model_adapter(Article, :read)).to generate_sql(%(SELECT "articles".* FROM "articles"))
         expect(@ability.model_adapter(Article, :manage)).to generate_sql(
-          %(SELECT "articles".* FROM "articles" WHERE "articles"."id" = 1)
+          %(SELECT "articles".* FROM "articles" WHERE "articles"."priority" = 1)
         )
       end
 
@@ -408,7 +408,7 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
       end
 
       it 'does not forget conditions when calling with SQL string' do
-        id1 = Article.create!(id: 1, secret: false)
+        priority1 = Article.create!(priority: 1, secret: false)
         unpublished_not_secret_article = Article.create!(published: false, secret: false)
         public_article = Article.create!(published: true, secret: false)
         Article.create!(secret: true)
@@ -418,7 +418,7 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
 
         expect(@ability.model_adapter(Article, :read).database_records).to match_array(
           [
-            id1,
+            priority1,
             unpublished_not_secret_article,
             public_article
           ]
