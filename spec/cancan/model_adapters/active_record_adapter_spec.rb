@@ -329,9 +329,11 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
       it 'returns `not (sql)` for single `cannot` definition in front of default `can` condition' do
         @ability.can :read, Article
         @ability.cannot :read, Article, published: false, secret: true
-        expect(@ability.model_adapter(Article, :read).conditions)
-          .to orderlessly_match(
-            %["not (#{@article_table}"."published" = #{false_v} AND "#{@article_table}"."secret" = #{true_v})]
+        expect(@ability.model_adapter(Article, :read))
+          .to generate_sql(
+            <<-SQL
+            SELECT "#{@article_table}".* FROM "#{@article_table}" WHERE NOT ("#{@article_table}"."published" = #{false_v} AND "articles"."secret" = #{true_v})
+            SQL
           )
       end
 
@@ -340,10 +342,13 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
         @ability.can :manage, Article, id: 1
         @ability.can :update, Article, published: true
         @ability.cannot :update, Article, secret: true
-        expect(@ability.model_adapter(Article, :update).conditions)
-          .to eq(%[not ("#{@article_table}"."secret" = #{true_v}) ] +
-                   %[AND (("#{@article_table}"."published" = #{true_v}) ] +
-                   %[OR ("#{@article_table}"."id" = 1))])
+        expect(@ability.model_adapter(Article, :update)).to generate_sql(
+          <<-SQL
+          SELECT "#{@article_table}".* FROM "#{@article_table}" WHERE
+          ("#{@article_table}"."published" = #{true_v} OR "#{@article_table}"."id" = 1)
+          AND NOT ("#{@article_table}"."secret" = #{true_v})
+          SQL
+        )
         expect(@ability.model_adapter(Article, :manage).conditions).to eq(id: 1)
         expect(@ability.model_adapter(Article, :read).conditions).to eq({})
         expect(@ability.model_adapter(Article, :read)).to generate_sql(%(SELECT "articles".* FROM "articles"))
@@ -363,10 +368,14 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
       it 'does not forget conditions when calling with SQL string' do
         @ability.can :read, Article, published: true
         @ability.can :read, Article, ['secret = ?', false]
-        adapter = @ability.model_adapter(Article, :read)
-        2.times do
-          expect(adapter.conditions).to eq(%[(secret = #{false_v}) OR ("#{@article_table}"."published" = #{true_v})])
-        end
+
+        expect(@ability.model_adapter(Article, :read))
+          .to generate_sql(
+            <<-SQL
+            SELECT "#{@article_table}".* FROM "#{@article_table}"
+              WHERE ((secret = #{false_v}) OR "articles"."published" = #{true_v})
+            SQL
+          )
       end
 
       it 'has nil joins if no rules' do
@@ -447,16 +456,6 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
       comment2 = Comment.create!(article: Article.create!(name: 'A', category: Category.create!(visible: true)))
       Comment.create!(article: Article.create!(category: Category.create!(visible: false)))
 
-      # doesn't work without explicitly calling a join on AR 5+,
-      # but does before that (where we don't use subqueries at all)
-      if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
-        expect { Comment.accessible_by(@ability).order('articles.name').to_a }
-          .to raise_error(ActiveRecord::StatementInvalid)
-      else
-        expect(Comment.accessible_by(@ability).order('articles.name'))
-          .to match_array([comment2, comment1])
-      end
-
       # works with the explicit join
       expect(Comment.accessible_by(@ability).joins(:article).order('articles.name'))
         .to match_array([comment2, comment1])
@@ -480,16 +479,8 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
       expect(Comment.accessible_by(@ability).order('articles.name')).to match_array([comment2, comment1])
 
       # works with the explicit join in AR 5.2+ and AR 4.2
-      if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.2.0')
-        expect(Comment.accessible_by(@ability).joins(:article).order('articles.name'))
-          .to match_array([comment2, comment1])
-      elsif CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
-        expect { Comment.accessible_by(@ability).joins(:article).order('articles.name').to_a }
-          .to raise_error(ActiveRecord::StatementInvalid)
-      else
-        expect(Comment.accessible_by(@ability).joins(:article).order('articles.name'))
-          .to match_array([comment2, comment1])
-      end
+      expect(Comment.accessible_by(@ability).joins(:article).order('articles.name'))
+        .to match_array([comment2, comment1])
     end
 
     # this fails on Postgres. see https://github.com/CanCanCommunity/cancancan/pull/608
@@ -762,18 +753,16 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
       ability.can :read, Article, mentioned_users: { name: u1.name }
       ability.can :read, Article, mentions: { user: { name: u2.name } }
       expect(Article.accessible_by(ability)).to match_array([a1, a2])
-      if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
-        expect(ability.model_adapter(Article, :read)).to generate_sql(%(
-  SELECT "articles".*
+      expect(ability.model_adapter(Article, :read)).to generate_sql(%(
+SELECT "articles".*
+FROM "articles"
+WHERE "articles"."id" IN
+(SELECT "articles"."id"
   FROM "articles"
-  WHERE "articles"."id" IN
-  (SELECT "articles"."id"
-    FROM "articles"
-    LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
-    LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
-    WHERE ("users"."name" = 'paperino' OR "users"."name" = 'pippo'))
-  ))
-      end
+  LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
+  LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
+  WHERE ("users"."name" = 'paperino' OR "users"."name" = 'pippo'))
+))
     end
   end
 
@@ -794,14 +783,12 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
       ability.can :read, Article, mentions: { user: { name: u2.name } }
       expect(Article.accessible_by(ability)).to match_array([a1, a2])
 
-      if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
-        expect(ability.model_adapter(Article, :read)).to generate_sql(%(
-  SELECT DISTINCT "articles".*
-  FROM "articles"
-  LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
-  LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
-  WHERE ("users"."name" = 'paperino' OR "users"."name" = 'pippo')))
-      end
+      expect(ability.model_adapter(Article, :read)).to generate_sql(%(
+SELECT DISTINCT "articles".*
+FROM "articles"
+LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
+LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
+WHERE ("users"."name" = 'paperino' OR "users"."name" = 'pippo')))
     end
   end
 
