@@ -338,17 +338,20 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
           )
       end
 
-      it 'returns appropriate sql conditions in complex case' do
+      it 'returns appropriate records in complex case' do
+        id_1 = Article.create!(id: 1, secret: false)
+        unpublished_not_secret_article = Article.create!(published: false, secret: false)
+        public_article = Article.create!(published: true, secret: false)
+        secret_article = Article.create!(secret: true)
         @ability.can :read, Article
         @ability.can :manage, Article, id: 1
         @ability.can :update, Article, published: true
         @ability.cannot :update, Article, secret: true
-        expect(@ability.model_adapter(Article, :update)).to generate_sql(
-          <<-SQL
-          SELECT "#{@article_table}".* FROM "#{@article_table}" WHERE
-          ("#{@article_table}"."published" = #{true_v} OR "#{@article_table}"."id" = 1)
-          AND NOT ("#{@article_table}"."secret" = #{true_v})
-          SQL
+        expect(@ability.model_adapter(Article, :update).database_records).to match_array(
+          [
+            id_1,
+            public_article
+          ]
         )
         expect(@ability.model_adapter(Article, :read)).to generate_sql(%(SELECT "articles".* FROM "articles"))
         expect(@ability.model_adapter(Article, :manage)).to generate_sql(
@@ -388,7 +391,7 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
             SELECT DISTINCT "comments".* FROM "comments"
             LEFT OUTER JOIN "articles" ON "articles"."id" = "comments"."article_id"
             LEFT OUTER JOIN "categories" ON "categories"."id" = "articles"."category_id"
-            WHERE "articles"."published" = 't' AND "categories"."visible" = 't'
+            WHERE "articles"."published" = #{true_v} AND "categories"."visible" = #{true_v}
             SQL
           )
         else
@@ -398,23 +401,26 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
               (SELECT "comments"."id" FROM "comments"
                 LEFT OUTER JOIN "articles" ON "articles"."id" = "comments"."article_id"
                 LEFT OUTER JOIN "categories" ON "categories"."id" = "articles"."category_id"
-                WHERE "articles"."published" = 't' AND "categories"."visible" = 't')
+                WHERE "articles"."published" = #{true_v} AND "categories"."visible" = #{true_v})
             SQL
           )
         end
       end
 
       it 'does not forget conditions when calling with SQL string' do
+        id_1 = Article.create!(id: 1, secret: false)
+        unpublished_not_secret_article = Article.create!(published: false, secret: false)
+        public_article = Article.create!(published: true, secret: false)
+        secret_article = Article.create!(secret: true)
+
         @ability.can :read, Article, published: true
         @ability.can :read, Article, ['secret = ?', false]
 
-        expect(@ability.model_adapter(Article, :read))
-          .to generate_sql(
-            <<-SQL
-            SELECT "#{@article_table}".* FROM "#{@article_table}"
-              WHERE ((secret = #{false_v}) OR "articles"."published" = #{true_v})
-            SQL
-          )
+        expect(@ability.model_adapter(Article, :read).database_records).to match_array([
+          id_1,
+          unpublished_not_secret_article,
+          public_article
+        ])
       end
 
       it 'has nil joins if no rules' do
