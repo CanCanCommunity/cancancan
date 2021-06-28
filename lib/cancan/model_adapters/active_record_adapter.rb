@@ -14,6 +14,10 @@ module CanCan
         @compressed_rules = RulesCompressor.new(@rules.reverse).rules_collapsed.reverse
         StiNormalizer.normalize(@compressed_rules)
         ConditionsNormalizer.normalize(@model_class, @compressed_rules)
+        # run the extractor on the reversed set of rules to fill the cache properly
+        @conditions_extractor = ConditionsExtractor.new(@model_class).tap do |extractor|
+          @compressed_rules.reverse_each { |rule| extractor.tableize_conditions(rule.conditions) }
+        end
       end
 
       def database_records
@@ -28,19 +32,8 @@ module CanCan
         @build_relation ||= begin
           return @model_class.none if @compressed_rules.empty?
 
-          # run the extractor on the reversed set of rules to fill the cache properly
-          conditions_extractor = ConditionsExtractor.new(@model_class)
-          @compressed_rules.reverse_each { |rule| conditions_extractor.tableize_conditions(rule.conditions) }
-
-          positive_rules, negative_rules = @compressed_rules.partition(&:base_behavior)
-
-          negative_conditions = negative_rules.map { |rule| rule_to_relation(rule, conditions_extractor) }.compact
-          positive_conditions = positive_rules.map { |rule| rule_to_relation(rule, conditions_extractor) }.compact
-
-          @relation = @relation.merge(positive_conditions.reduce(&:or)) if positive_conditions.present?
-          if negative_conditions.present?
-            @relation = @relation.where.not(negative_conditions.reduce(:or).where_clause.ast)
-          end
+          @relation = merge_positive_conditions
+          @relation = merge_negative_conditions
 
           build_joins_relation(@relation)
         end
@@ -58,11 +51,45 @@ module CanCan
 
       private
 
-      def rule_to_relation(rule, conditions_extractor)
+      def rule_to_relation(rule)
         if rule.conditions.is_a? ActiveRecord::Relation
           rule.conditions
         elsif rule.conditions.present?
-          @model_class.where(conditions_extractor.tableize_conditions(rule.conditions))
+          @model_class.where(@conditions_extractor.tableize_conditions(rule.conditions))
+        end
+      end
+
+      def positive_conditions
+        @positive_conditions ||= begin
+          @compressed_rules
+            .select(&:base_behavior)
+            .map { |rule| rule_to_relation(rule) }
+            .compact
+        end
+      end
+
+      def negative_conditions
+        @negative_conditions ||= begin
+          @compressed_rules
+            .reject(&:base_behavior)
+            .map { |rule| rule_to_relation(rule) }
+            .compact
+        end
+      end
+
+      def merge_positive_conditions
+        if positive_conditions.present?
+          @relation.merge(positive_conditions.reduce(&:or))
+        else
+          @relation
+        end
+      end
+
+      def merge_negative_conditions
+        if negative_conditions.present?
+          @relation.where.not(negative_conditions.reduce(:or).where_clause.ast)
+        else
+          @relation
         end
       end
 
