@@ -339,17 +339,17 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
       end
 
       it 'returns appropriate records in complex case' do
-        id_1 = Article.create!(id: 1, secret: false)
-        unpublished_not_secret_article = Article.create!(published: false, secret: false)
+        id1 = Article.create!(id: 1, secret: false)
+        Article.create!(published: false, secret: false)
         public_article = Article.create!(published: true, secret: false)
-        secret_article = Article.create!(secret: true)
+        Article.create!(secret: true)
         @ability.can :read, Article
         @ability.can :manage, Article, id: 1
         @ability.can :update, Article, published: true
         @ability.cannot :update, Article, secret: true
         expect(@ability.model_adapter(Article, :update).database_records).to match_array(
           [
-            id_1,
+            id1,
             public_article
           ]
         )
@@ -408,19 +408,21 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
       end
 
       it 'does not forget conditions when calling with SQL string' do
-        id_1 = Article.create!(id: 1, secret: false)
+        id1 = Article.create!(id: 1, secret: false)
         unpublished_not_secret_article = Article.create!(published: false, secret: false)
         public_article = Article.create!(published: true, secret: false)
-        secret_article = Article.create!(secret: true)
+        Article.create!(secret: true)
 
         @ability.can :read, Article, published: true
         @ability.can :read, Article, ['secret = ?', false]
 
-        expect(@ability.model_adapter(Article, :read).database_records).to match_array([
-          id_1,
-          unpublished_not_secret_article,
-          public_article
-        ])
+        expect(@ability.model_adapter(Article, :read).database_records).to match_array(
+          [
+            id1,
+            unpublished_not_secret_article,
+            public_article
+          ]
+        )
       end
 
       it 'has nil joins if no rules' do

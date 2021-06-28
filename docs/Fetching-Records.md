@@ -8,7 +8,7 @@ Sometimes you need to restrict which records are returned from the database base
 You can change the action by passing it as the second argument. Here we find only the records the user has permission to update.
 
 ```ruby
-@articles = Article.accessible_by(current_ability, :update) 
+@articles = Article.accessible_by(current_ability, :update)
 ```
 
 If you want to use the current controller's action, make sure to call `to_sym` on it:
@@ -17,7 +17,7 @@ If you want to use the current controller's action, make sure to call `to_sym` o
 @articles = Article.accessible_by(current_ability, params[:action].to_sym)
 ```
 
-This is an Active Record scope so other scopes and pagination can be chained onto it.
+This is an Active Record scope so other scopes and pagination can be chained onto it. It can also be chained onto existing scopes.
 
 This works with multiple `can` definitions, which allows you to define complex permission logic and have it translated properly to SQL.
 
@@ -29,7 +29,7 @@ class Ability
   can :manage, User, id: user.id
 end
 ```
-a call to User.accessible_by(current_ability) generates the following SQL
+a call to User.accessible_by(current_ability) generates the following or equivalent SQL, depending on your version of ActiveRecord.
 
 ```sql
 SELECT *
@@ -37,7 +37,7 @@ FROM users
 WHERE (id = 1) OR (not (self_managed = 't') AND (manager_id = 1))
 ```
 
-It will raise an exception if any requested model's ability definition is defined using just block. 
+It will raise an exception if any requested model's ability definition is defined using just block.
 You can define SQL fragment in addition to block (look for more examples in [[Defining Abilities with Blocks]]).
 
 If you are using something other than Active Record you can fetch the conditions hash directly from the current ability.
