@@ -134,17 +134,8 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
       end
 
       it 'is for only active record classes' do
-        if ActiveRecord.version > Gem::Version.new('5')
-          expect(CanCan::ModelAdapters::ActiveRecord5Adapter).to_not be_for_class(Object)
-          expect(CanCan::ModelAdapters::ActiveRecord5Adapter).to be_for_class(Article)
-          expect(CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article))
-            .to eq(CanCan::ModelAdapters::ActiveRecord5Adapter)
-        elsif ActiveRecord.version > Gem::Version.new('4')
-          expect(CanCan::ModelAdapters::ActiveRecord4Adapter).to_not be_for_class(Object)
-          expect(CanCan::ModelAdapters::ActiveRecord4Adapter).to be_for_class(Article)
-          expect(CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article))
-            .to eq(CanCan::ModelAdapters::ActiveRecord4Adapter)
-        end
+        expect(CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article))
+          .to eq(CanCan::ModelAdapters::ActiveRecordAdapter)
       end
 
       it 'finds record' do
@@ -444,32 +435,30 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
     end
   end
 
-  unless CanCan::ModelAdapters::ActiveRecordAdapter.version_lower?('5.0.0')
-    context 'base behaviour subquery specific' do
-      before :each do
-        CanCan.accessible_by_strategy = :subquery
-      end
+  context 'base behaviour subquery specific' do
+    before :each do
+      CanCan.accessible_by_strategy = :subquery
+    end
 
-      it 'allows ordering via relations' do
-        @ability.can :read, Comment, article: { category: { visible: true } }
-        comment1 = Comment.create!(article: Article.create!(name: 'B', category: Category.create!(visible: true)))
-        comment2 = Comment.create!(article: Article.create!(name: 'A', category: Category.create!(visible: true)))
-        Comment.create!(article: Article.create!(category: Category.create!(visible: false)))
+    it 'allows ordering via relations' do
+      @ability.can :read, Comment, article: { category: { visible: true } }
+      comment1 = Comment.create!(article: Article.create!(name: 'B', category: Category.create!(visible: true)))
+      comment2 = Comment.create!(article: Article.create!(name: 'A', category: Category.create!(visible: true)))
+      Comment.create!(article: Article.create!(category: Category.create!(visible: false)))
 
-        # doesn't work without explicitly calling a join on AR 5+,
-        # but does before that (where we don't use subqueries at all)
-        if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
-          expect { Comment.accessible_by(@ability).order('articles.name').to_a }
-            .to raise_error(ActiveRecord::StatementInvalid)
-        else
-          expect(Comment.accessible_by(@ability).order('articles.name'))
-            .to match_array([comment2, comment1])
-        end
-
-        # works with the explicit join
-        expect(Comment.accessible_by(@ability).joins(:article).order('articles.name'))
+      # doesn't work without explicitly calling a join on AR 5+,
+      # but does before that (where we don't use subqueries at all)
+      if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
+        expect { Comment.accessible_by(@ability).order('articles.name').to_a }
+          .to raise_error(ActiveRecord::StatementInvalid)
+      else
+        expect(Comment.accessible_by(@ability).order('articles.name'))
           .to match_array([comment2, comment1])
       end
+
+      # works with the explicit join
+      expect(Comment.accessible_by(@ability).joins(:article).order('articles.name'))
+        .to match_array([comment2, comment1])
     end
   end
 
@@ -756,35 +745,33 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
     end
   end
 
-  unless CanCan::ModelAdapters::ActiveRecordAdapter.version_lower?('5.0.0')
-    context 'has_many through is defined and referenced differently - subquery strategy' do
-      before do
-        CanCan.accessible_by_strategy = :subquery
-      end
+  context 'has_many through is defined and referenced differently - subquery strategy' do
+    before do
+      CanCan.accessible_by_strategy = :subquery
+    end
 
-      it 'recognises it and simplifies the query' do
-        u1 = User.create!(name: 'pippo')
-        u2 = User.create!(name: 'paperino')
+    it 'recognises it and simplifies the query' do
+      u1 = User.create!(name: 'pippo')
+      u2 = User.create!(name: 'paperino')
 
-        a1 = Article.create!(mentioned_users: [u1])
-        a2 = Article.create!(mentioned_users: [u2])
+      a1 = Article.create!(mentioned_users: [u1])
+      a2 = Article.create!(mentioned_users: [u2])
 
-        ability = Ability.new(u1)
-        ability.can :read, Article, mentioned_users: { name: u1.name }
-        ability.can :read, Article, mentions: { user: { name: u2.name } }
-        expect(Article.accessible_by(ability)).to match_array([a1, a2])
-        if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
-          expect(ability.model_adapter(Article, :read)).to generate_sql(%(
-    SELECT "articles".*
+      ability = Ability.new(u1)
+      ability.can :read, Article, mentioned_users: { name: u1.name }
+      ability.can :read, Article, mentions: { user: { name: u2.name } }
+      expect(Article.accessible_by(ability)).to match_array([a1, a2])
+      if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
+        expect(ability.model_adapter(Article, :read)).to generate_sql(%(
+  SELECT "articles".*
+  FROM "articles"
+  WHERE "articles"."id" IN
+  (SELECT "articles"."id"
     FROM "articles"
-    WHERE "articles"."id" IN
-    (SELECT "articles"."id"
-      FROM "articles"
-      LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
-      LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
-      WHERE (("users"."name" = 'paperino') OR ("users"."name" = 'pippo')))
-    ))
-        end
+    LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
+    LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
+    WHERE ("users"."name" = 'paperino' OR "users"."name" = 'pippo'))
+  ))
       end
     end
   end
@@ -817,98 +804,96 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
     end
   end
 
-  if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
-    context 'switching strategies' do
-      before do
-        CanCan.accessible_by_strategy = :left_join # default - should be ignored in these tests
-      end
+  context 'switching strategies' do
+    before do
+      CanCan.accessible_by_strategy = :left_join # default - should be ignored in these tests
+    end
 
-      it 'allows you to switch strategies with a keyword argument' do
-        u = User.create!(name: 'pippo')
-        Article.create!(mentioned_users: [u])
+    it 'allows you to switch strategies with a keyword argument' do
+      u = User.create!(name: 'pippo')
+      Article.create!(mentioned_users: [u])
 
-        ability = Ability.new(u)
-        ability.can :read, Article, mentions: { user: { name: u.name } }
+      ability = Ability.new(u)
+      ability.can :read, Article, mentions: { user: { name: u.name } }
 
-        subquery_sql = Article.accessible_by(ability, strategy: :subquery).to_sql
-        left_join_sql = Article.accessible_by(ability, strategy: :left_join).to_sql
+      subquery_sql = Article.accessible_by(ability, strategy: :subquery).to_sql
+      left_join_sql = Article.accessible_by(ability, strategy: :left_join).to_sql
 
-        expect(subquery_sql.strip.squeeze(' ')).to eq(%(
-    SELECT "articles".*
-    FROM "articles"
-    WHERE "articles"."id" IN
-    (SELECT "articles"."id"
-      FROM "articles"
-      LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
-      LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
-      WHERE "users"."name" = 'pippo')
-    ).gsub(/\s+/, ' ').strip)
-
-        expect(left_join_sql.strip.squeeze(' ')).to eq(%(
-  SELECT DISTINCT "articles".*
+      expect(subquery_sql.strip.squeeze(' ')).to eq(%(
+  SELECT "articles".*
   FROM "articles"
-  LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
-  LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
-  WHERE "users"."name" = 'pippo').gsub(/\s+/, ' ').strip)
-      end
-
-      it 'allows you to switch strategies with a block' do
-        u = User.create!(name: 'pippo')
-        Article.create!(mentioned_users: [u])
-
-        ability = Ability.new(u)
-        ability.can :read, Article, mentions: { user: { name: u.name } }
-
-        subquery_sql = CanCan.with_accessible_by_strategy(:subquery) { Article.accessible_by(ability).to_sql }
-        left_join_sql = CanCan.with_accessible_by_strategy(:left_join) { Article.accessible_by(ability).to_sql }
-
-        expect(subquery_sql.strip.squeeze(' ')).to eq(%(
-    SELECT "articles".*
+  WHERE "articles"."id" IN
+  (SELECT "articles"."id"
     FROM "articles"
-    WHERE "articles"."id" IN
-    (SELECT "articles"."id"
-      FROM "articles"
-      LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
-      LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
-      WHERE "users"."name" = 'pippo')
-    ).gsub(/\s+/, ' ').strip)
+    LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
+    LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
+    WHERE "users"."name" = 'pippo')
+  ).gsub(/\s+/, ' ').strip)
 
-        expect(left_join_sql.strip.squeeze(' ')).to eq(%(
-  SELECT DISTINCT "articles".*
+      expect(left_join_sql.strip.squeeze(' ')).to eq(%(
+SELECT DISTINCT "articles".*
+FROM "articles"
+LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
+LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
+WHERE "users"."name" = 'pippo').gsub(/\s+/, ' ').strip)
+    end
+
+    it 'allows you to switch strategies with a block' do
+      u = User.create!(name: 'pippo')
+      Article.create!(mentioned_users: [u])
+
+      ability = Ability.new(u)
+      ability.can :read, Article, mentions: { user: { name: u.name } }
+
+      subquery_sql = CanCan.with_accessible_by_strategy(:subquery) { Article.accessible_by(ability).to_sql }
+      left_join_sql = CanCan.with_accessible_by_strategy(:left_join) { Article.accessible_by(ability).to_sql }
+
+      expect(subquery_sql.strip.squeeze(' ')).to eq(%(
+  SELECT "articles".*
   FROM "articles"
-  LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
-  LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
-  WHERE "users"."name" = 'pippo').gsub(/\s+/, ' ').strip)
-      end
-
-      it 'allows you to switch strategies with a block, and to_sql called outside the block' do
-        u = User.create!(name: 'pippo')
-        Article.create!(mentioned_users: [u])
-
-        ability = Ability.new(u)
-        ability.can :read, Article, mentions: { user: { name: u.name } }
-
-        subquery_sql = CanCan.with_accessible_by_strategy(:subquery) { Article.accessible_by(ability) }.to_sql
-        left_join_sql = CanCan.with_accessible_by_strategy(:left_join) { Article.accessible_by(ability) }.to_sql
-
-        expect(subquery_sql.strip.squeeze(' ')).to eq(%(
-    SELECT "articles".*
+  WHERE "articles"."id" IN
+  (SELECT "articles"."id"
     FROM "articles"
-    WHERE "articles"."id" IN
-    (SELECT "articles"."id"
-      FROM "articles"
-      LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
-      LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
-      WHERE "users"."name" = 'pippo')
-    ).gsub(/\s+/, ' ').strip)
+    LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
+    LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
+    WHERE "users"."name" = 'pippo')
+  ).gsub(/\s+/, ' ').strip)
 
-        expect(left_join_sql.strip.squeeze(' ')).to eq(%(
-  SELECT DISTINCT "articles".*
+      expect(left_join_sql.strip.squeeze(' ')).to eq(%(
+SELECT DISTINCT "articles".*
+FROM "articles"
+LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
+LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
+WHERE "users"."name" = 'pippo').gsub(/\s+/, ' ').strip)
+    end
+
+    it 'allows you to switch strategies with a block, and to_sql called outside the block' do
+      u = User.create!(name: 'pippo')
+      Article.create!(mentioned_users: [u])
+
+      ability = Ability.new(u)
+      ability.can :read, Article, mentions: { user: { name: u.name } }
+
+      subquery_sql = CanCan.with_accessible_by_strategy(:subquery) { Article.accessible_by(ability) }.to_sql
+      left_join_sql = CanCan.with_accessible_by_strategy(:left_join) { Article.accessible_by(ability) }.to_sql
+
+      expect(subquery_sql.strip.squeeze(' ')).to eq(%(
+  SELECT "articles".*
   FROM "articles"
-  LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
-  LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
-  WHERE "users"."name" = 'pippo').gsub(/\s+/, ' ').strip)
-      end
+  WHERE "articles"."id" IN
+  (SELECT "articles"."id"
+    FROM "articles"
+    LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
+    LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
+    WHERE "users"."name" = 'pippo')
+  ).gsub(/\s+/, ' ').strip)
+
+      expect(left_join_sql.strip.squeeze(' ')).to eq(%(
+SELECT DISTINCT "articles".*
+FROM "articles"
+LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
+LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
+WHERE "users"."name" = 'pippo').gsub(/\s+/, ' ').strip)
     end
   end
 

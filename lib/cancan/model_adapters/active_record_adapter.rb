@@ -3,12 +3,8 @@
 module CanCan
   module ModelAdapters
     class ActiveRecordAdapter < AbstractAdapter
-      def self.version_greater_or_equal?(version)
-        Gem::Version.new(ActiveRecord.version).release >= Gem::Version.new(version)
-      end
-
-      def self.version_lower?(version)
-        Gem::Version.new(ActiveRecord.version).release < Gem::Version.new(version)
+      def self.for_class?(klass)
+        klass < ActiveRecord::Base
       end
 
       def initialize(relation_or_class, rules)

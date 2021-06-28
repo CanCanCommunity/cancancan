@@ -2,9 +2,7 @@
 
 module CanCan
   def self.valid_accessible_by_strategies
-    strategies = [:left_join]
-    strategies << :subquery unless does_not_support_subquery_strategy?
-    strategies
+    %i[left_join subquery]
   end
 
   # Determines how CanCan should build queries when calling accessible_by,
@@ -27,30 +25,17 @@ module CanCan
   end
 
   def self.default_accessible_by_strategy
-    if does_not_support_subquery_strategy?
-      # see https://github.com/CanCanCommunity/cancancan/pull/655 for where this was added
-      # the `subquery` strategy (from https://github.com/CanCanCommunity/cancancan/pull/619
-      # only works in Rails 5 and higher
-      :left_join
-    else
-      :subquery
-    end
+    # see https://github.com/CanCanCommunity/cancancan/pull/655 for where this was added
+    # the `subquery` strategy (from https://github.com/CanCanCommunity/cancancan/pull/619
+    :left_join
   end
 
   def self.accessible_by_strategy=(value)
-    validate_accessible_by_strategy!(value)
-
-    if value == :subquery && does_not_support_subquery_strategy?
-      raise ArgumentError, 'accessible_by_strategy = :subquery requires ActiveRecord 5 or newer'
-    end
-
     @accessible_by_strategy = value
   end
 
   def self.with_accessible_by_strategy(value)
     return yield if value == accessible_by_strategy
-
-    validate_accessible_by_strategy!(value)
 
     begin
       strategy_was = accessible_by_strategy
@@ -59,16 +44,5 @@ module CanCan
     ensure
       @accessible_by_strategy = strategy_was
     end
-  end
-
-  def self.validate_accessible_by_strategy!(value)
-    return if valid_accessible_by_strategies.include?(value)
-
-    raise ArgumentError, "accessible_by_strategy must be one of #{valid_accessible_by_strategies.join(', ')}"
-  end
-
-  def self.does_not_support_subquery_strategy?
-    !defined?(CanCan::ModelAdapters::ActiveRecordAdapter) ||
-      CanCan::ModelAdapters::ActiveRecordAdapter.version_lower?('5.0.0')
   end
 end
