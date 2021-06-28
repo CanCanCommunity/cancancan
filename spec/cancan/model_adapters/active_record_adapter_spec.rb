@@ -295,13 +295,15 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
         expect(-> { @ability.can? :read, Article.new }).to raise_error(CanCan::Error)
       end
 
-      it 'has false conditions if no abilities match' do
-        expect(@ability.model_adapter(Article, :read).conditions).to eq(false_condition)
+      it 'returns an empty scope if no abilities match' do
+        Article.create!
+        expect(@ability.model_adapter(Article, :read).database_records).to eq(Article.none)
       end
 
       it 'returns false conditions for cannot clause' do
+        Article.create!
         @ability.cannot :read, Article
-        expect(@ability.model_adapter(Article, :read).conditions).to eq(false_condition)
+        expect(@ability.model_adapter(Article, :read).database_records).to eq(Article.none)
       end
 
       it 'returns SQL for single `can` definition in front of default `cannot` condition' do
@@ -316,14 +318,13 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
       it 'returns true condition for single `can` definition in front of default `can` condition' do
         @ability.can :read, Article
         @ability.can :read, Article, published: false, secret: true
-        expect(@ability.model_adapter(Article, :read).conditions).to eq({})
         expect(@ability.model_adapter(Article, :read)).to generate_sql(%(SELECT "articles".* FROM "articles"))
       end
 
       it 'returns `false condition` for single `cannot` definition in front of default `cannot` condition' do
         @ability.cannot :read, Article
         @ability.cannot :read, Article, published: false, secret: true
-        expect(@ability.model_adapter(Article, :read).conditions).to eq(false_condition)
+        expect(@ability.model_adapter(Article, :read).database_records).to eq(Article.none)
       end
 
       it 'returns `not (sql)` for single `cannot` definition in front of default `can` condition' do
@@ -349,20 +350,58 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
           AND NOT ("#{@article_table}"."secret" = #{true_v})
           SQL
         )
-        expect(@ability.model_adapter(Article, :manage).conditions).to eq(id: 1)
-        expect(@ability.model_adapter(Article, :read).conditions).to eq({})
         expect(@ability.model_adapter(Article, :read)).to generate_sql(%(SELECT "articles".* FROM "articles"))
+        expect(@ability.model_adapter(Article, :manage)).to generate_sql(
+          %(SELECT "articles".* FROM "articles" WHERE "articles"."id" = 1)
+        )
       end
 
       it 'returns appropriate sql conditions in complex case with nested joins' do
         @ability.can :read, Comment, article: { category: { visible: true } }
-        expect(@ability.model_adapter(Comment, :read).conditions).to eq(Category.table_name.to_sym => { visible: true })
+        if CanCan.accessible_by_strategy == :left_join
+          expect(@ability.model_adapter(Comment, :read)).to generate_sql(
+            <<-SQL
+            SELECT DISTINCT "comments".* FROM "comments"
+            LEFT OUTER JOIN "articles" ON "articles"."id" = "comments"."article_id"
+            LEFT OUTER JOIN "categories" ON "categories"."id" = "articles"."category_id"
+            WHERE "categories"."visible" = #{true_v}
+            SQL
+          )
+        else
+          expect(@ability.model_adapter(Comment, :read)).to generate_sql(
+            <<-SQL
+            SELECT "comments".* FROM "comments" WHERE "comments"."id" IN
+              (SELECT "comments"."id" FROM "comments"
+              LEFT OUTER JOIN "articles" ON "articles"."id" = "comments"."article_id"
+              LEFT OUTER JOIN "categories" ON "categories"."id" = "articles"."category_id"
+              WHERE "categories"."visible" = #{true_v})
+            SQL
+          )
+        end
       end
 
       it 'returns appropriate sql conditions in complex case with nested joins of different depth' do
         @ability.can :read, Comment, article: { published: true, category: { visible: true } }
-        expect(@ability.model_adapter(Comment, :read).conditions)
-          .to eq(Article.table_name.to_sym => { published: true }, Category.table_name.to_sym => { visible: true })
+        if CanCan.accessible_by_strategy == :left_join
+          expect(@ability.model_adapter(Comment, :read)).to generate_sql(
+            <<-SQL
+            SELECT DISTINCT "comments".* FROM "comments"
+            LEFT OUTER JOIN "articles" ON "articles"."id" = "comments"."article_id"
+            LEFT OUTER JOIN "categories" ON "categories"."id" = "articles"."category_id"
+            WHERE "articles"."published" = 't' AND "categories"."visible" = 't'
+            SQL
+          )
+        else
+          expect(@ability.model_adapter(Comment, :read)).to generate_sql(
+            <<-SQL
+            SELECT "comments".* FROM "comments" WHERE "comments"."id" IN
+              (SELECT "comments"."id" FROM "comments"
+                LEFT OUTER JOIN "articles" ON "articles"."id" = "comments"."article_id"
+                LEFT OUTER JOIN "categories" ON "categories"."id" = "articles"."category_id"
+                WHERE "articles"."published" = 't' AND "categories"."visible" = 't')
+            SQL
+          )
+        end
       end
 
       it 'does not forget conditions when calling with SQL string' do
