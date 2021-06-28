@@ -539,18 +539,10 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
       comment2 = Comment.create!(article: Article.create!(name: 'A', category: Category.create!(visible: true)))
       Comment.create!(article: Article.create!(category: Category.create!(visible: false)))
 
-      if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
-        # doesn't work with or without the join
-        expect { Comment.accessible_by(@ability).order('articles.name').to_a }
-          .to raise_error(ActiveRecord::StatementInvalid)
-        expect { Comment.accessible_by(@ability).joins(:article).order('articles.name').to_a }
-          .to raise_error(ActiveRecord::StatementInvalid)
-      else
-        expect(Comment.accessible_by(@ability).order('articles.name'))
-          .to match_array([comment2, comment1])
-        expect(Comment.accessible_by(@ability).joins(:article).order('articles.name'))
-          .to match_array([comment2, comment1])
-      end
+      expect(Comment.accessible_by(@ability).select('"comments".*, "articles"."name"').order('articles.name'))
+        .to match_array([comment2, comment1])
+      expect(Comment.accessible_by(@ability).select('"comments".*, "articles"."name"').order('articles.name'))
+        .to match_array([comment2, comment1])
     end
   end
 
