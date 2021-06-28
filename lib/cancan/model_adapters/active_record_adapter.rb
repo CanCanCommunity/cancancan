@@ -3,68 +3,40 @@
 module CanCan
   module ModelAdapters
     class ActiveRecordAdapter < AbstractAdapter
-      def self.version_greater_or_equal?(version)
-        Gem::Version.new(ActiveRecord.version).release >= Gem::Version.new(version)
+      def self.for_class?(klass)
+        klass < ActiveRecord::Base
       end
 
-      def self.version_lower?(version)
-        Gem::Version.new(ActiveRecord.version).release < Gem::Version.new(version)
-      end
-
-      def initialize(model_class, rules)
+      def initialize(relation_or_class, rules)
         super
+        @model_class = relation_or_class.respond_to?(:klass) ? relation_or_class.klass : relation_or_class
+        @relation = relation_or_class.all
         @compressed_rules = RulesCompressor.new(@rules.reverse).rules_collapsed.reverse
         StiNormalizer.normalize(@compressed_rules)
-        ConditionsNormalizer.normalize(model_class, @compressed_rules)
-      end
-
-      # Returns conditions intended to be used inside a database query. Normally you will not call this
-      # method directly, but instead go through ModelAdditions#accessible_by.
-      #
-      # If there is only one "can" definition, a hash of conditions will be returned matching the one defined.
-      #
-      #   can :manage, User, :id => 1
-      #   query(:manage, User).conditions # => { :id => 1 }
-      #
-      # If there are multiple "can" definitions, a SQL string will be returned to handle complex cases.
-      #
-      #   can :manage, User, :id => 1
-      #   can :manage, User, :manager_id => 1
-      #   cannot :manage, User, :self_managed => true
-      #   query(:manage, User).conditions # => "not (self_managed = 't') AND ((manager_id = 1) OR (id = 1))"
-      #
-      def conditions
-        conditions_extractor = ConditionsExtractor.new(@model_class)
-        if @compressed_rules.size == 1 && @compressed_rules.first.base_behavior
-          # Return the conditions directly if there's just one definition
-          conditions_extractor.tableize_conditions(@compressed_rules.first.conditions).dup
-        else
-          extract_multiple_conditions(conditions_extractor, @compressed_rules)
-        end
-      end
-
-      def extract_multiple_conditions(conditions_extractor, rules)
-        rules.reverse.inject(false_sql) do |sql, rule|
-          merge_conditions(sql, conditions_extractor.tableize_conditions(rule.conditions).dup, rule.base_behavior)
+        ConditionsNormalizer.normalize(@model_class, @compressed_rules)
+        # run the extractor on the reversed set of rules to fill the cache properly
+        @conditions_extractor = ConditionsExtractor.new(@model_class).tap do |extractor|
+          @compressed_rules.reverse_each { |rule| extractor.tableize_conditions(rule.conditions) }
         end
       end
 
       def database_records
-        if override_scope
-          @model_class.where(nil).merge(override_scope)
-        elsif @model_class.respond_to?(:where) && @model_class.respond_to?(:joins)
-          build_relation(conditions)
+        if @model_class.respond_to?(:where) && @model_class.respond_to?(:joins)
+          build_relation
         else
           @model_class.all(conditions: conditions, joins: joins)
         end
       end
 
-      def build_relation(*where_conditions)
-        relation = @model_class.where(*where_conditions)
-        return relation unless joins.present?
+      def build_relation
+        @build_relation ||= begin
+          return @model_class.none if @compressed_rules.empty?
 
-        # subclasses must implement `build_joins_relation`
-        build_joins_relation(relation, *where_conditions)
+          @relation = merge_positive_conditions
+          @relation = merge_negative_conditions
+
+          build_joins_relation(@relation)
+        end
       end
 
       # Returns the associations used in conditions for the :joins option of a search.
@@ -78,6 +50,63 @@ module CanCan
       end
 
       private
+
+      def rule_to_relation(rule)
+        if rule.conditions.is_a? ActiveRecord::Relation
+          rule.conditions
+        elsif rule.conditions.present?
+          @model_class.where(@conditions_extractor.tableize_conditions(rule.conditions))
+        end
+      end
+
+      def positive_conditions
+        @positive_conditions ||= begin
+          @compressed_rules
+            .select(&:base_behavior)
+            .map { |rule| rule_to_relation(rule) }
+            .compact
+        end
+      end
+
+      def negative_conditions
+        @negative_conditions ||= begin
+          @compressed_rules
+            .reject(&:base_behavior)
+            .map { |rule| rule_to_relation(rule) }
+            .compact
+        end
+      end
+
+      def merge_positive_conditions
+        if positive_conditions.present?
+          @relation.merge(positive_conditions.reduce(&:or))
+        else
+          @relation
+        end
+      end
+
+      def merge_negative_conditions
+        if negative_conditions.present?
+          @relation.where.not(negative_conditions.reduce(:or).where_clause.ast)
+        else
+          @relation
+        end
+      end
+
+      def build_joins_relation(relation)
+        return relation unless joins.present?
+
+        case CanCan.accessible_by_strategy
+        when :subquery
+          inner = @model_class.unscoped do
+            @model_class.left_joins(joins).where(relation.where_clause.ast)
+          end
+          @model_class.where(@model_class.primary_key => inner)
+
+        when :left_join
+          relation.left_joins(joins).distinct
+        end
+      end
 
       # Removes empty hashes and moves everything into arrays.
       def deep_clean(joins_hash)
@@ -93,53 +122,6 @@ module CanCan
             base_hash[key] = value
           end
         end
-      end
-
-      def override_scope
-        conditions = @compressed_rules.map(&:conditions).compact
-        return unless conditions.any? { |c| c.is_a?(ActiveRecord::Relation) }
-        return conditions.first if conditions.size == 1
-
-        raise_override_scope_error
-      end
-
-      def raise_override_scope_error
-        rule_found = @compressed_rules.detect { |rule| rule.conditions.is_a?(ActiveRecord::Relation) }
-        raise Error,
-              'Unable to merge an Active Record scope with other conditions. '\
-              "Instead use a hash or SQL for #{rule_found.actions.first} #{rule_found.subjects.first} ability."
-      end
-
-      def merge_conditions(sql, conditions_hash, behavior)
-        if conditions_hash.blank?
-          behavior ? true_sql : false_sql
-        else
-          merge_non_empty_conditions(behavior, conditions_hash, sql)
-        end
-      end
-
-      def merge_non_empty_conditions(behavior, conditions_hash, sql)
-        conditions = sanitize_sql(conditions_hash)
-        case sql
-        when true_sql
-          behavior ? true_sql : "not (#{conditions})"
-        when false_sql
-          behavior ? conditions : false_sql
-        else
-          behavior ? "(#{conditions}) OR (#{sql})" : "not (#{conditions}) AND (#{sql})"
-        end
-      end
-
-      def false_sql
-        sanitize_sql(['?=?', true, false])
-      end
-
-      def true_sql
-        sanitize_sql(['?=?', true, true])
-      end
-
-      def sanitize_sql(conditions)
-        @model_class.send(:sanitize_sql, conditions)
       end
     end
   end
