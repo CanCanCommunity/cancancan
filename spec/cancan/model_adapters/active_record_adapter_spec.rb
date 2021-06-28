@@ -252,12 +252,13 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
       end
 
       it 'raises an exception when trying to merge scope with other conditions' do
+        published_article = Article.create!(published: true)
+        Article.create!(secret: true)
+        unpublished_not_secret_article = Article.create(published: false, secret: false)
         @ability.can :read, Article, published: true
-        @ability.can :read, Article, Article.where(secret: true)
-        expect(-> { Article.accessible_by(@ability) })
-          .to raise_error(CanCan::Error,
-                          'Unable to merge an Active Record scope with other conditions. '\
-                            'Instead use a hash or SQL for read Article ability.')
+        @ability.can :read, Article, Article.where(secret: false)
+        expect(-> { Article.accessible_by(@ability) }).not_to raise_error
+        expect(Article.accessible_by(@ability)).to match_array([published_article, unpublished_not_secret_article])
       end
 
       it 'does not raise an exception when the rule with scope is suppressed' do
@@ -799,7 +800,7 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
   FROM "articles"
   LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
   LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
-  WHERE (("users"."name" = 'paperino') OR ("users"."name" = 'pippo'))))
+  WHERE ("users"."name" = 'paperino' OR "users"."name" = 'pippo')))
       end
     end
   end

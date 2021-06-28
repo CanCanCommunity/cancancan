@@ -10,7 +10,7 @@ module CanCan
       def initialize(relation_or_class, rules)
         super
         @model_class = relation_or_class.respond_to?(:klass) ? relation_or_class.klass : relation_or_class
-        @relation = relation_or_class
+        @relation = relation_or_class.all
         @compressed_rules = RulesCompressor.new(@rules.reverse).rules_collapsed.reverse
         StiNormalizer.normalize(@compressed_rules)
         ConditionsNormalizer.normalize(@model_class, @compressed_rules)
@@ -48,21 +48,33 @@ module CanCan
       end
 
       def database_records
-        if override_scope
-          @model_class.where(nil).merge(override_scope)
-        elsif @model_class.respond_to?(:where) && @model_class.respond_to?(:joins)
-          build_relation(conditions)
+        if @model_class.respond_to?(:where) && @model_class.respond_to?(:joins)
+          build_relation
         else
           @model_class.all(conditions: conditions, joins: joins)
         end
       end
 
-      def build_relation(*where_conditions)
-        relation = @model_class.where(*where_conditions)
-        return relation unless joins.present?
+      def build_relation
+        @build_relation ||= begin
+          return @model_class.none if @compressed_rules.empty?
 
-        # subclasses must implement `build_joins_relation`
-        build_joins_relation(relation, *where_conditions)
+          # run the extractor on the reversed set of rules to fill the cache properly
+          conditions_extractor = ConditionsExtractor.new(@model_class)
+          @compressed_rules.reverse_each { |rule| conditions_extractor.tableize_conditions(rule.conditions) }
+
+          positive_rules, negative_rules = @compressed_rules.partition(&:base_behavior)
+
+          negative_conditions = negative_rules.map { |rule| rule_to_relation(rule, conditions_extractor) }.compact
+          positive_conditions = positive_rules.map { |rule| rule_to_relation(rule, conditions_extractor) }.compact
+
+          @relation = @relation.merge(positive_conditions.reduce(&:or)) if positive_conditions.present?
+          if negative_conditions.present?
+            @relation = @relation.where.not(negative_conditions.reduce(:or).where_clause.ast)
+          end
+
+          build_joins_relation(@relation)
+        end
       end
 
       # Returns the associations used in conditions for the :joins option of a search.
@@ -76,6 +88,29 @@ module CanCan
       end
 
       private
+
+      def rule_to_relation(rule, conditions_extractor)
+        if rule.conditions.is_a? ActiveRecord::Relation
+          rule.conditions
+        elsif rule.conditions.present?
+          @model_class.where(conditions_extractor.tableize_conditions(rule.conditions))
+        end
+      end
+
+      def build_joins_relation(relation)
+        return relation unless joins.present?
+
+        case CanCan.accessible_by_strategy
+        when :subquery
+          inner = @model_class.unscoped do
+            @model_class.left_joins(joins).where(relation.where_clause.ast)
+          end
+          @model_class.where(@model_class.primary_key => inner)
+
+        when :left_join
+          relation.left_joins(joins).distinct
+        end
+      end
 
       # Removes empty hashes and moves everything into arrays.
       def deep_clean(joins_hash)
