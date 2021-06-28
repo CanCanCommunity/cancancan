@@ -167,9 +167,10 @@ module CanCan
       raise Error, error_message if aliased_actions.values.flatten.include? target
     end
 
-    def model_adapter(model_class, action)
+    def model_adapter(relation_or_class, action)
+      model_class = relation_or_class.respond_to?(:klass) ? relation_or_class.klass : relation_or_class
       adapter_class = ModelAdapters::AbstractAdapter.adapter_class(model_class)
-      adapter_class.new(model_class, relevant_rules_for_query(action, model_class))
+      adapter_class.new(relation_or_class, relevant_rules_for_query(action, model_class))
     end
 
     # See ControllerAdditions#authorize! for documentation.

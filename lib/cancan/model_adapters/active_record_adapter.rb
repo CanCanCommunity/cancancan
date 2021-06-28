@@ -11,11 +11,13 @@ module CanCan
         Gem::Version.new(ActiveRecord.version).release < Gem::Version.new(version)
       end
 
-      def initialize(model_class, rules)
+      def initialize(relation_or_class, rules)
         super
+        @model_class = relation_or_class.respond_to?(:klass) ? relation_or_class.klass : relation_or_class
+        @relation = relation_or_class
         @compressed_rules = RulesCompressor.new(@rules.reverse).rules_collapsed.reverse
         StiNormalizer.normalize(@compressed_rules)
-        ConditionsNormalizer.normalize(model_class, @compressed_rules)
+        ConditionsNormalizer.normalize(@model_class, @compressed_rules)
       end
 
       # Returns conditions intended to be used inside a database query. Normally you will not call this
