@@ -26,8 +26,8 @@ module CanCan
         end
       end
 
-      # Provides a scope within the model, to find instances of the model that
-      # are accesssible by the given ability, within the given action/subject
+      # Provides a scope within the model to find instances of the model that
+      # are accessible by the given ability within the given action/subject
       # permission pair.
       # I.E.:
       #    Given the scenario below
@@ -61,7 +61,7 @@ module CanCan
       #      > Department.accessible_through(ability, :contact, User).to_sql
       #      => SELECT * FROM territories WHERE ((id = 13) OR (id IN (2, 3, 4)))
       #
-      #    Sometimes the name of the relation does't match the model, when that happens, you can override it with `relation`:
+      #    Sometimes the name of the relation doesn't match the model. When that happens, you can override it with `relation`:
       #
       #      class User < ActiveRecord::Base
       #        has_many :managing_users, class_name: "User", foreign_key: :managed_by_id
@@ -75,8 +75,7 @@ module CanCan
       #        end
       #      end
       #
-      #    This would give you a list of territories that the given ability can
-      #    contact their users:
+      #    The following would give you a list of territories that the given ability can contact their users:
       #
       #      > user = User.new(department_id: 13, manager: false)
       #      > ability = Ability.new(user)
