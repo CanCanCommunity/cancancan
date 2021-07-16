@@ -66,6 +66,18 @@ module CanCan
         end
       end
 
+      def relevant_rules_for_relation(model_class, action, subject, relation)
+        relevant_rules(action, subject).map do |rule|
+          case rule.conditions
+          when Hash
+            conditions = rule.conditions[relation] || rule.conditions[relation.to_sym]
+            Rule.new(rule.base_behavior, action, model_class, conditions, rule.block)
+          else
+            raise Error, "accessible_through is only available with hash conditions"
+          end
+        end
+      end
+
       def relevant_rules_for_query(action, subject)
         rules = relevant_rules(action, subject).reject do |rule|
           # reject 'cannot' rules with attributes when doing queries
