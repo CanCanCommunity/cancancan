@@ -172,6 +172,13 @@ module CanCan
       adapter_class.new(model_class, relevant_rules_for_query(action, model_class))
     end
 
+    # @private
+    def relation_model_adapter(model_class, action, subject, relation)
+      ::CanCan::ModelAdapters::AbstractAdapter
+        .adapter_class(model_class)
+        .new(model_class, relevant_rules_for_relation(model_class, action, subject, relation))
+    end
+
     # See ControllerAdditions#authorize! for documentation.
     def authorize!(action, subject, *args)
       message = args.last.is_a?(Hash) && args.last.key?(:message) ? args.pop[:message] : nil
