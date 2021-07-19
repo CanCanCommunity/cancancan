@@ -61,8 +61,7 @@ module CanCan
       #   > Department.accessible_through(ability, :contact, User).to_sql
       #   => SELECT * FROM departments WHERE ((id = 13) OR (id IN (2, 3, 4)))
       #
-      # Sometimes the name of the relation doesn't match the model. When that happens, you can override it
-      # with `relation`:
+      # Sometimes the name of the relation doesn't match the model:
       #
       #   class User < ActiveRecord::Base
       #     has_many :managing_users, class_name: "User", foreign_key: :managed_by_id
@@ -76,16 +75,17 @@ module CanCan
       #     end
       #   end
       #
-      # This would give you a list of departments that the given ability can contact their users:
+      # When that happens, you can override it with `relation`. This would give you a list of departments
+      # that the given ability can contact their users:
       #
       #   > user = User.new(department_id: 13, manager: false)
       #   > ability = Ability.new(user)
-      #   > Department.accessible_through(ability, :contact, User).to_sql
+      #   > Department.accessible_through(ability, :contact, User, relation: :managing_users).to_sql
       #   => SELECT * FROM departments WHERE id = 13
       #   >
       #   > user = User.new(department_id: 13, managing_department_ids: [2, 3, 4], manager: true)
       #   > ability = Ability.new(user)
-      #   > Department.accessible_through(ability, :contact, User).to_sql
+      #   > Department.accessible_through(ability, :contact, User, relation: :managing_users).to_sql
       #   => SELECT * FROM departments WHERE ((id = 13) OR (id IN (2, 3, 4)))
       #
       def accessible_through(ability, action, subject, relation: model_name.element, strategy: CanCan.accessible_by_strategy)
