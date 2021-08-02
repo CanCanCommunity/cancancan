@@ -1,4 +1,8 @@
-What do you do when permissions you defined in the Ability class don't seem to be working properly? First try to duplicate this problem in the `rails console` or better yet, see [[Testing Abilities]].
+# Debugging Abilities
+
+What do you do when permissions you defined in the Ability class don't seem to be working properly? 
+
+Have you already read the [Testing](./testing.md) section? You can now try to reproduce this problem in the `rails console`.
 
 ## Debugging Member Actions
 
@@ -16,7 +20,7 @@ Note: this assumes that the model instance is being loaded properly. If you are 
 ability.can?(:create, Project)
 ```
 
-## Debugging index Action
+## Debugging `index` Action
 
 ```ruby
 # in rails console or test
@@ -34,9 +38,6 @@ can :update, Project, ["priority < ?", 3] do |project|
   project.priority < 3
 end
 ```
-
-See [[issue #213|https://github.com/ryanb/cancan/issues#issue/213]] for a more complex example.
-
 ## Logging AccessDenied Exception
 
 If you think the `CanCan::AccessDenied` exception is being raised and you are not sure why, you can log this behavior to help debug what is triggering it.
@@ -51,11 +52,5 @@ end
 
 ## Issue Tracker
 
-If you are still unable to resolve the issue, please post on the [[issue tracker|https://github.com/ryanb/cancan/issues]]
-
-## Additional Docs
-
-* [[Defining Abilities]]
-* [[Checking Abilities]]
-* [[Ability Precedence]]
-* [[Testing Abilities]]
+If you are still unable to resolve the issue, [open a question on Stackoverflow](http://stackoverflow.com/questions/ask?tags=cancancan) with tag
+[cancancan](http://stackoverflow.com/questions/tagged/cancancan).

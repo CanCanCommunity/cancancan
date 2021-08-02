@@ -1,4 +1,7 @@
+# Internationalization
+
 To use translations in your app define some yaml like this:
+
 ```yaml
 # en.yml
 en:
@@ -6,6 +9,7 @@ en:
     manage:
       all: "You have no access to this resource"
 ```
+
 ## Translation for individual abilities
 If you want to customize messages for some model or even for some ability define translation like this:
 

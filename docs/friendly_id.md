@@ -1,10 +1,13 @@
-If you are using FriendlyId you will probably like something to make cancan compatible with it.
+# FriendlyId
+
+If you are using [FriendlyId](https://github.com/norman/friendly_id) you will probably like something to make CanCanCan compatible with it.
 
 You do not have to write `find_by :slug` or something like that, that is always error prone.
 
-You just need to create a `config/initizializers/cancan.rb` file with:
+You just need to create a `config/initizializers/cancancan.rb` file with:
+
 ```ruby
-if defined?(CanCan)
+if defined?(CanCanCan)
   class Object
     def metaclass
       class << self; self; end
