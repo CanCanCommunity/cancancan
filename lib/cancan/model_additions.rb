@@ -20,8 +20,10 @@ module CanCan
       #   @articles = Article.accessible_by(current_ability, :update)
       #
       # Here only the articles which the user can update are returned.
-      def accessible_by(ability, action = :index)
-        ability.model_adapter(self, action).database_records
+      def accessible_by(ability, action = :index, strategy: CanCan.accessible_by_strategy)
+        CanCan.with_accessible_by_strategy(strategy) do
+          ability.model_adapter(self, action).database_records
+        end
       end
     end
 

@@ -817,6 +817,101 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
     end
   end
 
+  if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
+    context 'switching strategies' do
+      before do
+        CanCan.accessible_by_strategy = :left_join # default - should be ignored in these tests
+      end
+
+      it 'allows you to switch strategies with a keyword argument' do
+        u = User.create!(name: 'pippo')
+        Article.create!(mentioned_users: [u])
+
+        ability = Ability.new(u)
+        ability.can :read, Article, mentions: { user: { name: u.name } }
+
+        subquery_sql = Article.accessible_by(ability, strategy: :subquery).to_sql
+        left_join_sql = Article.accessible_by(ability, strategy: :left_join).to_sql
+
+        expect(subquery_sql.strip.squeeze(' ')).to eq(%(
+    SELECT "articles".*
+    FROM "articles"
+    WHERE "articles"."id" IN
+    (SELECT "articles"."id"
+      FROM "articles"
+      LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
+      LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
+      WHERE "users"."name" = 'pippo')
+    ).gsub(/\s+/, ' ').strip)
+
+        expect(left_join_sql.strip.squeeze(' ')).to eq(%(
+  SELECT DISTINCT "articles".*
+  FROM "articles"
+  LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
+  LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
+  WHERE "users"."name" = 'pippo').gsub(/\s+/, ' ').strip)
+      end
+
+      it 'allows you to switch strategies with a block' do
+        u = User.create!(name: 'pippo')
+        Article.create!(mentioned_users: [u])
+
+        ability = Ability.new(u)
+        ability.can :read, Article, mentions: { user: { name: u.name } }
+
+        subquery_sql = CanCan.with_accessible_by_strategy(:subquery) { Article.accessible_by(ability).to_sql }
+        left_join_sql = CanCan.with_accessible_by_strategy(:left_join) { Article.accessible_by(ability).to_sql }
+
+        expect(subquery_sql.strip.squeeze(' ')).to eq(%(
+    SELECT "articles".*
+    FROM "articles"
+    WHERE "articles"."id" IN
+    (SELECT "articles"."id"
+      FROM "articles"
+      LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
+      LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
+      WHERE "users"."name" = 'pippo')
+    ).gsub(/\s+/, ' ').strip)
+
+        expect(left_join_sql.strip.squeeze(' ')).to eq(%(
+  SELECT DISTINCT "articles".*
+  FROM "articles"
+  LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
+  LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
+  WHERE "users"."name" = 'pippo').gsub(/\s+/, ' ').strip)
+      end
+
+      it 'allows you to switch strategies with a block, and to_sql called outside the block' do
+        u = User.create!(name: 'pippo')
+        Article.create!(mentioned_users: [u])
+
+        ability = Ability.new(u)
+        ability.can :read, Article, mentions: { user: { name: u.name } }
+
+        subquery_sql = CanCan.with_accessible_by_strategy(:subquery) { Article.accessible_by(ability) }.to_sql
+        left_join_sql = CanCan.with_accessible_by_strategy(:left_join) { Article.accessible_by(ability) }.to_sql
+
+        expect(subquery_sql.strip.squeeze(' ')).to eq(%(
+    SELECT "articles".*
+    FROM "articles"
+    WHERE "articles"."id" IN
+    (SELECT "articles"."id"
+      FROM "articles"
+      LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
+      LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
+      WHERE "users"."name" = 'pippo')
+    ).gsub(/\s+/, ' ').strip)
+
+        expect(left_join_sql.strip.squeeze(' ')).to eq(%(
+  SELECT DISTINCT "articles".*
+  FROM "articles"
+  LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
+  LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
+  WHERE "users"."name" = 'pippo').gsub(/\s+/, ' ').strip)
+      end
+    end
+  end
+
   CanCan.valid_accessible_by_strategies.each do |strategy|
     context "when a model has renamed primary_key with #{strategy} strategy" do
       before :each do
