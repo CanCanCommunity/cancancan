@@ -1,8 +1,11 @@
-You can bypass CanCanCan's authorization for Devise controllers:
+# Devise
+
+You should bypass CanCanCan's authorization for Devise controllers:
 
 ```ruby
 class ApplicationController < ActionController::Base
   protect_from_forgery
+  
   check_authorization unless: :devise_controller?
 end
 ```

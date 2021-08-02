@@ -1,3 +1,7 @@
+# Migration Guide
+
+## From 2.x to 3.x
+
 ### Breaking changes
 
 * **Defining abilities without a subject is not allowed anymore.**

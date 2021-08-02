@@ -1,3 +1,5 @@
+# Role-based Authorization
+
 CanCanCan is decoupled from how you implement roles in the User model, but how might one set up basic role-based authorization? The pros and cons are described [here](https://github.com/kristianmandrup/cantango/wiki/CanCan-vs-CanTango).
 
 The following approach allows you to simply define the role abilities in Ruby and does not need a role model. Alternatively, [[Separate Role Model]] describes how to define the roles and mappings in a database.
