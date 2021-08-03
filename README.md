@@ -33,7 +33,7 @@ of models automatically and reduce duplicated code.
 <br/>
 <br/>
 <a href="https://www.moderntreasury.com" target="_blank"  style="display:inline">
-  <img src="./logo/modern_treasury.svg" alt="Modern Treasury" height="50"/>
+  <img src="./logo/modern_treasury.svg" alt="Modern Treasury" height="40"/>
 </a>
 <br/>
 <br/>
@@ -51,7 +51,13 @@ of models automatically and reduce duplicated code.
 <br />
 <br />
 <a href="https://newrelic.com/" target="_blank">
-  <img src="./logo/new_relic.png" alt="NewRelic" height="50"/>
+  <img src="./logo/new_relic.png" alt="NewRelic" height="45"/>
+</a>
+<br />
+<br />
+<br />
+<a href="https://www.incloudcounsel.com" target="_blank">
+  <img src="./logo/in_cloud_counsel.png" alt="InCloudCounsel" height="70"/>
 </a>
 <br />
 <br />
