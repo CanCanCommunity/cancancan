@@ -115,7 +115,7 @@ is the possibility to retrieve all the objects that the user is authorized to ac
 The following:
 
 ```ruby
-  @posts Post.accessible_by(current_ability)
+  @posts = Post.accessible_by(current_ability)
 ```
 
 will use your rules to ensure that the user retrieves only a list of posts that can be read.
