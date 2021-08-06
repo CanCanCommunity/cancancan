@@ -1,6 +1,6 @@
 # Handling CanCan::AccessDenied
 
-In the [Controller helpers] chapter was saw that when a resource is not authorized, a `CanCan::AccessDenied` exception is raised, and we offered a basic handling through `config/application.rb`. Let's now see what else we can do.
+In the [Controller helpers](./controller_helpers.md) chapter was saw that when a resource is not authorized, a `CanCan::AccessDenied` exception is raised, and we offered a basic handling through `config/application.rb`. Let's now see what else we can do.
 
 The `CanCan::AccessDenied` exception is raised when calling `authorize!` in the controller and the user is not able to perform the given action. 
 
