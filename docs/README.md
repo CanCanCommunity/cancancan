@@ -6,7 +6,7 @@ It will advance chapter by chapter and go more and more into details, advanced u
 
 We will start by introducing basic concepts and features, and then dig deeper into configurations and implementation details in later chapters.
 
-You can skip the [Introduction](./introduction.md) where there's just some history and blablabla and go directly to [Installation](./installation) to start fast :rocket:.
+You can skip the [Introduction](./introduction.md) where there's just some history and blablabla and go directly to [Installation](./installation.md) to start fast :rocket:.
 
 ## Summary
 
