@@ -40,7 +40,7 @@ You can have a global configuration on how to react to this exception in `config
 config.action_dispatch.rescue_responses.merge!('CanCan::AccessDenied' => :unauthorized)
 ```
 
-The [Handling CanCan::AccessDenied Exception](./handling_exception.md) chapter digs deeper on how to handle the exception raised by `authorize!`.
+The [Handling CanCan::AccessDenied Exception](./handling_access_denied.md) chapter digs deeper on how to handle the exception raised by `authorize!`.
 
 > `:unauthorized` might not be your favourite return status of you don't want to reveal to the user that the article exists. In such cases `:not_found` would be a better http status. 
 
