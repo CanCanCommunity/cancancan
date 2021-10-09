@@ -68,11 +68,10 @@ WHERE (user_id = 1) OR (not (self_managed = 'true') AND (public = 'true'))
 The generation of the SQL query is a very complex task and probably the most powerful feature of CanCanCan.
 
 Even if the default behaviour will suffice at the beginning, larger databases or more complex rules, might lead to very complex SQL queries. This might result in a slow fetching of records. This is why is possible to use different strategies to generate the SQL.
-You will see that in one of the last chapters: [SQL strategies](./sql_strategies.ms)
+You will see that in one of the last chapters: [SQL strategies](./sql_strategies.md)
 
 # Blocks
 
 We haven't spoken about block abilities yet, but the SQL generation will not be possible if you have even a single rule that is defined using just a block.
 You can define SQL fragments in addition to block to fix that. But we'll see that in the [Define Abilities with Blocks](./define_abilities_with_blocks.md) chapter.
 ```
-
