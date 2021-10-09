@@ -244,7 +244,7 @@ You can create differing authorization rules that depend on the controller names
 
 In this case, just override the `current_ability` method in `ApplicationController` to include the controller namespace, and create an `Ability` class that knows what to do with it.
 
-``` ruby
+```ruby
 class Admin::WidgetsController < ActionController::Base
   #...
 
@@ -276,7 +276,7 @@ end
 
 Another way to achieve the same is to use a completely different Ability class in this controller:
 
-``` ruby
+```ruby
 class Admin::WidgetsController < ActionController::Base
   #...
 
