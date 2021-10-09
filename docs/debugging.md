@@ -52,5 +52,5 @@ end
 
 ## Issue Tracker
 
-If you are still unable to resolve the issue, [open a question on Stackoverflow](http://stackoverflow.com/questions/ask?tags=cancancan) with tag
-[cancancan](http://stackoverflow.com/questions/tagged/cancancan).
+If you are still unable to resolve the issue, [open a question on Stackoverflow](https://stackoverflow.com/questions/ask?tags=cancancan) with tag
+[cancancan](https://stackoverflow.com/questions/tagged/cancancan).
