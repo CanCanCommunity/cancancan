@@ -133,7 +133,7 @@ For now, what you need to know, is that these four will be your most used, basic
 
 One last action is `manage`. This action means that you have full permissions on the subject and you can perform any possible action. Knowing that, we can now rewrite our ability.rb example:
 
-```
+```ruby
 can :read, Article, published: true
 
 return unless user.present?
