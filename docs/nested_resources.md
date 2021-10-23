@@ -28,23 +28,23 @@ If the name of the association doesn't match the resource name, for instance `ha
   end
 ```
 
-If the resource name (`:project` in this case) does not match the controller then it will be considered a parent resource. You can manually specify parent/child resources using the `parent: false` option.
+If the resource name (`:project` in this case) does not match the controller, then it will be considered a parent resource. You can manually specify parent/child resources using the `parent: false` option.
 
 ## Securing `through` changes
 
-If you are using `through` you need to be wary of potential changes to the parent model. For example, consider this controller:
+If you are using `through`, you need to be wary of potential changes to the parent model. For example, consider this controller:
 
 ```ruby
 class TasksController < ApplicationController
   load_and_authorize_resource :project
   load_and_authorize_resource :task, through: :project
-  
+
   def update
     @task.update(task_params)
   end
-  
+
   private
-  
+
   def task_params
     params.require(:task).permit(:project_id)
   end
@@ -85,8 +85,7 @@ Here everything will be loaded through the `current_user.projects` association.
 
 ## Shallow nesting
 
-The parent resource is required to be present and it will raise an exception if the parent is ever `nil`. 
-If you want it to be optional (such as with shallow routes), add the `shallow: true` option to the child.
+The parent resource is required to be present and it will raise an exception if the parent is ever `nil`. If you want it to be optional (such as with shallow routes), add the `shallow: true` option to the child.
 
 ```ruby
 class TasksController < ApplicationController
@@ -156,7 +155,8 @@ can? :read, @project => Task
 This will use the above `:project` hash conditions and ensure `@project` meets those conditions.
 
 ## Has_many through associations
-How to load and authorize resources with a has_many :through association?
+
+How to load and authorize resources with a `has_many :through` association?
 
 Given that situation:
 
@@ -195,7 +195,7 @@ in ability.rb
 can :create, User, groups_users: { group: { CONDITION_ON_GROUP } }
 ```
 
-Don't forget the **inverse_of** option, it is the trick to make it work correctly. 
+Don't forget the **inverse_of** option, it is the trick to make it work correctly.
 
 Remember to define the ability through the **groups_users** model (i.e. don't write `can :create, User, groups: { CONDITION_ON_GROUP }`)
 

@@ -28,7 +28,7 @@ can :read, Article, is_published: true
 By using hashes instead of blocks for all actions, you won't have to worry about translating blocks used for member controller actions (`:create`, `:destroy`, `:update`) to equivalent blocks for collection actions (`:index`, `:show`)—which require hashes anyway!
 
 ### Hash conditions are OR'd in SQL, giving you maximum flexibilty.
-  
+
 Every time you define an ability with `can`, each `can` chains together with OR in the final SQL query for that model.
 
 So if, in addition to the `is_published` condition above, we want to allow authors to see their drafts:
@@ -54,7 +54,7 @@ See [Hash of Conditions Chapter](./hash_of_conditions.md).
 
 As suggested in this [topic on Reddit](https://www.reddit.com/r/ruby/comments/6ytka8/refactoring_cancancan_abilities_brewing_bits/) you should, when possible, give increasing permissions to your users.
 
-CanCanCan increases permissions: it starts by giving no permissions to nobody and then increases those permissions depending on the user. 
+CanCanCan increases permissions: it starts by giving no permissions to nobody and then increases those permissions depending on the user.
 
 A properly written `ability.rb` looks like that:
 
@@ -75,6 +75,6 @@ class Ability
 end
 ```
 
-following this good practice will help you to keep your permissions clean and more readable. 
+following this good practice will help you to keep your permissions clean and more readable.
 
 The risk of giving wrong permissions to the wrong users is also decreased.

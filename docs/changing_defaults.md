@@ -6,8 +6,8 @@ We now dig deeper in the customizations and options we have when working with [c
 
 CanCanCan makes two assumptions about your application:
 
-* You have an `Ability` class which defines the permissions.
-* You have a `current_user` method in the controller which returns the current user model.
+- You have an `Ability` class which defines the permissions.
+- You have a `current_user` method in the controller which returns the current user model.
 
 You can override both of these by defining the `current_ability` method in your `ApplicationController`. The default method looks like this.
 
@@ -58,7 +58,7 @@ class ArticlesController < ApplicationController
   load_and_authorize_resource param_method: :my_sanitizer
 
   def create
-    @article.save    
+    @article.save
   end
 
   private
@@ -81,7 +81,7 @@ Finally, it's possible to associate `param_method` with a Proc object which will
 load_and_authorize_resource param_method: -> { |c| c.params.require(:article).permit(:name) }
 ```
 
-If your model name and controller name differ, you can specify a `class` option. 
+If your model name and controller name differ, you can specify a `class` option.
 
 > Note that the method will still be `articles_params` and not `post_params`, since we are in `ArticlesController`.
 
@@ -104,7 +104,6 @@ end
 ## Non RESTful controllers
 
 You can use CanCanCan with controllers that do not follow the traditional REST actions, however you should not use the `load_and_authorize_resource` method since there is no resource to load. Instead you can call `authorize!` in each action separately.
-
 
 For example, let's say we have a controller which does some miscellaneous administration tasks such as rolling log files. We can use the `authorize!` method here.
 
@@ -166,7 +165,6 @@ class ProductsController < ApplicationController
 end
 ```
 
-
 ### Custom find
 
 If you want to fetch a resource by something other than `id` it can be done so using the `find_by` option.
@@ -225,9 +223,9 @@ Here's another example where authorization is only ensured for the admin subdoma
 ```ruby
 class ApplicationController < ActionController::Base
   check_authorization if: :admin_subdomain?
-  
+
   private
-  
+
   def admin_subdomain?
     request.subdomain == "admin"
   end
@@ -236,15 +234,15 @@ end
 
 > Note: The `check_authorization` only ensures that authorization is performed. If you have `authorize_resource` the authorization will still be performed no matter what is returned here.
 
-The default operation for CanCanCan is to authorize based on user and the object identified in `load_resource`.  So if you have a `WidgetsController` and also an `Admin::WidgetsController`, you can use some different approaches.
+The default operation for CanCanCan is to authorize based on user and the object identified in `load_resource`. So if you have a `WidgetsController` and also an `Admin::WidgetsController`, you can use some different approaches.
 
 # Overriding authorizations for Namespaced controllers
 
-You can create differing authorization rules that depend on the controller namespace.  
+You can create differing authorization rules that depend on the controller namespace.
 
 In this case, just override the `current_ability` method in `ApplicationController` to include the controller namespace, and create an `Ability` class that knows what to do with it.
 
-``` ruby
+```ruby
 class Admin::WidgetsController < ActionController::Base
   #...
 
@@ -276,7 +274,7 @@ end
 
 Another way to achieve the same is to use a completely different Ability class in this controller:
 
-``` ruby
+```ruby
 class Admin::WidgetsController < ActionController::Base
   #...
 

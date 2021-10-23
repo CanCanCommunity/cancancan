@@ -42,9 +42,9 @@ config.action_dispatch.rescue_responses.merge!('CanCan::AccessDenied' => :unauth
 
 The [Handling CanCan::AccessDenied Exception](./handling_access_denied.md) chapter digs deeper on how to handle the exception raised by `authorize!`.
 
-> `:unauthorized` might not be your favourite return status of you don't want to reveal to the user that the article exists. In such cases `:not_found` would be a better http status. 
+> `:unauthorized` might not be your favourite return status if you don't want to reveal to the user that the article exists. In such cases, `:not_found` would be a better http status.
 
-# authorize_resource, load_resource, load_and_authorize_resource
+## authorize_resource, load_resource, load_and_authorize_resource
 
 In a RESTful controller, calling `authorize! action` for every action can be tedious. Here we will show you, step by step, how to improve the code above.
 
@@ -83,11 +83,11 @@ and, clearly, `load_and_authorize_resource` allows to do the following:
 class ArticlesController < ApplicationController
   load_and_authorize_resource
 
-  def edit;  end
+  def edit; end
 end
 ```
 
-this means that a completely authorized  `ArticlesController` would look as follow:
+this means that a completely authorized `ArticlesController` would look as follow:
 
 ```ruby
 class ArticlesController < ApplicationController
@@ -107,7 +107,7 @@ class ArticlesController < ApplicationController
   end
 
   def edit
-    # the @article to edit is already loaded and authorized    
+    # the @article to edit is already loaded and authorized
   end
 
   def update

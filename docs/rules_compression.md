@@ -4,8 +4,7 @@ Your rules are optimized automatically at runtime. There are a set of "rules" to
 
 A rule without conditions is defined as `catch_all`.
 
-
-### A catch_all rule, eliminates all previous rules and all subsequent rules of the same type
+## A catch_all rule, eliminates all previous rules and all subsequent rules of the same type
 
 ```ruby
 can :read, Book, author_id: user.id
@@ -14,7 +13,9 @@ can :read, Book
 can :read, Book, id: 1
 cannot :read, Book, private: true
 ```
+
 becomes
+
 ```ruby
 can :read, Book
 cannot :read, Book, private: true
@@ -26,7 +27,9 @@ cannot :read, Book, private: true
 cannot :read, Book
 can :read, Book, author_id: user.id
 ```
+
 becomes
+
 ```ruby
 can :read, Book, author_id: user.id
 ```
@@ -36,7 +39,9 @@ can :read, Book, author_id: user.id
 ```ruby
 cannot :read, Book, private: true
 ```
+
 becomes
+
 ```ruby
 # nothing
 ```

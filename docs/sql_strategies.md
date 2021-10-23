@@ -41,7 +41,7 @@ can :read, Article, mentions: { user: { name: u.name } }
 
 ## :left_join
 
-Note that in the default strategy, we use the `DISTINCT` clasue which might cause performance issues.
+Note that in the default strategy, we use the `DISTINCT` clause which might cause performance issues.
 
 ```sql
 SELECT DISTINCT "articles".*

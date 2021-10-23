@@ -5,12 +5,11 @@ CanCanCan is an authorization library and therefore the first and most interesti
 There are two basic methods in CanCanCan that you will use:
 
 ```ruby
-can actions, subjects, conditions 
+can actions, subjects, conditions
 # without the question mark
 ```
 
 is how you define who can **perform** certain `actions` on certain `subjects`.
-
 
 ```ruby
 can? action, subject
@@ -28,7 +27,8 @@ class Article
 end
 ```
 
-The answer to this question is that 
+The answer to this question is that
+
 > "only the author can edit an article."
 
 We can define the permissions in the `ability.rb`:
@@ -56,13 +56,14 @@ can? :update, @article # => true
 But how does CanCanCan know who is the `user`?
 When you use the `can?` method in a Rails controller or view, CanCanCan expects that there's a `current_user` method defined. So if you are using something like [devise](https://github.com/heartcombo/devise) for your authentication, you don't need to do anything special.
 
-By default, CanCanCan assumes no permissions: no one can do any action on any object. 
+By default, CanCanCan assumes no permissions: no one can do any action on any object.
 
 `can :update, Article, user: user` is stating that the user can update an article, if it is its author.
 
 Regarding the `Article` there are actually more permissions to check:
-* who can read them?
-* what can the administrator do?
+
+- who can read them?
+- what can the administrator do?
 
 A complete example looks like the following:
 
@@ -82,9 +83,9 @@ can :update, Article
 
 The code above is stating the following:
 
-* users that are not logged in, can read published articles
-* logged in users can **also** read and update their own articles
-* administrators can read and update all the articles.
+- users that are not logged in, can read published articles
+- logged in users can **also** read and update their own articles
+- administrators can read and update all the articles.
 
 > CanCanCan works, at its best, when defining increasing permissions.
 
@@ -115,7 +116,7 @@ update: [:edit, :update]
 destroy: [:destroy]
 ```
 
-this means that when you define `can :read, Article`, you can also check: 
+this means that when you define `can :read, Article`, you can also check:
 
 ```ruby
 can? :show, @article
@@ -133,7 +134,7 @@ For now, what you need to know, is that these four will be your most used, basic
 
 One last action is `manage`. This action means that you have full permissions on the subject and you can perform any possible action. Knowing that, we can now rewrite our ability.rb example:
 
-```
+```ruby
 can :read, Article, published: true
 
 return unless user.present?
@@ -154,14 +155,14 @@ can? :destroy, @article # => true
 
 Now that we learned about actions and their aliases let's see what we can do with the subjects
 
-# Can subjects
+## Can subjects
 
 The subject of an action is usually a Ruby class. Most of the times you want to define your permissions on specific classes, but this is not your only option.
 
 You can actually use any subject, and one of the most common cases is to just use a symbol.
 An admin dashboard could be protected by definining:
 
-```
+```ruby
 can :read, :admin_dashboard
 ```
 
@@ -203,7 +204,7 @@ return unless user.admin?
 can :manage, :all
 ```
 
-# Checking other users abilities
+## Checking other users abilities
 
 What if you want to determine the abilities of a `User` record that is not the `current_user`? Maybe we want to see if another user can update an article.
 

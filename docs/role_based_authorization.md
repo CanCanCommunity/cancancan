@@ -23,13 +23,14 @@ rails generate migration add_role_to_users role:string
 rake db:migrate
 ```
 
-In your `users_controller.rb` add `:role` to the list of permitted parameters  
+In your `users_controller.rb` add `:role` to the list of permitted parameters.
 
 ```ruby
 def user_params
   params.require(:user).permit(:name, :email, :password, :password_confirmation, :role)
 end
 ```
+
 If you're using ActiveAdmin don't forget to add `role` to the `user.rb` list of parameters as well
 
 ```ruby

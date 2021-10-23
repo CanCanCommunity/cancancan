@@ -10,8 +10,8 @@ You can skip the [Introduction](./introduction.md) where there's just some histo
 
 ## Summary
 
-1. [Introduction](./introduction.md) 
-1. [Installation](./installation.md)   
+1. [Introduction](./introduction.md)
+1. [Installation](./installation.md)
 1. [Define and check abilities](./define_check_abilities.md)
 1. [Controller helpers](./controller_helpers.md)
 1. [Fetching records](./fetching_records.md)

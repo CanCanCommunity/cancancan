@@ -1,6 +1,6 @@
 # Debugging Abilities
 
-What do you do when permissions you defined in the Ability class don't seem to be working properly? 
+What do you do when permissions you defined in the Ability class don't seem to be working properly?
 
 Have you already read the [Testing](./testing.md) section? You can now try to reproduce this problem in the `rails console`.
 
@@ -38,6 +38,7 @@ can :update, Project, ["priority < ?", 3] do |project|
   project.priority < 3
 end
 ```
+
 ## Logging AccessDenied Exception
 
 If you think the `CanCan::AccessDenied` exception is being raised and you are not sure why, you can log this behavior to help debug what is triggering it.

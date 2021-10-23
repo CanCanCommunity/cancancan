@@ -36,6 +36,7 @@ end
 ```
 
 ## Mongoid
+
 With mongoid it is necessary to reference `:project_id` instead of just `:project`
 
 ```ruby

@@ -1,9 +1,9 @@
 # Abilities in Database
 
-What if you or a client, wants to change permissions without having to re-deploy the application? 
+What if you or a client, wants to change permissions without having to re-deploy the application?
 In that case, it may be best to store the permission logic in a database: it is very easy to use the database records when defining abilities.
 
-We will need a model called `Permission`. 
+We will need a model called `Permission`.
 
 Each user `has_many :permissions`, and each permission has `action`, `subject_class` and `subject_id` columns. The last of which is optional.
 
@@ -40,7 +40,6 @@ The actual details will depend largely on your application requirements, but hop
 
 You can mix-and-match this with defining permissions in the code as well. This way you can keep the more complex logic in the code so you don't need to shoe-horn every kind of permission rule into an overly-abstract database.
 
-
 You can also create a `Permission` model containing all possible permissions in your app. Use that code to create a rake task that fills a `Permission` table:
 (The code below is not fully tested)
 
@@ -71,7 +70,7 @@ def setup_actions_controllers_db
   end
   # You can change ApplicationController for a super-class used by your restricted controllers
   ApplicationController.subclasses.each do |controller|
-    if controller.respond_to?(:permission)	
+    if controller.respond_to?(:permission)
       klass, description = controller.permission
       write_permission(klass, "manage", description, "All operations")
       controller.action_methods.each do |action|
@@ -82,7 +81,7 @@ def setup_actions_controllers_db
       end
     end
   end
-	
+
 end
 
 
@@ -108,11 +107,11 @@ def eval_cancan_action(action)
 end
 
 def write_permission(class_name, cancan_action, name, description, force_id_1 = false)
-  permission  = Permission.find(:first, :conditions => ["subject_class = ? and action = ?", class_name, cancan_action]) 
+  permission = Permission.find(:first, :conditions => ["subject_class = ? and action = ?", class_name, cancan_action])
   if not permission
     permission = Permission.new
     permission.id = 1 if force_id_1
-    permission.subject_class =  class_name
+    permission.subject_class = class_name
     permission.action = cancan_action
     permission.name = name
     permission.description = description

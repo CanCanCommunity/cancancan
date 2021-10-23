@@ -14,13 +14,13 @@ can :manage, Project
 cannot :destroy, Project
 ```
 
-The order of these calls is important. 
+The order of these calls is important.
 
 ## Abilities precedence
 
-An ability rule will override a previous one. 
+An ability rule will override a previous one.
 
-For example, let's say we want the user to be able to do everything to projects except destroy them. 
+For example, let's say we want the user to be able to do everything to projects except destroy them.
 
 This is the correct way:
 
@@ -38,7 +38,7 @@ can :manage, Project, user: user
 can :update, Project, locked: false
 ```
 
-For the above, `can? :update, @project` will return true if project owner is the user, even if the project is locked. 
+For the above, `can? :update, @project` will return true if project owner is the user, even if the project is locked.
 
 This is also important when dealing with roles which have inherited behavior. For example, let's say we have two roles, moderator and admin. We want the admin to inherit the moderator's behavior.
 
