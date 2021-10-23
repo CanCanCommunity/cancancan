@@ -51,10 +51,9 @@ It's then very simple to determine the role of the user in the Ability class.
 can :manage, :all if user.role == "admin"
 ```
 
-
 ## Many roles per user
 
-It is possible to assign multiple roles to a user and store it into a single integer column using a [[bitmask|http://en.wikipedia.org/wiki/Mask_(computing)]]. First add a `roles_mask` integer column to your `users` table.
+It is possible to assign multiple roles to a user and store it into a single integer column using a [bitmask](<http://en.wikipedia.org/wiki/Mask_(computing)>). First add a `roles_mask` integer column to your `users` table.
 
 ```bash
 rails generate migration add_roles_mask_to_users roles_mask:integer
@@ -83,9 +82,10 @@ If you're using devise, don't forget to add `attr_accessible :roles` to your use
   before_action :configure_permitted_parameters, if: :devise_controller?
   protected
   def configure_permitted_parameters
-    devise_parameter_sanitizer.for(:sign_up)  { |u| u.permit(  :email, :password, :password_confirmation, roles: [] ) }
+    devise_parameter_sanitizer.for(:sign_up) { |u| u.permit(:email, :password, :password_confirmation, roles: []) }
   end
 ```
+
 You can use checkboxes in the view for setting these roles.
 
 ```rhtml
@@ -110,10 +110,9 @@ can :manage, :all if user.has_role? :admin
 
 See [[Custom Actions]] for a way to restrict which users can assign roles to other users.
 
-This functionality has also been extracted into a little gem called [[role_model|http://rubygems.org/gems/role_model]] ([[code & howto|http://github.com/martinrehfeld/role_model]]).
+This functionality has also been extracted into a little gem called [role_model](http://rubygems.org/gems/role_model) ([code & howto](http://github.com/martinrehfeld/role_model)).
 
 If you do not like this bitmask solution, see [[Separate Role Model]] for an alternative way to handle this.
-
 
 ## Role Inheritance
 
@@ -144,7 +143,7 @@ end
 
 Here a superadmin will be able to manage all three classes but a moderator can only manage the one. Of course you can change the role logic to fit your needs. You can add complex logic so certain roles only inherit from others. And if a given user can have multiple roles you can decide whether the lowest role takes priority or the highest one does. Or use other attributes on the user model such as a "banned", "activated", or "admin" column.
 
-This functionality has been extracted into a gem called [[canard|http://rubygems.org/gems/canard]] ([[code & howto|http://github.com/james2m/canard]]).
+This functionality has been extracted into a gem called [canard](http://rubygems.org/gems/canard) ([code & howto](http://github.com/james2m/canard)).
 
 ## Alternative Role Inheritance
 

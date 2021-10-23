@@ -46,18 +46,19 @@ And this is just an ActiveRecord scope so other scopes and pagination can be cha
 
 The call to accessible_by in the example above will generate the proper SQL to limit the records fetched.
 
-
 This works also with multiple `can` definitions, which allows you to define complex permission logic and have it translated properly to SQL.
 
 Given the definition:
+
 ```ruby
 class Ability
   can :read, Article, public: true
-  cannot :read, User, self_managed: true
+  cannot :read, Article, self_managed: true
   can :read, Article, user: user
 end
 ```
-a call to Article.accessible_by(current_ability) generates the following SQL
+
+a call to `Article.accessible_by(current_ability)` generates the following SQL
 
 ```sql
 SELECT *

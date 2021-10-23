@@ -185,11 +185,11 @@ can :manage, :all
 
 and give all possible permissions to the administrator.
 
-Note that the code above allows the administrator to also `:read, :admin_dashboard`. :manage means literally **any** action, not only CRUD ones.
+Note that the code above allows the administrator to also `:read, :admin_dashboard`. `:manage` means literally **any** action, not only CRUD ones.
 
 > You **must and should** always check for specific permisssions, but you don't need to define all of them if not needed.
 
-If at some point you have a new page reserved to the administrators, where they can traslate articles, you should check for `can? :translate, @article`, but you don't need to define the ability, since the administrators can already do any action. It will be easy in the future to give the possibility for authors to translate their own articles by changing your permissions file:
+If at some point you have a new page reserved to the administrators, where they can translate articles, you should check for `can? :translate, @article`, but you don't need to define the ability, since the administrators can already do any action. It will be easy in the future to give the possibility for authors to translate their own articles by changing your permissions file:
 
 ```ruby
 can :read, Article, published: true

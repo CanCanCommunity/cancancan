@@ -33,8 +33,7 @@ can :read, Project, active: true, owner: user
 
 so by using the association `owner` instead of the database column `user_id`.
 
-
-You can nest conditionsassociations. Here the project can only be read if the category it belongs to is visible.
+You can nest conditions associations. Here the project can only be read if the category it belongs to is visible.
 
 ```ruby
 can :read, Project, category: { visible: true }
