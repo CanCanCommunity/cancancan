@@ -1,6 +1,6 @@
 # Controller helpers
 
-As mentioned in the chapter [Define and check abilities](./define_and_check_abilities.md), the `can?` method works at its best in Rails controllers and views.
+As mentioned in the chapter [Define and check abilities](./define_check_abilities.md), the `can?` method works at its best in Rails controllers and views.
 This of course doesn't mean that it cannot be used everywhere.
 
 We know already that in order to check if the user is allowed to perform a certain action we need to have a `current_user` method available and we can check the permission with `can? :update, @article`.
