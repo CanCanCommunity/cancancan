@@ -34,7 +34,7 @@ Lint/AmbiguousBlockAssociation:
   Enabled: false
 
 AllCops:
-  TargetRubyVersion: 2.2.0
+  TargetRubyVersion: 2.4
   Exclude:
     - 'gemfiles/**/*'
     - 'vendor/**/*'
