@@ -93,7 +93,7 @@ class Ability
     can :read, Post, user: user
 
     return unless user.admin?  # additional permissions for administrators
-    can :read, Post      
+    can :read, Post
   end
 end
 ```
