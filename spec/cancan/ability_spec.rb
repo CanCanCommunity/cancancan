@@ -383,9 +383,11 @@ describe CanCan::Ability do
   it 'allows to check ability for Module' do
     module B
     end
+
     class A
       include B
     end
+
     @ability.can :read, B
     expect(@ability.can?(:read, A)).to be(true)
     expect(@ability.can?(:read, A.new)).to be(true)
@@ -394,9 +396,11 @@ describe CanCan::Ability do
   it 'passes nil to a block for ability on Module when no instance is passed' do
     module B
     end
+
     class A
       include B
     end
+
     @ability.can :read, B do |sym|
       expect(sym).to be_nil
       true
@@ -701,10 +705,10 @@ describe CanCan::Ability do
 
       I18n.backend.store_translations :en,
                                       activemodel: { models: { account: 'english name' } },
-                                      unauthorized: { update: { all: '%{subject}' } }
+                                      unauthorized: { update: { all: '%<subject>s' } }
       I18n.backend.store_translations :ja,
                                       activemodel: { models: { account: 'japanese name' } },
-                                      unauthorized: { update: { all: '%{subject}' } }
+                                      unauthorized: { update: { all: '%<subject>s' } }
 
       I18n.with_locale(:en) do
         expect(@ability.unauthorized_message(:update, Account)).to eq('english name')
@@ -722,10 +726,10 @@ describe CanCan::Ability do
 
       I18n.backend.store_translations :en,
                                       actions: { update: 'english name' },
-                                      unauthorized: { update: { all: '%{action}' } }
+                                      unauthorized: { update: { all: '%<action>s' } }
       I18n.backend.store_translations :ja,
                                       actions: { update: 'japanese name' },
-                                      unauthorized: { update: { all: '%{action}' } }
+                                      unauthorized: { update: { all: '%<action>s' } }
 
       I18n.with_locale(:en) do
         expect(@ability.unauthorized_message(:update, Account)).to eq('english name')

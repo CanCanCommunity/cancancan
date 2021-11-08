@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-lib = File.expand_path('lib', __dir__)
-$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'cancan/version'
+require_relative 'lib/cancan/version'
 
 Gem::Specification.new do |s|
   s.name        = 'cancancan'
@@ -25,5 +23,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'bundler', '~> 2.0'
   s.add_development_dependency 'rake', '~> 10.1', '>= 10.1.1'
   s.add_development_dependency 'rspec', '~> 3.2', '>= 3.2.0'
-  s.add_development_dependency 'rubocop', '~> 0.63.1'
+  s.add_development_dependency 'rubocop', '~> 1.12.0'
 end

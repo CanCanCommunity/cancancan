@@ -490,15 +490,13 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
       expect(Comment.accessible_by(@ability).order('articles.name')).to match_array([comment2, comment1])
 
       # works with the explicit join in AR 5.2+ and AR 4.2
-      if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.2.0')
+      if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.2.0') ||
+         CanCan::ModelAdapters::ActiveRecordAdapter.version_lower?('5.0.0')
         expect(Comment.accessible_by(@ability).joins(:article).order('articles.name'))
           .to match_array([comment2, comment1])
-      elsif CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
+      else
         expect { Comment.accessible_by(@ability).joins(:article).order('articles.name').to_a }
           .to raise_error(ActiveRecord::StatementInvalid)
-      else
-        expect(Comment.accessible_by(@ability).joins(:article).order('articles.name'))
-          .to match_array([comment2, comment1])
       end
     end
 

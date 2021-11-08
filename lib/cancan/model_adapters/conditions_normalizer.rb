@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # this class is responsible of normalizing the hash of conditions
 # by exploding has_many through associations
 # when a condition is defined with an has_many thorugh association this is exploded in all its parts

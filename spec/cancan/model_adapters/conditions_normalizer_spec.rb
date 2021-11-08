@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 RSpec.describe CanCan::ModelAdapters::ConditionsNormalizer do
@@ -5,15 +7,13 @@ RSpec.describe CanCan::ModelAdapters::ConditionsNormalizer do
     connect_db
     ActiveRecord::Migration.verbose = false
     ActiveRecord::Schema.define do
-      create_table(:articles) do |t|
-      end
+      create_table(:articles)
 
       create_table(:users) do |t|
         t.string :name
       end
 
-      create_table(:comments) do |t|
-      end
+      create_table(:comments)
 
       create_table(:spread_comments) do |t|
         t.integer :article_id
@@ -30,8 +30,7 @@ RSpec.describe CanCan::ModelAdapters::ConditionsNormalizer do
         t.integer :blob_id
       end
 
-      create_table(:blob) do |t|
-      end
+      create_table(:blob)
     end
 
     class Article < ActiveRecord::Base

@@ -4,7 +4,7 @@ module CanCan
   module Relevant
     # Matches both the action, subject, and attribute, not necessarily the conditions
     def relevant?(action, subject)
-      subject = subject.values.first if subject.class == Hash
+      subject = subject.values.first if subject.instance_of?(Hash)
       @match_all || (matches_action?(action) && matches_subject?(subject))
     end
 

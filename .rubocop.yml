@@ -19,6 +19,18 @@ Metrics/BlockLength:
     - '**/*_spec.rb'
 
 # TODO
+Metrics/ParameterLists:
+  Exclude:
+    # def initialize(message = nil, action = nil, subject = nil, conditions = nil)
+    - 'lib/cancan/exceptions.rb'
+
+# TODO
+Metrics/AbcSize:
+  Exclude:
+    # def permissions
+    - 'lib/cancan/ability.rb'
+
+# TODO
 # Offense count: 2
 # Configuration parameters: NamePrefix, NamePrefixBlacklist, NameWhitelist.
 # NamePrefix: is_, has_, have_
@@ -33,8 +45,20 @@ Naming/PredicateName:
 Lint/AmbiguousBlockAssociation:
   Enabled: false
 
+# TODO
+# There are to many errors, especially phantom, with `stub_const` for `ActiveRecord::Base`
+Lint/ConstantDefinitionInBlock:
+  Exclude:
+    - 'spec/**/*'
+
+# TODO
+Lint/EmptyClass:
+  Exclude:
+    - 'spec/**/*'
+
 AllCops:
   TargetRubyVersion: 2.4
+  NewCops: enable
   Exclude:
     - 'gemfiles/**/*'
     - 'vendor/**/*'

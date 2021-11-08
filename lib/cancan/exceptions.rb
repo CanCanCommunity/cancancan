@@ -48,15 +48,16 @@ module CanCan
     attr_writer :default_message
 
     def initialize(message = nil, action = nil, subject = nil, conditions = nil)
-      @message = message
+      super message.to_s
       @action = action
       @subject = subject
       @conditions = conditions
       @default_message = I18n.t(:"unauthorized.default", default: 'You are not authorized to access this page.')
     end
 
-    def to_s
-      @message || @default_message
+    def message
+      actual = super
+      actual.empty? ? @default_message : actual
     end
 
     def inspect

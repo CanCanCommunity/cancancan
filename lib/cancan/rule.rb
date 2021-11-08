@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require_relative 'conditions_matcher.rb'
-require_relative 'class_matcher.rb'
-require_relative 'relevant.rb'
+require_relative 'conditions_matcher'
+require_relative 'class_matcher'
+require_relative 'relevant'
 
 module CanCan
   # This class is used internally and should only be called through Ability.
@@ -12,8 +12,10 @@ module CanCan
     include ConditionsMatcher
     include Relevant
     include ParameterValidators
-    attr_reader :base_behavior, :subjects, :actions, :conditions, :attributes, :block
-    attr_writer :expanded_actions, :conditions
+
+    attr_reader :base_behavior, :subjects, :actions, :attributes, :block
+    attr_writer :expanded_actions
+    attr_accessor :conditions
 
     # The first argument when initializing is the base_behavior which is a true/false
     # value. True for "can" and false for "cannot". The next two arguments are the action
@@ -45,7 +47,7 @@ module CanCan
         repr += ", #{@conditions.inspect}"
       end
 
-      repr + '>'
+      "#{repr}>"
     end
 
     def can_rule?

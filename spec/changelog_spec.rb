@@ -42,7 +42,7 @@ RSpec.describe 'changelog' do
     describe 'link to related issue' do
       let(:issues) do
         entries.map do |entry|
-          entry.match(/\[(?<number>[#\d]+)\]\((?<url>[^\)]+)\)/)
+          entry.match(/\[(?<number>[#\d]+)\]\((?<url>[^)]+)\)/)
         end.compact
       end
 
@@ -83,7 +83,7 @@ RSpec.describe 'changelog' do
           entry
             .gsub(/`[^`]+`/, '``')
             .sub(/^\*\s*(?:\[.+?\):\s*)?/, '')
-            .sub(/\s*\([^\)]+\)$/, '')
+            .sub(/\s*\([^)]+\)$/, '')
         end
       end
 
@@ -94,7 +94,7 @@ RSpec.describe 'changelog' do
       end
 
       it 'ends with a punctuation' do
-        expect(bodies).to all(match(/[\.\!]$/))
+        expect(bodies).to all(match(/[.!]$/))
       end
     end
   end

@@ -2,7 +2,7 @@
 
 RSpec::Matchers.define :orderlessly_match do |original_string|
   match do |given_string|
-    original_string.split('').sort == given_string.split('').sort
+    original_string.chars.sort == given_string.chars.sort
   end
 
   failure_message do |given_string|

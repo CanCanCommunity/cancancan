@@ -121,18 +121,28 @@ RSpec.describe CanCan::ModelAdapters::ConditionsExtractor do
     end
 
     it 'converts very complex nested sets' do
-      original_conditions = { user: { id: 1 },
-                              mentioned_users: { name: 'a name',
-                                                 mentioned_articles: { id: 2 },
-                                                 articles: { user: { name: 'deep' },
-                                                             mentioned_users: { name: 'd2' } } } }
+      original_conditions = {
+        user: { id: 1 },
+        mentioned_users: {
+          name: 'a name',
+          mentioned_articles: { id: 2 },
+          articles: {
+            user: { name: 'deep' },
+            mentioned_users: { name: 'd2' }
+          }
+        }
+      }
 
       conditions = described_class.new(Article).tableize_conditions(original_conditions)
-      expect(conditions).to eq(users: { id: 1 },
-                               mentioned_articles_users: { id: 2 },
-                               mentioned_users_articles: { name: 'a name' },
-                               users_articles: { name: 'deep' },
-                               mentioned_users_articles_2: { name: 'd2' })
+      # rubocop:disable Naming/VariableNumber
+      expect(conditions).to eq(
+        users: { id: 1 },
+        mentioned_articles_users: { id: 2 },
+        mentioned_users_articles: { name: 'a name' },
+        users_articles: { name: 'deep' },
+        mentioned_users_articles_2: { name: 'd2' }
+      )
+      # rubocop:enable Naming/VariableNumber
     end
 
     it 'converts complex nested sets with duplicates' do

@@ -34,7 +34,7 @@ Kernel.const_get(rspec_module)::Matchers.define :be_able_to do |*args|
 
   failure_message do
     resource = args[1]
-    if resource.instance_of?(Class)
+    if resource.is_a?(Class)
       "expected to be able to #{args.map(&:to_s).join(' ')}"
     else
       "expected to be able to #{args.map(&:inspect).join(' ')}"
@@ -43,7 +43,7 @@ Kernel.const_get(rspec_module)::Matchers.define :be_able_to do |*args|
 
   failure_message_when_negated do
     resource = args[1]
-    if resource.instance_of?(Class)
+    if resource.is_a?(Class)
       "expected not to be able to #{args.map(&:to_s).join(' ')}"
     else
       "expected not to be able to #{args.map(&:inspect).join(' ')}"

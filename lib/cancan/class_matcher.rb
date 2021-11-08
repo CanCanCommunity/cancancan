@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # This class is responsible for matching classes and their subclasses as well as
 # upmatching classes to their ancestors.
 # This is used to generate sti connections

@@ -4,8 +4,7 @@ require 'spec_helper'
 
 describe CanCan::RulesCompressor do
   before do
-    class Blog
-    end
+    class Blog; end
   end
 
   def can(action, subject, args = nil)

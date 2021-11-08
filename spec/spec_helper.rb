@@ -12,8 +12,7 @@ require 'cancan/matchers'
 I18n.enforce_available_locales = false if defined?(I18n) && I18n.respond_to?('enforce_available_locales=')
 
 # Add support to load paths
-$LOAD_PATH.unshift File.expand_path('support', __dir__)
-Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }
+Dir["#{__dir__}/support/**/*.rb"].sort.each { |f| require f }
 
 RSpec.configure do |config|
   config.filter_run focus: true

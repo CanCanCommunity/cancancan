@@ -534,7 +534,9 @@ describe CanCan::ControllerResource do
   context 'when @name passed as symbol' do
     it 'returns namespaced #resource_class' do
       module Admin; end
+
       class Admin::Dashboard; end
+
       params[:controller] = 'admin/dashboard'
       resource = CanCan::ControllerResource.new(controller, :dashboard)
 

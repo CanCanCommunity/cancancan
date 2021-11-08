@@ -25,7 +25,7 @@ module CanCan
     end
 
     def matches_non_block_conditions(subject)
-      return nested_subject_matches_conditions?(subject) if subject.class == Hash
+      return nested_subject_matches_conditions?(subject) if subject.is_a?(Hash)
       return matches_conditions_hash?(subject) unless subject_class?(subject)
 
       # Don't stop at "cannot" definitions when there are conditions.
@@ -85,7 +85,7 @@ module CanCan
     end
 
     def call_block_with_all(action, subject, *extra_args)
-      if subject.class == Class
+      if subject.is_a?(Class)
         @block.call(action, subject, nil, *extra_args)
       else
         @block.call(action, subject.class, subject, *extra_args)

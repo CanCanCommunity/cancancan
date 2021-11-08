@@ -4,6 +4,7 @@ module CanCan
   module ModelAdapters
     class AbstractAdapter
       def self.inherited(subclass)
+        super
         @subclasses ||= []
         @subclasses.insert(0, subclass)
       end

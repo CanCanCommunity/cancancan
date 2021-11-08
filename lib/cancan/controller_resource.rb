@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-require_relative 'controller_resource_loader.rb'
+require_relative 'controller_resource_loader'
+
 module CanCan
   # Handle the load and authorization controller logic
   # so we don't clutter up all controllers with non-interface methods.

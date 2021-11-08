@@ -13,7 +13,7 @@ module CanCan
     end
 
     def translate_subject(subject)
-      klass = (subject.class == Class ? subject : subject.class)
+      klass = (subject.is_a?(Class) ? subject : subject.class)
       if klass.respond_to?(:model_name)
         klass.model_name.human
       else

@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
-require_relative 'controller_resource_finder.rb'
-require_relative 'controller_resource_name_finder.rb'
-require_relative 'controller_resource_builder.rb'
-require_relative 'controller_resource_sanitizer.rb'
+require_relative 'controller_resource_finder'
+require_relative 'controller_resource_name_finder'
+require_relative 'controller_resource_builder'
+require_relative 'controller_resource_sanitizer'
+
 module CanCan
   module ControllerResourceLoader
     include CanCan::ControllerResourceNameFinder

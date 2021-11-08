@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-require_relative 'conditions_matcher.rb'
+require_relative 'conditions_matcher'
+
 module CanCan
   class RulesCompressor
     attr_reader :initial_rules, :rules_collapsed
