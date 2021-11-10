@@ -11,6 +11,8 @@ module CanCan
         Gem::Version.new(ActiveRecord.version).release < Gem::Version.new(version)
       end
 
+      attr_reader :compressed_rules
+
       def initialize(model_class, rules)
         super
         @compressed_rules = RulesCompressor.new(@rules.reverse).rules_collapsed.reverse
