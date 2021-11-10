@@ -43,6 +43,6 @@ That is why passing a class to `can?` will return `true`.
 
 The code answering the question "can the user update all the articles?" would be something like:
 
-``` ruby
+```ruby
 Article.accessible_by(current_ability).count == Article.count
 ```

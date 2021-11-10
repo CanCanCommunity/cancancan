@@ -2,7 +2,7 @@
 
 Let's start our journey into the abilities definition by explaining the CanCanCan Hash of conditions mechanism.
 
-In the chapter [Define and Check Abilities](./define_and_check_abilities.md) we defined
+In the chapter [Define and Check Abilities](./define_check_abilities.md) we defined
 
 ```ruby
 can :update, @article, user: user
