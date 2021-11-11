@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'conditions_matcher.rb'
-require_relative 'class_matcher.rb'
+require_relative 'subject_class_matcher.rb'
 require_relative 'relevant.rb'
 
 module CanCan
@@ -24,28 +24,29 @@ module CanCan
       # attributes were passed or are actually conditions
       attributes, extra_args = parse_attributes_from_extra_args(extra_args)
       condition_and_block_check(extra_args, block, action, subject)
+      @base_behavior = base_behavior
       @match_all = action.nil? && subject.nil?
       raise Error, "Subject is required for #{action}" if action && subject.nil?
 
-      @base_behavior = base_behavior
+      initialize_attributes(action, subject, attributes, block, extra_args)
+    end
+
+    def initialize_attributes(action, subject, attributes, block, extra_args)
       @actions = wrap(action)
       @subjects = wrap(subject)
       @attributes = wrap(attributes)
+      @subject_class_matcher = SubjectClassMatcher.new
       @conditions = extra_args || {}
       @block = block
     end
 
     def inspect
-      repr = "#<#{self.class.name}"
-      repr += "#{@base_behavior ? 'can' : 'cannot'} #{@actions.inspect}, #{@subjects.inspect}, #{@attributes.inspect}"
-
-      if with_scope?
-        repr += ", #{@conditions.where_values_hash}"
-      elsif [Hash, String].include?(@conditions.class)
-        repr += ", #{@conditions.inspect}"
-      end
-
-      repr + '>'
+      [
+        "#<#{self.class.name}",
+        "#{@base_behavior ? 'can' : 'cannot'} #{@actions.inspect}, #{@subjects.inspect}, #{@attributes.inspect}",
+        format(', %<inspect>s', inspect: with_scope? ? @conditions.where_values_hash : @conditions.inspect),
+        '>'
+      ].join
     end
 
     def can_rule?
@@ -111,7 +112,7 @@ module CanCan
     end
 
     def matches_subject_class?(subject)
-      SubjectClassMatcher.matches_subject_class?(@subjects, subject)
+      @subject_class_matcher.matches_subject_class?(@subjects, subject)
     end
 
     def parse_attributes_from_extra_args(args)

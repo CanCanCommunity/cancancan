@@ -2,23 +2,28 @@
 # upmatching classes to their ancestors.
 # This is used to generate sti connections
 class SubjectClassMatcher
-  def self.matches_subject_class?(subjects, subject)
+  def initialize
+    @subclasses = {}
+  end
+
+  def matches_subject_class?(subjects, subject)
+    has_subclasses = subject.respond_to?(:subclasses)
     subjects.any? do |sub|
-      has_subclasses = subject.respond_to?(:subclasses)
       matching_class_check(subject, sub, has_subclasses)
     end
   end
 
-  def self.matching_class_check(subject, sub, has_subclasses)
+  def matching_class_check(subject, sub, has_subclasses)
     matches = matches_class_or_is_related(subject, sub)
     if has_subclasses
-      matches || subject.subclasses.include?(sub)
+      @subclasses[subject.class.name] ||= subject.subclasses
+      matches || @subclasses[subject.class.name].include?(sub)
     else
       matches
     end
   end
 
-  def self.matches_class_or_is_related(subject, sub)
+  def matches_class_or_is_related(subject, sub)
     sub.is_a?(Module) && (subject.is_a?(sub) ||
         subject.class.to_s == sub.to_s ||
         (subject.is_a?(Module) && subject.ancestors.include?(sub)))
