@@ -33,5 +33,5 @@ or in Strong Parameters:
 ```ruby
 params
   .require(:book)
-  .permit(ability.permitted_attributes(:read, @book))
+  .permit(current_ability.permitted_attributes(:read, @book))
 ```

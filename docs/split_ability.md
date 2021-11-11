@@ -61,7 +61,7 @@ class BooksController
 end
 ```
 
-Using this technique you have all the power of CanCanCan ability files, that allows you define your permissions with hash of conditions. This means you can check permissions on a single instance of a model, but also retrieve automatically all the instances where you are authorized to perform a certain action. 
+Using this technique you have all the power of CanCanCan ability files, that allows you define your permissions with hash of conditions. This means you can check permissions on a single instance of a model, but also retrieve automatically all the instances where you are authorized to perform a certain action.
 
 You can call `can? :read, @book` but also `Book.accessible_by(current_ability, :read)` that will return all the books you can read.
 

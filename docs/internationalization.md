@@ -11,7 +11,8 @@ en:
 ```
 
 ## Translation for individual abilities
-If you want to customize messages for some model or even for some ability define translation like this:
+
+If you want to customize messages for some model or even for some ability, define translation like this:
 
 ```ruby
 # models/ability.rb
@@ -19,6 +20,7 @@ If you want to customize messages for some model or even for some ability define
 can :create, Article
 ...
 ```
+
 ```yaml
 # en.yml
 en:
@@ -28,13 +30,16 @@ en:
 ```
 
 ### Translating custom abilities
+
 Also translations is available for your custom abilities:
+
 ```ruby
 # models/ability.rb
 ...
 can :vote, Article
 ...
 ```
+
 ```yaml
 # en.yml
 en:
@@ -42,8 +47,11 @@ en:
     vote:
       article: "Only users which have one or more article can vote"
 ```
+
 ## Variables for translations
+
 Finally you may use `action`(which contain ability like 'create') and `subject`(for example 'article') variables in your translation:
+
 ```yaml
 # en.yml
 en:

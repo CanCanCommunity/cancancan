@@ -37,10 +37,10 @@ require "cancan/matchers"
 describe "User" do
   describe "abilities" do
     subject(:ability) { Ability.new(user) }
-    let(:user){ nil }
+    let(:user) { nil }
 
     context "when is an account manager" do
-      let(:user){ create(:account_manager) }
+      let(:user) { create(:account_manager) }
 
       it { is_expected.to be_able_to(:manage, Account.new) }
     end
@@ -66,19 +66,18 @@ Scenario: Update Article
 
 Here the `rescue_from` block will take effect only in this scenario.
 
-
 ## Request Testing
 
-If you want to test authorization functionality at the request level one option is to log-in the user who has the appropriate permissions.
+If you want to test authorization functionality at the request level, one option is to log-in the user who has the appropriate permissions.
 
 ```ruby
 user = User.create!(admin: true)
 article = Article.create!
 login user, as: :user # in devise
 get article_path(article)
-expect(response).to have_http_status(:ok) 
+expect(response).to have_http_status(:ok)
 ```
 
-If you have very complex permissions it can lead to many branching possibilities. If these are all tested in the request layer then it can lead to slow and bloated tests. 
+If you have very complex permissions it can lead to many branching possibilities. If these are all tested in the request layer then it can lead to slow and bloated tests.
 
 Instead we recommend keeping request authorization tests light and testing the authorization functionality more thoroughly in the Ability model through unit tests as shown at the top.
