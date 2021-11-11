@@ -13,6 +13,7 @@ class ApplicationController < ActionController::Base
   end
 end
 ```
+
 ```ruby
 class Ability
   include CanCan::Ability

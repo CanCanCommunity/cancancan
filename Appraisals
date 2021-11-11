@@ -101,10 +101,12 @@ appraise 'activerecord_6.1.0' do
   end
 end
 
-appraise 'activerecord_master' do
-  gem 'actionpack', github: 'rails/rails', require: 'action_pack'
-  gem 'activerecord', github: 'rails/rails', require: 'active_record'
-  gem 'activesupport', github: 'rails/rails', require: 'active_support/all'
+appraise 'activerecord_main' do
+  git 'https://github.com/rails/rails', branch: 'main' do
+    gem 'actionpack', require: 'action_pack'
+    gem 'activerecord', require: 'active_record'
+    gem 'activesupport', require: 'active_support/all'
+  end
 
   platforms :jruby do
     gem 'activerecord-jdbcsqlite3-adapter'

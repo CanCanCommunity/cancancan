@@ -30,6 +30,6 @@ end
 This is everything you need to start. :boom:
 
 All the permissions will be defined in this file.
-You can of course split it into multiple files if your application grows, but we'll cover that in a [later chapter](./split_ability.md). 
+You can of course split it into multiple files if your application grows, but we'll cover that in a [later chapter](./split_ability.md).
 
 Let's now start with the basic concepts: [define and check abilities](./define_check_abilities.md).

@@ -8,9 +8,9 @@ can :update, Project do |project|
 end
 ```
 
-Note that if you pass a block to a `can` or `cannot`, the block only executes if an instance of a class is passed to `can?` or `cannot?` calls. 
+Note that if you pass a block to a `can` or `cannot`, the block only executes if an instance of a class is passed to `can?` or `cannot?` calls.
 
-If you define a `can` or `cannot` with a block and an object is not passed, the check will pass. 
+If you define a `can` or `cannot` with a block and an object is not passed, the check will pass.
 
 ```ruby
 can :update, Project do |project|
@@ -24,7 +24,7 @@ can? :update, Project # returns true!
 
 ## Fetching Records
 
-A block's conditions are only executable through Ruby. If you are [Fetching Records](./fetching_records.md) using `accessible_by` it will raise an exception. 
+A block's conditions are only executable through Ruby. If you are [Fetching Records](./fetching_records.md) using `accessible_by` it will raise an exception.
 
 To fetch records from the database you need to supply an SQL string representing the condition. The SQL will go in the `WHERE` clause:
 
@@ -35,7 +35,6 @@ end
 ```
 
 > If you are using `load_resource` and don't supply this SQL argument, the instance variable will not be set for the `index` action since they cannot be translated to a database query.
-
 
 ## Block Conditions with ActiveRecord Scopes
 
@@ -49,8 +48,8 @@ end
 
 This is really useful if you have complex conditions which require `joins`. A couple of caveats:
 
-* You cannot use this with multiple `can` definitions that match the same action and model since it is not possible to combine them. An exception will be raised when that is the case.
-* If you use this with `cannot`, the scope needs to be the inverse since it's passed directly through. For example, if you don't want someone to read discontinued products the scope will need to fetch non discontinued ones:
+- You cannot use this with multiple `can` definitions that match the same action and model since it is not possible to combine them. An exception will be raised when that is the case.
+- If you use this with `cannot`, the scope needs to be the inverse since it's passed directly through. For example, if you don't want someone to read discontinued products the scope will need to fetch non discontinued ones:
 
 ```ruby
 cannot :read, Product, Product.where(discontinued: false) do |product|

@@ -6,7 +6,7 @@
 [![Github Actions badge](https://github.com/CanCanCommunity/cancancan/actions/workflows/test.yml/badge.svg)](https://github.com/CanCanCommunity/cancancan/actions/workflows/test.yml/badge.svg)
 [![Code Climate Badge](https://codeclimate.com/github/CanCanCommunity/cancancan.svg)](https://codeclimate.com/github/CanCanCommunity/cancancan)
 
-[Developer guide](./docs) |
+[Developer guide](./docs/README.md) |
 [RDocs](http://rdoc.info/projects/CanCanCommunity/cancancan) |
 [Screencast 1](http://railscasts.com/episodes/192-authorization-with-cancan) |
 [Screencast 2](https://www.youtube.com/watch?v=cTYu-OjUgDw)
@@ -33,7 +33,7 @@ of models automatically and reduce duplicated code.
 <br/>
 <br/>
 <a href="https://www.moderntreasury.com" target="_blank"  style="display:inline">
-  <img src="./logo/modern_treasury.svg" alt="Modern Treasury" height="50"/>
+  <img src="./logo/modern_treasury.svg" alt="Modern Treasury" height="40"/>
 </a>
 <br/>
 <br/>
@@ -51,7 +51,13 @@ of models automatically and reduce duplicated code.
 <br />
 <br />
 <a href="https://newrelic.com/" target="_blank">
-  <img src="./logo/new_relic.png" alt="NewRelic" height="50"/>
+  <img src="./logo/new_relic.png" alt="NewRelic" height="45"/>
+</a>
+<br />
+<br />
+<br />
+<a href="https://www.incloudcounsel.com" target="_blank">
+  <img src="./logo/in_cloud_counsel.png" alt="InCloudCounsel" height="70"/>
 </a>
 <br />
 <br />
@@ -59,7 +65,7 @@ of models automatically and reduce duplicated code.
 Do you want to sponsor CanCanCan and show your logo here?
 Check our [Sponsors Page](https://github.com/sponsors/coorasse).
 
-Head to our complete [Developer Guide](./docs) to learn how to use CanCanCan in details.
+Head to our complete [Developer Guide](./docs/README.md) to learn how to use CanCanCan in details.
 
 ## Installation
 
@@ -87,7 +93,7 @@ class Ability
     can :read, Post, user: user
 
     return unless user.admin?  # additional permissions for administrators
-    can :read, Post      
+    can :read, Post
   end
 end
 ```
@@ -109,7 +115,7 @@ is the possibility to retrieve all the objects that the user is authorized to ac
 The following:
 
 ```ruby
-  @posts Post.accessible_by(current_ability)
+  @posts = Post.accessible_by(current_ability)
 ```
 
 will use your rules to ensure that the user retrieves only a list of posts that can be read.
@@ -145,12 +151,12 @@ end
 
 ## Documentation
 
-Head to our complete [Developer Guide](./docs) to learn how to use CanCanCan in details.
+Head to our complete [Developer Guide](./docs/README.md) to learn how to use CanCanCan in details.
 
 ## Questions?
 
 If you have any question or doubt regarding CanCanCan which you cannot find the solution to in the
-[documentation](./docs), please
+[documentation](./docs/README.md), please
 [open a question on Stackoverflow](http://stackoverflow.com/questions/ask?tags=cancancan) with tag
 [cancancan](http://stackoverflow.com/questions/tagged/cancancan)
 
@@ -172,4 +178,4 @@ See the [CONTRIBUTING](./CONTRIBUTING.md) for more information.
 ## Special Thanks
 
 Thanks to our Sponsors and to all the [CanCanCan contributors](https://github.com/CanCanCommunity/cancancan/contributors).
-See the [CHANGELOG](https://github.com/CanCanCommunity/cancancan/blob/master/CHANGELOG.md) for the full list.
+See the [CHANGELOG](https://github.com/CanCanCommunity/cancancan/blob/main/CHANGELOG.md) for the full list.

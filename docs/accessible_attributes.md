@@ -5,7 +5,7 @@ CanCanCan gives you the possibility to define actions on single instances' attri
 Given you want users to only read a user first name and last name you can define:
 
 ```ruby
-can :read, User, :first_name, :last_name
+can :read, User, [:first_name, :last_name]
 ```
 
 and check it with:
@@ -33,5 +33,5 @@ or in Strong Parameters:
 ```ruby
 params
   .require(:book)
-  .permit(ability.permitted_attributes(:read, @book))
+  .permit(current_ability.permitted_attributes(:read, @book))
 ```

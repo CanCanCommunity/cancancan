@@ -33,7 +33,7 @@ Think of it as asking
 
 > can the current user read **a** project?"
 
-The user can read a project, so this returns `true`. However it depends on which specific project you're talking about. 
+The user can read a project, so this returns `true`. However it depends on which specific project you're talking about.
 
 If you are doing a class check, it is important you do another check once an instance becomes available so the hash of conditions can be used.
 
@@ -43,6 +43,6 @@ That is why passing a class to `can?` will return `true`.
 
 The code answering the question "can the user update all the articles?" would be something like:
 
-``` ruby
+```ruby
 Article.accessible_by(current_ability).count == Article.count
 ```

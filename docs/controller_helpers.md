@@ -1,6 +1,6 @@
 # Controller helpers
 
-As mentioned in the chapter [Define and check abilities](./define_and_check_abilities.md), the `can?` method works at its bets in Rails controllers and views.
+As mentioned in the chapter [Define and check abilities](./define_check_abilities.md), the `can?` method works at its best in Rails controllers and views.
 This of course doesn't mean that it cannot be used everywhere.
 
 We know already that in order to check if the user is allowed to perform a certain action we need to have a `current_user` method available and we can check the permission with `can? :update, @article`.
@@ -40,11 +40,11 @@ You can have a global configuration on how to react to this exception in `config
 config.action_dispatch.rescue_responses.merge!('CanCan::AccessDenied' => :unauthorized)
 ```
 
-The [Handling CanCan::AccessDenied Exception](./handling_exception.md) chapter digs deeper on how to handle the exception raised by `authorize!`.
+The [Handling CanCan::AccessDenied Exception](./handling_access_denied.md) chapter digs deeper on how to handle the exception raised by `authorize!`.
 
-> `:unauthorized` might not be your favourite return status of you don't want to reveal to the user that the article exists. In such cases `:not_found` would be a better http status. 
+> `:unauthorized` might not be your favourite return status if you don't want to reveal to the user that the article exists. In such cases, `:not_found` would be a better http status.
 
-# authorize_resource, load_resource, load_and_authorize_resource
+## authorize_resource, load_resource, load_and_authorize_resource
 
 In a RESTful controller, calling `authorize! action` for every action can be tedious. Here we will show you, step by step, how to improve the code above.
 
@@ -83,11 +83,11 @@ and, clearly, `load_and_authorize_resource` allows to do the following:
 class ArticlesController < ApplicationController
   load_and_authorize_resource
 
-  def edit;  end
+  def edit; end
 end
 ```
 
-this means that a completely authorized  `ArticlesController` would look as follow:
+this means that a completely authorized `ArticlesController` would look as follow:
 
 ```ruby
 class ArticlesController < ApplicationController
@@ -107,7 +107,7 @@ class ArticlesController < ApplicationController
   end
 
   def edit
-    # the @article to edit is already loaded and authorized    
+    # the @article to edit is already loaded and authorized
   end
 
   def update
