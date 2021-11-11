@@ -1,8 +1,8 @@
 # Handling CanCan::AccessDenied
 
-In the [Controller helpers](./controller_helpers.md) chapter was saw that when a resource is not authorized, a `CanCan::AccessDenied` exception is raised, and we offered a basic handling through `config/application.rb`. Let's now see what else we can do.
+In the [Controller helpers](./controller_helpers.md) chapter, we saw that when a resource is not authorized, a `CanCan::AccessDenied` exception is raised, and we offered a basic handling through `config/application.rb`. Let's now see what else we can do.
 
-The `CanCan::AccessDenied` exception is raised when calling `authorize!` in the controller and the user is not able to perform the given action. 
+The `CanCan::AccessDenied` exception is raised when calling `authorize!` in the controller and the user is not able to perform the given action.
 
 A message can optionally be provided.
 
@@ -28,7 +28,7 @@ en:
     update:
       project: "Not allowed to update this project."
     action_name:
-      model_name: "..."  
+      model_name: "..."
 ```
 
 Notice `manage` and `all` can be used to generalize the subject and actions. Also `%{action}` and `%{subject}` can be used as interpolated variables in the message.
