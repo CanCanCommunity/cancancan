@@ -13,13 +13,16 @@ end
 It may be a good idea to specify the rescue from action:
 
 ```ruby
-rescue_from CanCan::Unauthorized do |exception|
+rescue_from CanCan::AccessDenied do |exception|
   if current_user.nil?
     session[:next] = request.fullpath
     redirect_to login_url, alert: 'You have to log in to continue.'
   else
-    # render file: "#{Rails.root}/public/403.html", status: 403
-    redirect_back(fallback_location: root_path)
+    respond_to do |format|
+      format.json { render nothing: true, status: :not_found }
+      format.html { redirect_to main_app.root_url, alert: exception.message }
+      format.js   { render nothing: true, status: :not_found }
+    end
   end
 end
 ```
