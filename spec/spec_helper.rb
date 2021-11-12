@@ -5,6 +5,7 @@ require 'bundler/setup'
 
 Bundler.require
 
+require 'byebug'
 require 'matchers'
 require 'cancan/matchers'
 
