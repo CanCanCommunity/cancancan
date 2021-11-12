@@ -24,4 +24,5 @@ if defined? ActiveRecord
   require 'cancan/model_adapters/strategies/base'
   require 'cancan/model_adapters/strategies/left_join'
   require 'cancan/model_adapters/strategies/subquery'
+  require 'cancan/model_adapters/strategies/exists_subquery'
 end

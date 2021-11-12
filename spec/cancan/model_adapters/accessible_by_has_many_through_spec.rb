@@ -89,7 +89,8 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecord5Adapter do
       if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
         describe 'selecting custom columns' do
           it 'extracts custom columns correctly' do
-            posts = Post.accessible_by(ability).where(published: true).select('title as mytitle')
+            posts = Post.where(title: 'a').accessible_by(ability).where(published: true).select('title as mytitle')
+            puts posts.to_sql
             expect(posts[0].mytitle).to eq 'post1'
           end
         end
