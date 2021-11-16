@@ -1,9 +1,7 @@
-require_relative 'base_strategy'
-
 module CanCan
   module ModelAdapters
     class Strategies
-      class JoinedAliasEachRuleAsExistsSubquery < BaseStrategy
+      class JoinedAliasEachRuleAsExistsSubquery < Base
         def execute!
           model_class
             .joins(
