@@ -1,9 +1,7 @@
-require_relative 'base_strategy'
-
 module CanCan
   module ModelAdapters
     class Strategies
-      class LeftJoin < BaseStrategy
+      class LeftJoin < Base
         def execute!
           relation.left_joins(joins).distinct
         end

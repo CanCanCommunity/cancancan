@@ -15,27 +15,27 @@ jobs:
       fail-fast: false
       matrix:
         ruby: ['2.4', '2.5', '2.6', '2.7', 'jruby', 'truffleruby']
-        gemfile: ['gemfiles/activerecord_4.2.0.gemfile', 'gemfiles/activerecord_5.0.2.gemfile', 'gemfiles/activerecord_5.1.0.gemfile', 'gemfiles/activerecord_5.2.2.gemfile', 'gemfiles/activerecord_6.0.0.gemfile', 'gemfiles/activerecord_6.1.0.gemfile', 'gemfiles/activerecord_master.gemfile']
+        gemfile: ['gemfiles/activerecord_4.2.0.gemfile', 'gemfiles/activerecord_5.0.2.gemfile', 'gemfiles/activerecord_5.1.0.gemfile', 'gemfiles/activerecord_5.2.2.gemfile', 'gemfiles/activerecord_6.0.0.gemfile', 'gemfiles/activerecord_6.1.0.gemfile', 'gemfiles/activerecord_main.gemfile']
         exclude:
           - gemfile: 'gemfiles/activerecord_4.2.0.gemfile'
             ruby: '2.7' # rails 4.2 can't run on ruby 2.7 due to BigDecimal API change
           - gemfile: 'gemfiles/activerecord_4.2.0.gemfile'
             ruby: 'truffleruby' # TruffleRuby 21.0 targets Ruby 2.7, same as above
-          - gemfile: 'gemfiles/activerecord_master.gemfile'
+          - gemfile: 'gemfiles/activerecord_main.gemfile'
             ruby: '2.6' # rails 7+ requires ruby 3.0+
-          - gemfile: 'gemfiles/activerecord_master.gemfile'
+          - gemfile: 'gemfiles/activerecord_main.gemfile'
             ruby: '2.5' # rails 7+ requires ruby 3.0+
           - gemfile: 'gemfiles/activerecord_6.0.0.gemfile'
             ruby: '2.4' # rails 6+ requires ruby 2.5+
           - gemfile: 'gemfiles/activerecord_6.1.0.gemfile'
             ruby: '2.4' # rails 6+ requires ruby 2.5+
-          - gemfile: 'gemfiles/activerecord_master.gemfile'
+          - gemfile: 'gemfiles/activerecord_main.gemfile'
             ruby: '2.4' # rails 6+ requires ruby 2.5+
           - gemfile: 'gemfiles/activerecord_5.0.2.gemfile'
             ruby: 'jruby' # this *should* work - there's a test failure; it's not incompatible like the other excludes. could be an issue in Rails 5.0.2?
           - gemfile: 'gemfiles/activerecord_6.1.0.gemfile'
             ruby: 'jruby' # this *should* work. it seems like there's an issue with rails 6 on jruby.
-          - gemfile: 'gemfiles/activerecord_master.gemfile'
+          - gemfile: 'gemfiles/activerecord_main.gemfile'
             ruby: 'jruby' # this *should* work. it seems like there's an issue with rails 6 on jruby.
 
     env:

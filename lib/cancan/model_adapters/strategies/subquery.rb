@@ -1,9 +1,7 @@
-require_relative 'base_strategy'
-
 module CanCan
   module ModelAdapters
     class Strategies
-      class Subquery < BaseStrategy
+      class Subquery < Base
         def execute!
           build_joins_relation_subquery(where_conditions)
         end

@@ -26,7 +26,6 @@ module CanCan
       end
 
       def strategy_class
-        require_relative "strategies/#{CanCan.accessible_by_strategy}"
         strategy_class_name = CanCan.accessible_by_strategy.to_s.camelize
         CanCan::ModelAdapters::Strategies.const_get(strategy_class_name)
       end
