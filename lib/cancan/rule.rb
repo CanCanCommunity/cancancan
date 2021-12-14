@@ -19,6 +19,7 @@ module CanCan
     # value. True for "can" and false for "cannot". The next two arguments are the action
     # and subject respectively (such as :read, @project). The third argument is a hash
     # of conditions and the last one is the block passed to the "can" call.
+    # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
     def initialize(base_behavior, action, subject, *extra_args, &block)
       # for backwards compatibility, attributes are an optional parameter. Check if
       # attributes were passed or are actually conditions
@@ -35,6 +36,7 @@ module CanCan
       @conditions = extra_args || {}
       @block = block
     end
+    # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 
     def inspect
       repr = "#<#{self.class.name}"
