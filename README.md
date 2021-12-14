@@ -61,6 +61,12 @@ of models automatically and reduce duplicated code.
 </a>
 <br />
 <br />
+<br />
+<a href="https://www.honeybadger.io/" target="_blank">
+  <img src="./logo/honeybadger.svg" alt="Honeybadger" height="45"/>
+</a>
+<br />
+<br />
 
 Do you want to sponsor CanCanCan and show your logo here?
 Check our [Sponsors Page](https://github.com/sponsors/coorasse).
