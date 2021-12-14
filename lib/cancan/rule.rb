@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'conditions_matcher.rb'
-require_relative 'class_matcher.rb'
+require_relative 'subject_class_matcher.rb'
 require_relative 'relevant.rb'
 
 module CanCan
@@ -28,6 +28,7 @@ module CanCan
       raise Error, "Subject is required for #{action}" if action && subject.nil?
 
       @base_behavior = base_behavior
+      @subject_class_matcher = SubjectClassMatcher.new
       @actions = wrap(action)
       @subjects = wrap(subject)
       @attributes = wrap(attributes)
@@ -70,7 +71,7 @@ module CanCan
     end
 
     def with_scope?
-      @conditions.is_a?(ActiveRecord::Relation)
+      defined?(ActiveRecord) ? @conditions.is_a?(ActiveRecord::Relation) : false
     end
 
     def associations_hash(conditions = @conditions)
@@ -111,7 +112,7 @@ module CanCan
     end
 
     def matches_subject_class?(subject)
-      SubjectClassMatcher.matches_subject_class?(@subjects, subject)
+      @subject_class_matcher.matches_subject_class?(@subjects, subject)
     end
 
     def parse_attributes_from_extra_args(args)
