@@ -39,7 +39,7 @@
 
 ## 3.0.0
 
-Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.com/CanCanCommunity/cancancan/wiki/Migrating-from-CanCanCan-2.x-to-3.0)
+Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.com/CanCanCommunity/cancancan/blob/develop/docs/migrating.md)
 
 * [#560](https://github.com/CanCanCommunity/cancancan/pull/560): Add support for Rails 6.0. ([@coorasse][])
 * [#489](https://github.com/CanCanCommunity/cancancan/pull/489): Drop support for actions without a subject. ([@andrew-aladev][])
