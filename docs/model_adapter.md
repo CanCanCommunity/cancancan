@@ -100,7 +100,7 @@ RSpec.describe CanCan::ModelAdapters::MongoidAdapter do
 end
 ```
 
-In this case `MongoidProject` is a decendant of `MongoidDocument`. The implementation of this class will not be shown as it only acts as an example.
+In this case `MongoidProject` is a descendant of `MongoidDocument`. The implementation of this class will not be shown as it only acts as an example.
 
 ### Running tests
 
@@ -205,6 +205,6 @@ Thus you'd probably be best served with inspecting the actual implementation of 
 - [ActiveRecord 4](../spec/cancan/model_adapters/active_record_4_adapter_spec.rb)
 - [ActiveRecord 5](../spec/cancan/model_adapters/active_record_5_adapter_spec.rb)
 
-**Mondoid, the adapter used in this entry as an example, can be found at:**
+**Mongoid, the adapter used in this entry as an example, can be found at:**
 
 - [Mongoid](https://github.com/CanCanCommunity/cancancan-mongoid)
