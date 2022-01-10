@@ -16,6 +16,15 @@ jobs:
       matrix:
         ruby: ['2.4', '2.5', '2.6', '2.7', 'jruby', 'truffleruby']
         gemfile: ['gemfiles/activerecord_4.2.0.gemfile', 'gemfiles/activerecord_5.0.2.gemfile', 'gemfiles/activerecord_5.1.0.gemfile', 'gemfiles/activerecord_5.2.2.gemfile', 'gemfiles/activerecord_6.0.0.gemfile', 'gemfiles/activerecord_6.1.0.gemfile', 'gemfiles/activerecord_main.gemfile']
+        include:
+          - gemfile: 'gemfiles/activerecord_7.0.0.gemfile'
+            ruby: '3.1'
+          - gemfile: 'gemfiles/activerecord_7.0.0.gemfile'
+            ruby: '3.0'
+          - gemfile: 'gemfiles/activerecord_6.1.0.gemfile'
+            ruby: '3.1'
+          - gemfile: 'gemfiles/activerecord_6.1.0.gemfile'
+            ruby: '3.0'
         exclude:
           - gemfile: 'gemfiles/activerecord_4.2.0.gemfile'
             ruby: '2.7' # rails 4.2 can't run on ruby 2.7 due to BigDecimal API change
