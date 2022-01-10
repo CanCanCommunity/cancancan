@@ -83,6 +83,7 @@ jobs:
 
       - name: Run linter
         run: bundle exec rubocop
+        if: ${{ matrix.ruby != '3.1' }}
 
       - name: Run tests on sqlite
         run: DB=sqlite bundle exec rake

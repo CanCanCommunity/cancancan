@@ -1,3 +1,5 @@
+inherit_from: .rubocop_todo.yml
+
 Style/Documentation:
   Enabled: false
 
@@ -10,7 +12,13 @@ Style/EmptyMethod:
 Style/ClassAndModuleChildren:
   Enabled: false
 
-Metrics/LineLength:
+Style/RedundantBegin:
+  Enabled: false
+
+Style/SlicingWithRange:
+  Enabled: false
+
+Layout/LineLength:
   Max: 120
 
 Metrics/BlockLength:
@@ -34,7 +42,7 @@ Lint/AmbiguousBlockAssociation:
   Enabled: false
 
 AllCops:
-  TargetRubyVersion: 2.2.0
+  TargetRubyVersion: 2.5
   Exclude:
     - 'gemfiles/**/*'
     - 'vendor/**/*'
