@@ -97,4 +97,35 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecord5Adapter do
       end
     end
   end
+
+  describe 'accessing posts through user' do
+    it 'works with user_id' do
+      ability.can :read, User
+      ability.can :read, Post, user_id: @user1.id
+      expect(ability.can?(:read, {@user1 => Post})).to be(true)
+      expect(ability.can?(:read, {@user2 => Post})).to be(true)
+    end
+
+    it 'works with user: {id: ...}' do
+      ability.can :read, User
+      ability.can :read, Post, user: { id: @user1.id }
+      expect(ability.can?(:read, {@user1 => Post})).to be(true)
+      expect(ability.can?(:read, {@user2 => Post})).to be(true)
+    end
+
+    it 'works with cannot user_id' do
+      ability.can :read, User
+      ability.cannot :read, Post, user_id: @user1.id
+      expect(ability.can?(:read, {@user1 => Post})).to be(false)
+      expect(ability.can?(:read, {@user2 => Post})).to be(true)
+    end
+
+    it 'works with cannot user: {id: ...}' do
+      ability.can :read, User
+      ability.cannot :read, Post, user: { id: @user1.id }
+      expect(ability.can?(:read, {@user1 => Post})).to be(false)
+      expect(ability.can?(:read, {@user2 => Post})).to be(true)
+    end
+  end
+  
 end

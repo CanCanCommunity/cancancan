@@ -62,6 +62,7 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
     end
 
     class Project < ActiveRecord::Base
+      has_many :articles
       has_many :comments
     end
 
@@ -96,6 +97,7 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
 
     class Comment < ActiveRecord::Base
       belongs_to :article
+      belongs_to :project
     end
 
     class User < ActiveRecord::Base
@@ -440,6 +442,46 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
         ability.can :read, Article
         ability.cannot :read, Article, :secret
         expect(Article.accessible_by(ability)).to eq([article])
+      end
+
+      describe 'when can? is used with a Hash (nested resources)' do
+        it 'verifies parent_id key in conditions' do
+          user1 = User.create!(name: 'user1')
+          user2 = User.create!(name: 'user2')
+          cat = Category.create!(name: 'cat')
+          proj = Project.create!(name: 'proj')
+          art1 = Article.create!(name: 'art1', category: cat, project: proj, user: user1)
+          art2 = Article.create!(name: 'art1', category: cat, project: proj, user: user2)
+          comm1 = Comment.create!(article: art1, project: proj)
+          comm2 = Comment.create!(article: art2, project: proj)
+    
+          ability = Ability.new(user1)
+          ability.can :read, Article
+          ability.can :manage, Article, user_id: user1.id
+          ability.can :manage, Comment, article_id: user1.article_ids
+
+          expect(ability.can?(:manage, {art1 => Comment})).to eq(true)
+          expect(ability.can?(:manage, {art2 => Comment})).to eq(false)
+        end
+
+        it 'verifies parent equality correctly' do
+          user1 = User.create!(name: 'user1')
+          user2 = User.create!(name: 'user2')
+          cat = Category.create!(name: 'cat')
+          proj = Project.create!(name: 'proj')
+          art1 = Article.create!(name: 'art1', category: cat, project: proj, user: user1)
+          art2 = Article.create!(name: 'art1', category: cat, project: proj, user: user2)
+          comm1 = Comment.create!(article: art1, project: proj)
+          comm2 = Comment.create!(article: art2, project: proj)
+    
+          ability = Ability.new(user1)
+          ability.can :read, Article
+          ability.can :manage, Article, user: user1
+          ability.can :manage, Comment, article: user1.articles
+
+          expect(ability.can?(:manage, {art1 => Comment})).to eq(true)
+          expect(ability.can?(:manage, {art2 => Comment})).to eq(false)
+        end
       end
     end
   end

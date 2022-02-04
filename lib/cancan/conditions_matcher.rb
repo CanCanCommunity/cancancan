@@ -33,8 +33,17 @@ module CanCan
     end
 
     def nested_subject_matches_conditions?(subject_hash)
-      parent, _child = subject_hash.first
-      matches_conditions_hash?(parent, @conditions[parent.class.name.downcase.to_sym] || {})
+      parent, child = subject_hash.first
+
+      matches_base_parent_conditions = matches_conditions_hash?(parent, @conditions[parent.class.name.downcase.to_sym] || {})
+
+      adapter = model_adapter(parent)
+
+      if adapter.override_nested_subject_conditions_matching?(parent, child, @conditions)
+        return matches_base_parent_conditions && adapter.nested_subject_matches_conditions?(parent, child, @conditions)
+      end
+
+      matches_base_parent_conditions
     end
 
     # Checks if the given subject matches the given conditions hash.
@@ -53,17 +62,13 @@ module CanCan
       matches_all_conditions?(adapter, conditions, subject)
     end
 
+    # conditions can be a collection, object, or hash
     def matches_all_conditions?(adapter, conditions, subject)
-      if conditions.is_a?(Hash)
-        matches_hash_conditions(adapter, conditions, subject)
-      elsif conditions.respond_to?(:include?)
-        conditions.include?(subject)
-      else
-        subject == conditions
+      unless conditions.is_a?(Hash)
+        return conditions.include?(subject) if conditions.respond_to?(:include?)
+        return subject == conditions
       end
-    end
 
-    def matches_hash_conditions(adapter, conditions, subject)
       conditions.all? do |name, value|
         if adapter.override_condition_matching?(subject, name, value)
           adapter.matches_condition?(subject, name, value)
