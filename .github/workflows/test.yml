@@ -8,7 +8,7 @@ env:
 
 jobs:
   tests:
-    name: Test & lint
+    name: Test
     runs-on: ubuntu-latest
 
     strategy:
@@ -72,11 +72,27 @@ jobs:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
 
-      - name: Run linter
-        run: bundle exec rubocop
-
       - name: Run tests on sqlite
         run: DB=sqlite bundle exec rake
 
       - name: Run tests on postgres
         run: DB=postgres bundle exec rake
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: '20'
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.7
+          bundler-cache: true
+
+      - name: Run linter
+        run: bundle exec rubocop
