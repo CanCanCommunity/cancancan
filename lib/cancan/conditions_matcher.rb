@@ -42,7 +42,7 @@ module CanCan
     # override_matching_for_conditions?(subject, conditions) and
     # matches_conditions_hash?(subject, conditions)
     def matches_conditions_hash?(subject, conditions = @conditions)
-      return true if conditions.empty?
+      return true if conditions.is_a?(Hash) && conditions.empty?
 
       adapter = model_adapter(subject)
 
@@ -54,6 +54,16 @@ module CanCan
     end
 
     def matches_all_conditions?(adapter, conditions, subject)
+      if conditions.is_a?(Hash)
+        matches_hash_conditions(adapter, conditions, subject)
+      elsif conditions.respond_to?(:include?)
+        conditions.include?(subject)
+      else
+        subject == conditions
+      end
+    end
+
+    def matches_hash_conditions(adapter, conditions, subject)
       conditions.all? do |name, value|
         if adapter.override_condition_matching?(subject, name, value)
           adapter.matches_condition?(subject, name, value)
