@@ -1,3 +1,7 @@
+Unreleased
+
+* [#773](https://github.com/CanCanCommunity/cancancan/pull/773): Drop support for ruby 2.4 and 2.5. ([@coorasse][])
+
 ## 3.3.0
 
 * [#675](https://github.com/CanCanCommunity/cancancan/pull/675): Support modifying the `accessible_by` querying strategy on a per-query basis. ([@ghiculescu][])
