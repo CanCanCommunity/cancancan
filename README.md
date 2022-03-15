@@ -56,8 +56,8 @@ of models automatically and reduce duplicated code.
 <br />
 <br />
 <br />
-<a href="https://www.incloudcounsel.com" target="_blank">
-  <img src="./logo/in_cloud_counsel.png" alt="InCloudCounsel" height="70"/>
+<a href="https://www.ontra.ai" target="_blank">
+  <img src="./logo/ontra.png" alt="Ontra" height="70"/>
 </a>
 <br />
 <br />
