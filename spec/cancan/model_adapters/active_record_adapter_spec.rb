@@ -641,7 +641,7 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
       expect(ability.can?(:read, Foo)).to eq(true)
     end
 
-    it 'allows for access with association with accesible_by' do
+    it 'allows for access with association with accessible_by' do
       user = User.new
       foo = Foo.create(name: 'foo')
       bar = Bar.create(name: 'bar')
@@ -664,7 +664,7 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
       expect(ability.can?(:read, Foo)).to eq(false)
     end
 
-    it 'blocks access with association for accesible_by' do
+    it 'blocks access with association for accessible_by' do
       user = User.create!
       foo = Foo.create(name: 'foo')
       role = Role.create(name: 'adviser')

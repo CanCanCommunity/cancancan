@@ -19,7 +19,7 @@ class Ability
 end
 ```
 
-This is, of course, not too complicated, and in an real world application we would not split this file, but for didactic reasons we want to split this file “per-model”.
+This is, of course, not too complicated, and in a real world application we would not split this file, but for didactic reasons we want to split this file “per-model”.
 
 We suggest to have an app/abilities folder and create a separate file for each model (exactly as you would do with Pundit).
 

@@ -74,7 +74,7 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecord5Adapter do
     ability.can :read, Post, editors: { user_id: @user1 }
   end
 
-  describe 'preloading of associatons' do
+  describe 'preloading of associations' do
     it 'preloads associations correctly' do
       posts = Post.accessible_by(ability).where(published: true).includes(likes: :user)
       expect(posts[0].association(:likes)).to be_loaded
