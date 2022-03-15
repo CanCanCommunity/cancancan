@@ -1,5 +1,6 @@
 Unreleased
 
+* [#772](https://github.com/CanCanCommunity/cancancan/pull/772): Support non-hash conditions in ability definitions. ([@Juleffel][])
 * [#773](https://github.com/CanCanCommunity/cancancan/pull/773): Drop support for ruby 2.4 and 2.5. ([@coorasse][])
 
 ## 3.3.0
@@ -693,3 +694,4 @@ Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.co
 [@Liberatys]: https://github.com/Liberatys
 [@ghiculescu]: https://github.com/ghiculescu
 [@mtoneil]: https://github.com/mtoneil
+[@Juleffel]: https://github.com/Juleffel
