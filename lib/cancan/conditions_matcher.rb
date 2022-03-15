@@ -64,11 +64,16 @@ module CanCan
 
     # conditions can be a collection, object, or hash
     def matches_all_conditions?(adapter, conditions, subject)
-      unless conditions.is_a?(Hash)
-        return conditions.include?(subject) if conditions.respond_to?(:include?)
-        return subject == conditions
+      if conditions.is_a?(Hash)
+        matches_hash_conditions(adapter, conditions, subject)
+      elsif conditions.respond_to?(:include?)
+        conditions.include?(subject)
+      else
+        subject == conditions
       end
+    end
 
+    def matches_hash_conditions(adapter, conditions, subject)
       conditions.all? do |name, value|
         if adapter.override_condition_matching?(subject, name, value)
           adapter.matches_condition?(subject, name, value)
