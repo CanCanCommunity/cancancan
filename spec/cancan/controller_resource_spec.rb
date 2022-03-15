@@ -282,7 +282,7 @@ describe CanCan::ControllerResource do
 
     it 'authorizes nested resource through parent association on index action' do
       controller.instance_variable_set(:@category, category = double)
-      allow(controller).to receive(:authorize!).with(:index, category => Model) { raise CanCan::AccessDenied }
+      allow(controller).to receive(:authorize!).with(:index, { category => Model }) { raise CanCan::AccessDenied }
       resource = CanCan::ControllerResource.new(controller, through: :category)
       expect { resource.authorize_resource }.to raise_error(CanCan::AccessDenied)
     end
