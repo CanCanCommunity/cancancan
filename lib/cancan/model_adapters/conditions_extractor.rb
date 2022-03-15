@@ -3,7 +3,7 @@
 # this class is responsible of converting the hash of conditions
 # in "where conditions" to generate the sql query
 # it consists of a names_cache that helps calculating the next name given to the association
-# it tries to reflect the bahavior of ActiveRecord when generating aliases for tables.
+# it tries to reflect the behavior of ActiveRecord when generating aliases for tables.
 module CanCan
   module ModelAdapters
     class ConditionsExtractor
@@ -50,18 +50,18 @@ module CanCan
       def generate_table_alias(model_class, relation_name, path_to_key)
         table_alias = model_class.reflect_on_association(relation_name).table_name.to_sym
 
-        if alredy_used?(table_alias, relation_name, path_to_key)
+        if already_used?(table_alias, relation_name, path_to_key)
           table_alias = "#{relation_name.to_s.pluralize}_#{model_class.table_name}".to_sym
 
           index = 1
-          while alredy_used?(table_alias, relation_name, path_to_key)
+          while already_used?(table_alias, relation_name, path_to_key)
             table_alias = "#{table_alias}_#{index += 1}".to_sym
           end
         end
         add_to_cache(table_alias, relation_name, path_to_key)
       end
 
-      def alredy_used?(table_alias, relation_name, path_to_key)
+      def already_used?(table_alias, relation_name, path_to_key)
         @names_cache[table_alias].try(:exclude?, "#{path_to_key}_#{relation_name}")
       end
 

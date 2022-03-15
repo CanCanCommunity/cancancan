@@ -160,7 +160,7 @@ Now that we learned about actions and their aliases let's see what we can do wit
 The subject of an action is usually a Ruby class. Most of the times you want to define your permissions on specific classes, but this is not your only option.
 
 You can actually use any subject, and one of the most common cases is to just use a symbol.
-An admin dashboard could be protected by definining:
+An admin dashboard could be protected by defining:
 
 ```ruby
 can :read, :admin_dashboard
@@ -188,7 +188,7 @@ and give all possible permissions to the administrator.
 
 Note that the code above allows the administrator to also `:read, :admin_dashboard`. `:manage` means literally **any** action, not only CRUD ones.
 
-> You **must and should** always check for specific permisssions, but you don't need to define all of them if not needed.
+> You **must and should** always check for specific permissions, but you don't need to define all of them if not needed.
 
 If at some point you have a new page reserved to the administrators, where they can translate articles, you should check for `can? :translate, @article`, but you don't need to define the ability, since the administrators can already do any action. It will be easy in the future to give the possibility for authors to translate their own articles by changing your permissions file:
 

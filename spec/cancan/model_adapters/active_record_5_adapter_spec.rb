@@ -109,7 +109,7 @@ if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
               expect(Thing.accessible_by(ability)).to contain_exactly(medium)
             end
 
-            context 'when a rule is overriden' do
+            context 'when a rule is overridden' do
               before do
                 ability.cannot :read, Thing, size: 'average'
               end

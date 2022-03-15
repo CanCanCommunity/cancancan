@@ -38,7 +38,7 @@ module CanCan
     end
 
     # Checks if the given subject matches the given conditions hash.
-    # This behavior can be overriden by a model adapter by defining two class methods:
+    # This behavior can be overridden by a model adapter by defining two class methods:
     # override_matching_for_conditions?(subject, conditions) and
     # matches_conditions_hash?(subject, conditions)
     def matches_conditions_hash?(subject, conditions = @conditions)

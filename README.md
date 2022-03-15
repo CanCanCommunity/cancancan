@@ -44,7 +44,7 @@ of models automatically and reduce duplicated code.
 <br/>
 <br/>
 <br/>
-<a href="https://jobs.goboony.com/fullstack-ruby-on-rails-developer" target="_blank">
+<a href="https://jobs.goboony.com/o/full-stack-ruby-on-rails-engineer" target="_blank">
   <img src="./logo/goboony.png" alt="Goboony" height="50"/>
 </a>
 <br />
@@ -56,8 +56,8 @@ of models automatically and reduce duplicated code.
 <br />
 <br />
 <br />
-<a href="https://www.incloudcounsel.com" target="_blank">
-  <img src="./logo/in_cloud_counsel.png" alt="InCloudCounsel" height="70"/>
+<a href="https://www.ontra.ai" target="_blank">
+  <img src="./logo/ontra.png" alt="Ontra" height="70"/>
 </a>
 <br />
 <br />

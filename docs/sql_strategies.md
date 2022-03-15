@@ -8,7 +8,7 @@ In the history of CanCanCan we had many issues with different versions of the ge
 
 That's why in the latest versions of CanCanCan, you are given the possibility to customize how the SQL is generated and choose from multiple options.
 
-You can customize the SQL startegy globally with:
+You can customize the SQL strategy globally with:
 
 ```ruby
 # config/initializers/cancancan.rb

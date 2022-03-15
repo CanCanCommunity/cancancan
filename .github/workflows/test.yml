@@ -8,13 +8,13 @@ env:
 
 jobs:
   tests:
-    name: Test & lint
+    name: Test
     runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
-        ruby: ['2.4', '2.5', '2.6', '2.7', 'jruby', 'truffleruby']
+        ruby: ['2.4', '2.5', '2.6', '2.7', '3.0', 'jruby', 'truffleruby']
         gemfile: ['gemfiles/activerecord_4.2.0.gemfile', 'gemfiles/activerecord_5.0.2.gemfile', 'gemfiles/activerecord_5.1.0.gemfile', 'gemfiles/activerecord_5.2.2.gemfile', 'gemfiles/activerecord_6.0.0.gemfile', 'gemfiles/activerecord_6.1.0.gemfile', 'gemfiles/activerecord_main.gemfile']
         include:
           - gemfile: 'gemfiles/activerecord_7.0.0.gemfile'
@@ -26,6 +26,16 @@ jobs:
           - gemfile: 'gemfiles/activerecord_6.1.0.gemfile'
             ruby: '3.0'
         exclude:
+          - gemfile: 'gemfiles/activerecord_5.2.2.gemfile'
+            ruby: '3.0' # rails 5.2 can't run on ruby 3.0
+          - gemfile: 'gemfiles/activerecord_5.1.0.gemfile'
+            ruby: '3.0' # rails 5.1 can't run on ruby 3.0
+          - gemfile: 'gemfiles/activerecord_5.0.2.gemfile'
+            ruby: '3.0' # rails 5.0 can't run on ruby 3.0
+          - gemfile: 'gemfiles/activerecord_5.0.2.gemfile'
+            ruby: '3.0' # rails 5.0 can't run on ruby 3.0
+          - gemfile: 'gemfiles/activerecord_4.2.0.gemfile'
+            ruby: '3.0' # rails 4.2 can't run on ruby 3.0
           - gemfile: 'gemfiles/activerecord_4.2.0.gemfile'
             ruby: '2.7' # rails 4.2 can't run on ruby 2.7 due to BigDecimal API change
           - gemfile: 'gemfiles/activerecord_4.2.0.gemfile'
@@ -81,12 +91,27 @@ jobs:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
 
-      - name: Run linter
-        run: bundle exec rubocop
-        if: ${{ matrix.ruby != '3.1' }}
-
       - name: Run tests on sqlite
         run: DB=sqlite bundle exec rake
 
       - name: Run tests on postgres
         run: DB=postgres bundle exec rake
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: '20'
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.7
+          bundler-cache: true
+
+      - name: Run linter
+        run: bundle exec rubocop

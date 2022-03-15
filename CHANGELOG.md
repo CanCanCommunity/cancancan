@@ -39,7 +39,7 @@
 
 ## 3.0.0
 
-Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.com/CanCanCommunity/cancancan/wiki/Migrating-from-CanCanCan-2.x-to-3.0)
+Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.com/CanCanCommunity/cancancan/blob/develop/docs/migrating.md#from-2x-to-3x)
 
 * [#560](https://github.com/CanCanCommunity/cancancan/pull/560): Add support for Rails 6.0. ([@coorasse][])
 * [#489](https://github.com/CanCanCommunity/cancancan/pull/489): Drop support for actions without a subject. ([@andrew-aladev][])
@@ -166,7 +166,7 @@ Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.co
 
 ## 1.9.0 (July 20th, 2014)
 
-* Fix cancancan#59 - Parameters are automatically detected and santitized for all actions, not just create and update ([@bryanrite][]).
+* Fix cancancan#59 - Parameters are automatically detected and sanitized for all actions, not just create and update ([@bryanrite][]).
 
 * Fix cancancan#97, 72, 40, 39, 26 - Support Active Record 4 properly with references on nested permissions (scpike, tdg5, Crystark).
 
@@ -199,7 +199,7 @@ Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.co
 
 * Feature cancancan#3 - Permit "can?" check multiple subjects (cefigueiredo).
 
-* Feature cancancan#29 - Add ability to use a String that will get instance_eval'd or a Proc that will get called as the parameter method option for strong_parameter santization (svoop).
+* Feature cancancan#29 - Add ability to use a String that will get instance_eval'd or a Proc that will get called as the parameter method option for strong_parameter sanitization (svoop).
 
 * Feature cancancan#48 - Define a CanCanCan module. Even though it is not used, it is standard practice to define the module, and helpful for determining between CanCanCan and CanCan for external libraries.
 
