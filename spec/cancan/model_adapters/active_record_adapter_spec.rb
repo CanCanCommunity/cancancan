@@ -441,6 +441,35 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
         ability.cannot :read, Article, :secret
         expect(Article.accessible_by(ability)).to eq([article])
       end
+
+      describe 'when can? is used with a Hash (nested resources)' do
+        it 'verifies parent equality correctly' do
+          user1 = User.create!(name: 'user1')
+          user2 = User.create!(name: 'user2')
+          category = Category.create!(name: 'cat')
+          article1 = Article.create!(name: 'article1', category: category, user: user1)
+          article2 = Article.create!(name: 'article2', category: category, user: user2)
+          comment1 = Comment.create!(article: article1)
+          comment2 = Comment.create!(article: article2)
+
+          ability1 = Ability.new(user1)
+          ability1.can :read, Article
+          ability1.can :manage, Article, user: user1
+          ability1.can :manage, Comment, article: user1.articles
+
+          expect(ability1.can?(:manage, { article1 => Comment })).to eq(true)
+          expect(ability1.can?(:manage, { article2 => Comment })).to eq(false)
+          expect(ability1.can?(:manage, { article1 => comment1 })).to eq(true)
+          expect(ability1.can?(:manage, { article2 => comment2 })).to eq(false)
+
+          ability2 = Ability.new(user2)
+
+          expect(ability2.can?(:manage, { article1 => Comment })).to eq(false)
+          expect(ability2.can?(:manage, { article2 => Comment })).to eq(false)
+          expect(ability2.can?(:manage, { article1 => comment1 })).to eq(false)
+          expect(ability2.can?(:manage, { article2 => comment2 })).to eq(false)
+        end
+      end
     end
   end
 
