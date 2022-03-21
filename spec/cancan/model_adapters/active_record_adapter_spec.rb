@@ -445,39 +445,36 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
       end
 
       describe 'when can? is used with a Hash (nested resources)' do
-        it 'verifies parent_id key in conditions' do
+        it 'verifies parent equality correctly' do
           user1 = User.create!(name: 'user1')
           user2 = User.create!(name: 'user2')
-          cat = Category.create!(name: 'cat')
-          proj = Project.create!(name: 'proj')
-          art1 = Article.create!(name: 'art1', category: cat, project: proj, user: user1)
-          art2 = Article.create!(name: 'art1', category: cat, project: proj, user: user2)
-          comm1 = Comment.create!(article: art1, project: proj)
-          comm2 = Comment.create!(article: art2, project: proj)
-    
+          category = Category.create!(name: 'cat')
+          article1 = Article.create!(name: 'article1', category: category, user: user1)
+          article2 = Article.create!(name: 'article2', category: category, user: user2)
+          comment1 = Comment.create!(article: article1)
+          comment2 = Comment.create!(article: article2)
+
+          ability1 = Ability.new(user1)
+          ability1.can :read, Article
+          ability1.can :manage, Article, user: user1
+          ability1.can :manage, Comment, article: user1.articles
+
+          expect(ability1.can?(:manage, { article1 => Comment })).to eq(true)
+          expect(ability1.can?(:manage, { article2 => Comment })).to eq(false)
+          expect(ability1.can?(:manage, { article1 => comment1 })).to eq(true)
+          expect(ability1.can?(:manage, { article2 => comment2 })).to eq(false)
+
+          ability2 = Ability.new(user2)
+
+          expect(ability2.can?(:manage, { article1 => Comment })).to eq(false)
+          expect(ability2.can?(:manage, { article2 => Comment })).to eq(false)
+          expect(ability2.can?(:manage, { article1 => comment1 })).to eq(false)
+          expect(ability2.can?(:manage, { article2 => comment2 })).to eq(false)
+
           ability = Ability.new(user1)
           ability.can :read, Article
           ability.can :manage, Article, user_id: user1.id
           ability.can :manage, Comment, article_id: user1.article_ids
-
-          expect(ability.can?(:manage, {art1 => Comment})).to eq(true)
-          expect(ability.can?(:manage, {art2 => Comment})).to eq(false)
-        end
-
-        it 'verifies parent equality correctly' do
-          user1 = User.create!(name: 'user1')
-          user2 = User.create!(name: 'user2')
-          cat = Category.create!(name: 'cat')
-          proj = Project.create!(name: 'proj')
-          art1 = Article.create!(name: 'art1', category: cat, project: proj, user: user1)
-          art2 = Article.create!(name: 'art1', category: cat, project: proj, user: user2)
-          comm1 = Comment.create!(article: art1, project: proj)
-          comm2 = Comment.create!(article: art2, project: proj)
-    
-          ability = Ability.new(user1)
-          ability.can :read, Article
-          ability.can :manage, Article, user: user1
-          ability.can :manage, Comment, article: user1.articles
 
           expect(ability.can?(:manage, {art1 => Comment})).to eq(true)
           expect(ability.can?(:manage, {art2 => Comment})).to eq(false)
