@@ -20,6 +20,10 @@ Metrics/BlockLength:
     - 'lib/cancan/matchers.rb'
     - '**/*_spec.rb'
 
+Metrics/ClassLength:
+  Exclude:
+    - 'lib/cancan/model_adapters/active_record_adapter.rb'
+
 # TODO
 # Offense count: 2
 # Configuration parameters: NamePrefix, NamePrefixBlacklist, NameWhitelist.

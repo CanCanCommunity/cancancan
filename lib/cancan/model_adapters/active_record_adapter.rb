@@ -20,6 +20,31 @@ module CanCan
         ConditionsNormalizer.normalize(model_class, @compressed_rules)
       end
 
+      class << self
+        # When belongs_to parent_id is a condition for a model,
+        # we want to check the parent when testing ability for a hash {parent => model}
+        def override_nested_subject_conditions_matching?(parent, child, all_conditions)
+          parent_child_conditions(parent, child, all_conditions).present?
+        end
+
+        # parent_id condition can be an array of integer or one integer, we check the parent against this
+        def nested_subject_matches_conditions?(parent, child, all_conditions)
+          id_condition = parent_child_conditions(parent, child, all_conditions)
+          return id_condition.include?(parent.id) if id_condition.is_a? Array
+          return id_condition == parent.id if id_condition.is_a? Integer
+
+          false
+        end
+
+        def parent_child_conditions(parent, child, all_conditions)
+          child_class = child.is_a?(Class) ? child : child.class
+          foreign_key = child_class.reflect_on_all_associations(:belongs_to).find do |association|
+                          association.klass == parent.class
+                        end&.foreign_key&.to_sym
+          foreign_key.nil? ? nil : all_conditions[foreign_key]
+        end
+      end
+
       # Returns conditions intended to be used inside a database query. Normally you will not call this
       # method directly, but instead go through ModelAdditions#accessible_by.
       #
