@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe CanCan::ModelAdapters::ActiveRecordAdapter do
+RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
   let(:true_v) do
     ActiveRecord::Base.connection.quoted_true
   end
@@ -46,6 +46,11 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
         t.boolean :spam
         t.integer :article_id
         t.integer :project_id
+        t.timestamps null: false
+      end
+
+      create_table(:legacy_comments) do |t|
+        t.integer :post_id
         t.timestamps null: false
       end
 
@@ -97,6 +102,11 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
 
     class Comment < ActiveRecord::Base
       belongs_to :article
+      belongs_to :project
+    end
+
+    class LegacyComment < ActiveRecord::Base
+      belongs_to :article, foreign_key: 'post_id'
       belongs_to :project
     end
 
@@ -443,42 +453,64 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
         ability.cannot :read, Article, :secret
         expect(Article.accessible_by(ability)).to eq([article])
       end
+    end
+  end
 
-      describe 'when can? is used with a Hash (nested resources)' do
-        it 'verifies parent equality correctly' do
-          user1 = User.create!(name: 'user1')
-          user2 = User.create!(name: 'user2')
-          category = Category.create!(name: 'cat')
-          article1 = Article.create!(name: 'article1', category: category, user: user1)
-          article2 = Article.create!(name: 'article2', category: category, user: user2)
-          comment1 = Comment.create!(article: article1)
-          comment2 = Comment.create!(article: article2)
+  describe 'when can? is used with a Hash (nested resources)' do
+    let(:user1) { User.create!(name: 'user1') }
+    let(:user2) { User.create!(name: 'user2') }
 
-          ability1 = Ability.new(user1)
-          ability1.can :read, Article
-          ability1.can :manage, Article, user: user1
-          ability1.can :manage, Comment, article: user1.articles
+    before do
+      category = Category.create!(name: 'category')
+      @article1 = Article.create!(name: 'article1', category: category, user: user1)
+      @article2 = Article.create!(name: 'article2', category: category, user: user2)
+      @comment1 = Comment.create!(article: @article1)
+      @comment2 = Comment.create!(article: @article2)
+      @legacy_comment1 = LegacyComment.create!(article: @article1)
+      @legacy_comment2 = LegacyComment.create!(article: @article2)
+    end
 
-          expect(ability1.can?(:manage, { article1 => Comment })).to eq(true)
-          expect(ability1.can?(:manage, { article2 => Comment })).to eq(false)
-          expect(ability1.can?(:manage, { article1 => comment1 })).to eq(true)
-          expect(ability1.can?(:manage, { article2 => comment2 })).to eq(false)
+    context 'when conditions are defined using the parent model' do
+      let(:ability) do
+        Ability.new(user1).tap do |ability|
+          ability.can :read, Article
+          ability.can :manage, Article, user: user1
+          ability.can :manage, Comment, article: user1.articles
+          ability.can :manage, LegacyComment, article: user1.articles
+        end
+      end
 
-          ability2 = Ability.new(user2)
+      it 'verifies parent equality correctly' do
+        expect(ability.can?(:manage, { @article1 => Comment })).to eq(true)
+        expect(ability.can?(:manage, { @article1 => LegacyComment })).to eq(true)
+        expect(ability.can?(:manage, { @article1 => @comment1 })).to eq(true)
+        expect(ability.can?(:manage, { @article1 => @legacy_comment1 })).to eq(true)
 
-          expect(ability2.can?(:manage, { article1 => Comment })).to eq(false)
-          expect(ability2.can?(:manage, { article2 => Comment })).to eq(false)
-          expect(ability2.can?(:manage, { article1 => comment1 })).to eq(false)
-          expect(ability2.can?(:manage, { article2 => comment2 })).to eq(false)
+        expect(ability.can?(:manage, { @article2 => Comment })).to eq(false)
+        expect(ability.can?(:manage, { @article2 => LegacyComment })).to eq(false)
+        expect(ability.can?(:manage, { @article2 => @legacy_comment2 })).to eq(false)
+      end
+    end
 
-          ability = Ability.new(user1)
+    context 'when conditions are defined using the parent id' do
+      let(:ability) do
+        Ability.new(user1).tap do |ability|
           ability.can :read, Article
           ability.can :manage, Article, user_id: user1.id
           ability.can :manage, Comment, article_id: user1.article_ids
-
-          expect(ability.can?(:manage, {art1 => Comment})).to eq(true)
-          expect(ability.can?(:manage, {art2 => Comment})).to eq(false)
+          ability.can :manage, LegacyComment, post_id: user1.article_ids
         end
+      end
+
+      it 'verifies parent equality correctly' do
+        expect(ability.can?(:manage, { @article1 => Comment })).to eq(true)
+        expect(ability.can?(:manage, { @article1 => LegacyComment })).to eq(true)
+        expect(ability.can?(:manage, { @article1 => @comment1 })).to eq(true)
+        expect(ability.can?(:manage, { @article1 => @legacy_comment1 })).to eq(true)
+
+        expect(ability.can?(:manage, { @article2 => Comment })).to eq(false)
+        expect(ability.can?(:manage, { @article2 => LegacyComment })).to eq(false)
+        expect(ability.can?(:manage, { @article2 => @legacy_comment2 })).to eq(false)
       end
     end
   end

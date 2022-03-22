@@ -35,7 +35,8 @@ module CanCan
         raise NotImplemented, 'This model adapter does not support matching on a conditions hash.'
       end
 
-      # Used above override_conditions_hash_matching to determine if this model adapter will override the matching behavior for nested subject.
+      # Used above override_conditions_hash_matching to determine if this model adapter will override the
+      # matching behavior for nested subject.
       # If this returns true then nested_subject_matches_conditions? will be called.
       def self.override_nested_subject_conditions_matching?(_parent, _child, _all_conditions)
         false
