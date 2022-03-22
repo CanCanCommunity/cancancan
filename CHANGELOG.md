@@ -1,7 +1,9 @@
 Unreleased
 
+* [#767](https://github.com/CanCanCommunity/cancancan/pull/767): Improve ability checks with nested resources (hash checks)vim. ([@Juleffel][])
 * [#772](https://github.com/CanCanCommunity/cancancan/pull/772): Support non-hash conditions in ability definitions. ([@Juleffel][])
 * [#773](https://github.com/CanCanCommunity/cancancan/pull/773): Drop support for ruby 2.4 and 2.5. ([@coorasse][])
+* [#778](https://github.com/CanCanCommunity/cancancan/pull/778): Drop support for ActiveRecord 4. ([@coorasse][])
 
 ## 3.3.0
 
