@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class StiDetector
   def self.sti_class?(subject)
     return false unless defined?(ActiveRecord::Base)

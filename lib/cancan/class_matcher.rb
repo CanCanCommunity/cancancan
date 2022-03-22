@@ -1,4 +1,4 @@
-require_relative 'sti_detector.rb'
+require_relative 'sti_detector'
 
 # This class is responsible for matching classes and their subclasses as well as
 # upmatching classes to their ancestors.

@@ -1,4 +1,4 @@
-require_relative '../sti_detector.rb'
+require_relative '../sti_detector'
 
 # this class is responsible for detecting sti classes and creating new rules for the
 # relevant subclasses, using the inheritance_column as a merger

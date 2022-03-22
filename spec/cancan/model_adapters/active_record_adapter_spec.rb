@@ -1036,11 +1036,9 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
   context 'with rule application to subclass for non sti class' do
     before do
       ActiveRecord::Schema.define do
-        create_table :parents, force: true do |t|
-        end
+        create_table :parents, force: true
 
-        create_table :children, force: true do |t|
-        end
+        create_table :children, force: true
       end
 
       class ApplicationRecord < ActiveRecord::Base
