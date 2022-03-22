@@ -265,7 +265,7 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
       it 'raises an exception when trying to merge scope with other conditions' do
         @ability.can :read, Article, published: true
         @ability.can :read, Article, Article.where(secret: true)
-        expect(-> { Article.accessible_by(@ability) })
+        expect { Article.accessible_by(@ability) }
           .to raise_error(CanCan::Error,
                           'Unable to merge an Active Record scope with other conditions. '\
                             'Instead use a hash or SQL for read Article ability.')
@@ -275,20 +275,20 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
         @ability.can :read, Article, published: true
         @ability.can :read, Article, Article.where(secret: true)
         @ability.cannot :read, Article
-        expect(-> { Article.accessible_by(@ability) }).not_to raise_error
+        expect { Article.accessible_by(@ability) }.not_to raise_error
       end
 
       it 'recognises empty scopes and compresses them' do
         @ability.can :read, Article, published: true
         @ability.can :read, Article, Article.all
-        expect(-> { Article.accessible_by(@ability) }).not_to raise_error
+        expect { Article.accessible_by(@ability) }.not_to raise_error
       end
 
       it 'does not allow to fetch records when ability with just block present' do
         @ability.can :read, Article do
           false
         end
-        expect(-> { Article.accessible_by(@ability) }).to raise_error(CanCan::Error)
+        expect { Article.accessible_by(@ability) }.to raise_error(CanCan::Error)
       end
 
       it 'should support more than one deeply nested conditions' do
@@ -302,7 +302,7 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
 
       it 'does not allow to check ability on object against SQL conditions without block' do
         @ability.can :read, Article, ['secret=?', true]
-        expect(-> { @ability.can? :read, Article.new }).to raise_error(CanCan::Error)
+        expect { @ability.can? :read, Article.new }.to raise_error(CanCan::Error)
       end
 
       it 'has false conditions if no abilities match' do
