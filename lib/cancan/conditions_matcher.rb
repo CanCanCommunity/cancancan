@@ -50,20 +50,21 @@ module CanCan
         return adapter.matches_conditions_hash?(subject, conditions)
       end
 
-      matches_all_conditions?(adapter, conditions, subject)
+      matches_all_conditions?(adapter, subject, conditions)
     end
 
-    def matches_all_conditions?(adapter, conditions, subject)
+    def matches_all_conditions?(adapter, subject, conditions)
       if conditions.is_a?(Hash)
-        matches_hash_conditions(adapter, conditions, subject)
+        matches_hash_conditions(adapter, subject, conditions)
       elsif conditions.respond_to?(:include?)
         conditions.include?(subject)
       else
+        puts "does #{subject} match #{conditions}?"
         subject == conditions
       end
     end
 
-    def matches_hash_conditions(adapter, conditions, subject)
+    def matches_hash_conditions(adapter, subject, conditions)
       conditions.all? do |name, value|
         if adapter.override_condition_matching?(subject, name, value)
           adapter.matches_condition?(subject, name, value)
