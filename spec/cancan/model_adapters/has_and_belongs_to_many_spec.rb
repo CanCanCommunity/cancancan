@@ -51,7 +51,7 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecord5Adapter do
         CanCan.accessible_by_strategy = :subquery
       end
 
-      it 'it retreives the records correctly' do
+      it 'it retrieves the records correctly' do
         houses = House.accessible_by(ability)
         expect(houses).to match_array [@house2, @house1]
       end
@@ -78,7 +78,7 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecord5Adapter do
       CanCan.accessible_by_strategy = :left_join
     end
 
-    it 'it retreives the records correctly' do
+    it 'it retrieves the records correctly' do
       houses = House.accessible_by(ability)
       expect(houses).to match_array [@house2, @house1]
     end

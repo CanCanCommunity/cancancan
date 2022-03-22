@@ -263,7 +263,7 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
       it 'raises an exception when trying to merge scope with other conditions' do
         @ability.can :read, Article, published: true
         @ability.can :read, Article, Article.where(secret: true)
-        expect(-> { Article.accessible_by(@ability) })
+        expect { Article.accessible_by(@ability) }
           .to raise_error(CanCan::Error,
                           'Unable to merge an Active Record scope with other conditions. '\
                             'Instead use a hash or SQL for read Article ability.')
@@ -273,20 +273,20 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
         @ability.can :read, Article, published: true
         @ability.can :read, Article, Article.where(secret: true)
         @ability.cannot :read, Article
-        expect(-> { Article.accessible_by(@ability) }).not_to raise_error
+        expect { Article.accessible_by(@ability) }.not_to raise_error
       end
 
       it 'recognises empty scopes and compresses them' do
         @ability.can :read, Article, published: true
         @ability.can :read, Article, Article.all
-        expect(-> { Article.accessible_by(@ability) }).not_to raise_error
+        expect { Article.accessible_by(@ability) }.not_to raise_error
       end
 
       it 'does not allow to fetch records when ability with just block present' do
         @ability.can :read, Article do
           false
         end
-        expect(-> { Article.accessible_by(@ability) }).to raise_error(CanCan::Error)
+        expect { Article.accessible_by(@ability) }.to raise_error(CanCan::Error)
       end
 
       it 'should support more than one deeply nested conditions' do
@@ -300,7 +300,7 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
 
       it 'does not allow to check ability on object against SQL conditions without block' do
         @ability.can :read, Article, ['secret=?', true]
-        expect(-> { @ability.can? :read, Article.new }).to raise_error(CanCan::Error)
+        expect { @ability.can? :read, Article.new }.to raise_error(CanCan::Error)
       end
 
       it 'has false conditions if no abilities match' do
@@ -440,6 +440,35 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
         ability.can :read, Article
         ability.cannot :read, Article, :secret
         expect(Article.accessible_by(ability)).to eq([article])
+      end
+
+      describe 'when can? is used with a Hash (nested resources)' do
+        it 'verifies parent equality correctly' do
+          user1 = User.create!(name: 'user1')
+          user2 = User.create!(name: 'user2')
+          category = Category.create!(name: 'cat')
+          article1 = Article.create!(name: 'article1', category: category, user: user1)
+          article2 = Article.create!(name: 'article2', category: category, user: user2)
+          comment1 = Comment.create!(article: article1)
+          comment2 = Comment.create!(article: article2)
+
+          ability1 = Ability.new(user1)
+          ability1.can :read, Article
+          ability1.can :manage, Article, user: user1
+          ability1.can :manage, Comment, article: user1.articles
+
+          expect(ability1.can?(:manage, { article1 => Comment })).to eq(true)
+          expect(ability1.can?(:manage, { article2 => Comment })).to eq(false)
+          expect(ability1.can?(:manage, { article1 => comment1 })).to eq(true)
+          expect(ability1.can?(:manage, { article2 => comment2 })).to eq(false)
+
+          ability2 = Ability.new(user2)
+
+          expect(ability2.can?(:manage, { article1 => Comment })).to eq(false)
+          expect(ability2.can?(:manage, { article2 => Comment })).to eq(false)
+          expect(ability2.can?(:manage, { article1 => comment1 })).to eq(false)
+          expect(ability2.can?(:manage, { article2 => comment2 })).to eq(false)
+        end
       end
     end
   end
@@ -641,7 +670,7 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
       expect(ability.can?(:read, Foo)).to eq(true)
     end
 
-    it 'allows for access with association with accesible_by' do
+    it 'allows for access with association with accessible_by' do
       user = User.new
       foo = Foo.create(name: 'foo')
       bar = Bar.create(name: 'bar')
@@ -664,7 +693,7 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
       expect(ability.can?(:read, Foo)).to eq(false)
     end
 
-    it 'blocks access with association for accesible_by' do
+    it 'blocks access with association for accessible_by' do
       user = User.create!
       foo = Foo.create(name: 'foo')
       role = Role.create(name: 'adviser')
@@ -813,6 +842,101 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
   LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
   LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
   WHERE (("users"."name" = 'paperino') OR ("users"."name" = 'pippo'))))
+      end
+    end
+  end
+
+  if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
+    context 'switching strategies' do
+      before do
+        CanCan.accessible_by_strategy = :left_join # default - should be ignored in these tests
+      end
+
+      it 'allows you to switch strategies with a keyword argument' do
+        u = User.create!(name: 'pippo')
+        Article.create!(mentioned_users: [u])
+
+        ability = Ability.new(u)
+        ability.can :read, Article, mentions: { user: { name: u.name } }
+
+        subquery_sql = Article.accessible_by(ability, strategy: :subquery).to_sql
+        left_join_sql = Article.accessible_by(ability, strategy: :left_join).to_sql
+
+        expect(subquery_sql.strip.squeeze(' ')).to eq(%(
+    SELECT "articles".*
+    FROM "articles"
+    WHERE "articles"."id" IN
+    (SELECT "articles"."id"
+      FROM "articles"
+      LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
+      LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
+      WHERE "users"."name" = 'pippo')
+    ).gsub(/\s+/, ' ').strip)
+
+        expect(left_join_sql.strip.squeeze(' ')).to eq(%(
+  SELECT DISTINCT "articles".*
+  FROM "articles"
+  LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
+  LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
+  WHERE "users"."name" = 'pippo').gsub(/\s+/, ' ').strip)
+      end
+
+      it 'allows you to switch strategies with a block' do
+        u = User.create!(name: 'pippo')
+        Article.create!(mentioned_users: [u])
+
+        ability = Ability.new(u)
+        ability.can :read, Article, mentions: { user: { name: u.name } }
+
+        subquery_sql = CanCan.with_accessible_by_strategy(:subquery) { Article.accessible_by(ability).to_sql }
+        left_join_sql = CanCan.with_accessible_by_strategy(:left_join) { Article.accessible_by(ability).to_sql }
+
+        expect(subquery_sql.strip.squeeze(' ')).to eq(%(
+    SELECT "articles".*
+    FROM "articles"
+    WHERE "articles"."id" IN
+    (SELECT "articles"."id"
+      FROM "articles"
+      LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
+      LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
+      WHERE "users"."name" = 'pippo')
+    ).gsub(/\s+/, ' ').strip)
+
+        expect(left_join_sql.strip.squeeze(' ')).to eq(%(
+  SELECT DISTINCT "articles".*
+  FROM "articles"
+  LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
+  LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
+  WHERE "users"."name" = 'pippo').gsub(/\s+/, ' ').strip)
+      end
+
+      it 'allows you to switch strategies with a block, and to_sql called outside the block' do
+        u = User.create!(name: 'pippo')
+        Article.create!(mentioned_users: [u])
+
+        ability = Ability.new(u)
+        ability.can :read, Article, mentions: { user: { name: u.name } }
+
+        subquery_sql = CanCan.with_accessible_by_strategy(:subquery) { Article.accessible_by(ability) }.to_sql
+        left_join_sql = CanCan.with_accessible_by_strategy(:left_join) { Article.accessible_by(ability) }.to_sql
+
+        expect(subquery_sql.strip.squeeze(' ')).to eq(%(
+    SELECT "articles".*
+    FROM "articles"
+    WHERE "articles"."id" IN
+    (SELECT "articles"."id"
+      FROM "articles"
+      LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
+      LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
+      WHERE "users"."name" = 'pippo')
+    ).gsub(/\s+/, ' ').strip)
+
+        expect(left_join_sql.strip.squeeze(' ')).to eq(%(
+  SELECT DISTINCT "articles".*
+  FROM "articles"
+  LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
+  LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
+  WHERE "users"."name" = 'pippo').gsub(/\s+/, ' ').strip)
       end
     end
   end

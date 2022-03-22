@@ -1,42 +1,44 @@
-### Getting Started
+# CanCanCan - Developer guide
 
-* [Defining Abilities](./Defining-Abilities.md), [Best Practices](https://github.com/CanCanCommunity/cancancan/wiki/Defining-Abilities%3A-Best-Practices)
-* [Checking Abilities](./Checking-Abilities.md)
-* [Authorizing Controller Actions](./Authorizing-controller-actions.md)
-* [Exception Handling](./Exception-Handling.md)
-* [Ensure Authorization](./Ensure-Authorization.md)
-* [Changing Defaults](./Changing-Defaults.md)
-* [Translations (i18n)](./Translations-(i18n).md)
+This is the official guide to CanCanCan.
 
-### More about Abilities
+It will advance chapter by chapter and go more and more into details, advanced usages, and special cases.
 
-* [Testing Abilities](./Testing-Abilities.md)
-* [Debugging Abilities](./Debugging-Abilities.md)
-* [Ability Precedence](./Ability-Precedence.md)
-* [Fetching Records](./Fetching-Records.md)
-* [Action Aliases](./Action-Aliases.md)
-* [Custom Actions](./Custom-Actions.md)
-* [Role Based Authorization](./Role-Based-Authorization.md)
+We will start by introducing basic concepts and features, and then dig deeper into configurations and implementation details in later chapters.
 
+You can skip the [Introduction](./introduction.md) where there's just some history and blablabla and go directly to [Installation](./installation.md) to start fast :rocket:.
 
-### More about Controllers & Views
+## Summary
 
-* [Controller Authorization Example](./Controller-Authorization-Example.md)
-* [Nested Resources](./Nested-Resources.md)
-* [Strong Parameters](./Strong-Parameters.md)
-* [Non RESTful Controllers](./Non-RESTful-Controllers.md)
-* [Link Helpers](./Link-Helpers.md)
+1. [Introduction](./introduction.md)
+1. [Installation](./installation.md)
+1. [Define and check abilities](./define_check_abilities.md)
+1. [Controller helpers](./controller_helpers.md)
+1. [Fetching records](./fetching_records.md)
+1. [Cannot](./cannot.md)
+1. [Hash of conditions](./hash_of_conditions.md)
+1. [Combine Abilities](./combine_abilities.md)
+1. [Check abilities - avoid mistakes](./check_abilities_mistakes.md)
+1. [Handling CanCan::AccessDenied](./handling_access_denied.md)
+1. [Customize controller helpers](./changing_defaults.md)
+1. [Accessing request data](./accessing_request_data.md)
+1. [SQL strategies](./sql_strategies.md)
+1. [Accessible attributes](./accessible_attributes.md)
+1. [Testing](./testing.md)
+1. [Internationalization](./internationalization.md)
 
+## Further topics
 
-### Other Use Cases
+In these topics, you will learn some best practices, but also how to solve specific integration issues with other libraries or how to extend CanCanCan.
 
-* [Inherited Resources](./Inherited-Resources.md)
-* [Mongoid](./Mongoid.md)
-* [Rails Admin](https://github.com/sferik/rails_admin/wiki/CanCanCan)
-* [Devise](./Devise.md)
-* [Accessing Request Data](./Accessing-request-data.md)
-* [Abilities in Database](./Abilities-in-Database.md)
-* [Ability for Other Users](./Ability-for-Other-Users.md)
-* [Other Authorization Solutions](./Other-Authorization-Solutions.md)
-
-**Can't find what you're looking for? [Submit a Question on StackOverflow](http://stackoverflow.com/questions/ask?tags=cancancan)
+1. [Migrating](./migrating.md)
+1. [Debugging Abilities](./debugging.md)
+1. [Split your ability file](./split_ability.md)
+1. [Define Abilities - best practices](./define_abilities_best_practices.md)
+1. [Abilities in database](./abilities_in_database.md)
+1. [Role-based Authorization](./role_based_authorization.md)
+1. [Model Adapter](./model_adapter.md)
+1. [Rules compression](./rules_compression.md)
+1. [Inherited Resources](./inherited_resources.md)
+1. [Devise](./devise.md)
+1. [FriendlyId](./friendly_id.md)

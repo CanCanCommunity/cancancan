@@ -70,7 +70,7 @@ module CanCan
     end
 
     def with_scope?
-      @conditions.is_a?(ActiveRecord::Relation)
+      defined?(ActiveRecord) && @conditions.is_a?(ActiveRecord::Relation)
     end
 
     def associations_hash(conditions = @conditions)

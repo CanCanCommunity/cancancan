@@ -21,7 +21,9 @@ module CanCan
   #                `distinct` is not reliable in some cases. See
   #                https://github.com/CanCanCommunity/cancancan/pull/605
   def self.accessible_by_strategy
-    @accessible_by_strategy || default_accessible_by_strategy
+    return @accessible_by_strategy if @accessible_by_strategy
+
+    @accessible_by_strategy = default_accessible_by_strategy
   end
 
   def self.default_accessible_by_strategy
@@ -36,15 +38,33 @@ module CanCan
   end
 
   def self.accessible_by_strategy=(value)
-    unless valid_accessible_by_strategies.include?(value)
-      raise ArgumentError, "accessible_by_strategy must be one of #{valid_accessible_by_strategies.join(', ')}"
-    end
+    validate_accessible_by_strategy!(value)
 
     if value == :subquery && does_not_support_subquery_strategy?
       raise ArgumentError, 'accessible_by_strategy = :subquery requires ActiveRecord 5 or newer'
     end
 
     @accessible_by_strategy = value
+  end
+
+  def self.with_accessible_by_strategy(value)
+    return yield if value == accessible_by_strategy
+
+    validate_accessible_by_strategy!(value)
+
+    begin
+      strategy_was = accessible_by_strategy
+      @accessible_by_strategy = value
+      yield
+    ensure
+      @accessible_by_strategy = strategy_was
+    end
+  end
+
+  def self.validate_accessible_by_strategy!(value)
+    return if valid_accessible_by_strategies.include?(value)
+
+    raise ArgumentError, "accessible_by_strategy must be one of #{valid_accessible_by_strategies.join(', ')}"
   end
 
   def self.does_not_support_subquery_strategy?
