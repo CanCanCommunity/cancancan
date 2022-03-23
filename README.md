@@ -44,7 +44,7 @@ of models automatically and reduce duplicated code.
 <br/>
 <br/>
 <br/>
-<a href="https://jobs.goboony.com/fullstack-ruby-on-rails-developer" target="_blank">
+<a href="https://jobs.goboony.com/o/full-stack-ruby-on-rails-engineer" target="_blank">
   <img src="./logo/goboony.png" alt="Goboony" height="50"/>
 </a>
 <br />
@@ -56,8 +56,8 @@ of models automatically and reduce duplicated code.
 <br />
 <br />
 <br />
-<a href="https://www.incloudcounsel.com" target="_blank">
-  <img src="./logo/in_cloud_counsel.png" alt="InCloudCounsel" height="70"/>
+<a href="https://www.ontra.ai" target="_blank">
+  <img src="./logo/ontra.png" alt="Ontra" height="70"/>
 </a>
 <br />
 <br />
@@ -178,6 +178,9 @@ of Rails, as well as the different model adapters.
 When first developing, you need to run `bundle install` and then `bundle exec appraisal install`, to install the different sets.
 
 You can then run all appraisal files (like CI does), with `appraisal rake` or just run a specific set `DB='sqlite' bundle exec appraisal activerecord_5.2.2 rake`.
+
+If you use RubyMine, you can run RSpec tests by configuring the RSpec configuration template like this:
+![rubymine_rspec.png](rubymine_rspec.png)
 
 See the [CONTRIBUTING](./CONTRIBUTING.md) for more information.
 

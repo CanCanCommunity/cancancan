@@ -30,7 +30,7 @@ describe CanCan::ControllerAdditions do
 
   it 'load_and_authorize_resource setups a before filter which passes call to ControllerResource' do
     expect(cancan_resource_class = double).to receive(:load_and_authorize_resource)
-    allow(CanCan::ControllerResource).to receive(:new).with(@controller, nil, foo: :bar) { cancan_resource_class }
+    allow(CanCan::ControllerResource).to receive(:new).with(@controller, nil, { foo: :bar }) { cancan_resource_class }
     expect(@controller_class)
       .to receive(:before_action).with({}) { |_options, &block| block.call(@controller) }
     @controller_class.load_and_authorize_resource foo: :bar
@@ -38,7 +38,9 @@ describe CanCan::ControllerAdditions do
 
   it 'load_and_authorize_resource properly passes first argument as the resource name' do
     expect(cancan_resource_class = double).to receive(:load_and_authorize_resource)
-    allow(CanCan::ControllerResource).to receive(:new).with(@controller, :project, foo: :bar) { cancan_resource_class }
+    allow(CanCan::ControllerResource).to receive(:new).with(@controller, :project, { foo: :bar }) do
+      cancan_resource_class
+    end
     expect(@controller_class)
       .to receive(:before_action).with({}) { |_options, &block| block.call(@controller) }
     @controller_class.load_and_authorize_resource :project, foo: :bar
@@ -51,9 +53,9 @@ describe CanCan::ControllerAdditions do
 
   it 'authorize_resource setups a before filter which passes call to ControllerResource' do
     expect(cancan_resource_class = double).to receive(:authorize_resource)
-    allow(CanCan::ControllerResource).to receive(:new).with(@controller, nil, foo: :bar) { cancan_resource_class }
+    allow(CanCan::ControllerResource).to receive(:new).with(@controller, nil, { foo: :bar }) { cancan_resource_class }
     expect(@controller_class)
-      .to receive(:before_action).with(except: :show, if: true) do |_options, &block|
+      .to receive(:before_action).with({ except: :show, if: true }) do |_options, &block|
         block.call(@controller)
       end
     @controller_class.authorize_resource foo: :bar, except: :show, if: true
@@ -61,9 +63,9 @@ describe CanCan::ControllerAdditions do
 
   it 'load_resource setups a before filter which passes call to ControllerResource' do
     expect(cancan_resource_class = double).to receive(:load_resource)
-    allow(CanCan::ControllerResource).to receive(:new).with(@controller, nil, foo: :bar) { cancan_resource_class }
+    allow(CanCan::ControllerResource).to receive(:new).with(@controller, nil, { foo: :bar }) { cancan_resource_class }
     expect(@controller_class)
-      .to receive(:before_action).with(only: %i[show index], unless: false) do |_options, &block|
+      .to receive(:before_action).with({ only: %i[show index], unless: false }) do |_options, &block|
         block.call(@controller)
       end
     @controller_class.load_resource foo: :bar, only: %i[show index], unless: false
@@ -78,9 +80,9 @@ describe CanCan::ControllerAdditions do
 
   it 'check_authorization triggers AuthorizationNotPerformed in after filter' do
     expect(@controller_class)
-      .to receive(:after_action).with(only: [:test]) { |_options, &block| block.call(@controller) }
+      .to receive(:after_action).with({ only: [:test] }) { |_options, &block| block.call(@controller) }
     expect do
-      @controller_class.check_authorization(only: [:test])
+      @controller_class.check_authorization({ only: [:test] })
     end.to raise_error(CanCan::AuthorizationNotPerformed)
   end
 
@@ -105,7 +107,7 @@ describe CanCan::ControllerAdditions do
   it 'check_authorization does not raise error when @_authorized is set' do
     @controller.instance_variable_set(:@_authorized, true)
     expect(@controller_class)
-      .to receive(:after_action).with(only: [:test]) { |_options, &block| block.call(@controller) }
+      .to receive(:after_action).with({ only: [:test] }) { |_options, &block| block.call(@controller) }
     expect do
       @controller_class.check_authorization(only: [:test])
     end.not_to raise_error
@@ -139,7 +141,7 @@ describe CanCan::ControllerAdditions do
     expect(@controller_class.cancan_skipper[:load][:article]).to eq({})
   end
 
-  it 'skip_load_and_authore_resource adds itself to the cancan skipper with given model name and options' do
+  it 'skip_load_and_authorize_resource adds itself to the cancan skipper with given model name and options' do
     @controller_class.skip_load_and_authorize_resource(:project, only: %i[index show])
     expect(@controller_class.cancan_skipper[:load][:project]).to eq(only: %i[index show])
     expect(@controller_class.cancan_skipper[:authorize][:project]).to eq(only: %i[index show])

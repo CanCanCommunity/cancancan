@@ -1,3 +1,5 @@
+require_relative 'sti_detector'
+
 # This class is responsible for matching classes and their subclasses as well as
 # upmatching classes to their ancestors.
 # This is used to generate sti connections
@@ -12,6 +14,8 @@ class SubjectClassMatcher
   def self.matching_class_check(subject, sub, has_subclasses)
     matches = matches_class_or_is_related(subject, sub)
     if has_subclasses
+      return matches unless StiDetector.sti_class?(sub)
+
       matches || subject.subclasses.include?(sub)
     else
       matches

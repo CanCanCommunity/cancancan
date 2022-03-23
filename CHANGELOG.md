@@ -1,3 +1,11 @@
+Unreleased
+
+* [#691](https://github.com/CanCanCommunity/cancancan/pull/691): Add two new subquery strategies: `joined_alias_exists_subquery`, `joined_alias_each_rule_as_exists_subquery`. ([@kaspernj][])
+* [#767](https://github.com/CanCanCommunity/cancancan/pull/767): Improve ability checks with nested resources (hash checks)vim. ([@Juleffel][])
+* [#772](https://github.com/CanCanCommunity/cancancan/pull/772): Support non-hash conditions in ability definitions. ([@Juleffel][])
+* [#773](https://github.com/CanCanCommunity/cancancan/pull/773): Drop support for ruby 2.4 and 2.5. ([@coorasse][])
+* [#778](https://github.com/CanCanCommunity/cancancan/pull/778): Drop support for ActiveRecord 4. ([@coorasse][])
+
 ## 3.3.0
 
 * [#675](https://github.com/CanCanCommunity/cancancan/pull/675): Support modifying the `accessible_by` querying strategy on a per-query basis. ([@ghiculescu][])
@@ -39,7 +47,7 @@
 
 ## 3.0.0
 
-Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.com/CanCanCommunity/cancancan/wiki/Migrating-from-CanCanCan-2.x-to-3.0)
+Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.com/CanCanCommunity/cancancan/blob/develop/docs/migrating.md#from-2x-to-3x)
 
 * [#560](https://github.com/CanCanCommunity/cancancan/pull/560): Add support for Rails 6.0. ([@coorasse][])
 * [#489](https://github.com/CanCanCommunity/cancancan/pull/489): Drop support for actions without a subject. ([@andrew-aladev][])
@@ -166,7 +174,7 @@ Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.co
 
 ## 1.9.0 (July 20th, 2014)
 
-* Fix cancancan#59 - Parameters are automatically detected and santitized for all actions, not just create and update ([@bryanrite][]).
+* Fix cancancan#59 - Parameters are automatically detected and sanitized for all actions, not just create and update ([@bryanrite][]).
 
 * Fix cancancan#97, 72, 40, 39, 26 - Support Active Record 4 properly with references on nested permissions (scpike, tdg5, Crystark).
 
@@ -199,7 +207,7 @@ Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.co
 
 * Feature cancancan#3 - Permit "can?" check multiple subjects (cefigueiredo).
 
-* Feature cancancan#29 - Add ability to use a String that will get instance_eval'd or a Proc that will get called as the parameter method option for strong_parameter santization (svoop).
+* Feature cancancan#29 - Add ability to use a String that will get instance_eval'd or a Proc that will get called as the parameter method option for strong_parameter sanitization (svoop).
 
 * Feature cancancan#48 - Define a CanCanCan module. Even though it is not used, it is standard practice to define the module, and helpful for determining between CanCanCan and CanCan for external libraries.
 
@@ -689,3 +697,4 @@ Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.co
 [@Liberatys]: https://github.com/Liberatys
 [@ghiculescu]: https://github.com/ghiculescu
 [@mtoneil]: https://github.com/mtoneil
+[@Juleffel]: https://github.com/Juleffel

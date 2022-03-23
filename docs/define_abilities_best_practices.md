@@ -27,7 +27,7 @@ can :read, Article, is_published: true
 
 By using hashes instead of blocks for all actions, you won't have to worry about translating blocks used for member controller actions (`:create`, `:destroy`, `:update`) to equivalent blocks for collection actions (`:index`, `:show`)—which require hashes anyway!
 
-### Hash conditions are OR'd in SQL, giving you maximum flexibilty.
+### Hash conditions are OR'd in SQL, giving you maximum flexibility.
 
 Every time you define an ability with `can`, each `can` chains together with OR in the final SQL query for that model.
 

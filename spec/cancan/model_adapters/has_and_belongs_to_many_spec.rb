@@ -46,12 +46,68 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecord5Adapter do
   end
 
   unless CanCan::ModelAdapters::ActiveRecordAdapter.version_lower?('5.0.0')
+    describe 'fetching of records - joined_alias_subquery strategy' do
+      before do
+        CanCan.accessible_by_strategy = :joined_alias_exists_subquery
+      end
+
+      it 'it retreives the records correctly' do
+        houses = House.accessible_by(ability)
+        expect(houses).to match_array [@house2, @house1]
+      end
+
+      if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
+        it 'generates the correct query' do
+          expect(ability.model_adapter(House, :read))
+            .to generate_sql("SELECT \"houses\".*
+                             FROM \"houses\"
+                             JOIN \"houses\" AS \"houses_alias\" ON \"houses_alias\".\"id\" = \"houses\".\"id\"
+                             WHERE (EXISTS (SELECT 1
+                               FROM \"houses\"
+                               LEFT OUTER JOIN \"houses_people\" ON \"houses_people\".\"house_id\" = \"houses\".\"id\"
+                               LEFT OUTER JOIN \"people\" ON \"people\".\"id\" = \"houses_people\".\"person_id\"
+                               WHERE
+                                 \"people\".\"id\" = #{@person1.id} AND
+                                 (\"houses\".\"id\" = \"houses_alias\".\"id\") LIMIT 1))
+                            ")
+        end
+      end
+    end
+
+    describe 'fetching of records - joined_alias_each_rule_as_exists_subquery strategy' do
+      before do
+        CanCan.accessible_by_strategy = :joined_alias_each_rule_as_exists_subquery
+      end
+
+      it 'it retreives the records correctly' do
+        houses = House.accessible_by(ability)
+        expect(houses).to match_array [@house2, @house1]
+      end
+
+      if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
+        it 'generates the correct query' do
+          expect(ability.model_adapter(House, :read))
+            .to generate_sql("SELECT \"houses\".*
+                             FROM \"houses\"
+                             JOIN \"houses\" AS \"houses_alias\" ON \"houses_alias\".\"id\" = \"houses\".\"id\"
+                             WHERE (EXISTS (SELECT 1
+                               FROM \"houses\"
+                               INNER JOIN \"houses_people\" ON \"houses_people\".\"house_id\" = \"houses\".\"id\"
+                               INNER JOIN \"people\" ON \"people\".\"id\" = \"houses_people\".\"person_id\"
+                               WHERE (\"houses\".\"id\" = \"houses_alias\".\"id\") AND
+                               (\"people\".\"id\" = #{@person1.id})
+                               LIMIT 1))
+                             ")
+        end
+      end
+    end
+
     describe 'fetching of records - subquery strategy' do
       before do
         CanCan.accessible_by_strategy = :subquery
       end
 
-      it 'it retreives the records correctly' do
+      it 'it retrieves the records correctly' do
         houses = House.accessible_by(ability)
         expect(houses).to match_array [@house2, @house1]
       end
@@ -78,7 +134,7 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecord5Adapter do
       CanCan.accessible_by_strategy = :left_join
     end
 
-    it 'it retreives the records correctly' do
+    it 'it retrieves the records correctly' do
       houses = House.accessible_by(ability)
       expect(houses).to match_array [@house2, @house1]
     end
