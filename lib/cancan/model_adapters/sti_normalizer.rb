@@ -1,3 +1,5 @@
+require_relative '../sti_detector'
+
 # this class is responsible for detecting sti classes and creating new rules for the
 # relevant subclasses, using the inheritance_column as a merger
 module CanCan
@@ -20,9 +22,7 @@ module CanCan
         private
 
         def update_rule(subject, rule, rules_cache)
-          return false unless subject.respond_to?(:descends_from_active_record?)
-          return false if subject == :all || subject.descends_from_active_record?
-          return false unless subject < ActiveRecord::Base
+          return false unless StiDetector.sti_class?(subject)
 
           rules_cache.push(build_rule_for_subclass(rule, subject))
           true
@@ -31,7 +31,7 @@ module CanCan
         # create a new rule for the subclasses that links on the inheritance_column
         def build_rule_for_subclass(rule, subject)
           CanCan::Rule.new(rule.base_behavior, rule.actions, subject.superclass,
-                           rule.conditions.merge(subject.inheritance_column => subject.name), rule.block)
+                           rule.conditions.merge(subject.inheritance_column => subject.sti_name), rule.block)
         end
       end
     end

@@ -1104,6 +1104,43 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
     end
   end
 
+  context 'with rule application to subclass for non sti class' do
+    before do
+      ActiveRecord::Schema.define do
+        create_table :parents, force: true
+
+        create_table :children, force: true
+      end
+
+      class ApplicationRecord < ActiveRecord::Base
+        self.abstract_class = true
+      end
+
+      class Parent < ActiveRecord::Base
+      end
+
+      class Child < Parent
+      end
+    end
+
+    it 'cannot rules are not effecting parent class' do
+      u1 = User.create!(name: 'pippo')
+      ability = Ability.new(u1)
+      ability.can :manage, Parent
+      ability.cannot :manage, Child
+      expect(ability).not_to be_able_to(:index, Child)
+      expect(ability).to be_able_to(:index, Parent)
+    end
+
+    it 'can rules are not effecting parent class' do
+      u1 = User.create!(name: 'pippo')
+      ability = Ability.new(u1)
+      ability.can :manage, Child
+      expect(ability).to be_able_to(:index, Child)
+      expect(ability).not_to be_able_to(:index, Parent)
+    end
+  end
+
   context 'when STI is in use' do
     before do
       ActiveRecord::Schema.define do
