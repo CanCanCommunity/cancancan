@@ -1052,13 +1052,21 @@ describe CanCan::ModelAdapters::ActiveRecordAdapter do
       end
     end
 
-    it 'rules are not effecting parent class' do
+    it 'cannot rules are not effecting parent class' do
       u1 = User.create!(name: 'pippo')
       ability = Ability.new(u1)
       ability.can :manage, Parent
       ability.cannot :manage, Child
       expect(ability).not_to be_able_to(:index, Child)
       expect(ability).to be_able_to(:index, Parent)
+    end
+
+    it 'can rules are not effecting parent class' do
+      u1 = User.create!(name: 'pippo')
+      ability = Ability.new(u1)
+      ability.can :manage, Child
+      expect(ability).to be_able_to(:index, Child)
+      expect(ability).not_to be_able_to(:index, Parent)
     end
   end
 
