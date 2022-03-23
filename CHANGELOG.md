@@ -1,5 +1,6 @@
 Unreleased
 
+* [#691](https://github.com/CanCanCommunity/cancancan/pull/691): Add two new subquery strategies: `joined_alias_exists_subquery`, `joined_alias_each_rule_as_exists_subquery`. ([@kaspernj][])
 * [#767](https://github.com/CanCanCommunity/cancancan/pull/767): Improve ability checks with nested resources (hash checks)vim. ([@Juleffel][])
 * [#772](https://github.com/CanCanCommunity/cancancan/pull/772): Support non-hash conditions in ability definitions. ([@Juleffel][])
 * [#773](https://github.com/CanCanCommunity/cancancan/pull/773): Drop support for ruby 2.4 and 2.5. ([@coorasse][])
