@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module CanCan
   module ModelAdapters
     class Strategies
@@ -15,7 +17,7 @@ module CanCan
           double_exists_sql = ''
 
           compressed_rules.each_with_index do |rule, index|
-            double_exists_sql << ' OR ' if index > 0
+            double_exists_sql << ' OR ' if index.positive?
             double_exists_sql << "EXISTS (#{sub_query_for_rule(rule).to_sql})"
           end
 
