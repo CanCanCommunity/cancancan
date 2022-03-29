@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'conditions_matcher.rb'
-require_relative 'class_matcher.rb'
+require_relative 'subject_class_matcher.rb'
 require_relative 'relevant.rb'
 
 module CanCan
@@ -15,6 +15,7 @@ module CanCan
     attr_reader :base_behavior, :subjects, :actions, :conditions, :attributes, :block
     attr_writer :expanded_actions, :conditions
 
+    # rubocop:disable Metrics/MethodLength
     # The first argument when initializing is the base_behavior which is a true/false
     # value. True for "can" and false for "cannot". The next two arguments are the action
     # and subject respectively (such as :read, @project). The third argument is a hash
@@ -28,12 +29,14 @@ module CanCan
       raise Error, "Subject is required for #{action}" if action && subject.nil?
 
       @base_behavior = base_behavior
+      @subject_class_matcher = SubjectClassMatcher.new
       @actions = wrap(action)
       @subjects = wrap(subject)
       @attributes = wrap(attributes)
       @conditions = extra_args || {}
       @block = block
     end
+    # rubocop:enable Metrics/MethodLength
 
     def inspect
       repr = "#<#{self.class.name}"
@@ -111,7 +114,7 @@ module CanCan
     end
 
     def matches_subject_class?(subject)
-      SubjectClassMatcher.matches_subject_class?(@subjects, subject)
+      @subject_class_matcher.matches_subject_class?(@subjects, subject)
     end
 
     def parse_attributes_from_extra_args(args)
