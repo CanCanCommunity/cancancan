@@ -82,7 +82,12 @@ module CanCan
       end
     end
 
-    def condition_match?(attribute, value)
+    def condition_match?(attribute, value) # rubocop:disable Metrics/MethodLength
+      if defined?(ActiveRecord) &&
+         (value.is_a?(ActiveRecord::AssociationRelation) || value.is_a?(ActiveRecord::Relation))
+        return condition_match_query?(attribute, value)
+      end
+
       case value
       when Hash
         hash_condition_match?(attribute, value)
@@ -93,6 +98,16 @@ module CanCan
       else
         attribute == value
       end
+    end
+
+    def condition_match_query?(attribute, query)
+      selects = query.values[:select]
+
+      if selects&.length != 1
+        raise "Only one column should be selected and not #{selects&.length || 0} for: #{value.to_sql}"
+      end
+
+      query.where(selects[0] => attribute).any?
     end
 
     def hash_condition_match?(attribute, value)
