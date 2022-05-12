@@ -196,8 +196,7 @@ module CanCan
       end
 
       # Skip the loading behavior of CanCan. This is useful when using +load_and_authorize_resource+ but want to
-      # only do authorization on certain actions. You can pass :only and :except options to specify which actions to
-      # skip the effects on. It will apply to all actions by default.
+      # only do authorization on certain actions. It will apply to all actions by default.
       #
       #   class ProjectsController < ApplicationController
       #     load_and_authorize_resource
@@ -205,6 +204,26 @@ module CanCan
       #   end
       #
       # You can also pass the resource name as the first argument to skip that resource.
+      #
+      # Options:
+      # [:+only+]
+      #   Only applies to given actions.
+      #
+      # [:+except+]
+      #   Does not apply to given actions.
+      #
+      # [:+if+]
+      #   Supply the name of a controller method or a lambda/proc to be called.
+      #   The loading is only skipped if this returns true.
+      #
+      #     skip_load_resource :if => :admin_controller?
+      #
+      # [:+unless+]
+      #   Supply the name of a controller method to be called.
+      #   The loading is skipped if this returns false.
+      #
+      #     skip_load_resource :unless => :devise_controller?
+      #
       def skip_load_resource(*args)
         options = args.extract_options!
         name = args.first
@@ -212,8 +231,7 @@ module CanCan
       end
 
       # Skip the authorization behavior of CanCan. This is useful when using +load_and_authorize_resource+ but want to
-      # only do loading on certain actions. You can pass :only and :except options to specify which actions to
-      # skip the effects on. It will apply to all actions by default.
+      # only do loading on certain actions. It will apply to all actions by default.
       #
       #   class ProjectsController < ApplicationController
       #     load_and_authorize_resource
@@ -221,6 +239,26 @@ module CanCan
       #   end
       #
       # You can also pass the resource name as the first argument to skip that resource.
+      #
+      # Options:
+      # [:+only+]
+      #   Only applies to given actions.
+      #
+      # [:+except+]
+      #   Does not apply to given actions.
+      #
+      # [:+if+]
+      #   Supply the name of a controller method or a lambda/proc to be called.
+      #   The authorization is only skipped if this returns true.
+      #
+      #     skip_authorize_resource :if => :admin_controller?
+      #
+      # [:+unless+]
+      #   Supply the name of a controller method to be called.
+      #   The authorization is skipped if this returns false.
+      #
+      #     skip_authorize_resource :unless => :devise_controller?
+      #
       def skip_authorize_resource(*args)
         options = args.extract_options!
         name = args.first

@@ -47,9 +47,7 @@ module CanCan
     def skip?(behavior)
       return false unless (options = @controller.class.cancan_skipper[behavior][@name])
 
-      options == {} ||
-        options[:except] && !action_exists_in?(options[:except]) ||
-        action_exists_in?(options[:only])
+      options == {} || evaluate_options(options)
     end
 
     protected
@@ -128,6 +126,18 @@ module CanCan
 
     def action_exists_in?(options)
       Array(options).include?(@params[:action].to_sym)
+    end
+
+    def evaluate_callable(option)
+      return option.call if option.respond_to?(:call)
+      return @controller.send(option) if option && defined?(option)
+    end
+
+    def evaluate_options(options)
+      options[:except] && !action_exists_in?(options[:except]) ||
+        options[:unless] && !evaluate_callable(options[:unless]) ||
+        action_exists_in?(options[:only]) ||
+        evaluate_callable(options[:if])
     end
 
     def adapter

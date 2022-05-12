@@ -645,6 +645,62 @@ describe CanCan::ControllerResource do
     expect(CanCan::ControllerResource.new(controller, :model).skip?(:authorize)).to be(true)
   end
 
+  it 'skips resource behavior :if method returns true' do
+    allow(controller).to receive(:should_skip?) { params[:action] == 'index' }
+    allow(controller_class).to receive(:cancan_skipper) { { authorize: { model: { if: :should_skip? } } } }
+
+    params[:action] = 'index'
+    expect(CanCan::ControllerResource.new(controller, :model).skip?(:authorize)).to be_truthy
+    params[:action] = 'other_action'
+    expect(CanCan::ControllerResource.new(controller).skip?(:authorize)).to be(false)
+    expect(CanCan::ControllerResource.new(controller, :model).skip?(:authorize)).to be(false)
+  end
+
+  it 'skips resource behavior :if lambda returns true' do
+    allow(controller_class).to receive(:cancan_skipper) {
+                                 {
+                                   authorize: {
+                                     model: {
+                                       if: -> { params[:action] == 'index' }
+                                     }
+                                   }
+                                 }
+                               }
+    params[:action] = 'index'
+    expect(CanCan::ControllerResource.new(controller, :model).skip?(:authorize)).to be_truthy
+    params[:action] = 'other_action'
+    expect(CanCan::ControllerResource.new(controller).skip?(:authorize)).to be(false)
+    expect(CanCan::ControllerResource.new(controller, :model).skip?(:authorize)).to be(false)
+  end
+
+  it 'skips resource behavior :unless method returns true' do
+    allow(controller).to receive(:should_not_skip?) { params[:action] == 'index' }
+    allow(controller_class).to receive(:cancan_skipper) { { authorize: { model: { unless: :should_not_skip? } } } }
+
+    params[:action] = 'index'
+    expect(CanCan::ControllerResource.new(controller, :model).skip?(:authorize)).to be_falsey
+    params[:action] = 'other_action'
+    expect(CanCan::ControllerResource.new(controller).skip?(:authorize)).to be(false)
+    expect(CanCan::ControllerResource.new(controller, :model).skip?(:authorize)).to be(true)
+  end
+
+  it 'skips resource behavior :unless lambda returns true' do
+    allow(controller_class).to receive(:cancan_skipper) {
+                                 {
+                                   authorize: {
+                                     model: {
+                                       unless: -> { params[:action] == 'index' }
+                                     }
+                                   }
+                                 }
+                               }
+    params[:action] = 'index'
+    expect(CanCan::ControllerResource.new(controller, :model).skip?(:authorize)).to be_falsey
+    params[:action] = 'other_action'
+    expect(CanCan::ControllerResource.new(controller).skip?(:authorize)).to be(false)
+    expect(CanCan::ControllerResource.new(controller, :model).skip?(:authorize)).to be(true)
+  end
+
   it 'skips loading and authorization' do
     allow(controller_class).to receive(:cancan_skipper) { { authorize: { nil => {} }, load: { nil => {} } } }
     params[:action] = 'new'
