@@ -146,6 +146,7 @@ class ProductsController < ActionController::Base
   skip_authorize_resource only: :new
 end
 ```
+Both `skip_authorize_resource` and `skip_load_resource` support `:if` and `:unless` options. Either one takes a method name as a symbol or a lambda/proc. This option will be called to determine if the authorization/loading will be performed.
 
 ### Custom class name
 
