@@ -92,7 +92,7 @@ module CanCan
     end
 
     def parent_authorization_action
-      @options[:parent_action] || :show
+      @options[:parent_action] || @params[:action].to_sym
     end
 
     def authorization_action

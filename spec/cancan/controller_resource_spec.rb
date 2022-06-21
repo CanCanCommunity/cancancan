@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require 'pry'
 
 describe CanCan::ControllerResource do
   let(:ability) { Ability.new(nil) }
@@ -52,12 +53,13 @@ describe CanCan::ControllerResource do
       expect(controller.instance_variable_get(:@model)).to eq(:some_model)
     end
 
-    it 'only authorizes :show action on parent resource' do
+    it 'delegate controller action on parent resource' do
       model = Model.new
       allow(Model).to receive(:find).with('123') { model }
 
       params[:model_id] = 123
-      allow(controller).to receive(:authorize!).with(:show, model) { raise CanCan::AccessDenied }
+      action = controller.params[:action].to_sym
+      allow(controller).to receive(:authorize!).with(action, model) { raise CanCan::AccessDenied }
       resource = CanCan::ControllerResource.new(controller, :model, parent: true)
       expect { resource.load_and_authorize_resource }.to raise_error(CanCan::AccessDenied)
     end
@@ -229,7 +231,7 @@ describe CanCan::ControllerResource do
 
     it 'authorizes parent resource in collection action' do
       controller.instance_variable_set(:@category, :some_category)
-      allow(controller).to receive(:authorize!).with(:show, :some_category) { raise CanCan::AccessDenied }
+      allow(controller).to receive(:authorize!).with(:index, :some_category) { raise CanCan::AccessDenied }
 
       resource = CanCan::ControllerResource.new(controller, :category, parent: true)
       expect { resource.authorize_resource }.to raise_error(CanCan::AccessDenied)
