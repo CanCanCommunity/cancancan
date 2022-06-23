@@ -49,7 +49,7 @@ describe 'be_able_to' do
       is_expected.not_to be_able_to([], 123)
     end
 
-    it 'delegates to can? with array of abilities with only one eligable ability' do
+    it 'delegates to can? with array of abilities with only one eligible ability' do
       is_expected.to receive(:can?).with(:read, 123) { true }
       is_expected.to receive(:can?).with(:update, 123) { false }
       is_expected.not_to be_able_to(%i[read update], 123)

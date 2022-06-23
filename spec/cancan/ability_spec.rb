@@ -829,4 +829,38 @@ describe CanCan::Ability do
       expect(@ability.send(:rules).size).to eq(0)
     end
   end
+
+  describe 'when #can? is used with a Hash (nested resources)' do
+    it 'is unauthorized with no rules' do
+      expect(@ability.can?(:read, 1 => Symbol)).to be(false)
+    end
+
+    it 'is authorized when the child is authorized' do
+      @ability.can :read, Symbol
+      expect(@ability.can?(:read, 1 => Symbol)).to be(true)
+    end
+
+    it 'is authorized when the condition doesn\'t concern the parent' do
+      @ability.can :read, Symbol, whatever: true
+      expect(@ability.can?(:read, 1 => Symbol)).to be(true)
+    end
+
+    it 'verifies the parent against an equality condition' do
+      @ability.can :read, Symbol, integer: 1
+      expect(@ability.can?(:read, 1 => Symbol)).to be(true)
+      expect(@ability.can?(:read, 2 => Symbol)).to be(false)
+    end
+
+    it 'verifies the parent against an array condition' do
+      @ability.can :read, Symbol, integer: [0, 1]
+      expect(@ability.can?(:read, 1 => Symbol)).to be(true)
+      expect(@ability.can?(:read, 2 => Symbol)).to be(false)
+    end
+
+    it 'verifies the parent against a hash condition' do
+      @ability.can :read, Symbol, integer: { to_i: 1 }
+      expect(@ability.can?(:read, 1 => Symbol)).to be(true)
+      expect(@ability.can?(:read, 2 => Symbol)).to be(false)
+    end
+  end
 end

@@ -54,7 +54,7 @@ module CanCan
 
     protected
 
-    # Returns the class used for this resource. This can be overriden by the :class option.
+    # Returns the class used for this resource. This can be overridden by the :class option.
     # If +false+ is passed in it will use the resource name as a symbol in which case it should
     # only be used for authorization, not loading since there's no class to load through.
     def resource_class

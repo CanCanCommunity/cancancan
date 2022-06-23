@@ -1,3 +1,5 @@
+inherit_from: .rubocop_todo.yml
+
 Style/Documentation:
   Enabled: false
 
@@ -10,13 +12,17 @@ Style/EmptyMethod:
 Style/ClassAndModuleChildren:
   Enabled: false
 
-Metrics/LineLength:
+Layout/LineLength:
   Max: 120
 
 Metrics/BlockLength:
   Exclude:
     - 'lib/cancan/matchers.rb'
     - '**/*_spec.rb'
+
+Metrics/ClassLength:
+  Exclude:
+    - 'lib/cancan/model_adapters/active_record_adapter.rb'
 
 # TODO
 # Offense count: 2
@@ -34,7 +40,9 @@ Lint/AmbiguousBlockAssociation:
   Enabled: false
 
 AllCops:
-  TargetRubyVersion: 2.2.0
+  NewCops: enable
+  SuggestExtensions: false
+  TargetRubyVersion: 3.0
   Exclude:
     - 'gemfiles/**/*'
     - 'vendor/**/*'

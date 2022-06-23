@@ -13,8 +13,8 @@ platforms :jruby do
 end
 
 platforms :ruby, :mswin, :mingw do
-  gem "sqlite3", "~> 1.3.0"
-  gem "pg", "~> 0.21"
+  gem "pg", "~> 1.3.4"
+  gem "sqlite3", "~> 1.4.2"
 end
 
 gemspec path: "../"
