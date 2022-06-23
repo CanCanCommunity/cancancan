@@ -179,6 +179,8 @@ When first developing, you need to run `bundle install` and then `bundle exec ap
 
 You can then run all appraisal files (like CI does), with `appraisal rake` or just run a specific set `DB='sqlite' bundle exec appraisal activerecord_5.2.2 rake`.
 
+If you'd like to run a specific set of tests within a specific file or folder you can use `DB='sqlite' SPEC=path/to/file/or/folder bundle exec appraisal activerecord_5.2.2 rake`.
+
 If you use RubyMine, you can run RSpec tests by configuring the RSpec configuration template like this:
 ![rubymine_rspec.png](rubymine_rspec.png)
 
