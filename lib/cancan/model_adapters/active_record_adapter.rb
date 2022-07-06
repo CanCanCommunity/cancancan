@@ -15,7 +15,11 @@ module CanCan
 
       def initialize(model_class, rules)
         super
-        @compressed_rules = RulesCompressor.new(@rules.reverse).rules_collapsed.reverse
+        @compressed_rules = if CanCan.rules_compressor_enabled
+                              RulesCompressor.new(@rules.reverse).rules_collapsed.reverse
+                            else
+                              @rules
+                            end
         StiNormalizer.normalize(@compressed_rules)
         ConditionsNormalizer.normalize(model_class, @compressed_rules)
       end
@@ -39,8 +43,8 @@ module CanCan
         def parent_child_conditions(parent, child, all_conditions)
           child_class = child.is_a?(Class) ? child : child.class
           foreign_key = child_class.reflect_on_all_associations(:belongs_to).find do |association|
-                          association.klass == parent.class
-                        end&.foreign_key&.to_sym
+            association.klass == parent.class
+          end&.foreign_key&.to_sym
           foreign_key.nil? ? nil : all_conditions[foreign_key]
         end
       end

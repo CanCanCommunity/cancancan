@@ -393,12 +393,26 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
         expect(@ability.model_adapter(Article, :read).joins).to be_nil
       end
 
-      it 'has nil joins if rules got compressed' do
-        @ability.can :read, Comment, article: { category: { visible: true } }
-        @ability.can :read, Comment
-        expect(@ability.model_adapter(Comment, :read))
-          .to generate_sql("SELECT \"#{@comment_table}\".* FROM \"#{@comment_table}\"")
-        expect(@ability.model_adapter(Comment, :read).joins).to be_nil
+      context 'if rules got compressed' do
+        it 'has nil joins' do
+          @ability.can :read, Comment, article: { category: { visible: true } }
+          @ability.can :read, Comment
+          expect(@ability.model_adapter(Comment, :read))
+            .to generate_sql("SELECT \"#{@comment_table}\".* FROM \"#{@comment_table}\"")
+          expect(@ability.model_adapter(Comment, :read).joins).to be_nil
+        end
+      end
+
+      context 'if rules did not get compressed' do
+        before :each do
+          CanCan.rules_compressor_enabled = false
+        end
+
+        it 'has joins' do
+          @ability.can :read, Comment, article: { category: { visible: true } }
+          @ability.can :read, Comment
+          expect(@ability.model_adapter(Comment, :read).joins).to be_present
+        end
       end
 
       it 'has nil joins if no nested hashes specified in conditions' do
