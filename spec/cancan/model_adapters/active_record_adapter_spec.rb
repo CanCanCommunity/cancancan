@@ -1150,6 +1150,7 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
 
         create_table(:vehicles) do |t|
           t.string :type
+          t.integer :capacity
         end
       end
 
@@ -1226,6 +1227,19 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
       ability.can :read, [Motorbike]
       expect(ability).to be_able_to(:read, motorbike)
       expect(ability).to be_able_to(:read, Suzuki.new)
+    end
+
+    it 'allows a scope of a subclass for conditions' do
+      u1 = User.create!(name: 'pippo')
+      car = Car.create!(capacity: 2)
+      Car.create!(capacity: 4)
+      Motorbike.create!(capacity: 2)
+
+      ability = Ability.new(u1)
+      ability.can :read, [Car], Car.where(capacity: 2)
+      expect(Vehicle.accessible_by(ability)).to match_array([car])
+      expect(Car.accessible_by(ability)).to eq([car])
+      expect(Motorbike.accessible_by(ability)).to eq([])
     end
   end
 end
