@@ -1,6 +1,6 @@
 ## Unreleased
 
-* [#702](https://github.com/CanCanCommunity/cancancan/pull/702): Support scopes of STI classes as ability conditions. ([@honigc][]))
+* [#702](https://github.com/CanCanCommunity/cancancan/pull/702): Support scopes of STI classes as ability conditions. ([@honigc][])
 
 ## 3.4.0
 
