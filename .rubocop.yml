@@ -8,7 +8,7 @@ Style/NonNilCheck:
 
 Style/RedundantInitialize:
   Enabled: false
-    
+
 Style/EmptyMethod:
   Enabled: false
 
