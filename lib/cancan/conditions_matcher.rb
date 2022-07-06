@@ -108,7 +108,6 @@ module CanCan
     end
 
     def array_like_matches_condition_hash?(attribute, value)
-      attribute = attribute.to_a
       if attribute.any?
         attribute.any? { |element| matches_conditions_hash?(element, value) }
       else
