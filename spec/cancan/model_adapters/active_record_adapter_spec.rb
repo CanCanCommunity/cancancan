@@ -277,7 +277,7 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
         @ability.can :read, Article, Article.where(secret: true)
         expect { Article.accessible_by(@ability) }
           .to raise_error(CanCan::Error,
-                          'Unable to merge an Active Record scope with other conditions. '\
+                          'Unable to merge an Active Record scope with other conditions. ' \
                             'Instead use a hash or SQL for read Article ability.')
       end
 
