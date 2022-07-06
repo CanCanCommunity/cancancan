@@ -3,6 +3,8 @@
 module CanCan
   module ModelAdapters
     class AbstractAdapter
+      attr_reader :model_class
+
       def self.inherited(subclass)
         @subclasses ||= []
         @subclasses.insert(0, subclass)
@@ -31,6 +33,18 @@ module CanCan
       # Override if override_conditions_hash_matching? returns true
       def self.matches_conditions_hash?(_subject, _conditions)
         raise NotImplemented, 'This model adapter does not support matching on a conditions hash.'
+      end
+
+      # Used above override_conditions_hash_matching to determine if this model adapter will override the
+      # matching behavior for nested subject.
+      # If this returns true then nested_subject_matches_conditions? will be called.
+      def self.override_nested_subject_conditions_matching?(_parent, _child, _all_conditions)
+        false
+      end
+
+      # Override if override_nested_subject_conditions_matching? returns true
+      def self.nested_subject_matches_conditions?(_parent, _child, _all_conditions)
+        raise NotImplemented, 'This model adapter does not support matching on a nested subject.'
       end
 
       # Used to determine if this model adapter will override the matching behavior for a specific condition.

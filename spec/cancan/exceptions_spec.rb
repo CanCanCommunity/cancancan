@@ -14,7 +14,7 @@ describe CanCan::AccessDenied do
       expect(@exception.conditions).to eq(:some_conditions)
     end
 
-    it 'has a changable default message' do
+    it 'has a changeable default message' do
       expect(@exception.message).to eq('You are not authorized to access this page.')
       @exception.default_message = 'Unauthorized!'
       expect(@exception.message).to eq('Unauthorized!')

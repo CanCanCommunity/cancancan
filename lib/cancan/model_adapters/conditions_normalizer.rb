@@ -1,6 +1,6 @@
 # this class is responsible of normalizing the hash of conditions
 # by exploding has_many through associations
-# when a condition is defined with an has_many thorugh association this is exploded in all its parts
+# when a condition is defined with an has_many through association this is exploded in all its parts
 # TODO: it could identify STI and normalize it
 module CanCan
   module ModelAdapters

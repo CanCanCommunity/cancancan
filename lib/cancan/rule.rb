@@ -70,7 +70,7 @@ module CanCan
     end
 
     def with_scope?
-      @conditions.is_a?(ActiveRecord::Relation)
+      defined?(ActiveRecord) && @conditions.is_a?(ActiveRecord::Relation)
     end
 
     def associations_hash(conditions = @conditions)
@@ -123,7 +123,7 @@ module CanCan
     def condition_and_block_check(conditions, block, action, subject)
       return unless conditions.is_a?(Hash) && block
 
-      raise BlockAndConditionsError, 'A hash of conditions is mutually exclusive with a block. '\
+      raise BlockAndConditionsError, 'A hash of conditions is mutually exclusive with a block. ' \
         "Check \":#{action} #{subject}\" ability."
     end
 

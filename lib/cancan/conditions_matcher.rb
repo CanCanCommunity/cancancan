@@ -18,10 +18,14 @@ module CanCan
       [Class, Module].include? klass
     end
 
-    def matches_block_conditions(subject, *extra_args)
+    def matches_block_conditions(subject, attribute, *extra_args)
       return @base_behavior if subject_class?(subject)
 
-      @block.call(subject, *extra_args.compact)
+      if attribute
+        @block.call(subject, attribute, *extra_args)
+      else
+        @block.call(subject, *extra_args)
+      end
     end
 
     def matches_non_block_conditions(subject)
@@ -33,16 +37,24 @@ module CanCan
     end
 
     def nested_subject_matches_conditions?(subject_hash)
-      parent, _child = subject_hash.first
-      matches_conditions_hash?(parent, @conditions[parent.class.name.downcase.to_sym] || {})
+      parent, child = subject_hash.first
+
+      matches_base_parent_conditions = matches_conditions_hash?(parent,
+                                                                @conditions[parent.class.name.downcase.to_sym] || {})
+
+      adapter = model_adapter(parent)
+
+      matches_base_parent_conditions &&
+        (!adapter.override_nested_subject_conditions_matching?(parent, child, @conditions) ||
+          adapter.nested_subject_matches_conditions?(parent, child, @conditions))
     end
 
     # Checks if the given subject matches the given conditions hash.
-    # This behavior can be overriden by a model adapter by defining two class methods:
+    # This behavior can be overridden by a model adapter by defining two class methods:
     # override_matching_for_conditions?(subject, conditions) and
     # matches_conditions_hash?(subject, conditions)
     def matches_conditions_hash?(subject, conditions = @conditions)
-      return true if conditions.empty?
+      return true if conditions.is_a?(Hash) && conditions.empty?
 
       adapter = model_adapter(subject)
 
@@ -50,10 +62,21 @@ module CanCan
         return adapter.matches_conditions_hash?(subject, conditions)
       end
 
-      matches_all_conditions?(adapter, conditions, subject)
+      matches_all_conditions?(adapter, subject, conditions)
     end
 
-    def matches_all_conditions?(adapter, conditions, subject)
+    def matches_all_conditions?(adapter, subject, conditions)
+      if conditions.is_a?(Hash)
+        matches_hash_conditions(adapter, subject, conditions)
+      elsif conditions.respond_to?(:include?)
+        conditions.include?(subject)
+      else
+        puts "does #{subject} match #{conditions}?"
+        subject == conditions
+      end
+    end
+
+    def matches_hash_conditions(adapter, subject, conditions)
       conditions.all? do |name, value|
         if adapter.override_condition_matching?(subject, name, value)
           adapter.matches_condition?(subject, name, value)

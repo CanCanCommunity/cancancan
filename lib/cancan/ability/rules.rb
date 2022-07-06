@@ -19,12 +19,13 @@ module CanCan
       end
 
       def add_rule_to_index(rule, position)
-        @rules_index ||= Hash.new { |h, k| h[k] = [] }
+        @rules_index ||= {}
 
         subjects = rule.subjects.compact
         subjects << :all if subjects.empty?
 
         subjects.each do |subject|
+          @rules_index[subject] ||= []
           @rules_index[subject] << position
         end
       end
@@ -48,7 +49,9 @@ module CanCan
           rules
         else
           positions = @rules_index.values_at(subject, *alternative_subjects(subject))
-          positions.flatten!.sort!
+          positions.compact!
+          positions.flatten!
+          positions.sort!
           positions.map { |i| @rules[i] }
         end
       end
@@ -58,8 +61,8 @@ module CanCan
           next unless rule.only_raw_sql?
 
           raise Error,
-                "The can? and cannot? call cannot be used with a raw sql 'can' definition."\
-                " The checking code cannot be determined for #{action.inspect} #{subject.inspect}"
+                "The can? and cannot? call cannot be used with a raw sql 'can' definition. " \
+                "The checking code cannot be determined for #{action.inspect} #{subject.inspect}"
         end
       end
 
@@ -69,7 +72,7 @@ module CanCan
           rule.base_behavior == false && rule.attributes.present?
         end
         if rules.any?(&:only_block?)
-          raise Error, "The accessible_by call cannot be used with a block 'can' definition."\
+          raise Error, "The accessible_by call cannot be used with a block 'can' definition." \
             "The SQL cannot be determined for #{action.inspect} #{subject.inspect}"
         end
         rules

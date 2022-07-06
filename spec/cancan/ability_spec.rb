@@ -127,6 +127,17 @@ describe CanCan::Ability do
     expect(@block_called).to be(true)
   end
 
+  it 'allows passing nil as extra arguments' do
+    @ability.can :to_s, Integer do |integer, arg1, arg2|
+      expect(integer).to eq(42)
+      expect(arg1).to eq(nil)
+      expect(arg2).to eq(:foo)
+      @block_called = true
+    end
+    @ability.can?(:to_s, 42, nil, nil, :foo)
+    expect(@block_called).to be(true)
+  end
+
   it 'passes nil to object when comparing class with can check' do
     @ability.can do |action, object_class, object|
       expect(action).to eq(:foo)
@@ -674,6 +685,14 @@ describe CanCan::Ability do
     expect(@ability.permitted_attributes(:read, Integer)).to eq([:to_s])
   end
 
+  it 'does not retain references to subjects that do not have direct rules' do
+    @ability.can :read, String
+
+    @ability.can?(:read, 'foo')
+
+    expect(@ability.instance_variable_get(:@rules_index)).not_to have_key('foo')
+  end
+
   describe 'unauthorized message' do
     after(:each) do
       I18n.backend = nil
@@ -819,6 +838,40 @@ describe CanCan::Ability do
 
       @ability.merge(another_ability)
       expect(@ability.send(:rules).size).to eq(0)
+    end
+  end
+
+  describe 'when #can? is used with a Hash (nested resources)' do
+    it 'is unauthorized with no rules' do
+      expect(@ability.can?(:read, 1 => Symbol)).to be(false)
+    end
+
+    it 'is authorized when the child is authorized' do
+      @ability.can :read, Symbol
+      expect(@ability.can?(:read, 1 => Symbol)).to be(true)
+    end
+
+    it 'is authorized when the condition doesn\'t concern the parent' do
+      @ability.can :read, Symbol, whatever: true
+      expect(@ability.can?(:read, 1 => Symbol)).to be(true)
+    end
+
+    it 'verifies the parent against an equality condition' do
+      @ability.can :read, Symbol, integer: 1
+      expect(@ability.can?(:read, 1 => Symbol)).to be(true)
+      expect(@ability.can?(:read, 2 => Symbol)).to be(false)
+    end
+
+    it 'verifies the parent against an array condition' do
+      @ability.can :read, Symbol, integer: [0, 1]
+      expect(@ability.can?(:read, 1 => Symbol)).to be(true)
+      expect(@ability.can?(:read, 2 => Symbol)).to be(false)
+    end
+
+    it 'verifies the parent against a hash condition' do
+      @ability.can :read, Symbol, integer: { to_i: 1 }
+      expect(@ability.can?(:read, 1 => Symbol)).to be(true)
+      expect(@ability.can?(:read, 2 => Symbol)).to be(false)
     end
   end
 end
