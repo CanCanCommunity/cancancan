@@ -626,6 +626,199 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
     end
   end
 
+  it 'allows an empty array to be used as a condition for a has_many, but this is never a passing condition' do
+    a1 = Article.create!
+    a2 = Article.create!
+    a2.comments = [Comment.create!]
+
+    @ability.can :read, Article, comment_ids: []
+
+    expect(@ability.can?(:read, a1)).to eq(false)
+    expect(@ability.can?(:read, a2)).to eq(false)
+
+    expect(Article.accessible_by(@ability)).to eq([])
+
+    if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
+      expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
+  SELECT "articles".*
+  FROM "articles"
+  WHERE 1=0))
+    end
+  end
+
+  it 'allows a nil to be used as a condition for a has_many - with join' do
+    a1 = Article.create!
+    a2 = Article.create!
+    a2.comments = [Comment.create!]
+
+    @ability.can :read, Article, comments: { id: nil }
+
+    expect(@ability.can?(:read, a1)).to eq(true)
+    expect(@ability.can?(:read, a2)).to eq(false)
+
+    expect(Article.accessible_by(@ability)).to eq([a1])
+
+    if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
+      expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
+  SELECT "articles".*
+  FROM "articles"
+  WHERE "articles"."id" IN (SELECT "articles"."id" FROM "articles"
+    LEFT OUTER JOIN "comments" ON "comments"."article_id" = "articles"."id"
+    WHERE "comments"."id" IS NULL)))
+    end
+  end
+
+  it 'allows several nils to be used as a condition for a has_many - with join' do
+    a1 = Article.create!
+    a2 = Article.create!
+    a2.comments = [Comment.create!]
+
+    @ability.can :read, Article, comments: { id: nil, spam: nil }
+
+    expect(@ability.can?(:read, a1)).to eq(true)
+    expect(@ability.can?(:read, a2)).to eq(false)
+
+    expect(Article.accessible_by(@ability)).to eq([a1])
+
+    if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
+      expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
+  SELECT "articles".*
+  FROM "articles"
+  WHERE "articles"."id" IN (SELECT "articles"."id" FROM "articles"
+    LEFT OUTER JOIN "comments" ON "comments"."article_id" = "articles"."id"
+    WHERE "comments"."id" IS NULL AND "comments"."spam" IS NULL)))
+    end
+  end
+
+  it 'doesn\'t permit anything if a nil is used as a condition for a has_many alongside other attributes' do
+    a1 = Article.create!
+    a2 = Article.create!
+    a2.comments = [Comment.create!(spam: true)]
+    a3 = Article.create!
+    a3.comments = [Comment.create!(spam: false)]
+
+    # if we are checking for `id: nil` and any other criteria, we should never return any Article.
+    # either the Article has Comments, which means `id: nil` fails.
+    # or the Article has no Comments, which means `spam: true` fails.
+    @ability.can :read, Article, comments: { id: nil, spam: true }
+
+    expect(@ability.can?(:read, a1)).to eq(false)
+    expect(@ability.can?(:read, a2)).to eq(false)
+    expect(@ability.can?(:read, a3)).to eq(false)
+
+    expect(Article.accessible_by(@ability)).to eq([])
+
+    if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
+      expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
+  SELECT "articles".*
+  FROM "articles"
+  WHERE "articles"."id" IN (SELECT "articles"."id" FROM "articles"
+    LEFT OUTER JOIN "comments" ON "comments"."article_id" = "articles"."id"
+    WHERE "comments"."id" IS NULL AND "comments"."spam" = #{true_v})))
+    end
+  end
+
+  it 'doesn\'t permit if a nil is used as a condition for a has_many alongside other attributes - false case' do
+    a1 = Article.create!
+    a2 = Article.create!
+    a2.comments = [Comment.create!(spam: true)]
+    a3 = Article.create!
+    a3.comments = [Comment.create!(spam: false)]
+
+    # if we are checking for `id: nil` and any other criteria, we should never return any Article.
+    # either the Article has Comments, which means `id: nil` fails.
+    # or the Article has no Comments, which means `spam: false` fails.
+    @ability.can :read, Article, comments: { id: nil, spam: false }
+
+    expect(@ability.can?(:read, a1)).to eq(false)
+    expect(@ability.can?(:read, a2)).to eq(false)
+    expect(@ability.can?(:read, a3)).to eq(false)
+
+    expect(Article.accessible_by(@ability)).to eq([])
+
+    if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
+      expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
+  SELECT "articles".*
+  FROM "articles"
+  WHERE "articles"."id" IN (SELECT "articles"."id" FROM "articles"
+    LEFT OUTER JOIN "comments" ON "comments"."article_id" = "articles"."id"
+    WHERE "comments"."id" IS NULL AND "comments"."spam" = #{false_v})))
+    end
+  end
+
+  it 'allows a nil to be used as a condition for a has_many when combined with other conditions' do
+    a1 = Article.create!
+    a2 = Article.create!
+    a2.comments = [Comment.create!(spam: true)]
+    a3 = Article.create!
+    a3.comments = [Comment.create!(spam: false)]
+
+    @ability.can :read, Article, comments: { spam: true }
+    @ability.can :read, Article, comments: { id: nil }
+
+    expect(@ability.can?(:read, a1)).to eq(true) # true because no comments
+    expect(@ability.can?(:read, a2)).to eq(true) # true because has comments but they have spam=true
+    expect(@ability.can?(:read, a3)).to eq(false) # false because has comments but none with spam=true
+
+    expect(Article.accessible_by(@ability).sort_by(&:id)).to eq([a1, a2].sort_by(&:id))
+
+    if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
+      expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
+  SELECT "articles".*
+  FROM "articles"
+  WHERE "articles"."id" IN (SELECT "articles"."id" FROM "articles"
+    LEFT OUTER JOIN "comments" ON "comments"."article_id" = "articles"."id"
+    WHERE (("comments"."id" IS NULL) OR ("comments"."spam" = #{true_v})))))
+    end
+  end
+
+  it 'allows a nil to be used as a condition for a has_many alongside other attributes on the parent' do
+    a1 = Article.create!(secret: true)
+    a2 = Article.create!(secret: true)
+    a2.comments = [Comment.create!]
+    a3 = Article.create!(secret: false)
+    a3.comments = [Comment.create!]
+    a4 = Article.create!(secret: false)
+
+    @ability.can :read, Article, secret: true, comments: { id: nil }
+
+    expect(@ability.can?(:read, a1)).to eq(true)
+    expect(@ability.can?(:read, a2)).to eq(false)
+    expect(@ability.can?(:read, a3)).to eq(false)
+    expect(@ability.can?(:read, a4)).to eq(false)
+
+    expect(Article.accessible_by(@ability)).to eq([a1])
+
+    if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
+      expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
+  SELECT "articles".*
+  FROM "articles"
+  WHERE "articles"."id" IN (SELECT "articles"."id" FROM "articles"
+    LEFT OUTER JOIN "comments" ON "comments"."article_id" = "articles"."id"
+    WHERE "articles"."secret" = #{true_v} AND "comments"."id" IS NULL)))
+    end
+  end
+
+  it 'allows an empty array to be used as a condition for a belongs_to; this never returns true' do
+    a1 = Article.create!
+    a2 = Article.create!
+    a2.project = Project.create!
+
+    @ability.can :read, Article, project_id: []
+
+    expect(@ability.can?(:read, a1)).to eq(false)
+    expect(@ability.can?(:read, a2)).to eq(false)
+
+    expect(Article.accessible_by(@ability)).to eq([])
+
+    if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
+      expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
+  SELECT "articles".*
+  FROM "articles"
+  WHERE 1=0))
+    end
+  end
+
   context 'with namespaced models' do
     before :each do
       ActiveRecord::Schema.define do

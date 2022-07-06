@@ -46,6 +46,13 @@ An array or range can be passed to match multiple values. Here the user can only
 can :read, Project, priority: 1..3
 ```
 
+If you want to a negative match, you can pass in `nil`.
+
+```ruby
+# Can read projects that don't have any members.
+can :read, Project, members: { id: nil }
+```
+
 Almost anything that you can pass to a hash of conditions in ActiveRecord will work here as well.
 
 ## Traverse associations

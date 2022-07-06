@@ -101,9 +101,26 @@ module CanCan
 
     def hash_condition_match?(attribute, value)
       if attribute.is_a?(Array) || (defined?(ActiveRecord) && attribute.is_a?(ActiveRecord::Relation))
-        attribute.to_a.any? { |element| matches_conditions_hash?(element, value) }
+        array_like_matches_condition_hash?(attribute, value)
       else
         attribute && matches_conditions_hash?(attribute, value)
+      end
+    end
+
+    def array_like_matches_condition_hash?(attribute, value)
+      if attribute.any?
+        attribute.any? { |element| matches_conditions_hash?(element, value) }
+      else
+        # you can use `nil`s in your ability definition to tell cancancan to find
+        # objects that *don't* have any children in a has_many relationship.
+        #
+        # for example, given ability:
+        # => can :read, Article, comments: { id: nil }
+        # cancancan will return articles where `article.comments == []`
+        #
+        # this is implemented here. `attribute` is `article.comments`, and it's an empty array.
+        # the expression below returns true if this was expected.
+        !value.values.empty? && value.values.all?(&:nil?)
       end
     end
 
