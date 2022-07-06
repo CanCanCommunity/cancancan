@@ -1,5 +1,7 @@
 ## Unreleased
 
+* Disable `expect(...).not_to be_able_to(:action_a, :action_b)` for multiple actions because it leads to ambiguity. ([@coorasse][])
+
 ## 3.4.0
 
 * [#691](https://github.com/CanCanCommunity/cancancan/pull/691): Add two new subquery strategies: `joined_alias_exists_subquery`, `joined_alias_each_rule_as_exists_subquery`. ([@kaspernj][])
