@@ -1,6 +1,12 @@
 # Rules compressions
 
-Your rules are optimized automatically at runtime. There are a set of "rules" to optimize your rules definition and they are implemented in the `RulesCompressor` class. Here you can see how this works:
+Database are great on optimizing queries, but sometimes cancancan builds `joins` that might lead to slow performance.
+This is why your rules are optimized automatically at runtime.
+There are a set of "rules" to optimize your rules definition and they are implemented in the `RulesCompressor` class.
+You can always disable the rules compressor by setting `CanCan.rules_compressor_enabled = false` in your initializer.
+You can also enable/disable it on a specific check by using: `with_rules_compressor_enabled(false) { ... }`
+
+Here you can see how this works:
 
 A rule without conditions is defined as `catch_all`.
 
