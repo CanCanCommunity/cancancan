@@ -73,6 +73,7 @@ Check our [Sponsors Page](https://github.com/sponsors/coorasse).
 
 Head to our complete [Developer Guide](./docs/README.md) to learn how to use CanCanCan in details.
 
+
 ## Installation
 
 Add this to your Gemfile:
@@ -158,6 +159,14 @@ end
 ## Documentation
 
 Head to our complete [Developer Guide](./docs/README.md) to learn how to use CanCanCan in details.
+
+## FAQ
+
+-Question 1
+
+-Question 2
+
+-Question 3
 
 ## Questions?
 
