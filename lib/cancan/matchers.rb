@@ -22,6 +22,19 @@ Kernel.const_get(rspec_module)::Matchers.define :be_able_to do |*args|
       ability.can?(*args)
     end
   end
+  
+  match_when_negated do |ability|
+    actions = args.first
+    if actions.is_a? Array
+      if actions.empty?
+        false
+      else
+        actions.all? { |action| ability.cannot?(action, *args[1..-1]) }
+      end
+    else
+      ability.can?(*args)
+    end
+  end
 
   # Check that RSpec is < 2.99
   if !respond_to?(:failure_message) && respond_to?(:failure_message_for_should)
