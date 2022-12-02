@@ -3,6 +3,7 @@
 * [#653](https://github.com/CanCanCommunity/cancancan/pull/653): Add support for using an nil relation as a condition. ([@ghiculescu][])
 * [#702](https://github.com/CanCanCommunity/cancancan/pull/702): Support scopes of STI classes as ability conditions. ([@honigc][])
 * [#798](https://github.com/CanCanCommunity/cancancan/pull/798): Allow disabling of rules compressor via `CanCan.rules_compressor_enabled = false`. ([@coorasse][])
+* [#808](https://github.com/CanCanCommunity/cancancan/pull/808): Add `if` and `unless` options controller helpers for skipping. ([@ammarghaus][])
 
 ## 3.4.0
 
