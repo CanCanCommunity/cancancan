@@ -108,7 +108,7 @@ module CanCan
       selects = query.values[:select]
 
       if selects&.length != 1
-        raise "Only one column should be selected and not #{selects&.length || 0} for: #{value.to_sql}"
+        raise "Only one column should be selected and not #{selects&.length || 0} for: #{query.to_sql}"
       end
 
       query.where(selects[0] => attribute).any?
