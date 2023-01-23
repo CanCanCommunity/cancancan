@@ -30,6 +30,7 @@ RSpec.configure do |config|
 
   config.after :each do
     CanCan.accessible_by_strategy = CanCan.default_accessible_by_strategy
+    CanCan.rules_compressor_enabled = true
   end
 end
 

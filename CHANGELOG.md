@@ -1,4 +1,10 @@
-Unreleased
+## Unreleased
+
+* [#653](https://github.com/CanCanCommunity/cancancan/pull/653): Add support for using an nil relation as a condition. ([@ghiculescu][])
+* [#702](https://github.com/CanCanCommunity/cancancan/pull/702): Support scopes of STI classes as ability conditions. ([@honigc][])
+* [#798](https://github.com/CanCanCommunity/cancancan/pull/798): Allow disabling of rules compressor via `CanCan.rules_compressor_enabled = false`. ([@coorasse][])
+
+## 3.4.0
 
 * [#691](https://github.com/CanCanCommunity/cancancan/pull/691): Add two new subquery strategies: `joined_alias_exists_subquery`, `joined_alias_each_rule_as_exists_subquery`. ([@kaspernj][])
 * [#767](https://github.com/CanCanCommunity/cancancan/pull/767): Improve ability checks with nested resources (hash checks)vim. ([@Juleffel][])
@@ -698,3 +704,4 @@ Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.co
 [@ghiculescu]: https://github.com/ghiculescu
 [@mtoneil]: https://github.com/mtoneil
 [@Juleffel]: https://github.com/Juleffel
+[@honigc]: https://github.com/honigc
