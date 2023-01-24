@@ -35,7 +35,6 @@ module CanCan
         def nested_subject_matches_conditions?(parent, child, all_conditions)
           id_condition = parent_child_conditions(parent, child, all_conditions)
           return id_condition.include?(parent.id) if id_condition.is_a? Array
-          
           return id_condition == parent.id if id_condition.is_a? Integer
 
           false
@@ -53,24 +52,44 @@ module CanCan
           # Search again in case of polymorphic associations, this time matching on the :has_many side
           # via the :as option, as well as klass
           foreign_key ||= parent_class.reflect_on_all_associations(:has_many).find do |has_many_assoc|
-            matching_parent_child_polymorphic_association(has_many_assoc, child_class)
+            !matching_parent_child_polymorphic_association(has_many_assoc, child_class).nil?
           end&.foreign_key&.to_sym
-          
+
           foreign_key.nil? ? nil : all_conditions[foreign_key]
         end
 
         def matching_parent_child_polymorphic_association(parent_assoc, child_class)
-          return false unless parent_assoc.klass == child_class
-          return false if parent_assoc&.options[:as].nil?
+          return nil unless parent_assoc.klass == child_class
+          return nil if parent_assoc&.options[:as].nil?
   
-          child_class.reflect_on_all_associations(:belongs_to).any? do |child_assoc|
+          child_class.reflect_on_all_associations(:belongs_to).find do |child_assoc|
             # Only match this way for polymorphic associations
             child_assoc.polymorphic? && child_assoc.name == parent_assoc.options[:as]
           end
         end
+
+        def child_association_to_parent(parent, child)
+          child_class = child.is_a?(Class) ? child : child.class
+          parent_class = parent.is_a?(Class) ? parent : parent.class
+
+          association = child_class.reflect_on_all_associations(:belongs_to).find do |association|
+            # Do not match on polymorphic associations or it will throw an error (klass cannot be determined)
+            !association.polymorphic? && association.klass == parent.class
+          end
+
+          return association unless association.nil?
+
+          parent_class.reflect_on_all_associations(:has_many).each do |has_many_assoc|
+            association ||= matching_parent_child_polymorphic_association(has_many_assoc, child_class)
+          end
+
+          association
+        end
+
+        def parent_condition_name(parent, child)
+          child_association_to_parent(parent, child)&.name || parent.class.name.downcase.to_sym
+        end
       end
-
-
 
       # Returns conditions intended to be used inside a database query. Normally you will not call this
       # method directly, but instead go through ModelAdditions#accessible_by.
