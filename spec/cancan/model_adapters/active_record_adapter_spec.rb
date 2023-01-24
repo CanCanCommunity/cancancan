@@ -60,6 +60,12 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
         t.timestamps null: false
       end
 
+      create_table(:attachments) do |t|
+        t.integer :attachable_id
+        t.string :attachable_type
+        t.timestamps null: false
+      end
+
       create_table(:users) do |t|
         t.string :name
         t.timestamps null: false
@@ -86,6 +92,7 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
       has_many :mentioned_users, through: :mentions, source: :user
       belongs_to :user
       belongs_to :project
+      has_many :attachments, as: :attachable
 
       scope :unpopular, lambda {
         joins('LEFT OUTER JOIN comments ON (comments.post_id = posts.id)')
@@ -103,6 +110,7 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
     class Comment < ActiveRecord::Base
       belongs_to :article
       belongs_to :project
+      has_many :attachments, as: :attachable
     end
 
     class LegacyComment < ActiveRecord::Base
@@ -110,10 +118,15 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
       belongs_to :project
     end
 
+    class Attachment < ActiveRecord::Base
+      belongs_to :attachable, polymorphic: true
+    end
+
     class User < ActiveRecord::Base
       has_many :articles
       has_many :mentions
       has_many :mentioned_articles, through: :mentions, source: :article
+      has_many :comments, through: :articles
     end
 
     (@ability = double).extend(CanCan::Ability)
@@ -511,6 +524,10 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
       @comment2 = Comment.create!(article: @article2)
       @legacy_comment1 = LegacyComment.create!(article: @article1)
       @legacy_comment2 = LegacyComment.create!(article: @article2)
+      @attachment1 = Attachment.create!(attachable: @article1)
+      @comment_attachment1 = Attachment.create!(attachable: @comment1)
+      @attachment2 = Attachment.create!(attachable: @article2)
+      @comment_attachment2 = Attachment.create!(attachable: @comment2)
     end
 
     context 'when conditions are defined using the parent model' do
@@ -520,6 +537,8 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
           ability.can :manage, Article, user: user1
           ability.can :manage, Comment, article: user1.articles
           ability.can :manage, LegacyComment, article: user1.articles
+          ability.can :manage, Attachment, attachable: user1.articles
+          ability.can :manage, Attachment, attachable: user1.comments
         end
       end
 
@@ -532,6 +551,20 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
         expect(ability.can?(:manage, { @article2 => Comment })).to eq(false)
         expect(ability.can?(:manage, { @article2 => LegacyComment })).to eq(false)
         expect(ability.can?(:manage, { @article2 => @legacy_comment2 })).to eq(false)
+      end
+
+      context 'when the association is polymorphic' do
+        it 'verifies parent equality correctly' do
+          expect(ability.can?(:manage, { @article1 => Attachment })).to eq(true)
+          expect(ability.can?(:manage, { @article1 => @attachment1 })).to eq(true)
+          expect(ability.can?(:manage, { @comment1 => Attachment })).to eq(true)
+          expect(ability.can?(:manage, { @comment1 => @comment_attachment1 })).to eq(true)
+
+          expect(ability.can?(:manage, { @article2 => Attachment })).to eq(false)
+          expect(ability.can?(:manage, { @article2 => @attachment2 })).to eq(false)
+          expect(ability.can?(:manage, { @comment2 => Attachment })).to eq(false)
+          expect(ability.can?(:manage, { @comment2 => @comment_attachment2 })).to eq(false)
+        end
       end
     end
 
@@ -542,6 +575,7 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
           ability.can :manage, Article, user_id: user1.id
           ability.can :manage, Comment, article_id: user1.article_ids
           ability.can :manage, LegacyComment, post_id: user1.article_ids
+          ability.can :manage, Attachment, attachable_id: user1.article_ids
         end
       end
 
@@ -554,6 +588,20 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
         expect(ability.can?(:manage, { @article2 => Comment })).to eq(false)
         expect(ability.can?(:manage, { @article2 => LegacyComment })).to eq(false)
         expect(ability.can?(:manage, { @article2 => @legacy_comment2 })).to eq(false)
+      end
+
+      context 'when the association is polymorphic' do
+        it 'verifies parent equality correctly' do
+          expect(ability.can?(:manage, { @article1 => Attachment })).to eq(true)
+          expect(ability.can?(:manage, { @article1 => @attachment1 })).to eq(true)
+          expect(ability.can?(:manage, { @comment1 => Attachment })).to eq(true)
+          expect(ability.can?(:manage, { @comment1 => @comment_attachment1 })).to eq(true)
+
+          expect(ability.can?(:manage, { @article2 => Attachment })).to eq(false)
+          expect(ability.can?(:manage, { @article2 => @attachment2 })).to eq(false)
+          expect(ability.can?(:manage, { @comment2 => Attachment })).to eq(false)
+          expect(ability.can?(:manage, { @comment2 => @comment_attachment2 })).to eq(false)
+        end
       end
     end
   end
