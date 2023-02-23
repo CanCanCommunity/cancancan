@@ -4,7 +4,7 @@ If you are using [FriendlyId](https://github.com/norman/friendly_id) you will pr
 
 You do not have to write `find_by :slug` or something like that, that is always error prone.
 
-You just need to create a `config/initizializers/cancancan.rb` file with:
+You just need to create a `config/initializers/cancancan.rb` file with:
 
 ```ruby
 if defined?(CanCanCan)
