@@ -67,7 +67,7 @@ module CanCan
 
     def matches_all_conditions?(adapter, subject, conditions)
       if conditions.is_a?(Hash)
-        matches_hash_conditions(adapter, subject, conditions)
+        matches_hash_conditions?(adapter, subject, conditions)
       elsif conditions.respond_to?(:include?)
         conditions.include?(subject)
       else
@@ -75,7 +75,7 @@ module CanCan
       end
     end
 
-    def matches_hash_conditions(adapter, subject, conditions)
+    def matches_hash_conditions?(adapter, subject, conditions)
       conditions.all? do |name, value|
         if adapter.override_condition_matching?(subject, name, value)
           adapter.matches_condition?(subject, name, value)
