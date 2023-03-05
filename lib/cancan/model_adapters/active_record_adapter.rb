@@ -15,7 +15,11 @@ module CanCan
 
       def initialize(model_class, rules)
         super
-        @compressed_rules = RulesCompressor.new(@rules.reverse).rules_collapsed.reverse
+        @compressed_rules = if CanCan.rules_compressor_enabled
+                              RulesCompressor.new(@rules.reverse).rules_collapsed.reverse
+                            else
+                              @rules
+                            end
         StiNormalizer.normalize(@compressed_rules)
         ConditionsNormalizer.normalize(model_class, @compressed_rules)
       end
@@ -38,10 +42,52 @@ module CanCan
 
         def parent_child_conditions(parent, child, all_conditions)
           child_class = child.is_a?(Class) ? child : child.class
+          parent_class = parent.is_a?(Class) ? parent : parent.class
+
           foreign_key = child_class.reflect_on_all_associations(:belongs_to).find do |association|
-                          association.klass == parent.class
-                        end&.foreign_key&.to_sym
+            # Do not match on polymorphic associations or it will throw an error (klass cannot be determined)
+            !association.polymorphic? && association.klass == parent.class
+          end&.foreign_key&.to_sym
+
+          # Search again in case of polymorphic associations, this time matching on the :has_many side
+          # via the :as option, as well as klass
+          foreign_key ||= parent_class.reflect_on_all_associations(:has_many).find do |has_many_assoc|
+            !matching_parent_child_polymorphic_association(has_many_assoc, child_class).nil?
+          end&.foreign_key&.to_sym
+
           foreign_key.nil? ? nil : all_conditions[foreign_key]
+        end
+
+        def matching_parent_child_polymorphic_association(parent_assoc, child_class)
+          return nil unless parent_assoc.klass == child_class
+          return nil if parent_assoc&.options[:as].nil?
+  
+          child_class.reflect_on_all_associations(:belongs_to).find do |child_assoc|
+            # Only match this way for polymorphic associations
+            child_assoc.polymorphic? && child_assoc.name == parent_assoc.options[:as]
+          end
+        end
+
+        def child_association_to_parent(parent, child)
+          child_class = child.is_a?(Class) ? child : child.class
+          parent_class = parent.is_a?(Class) ? parent : parent.class
+
+          association = child_class.reflect_on_all_associations(:belongs_to).find do |association|
+            # Do not match on polymorphic associations or it will throw an error (klass cannot be determined)
+            !association.polymorphic? && association.klass == parent.class
+          end
+
+          return association unless association.nil?
+
+          parent_class.reflect_on_all_associations(:has_many).each do |has_many_assoc|
+            association ||= matching_parent_child_polymorphic_association(has_many_assoc, child_class)
+          end
+
+          association
+        end
+
+        def parent_condition_name(parent, child)
+          child_association_to_parent(parent, child)&.name || parent.class.name.downcase.to_sym
         end
       end
 
@@ -133,7 +179,7 @@ module CanCan
       def raise_override_scope_error
         rule_found = @compressed_rules.detect { |rule| rule.conditions.is_a?(ActiveRecord::Relation) }
         raise Error,
-              'Unable to merge an Active Record scope with other conditions. '\
+              'Unable to merge an Active Record scope with other conditions. ' \
               "Instead use a hash or SQL for #{rule_found.actions.first} #{rule_found.subjects.first} ability."
       end
 

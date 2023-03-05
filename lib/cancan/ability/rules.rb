@@ -61,8 +61,8 @@ module CanCan
           next unless rule.only_raw_sql?
 
           raise Error,
-                "The can? and cannot? call cannot be used with a raw sql 'can' definition."\
-                " The checking code cannot be determined for #{action.inspect} #{subject.inspect}"
+                "The can? and cannot? call cannot be used with a raw sql 'can' definition. " \
+                "The checking code cannot be determined for #{action.inspect} #{subject.inspect}"
         end
       end
 
@@ -72,7 +72,7 @@ module CanCan
           rule.base_behavior == false && rule.attributes.present?
         end
         if rules.any?(&:only_block?)
-          raise Error, "The accessible_by call cannot be used with a block 'can' definition."\
+          raise Error, "The accessible_by call cannot be used with a block 'can' definition." \
             "The SQL cannot be determined for #{action.inspect} #{subject.inspect}"
         end
         rules

@@ -18,10 +18,14 @@ module CanCan
       [Class, Module].include? klass
     end
 
-    def matches_block_conditions(subject, *extra_args)
+    def matches_block_conditions(subject, attribute, *extra_args)
       return @base_behavior if subject_class?(subject)
 
-      @block.call(subject, *extra_args.compact)
+      if attribute
+        @block.call(subject, attribute, *extra_args)
+      else
+        @block.call(subject, *extra_args)
+      end
     end
 
     def matches_non_block_conditions(subject)
@@ -35,10 +39,12 @@ module CanCan
     def nested_subject_matches_conditions?(subject_hash)
       parent, child = subject_hash.first
 
-      matches_base_parent_conditions = matches_conditions_hash?(parent,
-                                                                @conditions[parent.class.name.downcase.to_sym] || {})
-
       adapter = model_adapter(parent)
+
+      parent_condition_name = adapter.parent_condition_name(parent, child)
+
+      matches_base_parent_conditions = matches_conditions_hash?(parent,
+                                                                @conditions[parent_condition_name] || {})
 
       matches_base_parent_conditions &&
         (!adapter.override_nested_subject_conditions_matching?(parent, child, @conditions) ||
@@ -63,16 +69,15 @@ module CanCan
 
     def matches_all_conditions?(adapter, subject, conditions)
       if conditions.is_a?(Hash)
-        matches_hash_conditions(adapter, subject, conditions)
+        matches_hash_conditions?(adapter, subject, conditions)
       elsif conditions.respond_to?(:include?)
         conditions.include?(subject)
       else
-        puts "does #{subject} match #{conditions}?"
         subject == conditions
       end
     end
 
-    def matches_hash_conditions(adapter, subject, conditions)
+    def matches_hash_conditions?(adapter, subject, conditions)
       conditions.all? do |name, value|
         if adapter.override_condition_matching?(subject, name, value)
           adapter.matches_condition?(subject, name, value)
@@ -97,9 +102,26 @@ module CanCan
 
     def hash_condition_match?(attribute, value)
       if attribute.is_a?(Array) || (defined?(ActiveRecord) && attribute.is_a?(ActiveRecord::Relation))
-        attribute.to_a.any? { |element| matches_conditions_hash?(element, value) }
+        array_like_matches_condition_hash?(attribute, value)
       else
         attribute && matches_conditions_hash?(attribute, value)
+      end
+    end
+
+    def array_like_matches_condition_hash?(attribute, value)
+      if attribute.any?
+        attribute.any? { |element| matches_conditions_hash?(element, value) }
+      else
+        # you can use `nil`s in your ability definition to tell cancancan to find
+        # objects that *don't* have any children in a has_many relationship.
+        #
+        # for example, given ability:
+        # => can :read, Article, comments: { id: nil }
+        # cancancan will return articles where `article.comments == []`
+        #
+        # this is implemented here. `attribute` is `article.comments`, and it's an empty array.
+        # the expression below returns true if this was expected.
+        !value.values.empty? && value.values.all?(&:nil?)
       end
     end
 
