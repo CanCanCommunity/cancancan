@@ -71,7 +71,6 @@ module CanCan
       elsif conditions.respond_to?(:include?)
         conditions.include?(subject)
       else
-        puts "does #{subject} match #{conditions}?"
         subject == conditions
       end
     end
