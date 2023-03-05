@@ -1,8 +1,9 @@
-## Unreleased
+## 3.5.0
 
 * [#653](https://github.com/CanCanCommunity/cancancan/pull/653): Add support for using an nil relation as a condition. ([@ghiculescu][])
 * [#702](https://github.com/CanCanCommunity/cancancan/pull/702): Support scopes of STI classes as ability conditions. ([@honigc][])
 * [#798](https://github.com/CanCanCommunity/cancancan/pull/798): Allow disabling of rules compressor via `CanCan.rules_compressor_enabled = false`. ([@coorasse][])
+* [#814](https://github.com/CanCanCommunity/cancancan/pull/814): Fix issue with polymorphic associations. ([@WriterZephos][])
 
 ## 3.4.0
 
@@ -705,3 +706,4 @@ Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.co
 [@mtoneil]: https://github.com/mtoneil
 [@Juleffel]: https://github.com/Juleffel
 [@honigc]: https://github.com/honigc
+[@WriterZephos]: https://github.com/WriterZephos
