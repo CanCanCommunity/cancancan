@@ -7,7 +7,7 @@
 [![Code Climate Badge](https://codeclimate.com/github/CanCanCommunity/cancancan.svg)](https://codeclimate.com/github/CanCanCommunity/cancancan)
 
 [Developer guide](./docs/README.md) |
-[RDocs](http://rdoc.info/projects/CanCanCommunity/cancancan) |
+[RDocs](https://www.rubydoc.info/github/CanCanCommunity/cancancan) |
 [Screencast 1](http://railscasts.com/episodes/192-authorization-with-cancan) |
 [Screencast 2](https://www.youtube.com/watch?v=cTYu-OjUgDw)
 
