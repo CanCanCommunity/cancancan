@@ -15,6 +15,8 @@ test "user can only destroy projects which they own" do
   ability = Ability.new(user)
   assert ability.can?(:destroy, project)
   assert ability.cannot?(:destroy, Project.new)
+  assert ability.can?(:update, project, :name) # testing per-attribute access
+  assert ability.cannot?(:update, project, :id) # testing per-attribute access
 end
 ```
 
@@ -27,6 +29,8 @@ require "cancan/matchers"
 ability = Ability.new(user)
 expect(ability).to be_able_to(:destroy, Project.new(user: user))
 expect(ability).not_to be_able_to(:destroy, Project.new)
+expect(ability).to be_able_to(:update, Project.new(user: user), :name) # testing per-attribute access
+expect(ability).not_to be_able_to(:update, Project.new(user: user), :id) # testing per-attribute access
 ```
 
 Pro way 😉
