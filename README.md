@@ -26,6 +26,12 @@ of models automatically and reduce duplicated code.
 
 ## Our sponsors
 <br/>
+<a href="https://www.pennylane.com/" target="_blank">
+  <img src="./logo/pennylane.svg" alt="Pennylane" height="50"/>
+</a>
+<br/>
+<br/>
+<br/>
 <a href="https://www.renuo.ch" target="_blank">
   <img src="./logo/renuo.png" alt="Renuo AG" height="50"/>
 </a>
