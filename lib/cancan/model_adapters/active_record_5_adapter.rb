@@ -14,8 +14,8 @@ module CanCan
       def self.matches_condition?(subject, name, value)
         return super if Array.wrap(value).all? { |x| x.is_a? Integer }
 
-        attribute = subject.send(name)
-        raw_attribute = subject.class.send(name.to_s.pluralize)[attribute]
+        attribute = subject.send(name).to_s
+        raw_attribute = subject.class.send(name.to_s.pluralize)[attribute].to_s
         !(Array(value).map(&:to_s) & [attribute, raw_attribute]).empty?
       end
 
