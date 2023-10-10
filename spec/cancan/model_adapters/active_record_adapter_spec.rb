@@ -1307,6 +1307,33 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
 
         expect(CustomPkTransaction.accessible_by(ability)).to match_array([transaction1])
       end
+
+      it 'allows scope usage on can?' do
+        user1 = User.create!
+        user2 = User.create!
+
+        ability = Ability.new(user1)
+        ability.can :read, Article, user_id: User.where(id: user1.id).select(:id)
+
+        article1 = Article.create!(user: user1)
+        article2 = Article.create!(user: user2)
+
+        expect(ability).to be_able_to :read, article1
+        expect(ability).not_to be_able_to :read, article2
+        expect(Article.accessible_by(ability)).to eq [article1]
+      end
+
+      it 'raises an error if multiple columns are selected' do
+        user1 = User.create!
+
+        ability = Ability.new(user1)
+        ability.can :read, Article, user_id: User.where(id: user1.id).select(:id, :created_at)
+
+        article1 = Article.create!(user: user1)
+
+        expect { ability.can?(:read, article1) }
+          .to raise_error(/\AOnly one column should be selected and not 2 for: SELECT/)
+      end
     end
   end
 
