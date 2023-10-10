@@ -2,7 +2,7 @@
 
 ### Reporting an Issue
 
-1. If you have any questions about CanCanCan, search the [Wiki](https://github.com/cancancommunity/cancancan/wiki) or
+1. If you have any questions about CanCanCan, search the [Developer guide](./docs/README.md) or
 use [Stack Overflow](http://stackoverflow.com/questions/tagged/cancancan).
 Do not post questions here.
 
