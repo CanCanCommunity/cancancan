@@ -5,6 +5,8 @@
 * [#798](https://github.com/CanCanCommunity/cancancan/pull/798): Allow disabling of rules compressor via `CanCan.rules_compressor_enabled = false`. ([@coorasse][])
 * [#814](https://github.com/CanCanCommunity/cancancan/pull/814): Fix issue with polymorphic associations. ([@WriterZephos][])
 
+* Disable `expect(...).not_to be_able_to(:action_a, :action_b)` for multiple actions because it leads to ambiguity. ([@coorasse][])
+
 ## 3.4.0
 
 * [#691](https://github.com/CanCanCommunity/cancancan/pull/691): Add two new subquery strategies: `joined_alias_exists_subquery`, `joined_alias_each_rule_as_exists_subquery`. ([@kaspernj][])
