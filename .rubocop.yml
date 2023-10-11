@@ -23,6 +23,11 @@ Metrics/BlockLength:
     - 'lib/cancan/matchers.rb'
     - '**/*_spec.rb'
 
+Style/RedundantInitialize:
+  Exclude:
+    - 'spec/support/ability.rb'
+    - 'lib/generators/cancan/ability/templates/ability.rb'
+
 Metrics/ClassLength:
   Exclude:
     - 'lib/cancan/model_adapters/active_record_adapter.rb'
