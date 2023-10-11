@@ -227,6 +227,6 @@ end
 some_user.can? :update, @article
 ```
 
-That's everything you know about defining and checking abilities. The DSL is very easy but yet very powerful. There's still a lot you need/should learn about defining abilities. You can [dig deeper](./hash_of_conditions.md) now, but we would suggest to stop, digest it, and proceed on a more Rails-specific topic: [Controller helpers](./controller_helpers.md) where you will learn how to secure your Rails application.
+That's everything you need to know about checking abilities. The DSL is very easy but yet very powerful. However, there is still a lot you should learn about defining abilities. You can [dig deeper](./hash_of_conditions.md) now, but we would suggest to stop, digest, and proceed on a more Rails-specific topic: [Controller helpers](./controller_helpers.md) where you will learn how to secure your Rails application.
 
 Or you could already take a look at the session about [testing](./testing.md).
