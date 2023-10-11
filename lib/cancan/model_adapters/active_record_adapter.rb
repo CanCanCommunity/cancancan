@@ -199,7 +199,7 @@ module CanCan
         when false_sql
           behavior ? conditions : false_sql
         else
-          behavior ? "(#{conditions}) OR (#{sql})" : "not (#{conditions}) AND (#{sql})"
+          behavior ? "(#{conditions}) OR #{sql}" : "(not (#{conditions}) AND #{sql})"
         end
       end
 
