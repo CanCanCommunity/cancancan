@@ -186,6 +186,12 @@ describe CanCan::ControllerResource do
         resource = CanCan::ControllerResource.new(controller)
         expect(resource.send('resource_params')).to eq(resource: 'params')
       end
+
+      it 'use the <action>_<model_name>_params method for sanitizing input if no other method is found' do
+        allow(controller).to receive(:create_model_params).and_return(model: 'params')
+        resource = CanCan::ControllerResource.new(controller)
+        expect(resource.send('resource_params')).to eq(model: 'params')
+      end
     end
   end
 
