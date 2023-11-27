@@ -171,6 +171,11 @@ module CanCan
       # [:+instance_name+]
       #   The name of the instance variable for this resource.
       #
+      # [:+id_param+]
+      #   Find using a param key other than :id. For example:
+      #
+      #     load_resource :id_param => :url # will use find(params[:url])
+      #
       # [:+through+]
       #   Authorize conditions on this parent resource when instance isn't available.
       #
