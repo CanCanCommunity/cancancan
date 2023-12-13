@@ -80,7 +80,7 @@ module CanCan
 
     def member_action?
       new_actions.include?(@params[:action].to_sym) || @options[:singleton] ||
-        ((@params[:id] || @params[@options[:id_param]]) &&
+        ((@params[:id] || @params["#{instance_name}_id"] || @params[@options[:id_param]]) &&
           !collection_actions.include?(@params[:action].to_sym))
     end
 
