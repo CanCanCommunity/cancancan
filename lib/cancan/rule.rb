@@ -58,7 +58,8 @@ module CanCan
 
     def catch_all?
       (with_scope? && @conditions.where_values_hash.empty?) ||
-        (!with_scope? && [nil, false, [], {}, '', ' '].include?(@conditions))
+        ((@subjects.all? { |subject| !StiDetector.sti_class?(subject) || subject.base_class? }) &&
+          (!with_scope? && [nil, false, [], {}, '', ' '].include?(@conditions)))
     end
 
     def only_block?
