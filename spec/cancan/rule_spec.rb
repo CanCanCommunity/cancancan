@@ -86,4 +86,95 @@ RSpec.describe CanCan::Rule do
       end
     end
   end
+
+  describe '#catch_all?' do
+    it 'is true when no conditions are specified' do
+      rule = CanCan::Rule.new(true, :read, Integer, nil)
+      expect(rule).to be_catch_all
+    end
+
+    it 'is false when conditions are specified' do
+      rule = CanCan::Rule.new(true, :read, Integer, foo: :bar)
+      expect(rule).not_to be_catch_all
+    end
+
+    describe 'when subject is a ActiveRecord class' do
+      around do |example|
+        connect_db
+        ActiveRecord::Migration.verbose = false
+
+        ActiveRecord::Base.transaction do
+          ActiveRecord::Schema.define do
+            create_table(:vehicles) do |t|
+              t.string :name
+            end
+          end
+
+          class Vehicle < ApplicationRecord; end
+
+          example.run
+        end
+      end
+
+      it 'is true when no conditions are specified' do
+        rule = CanCan::Rule.new(true, :read, Vehicle)
+        expect(rule).to be_catch_all
+      end
+
+      it 'is false when conditions are specified' do
+        rule = CanCan::Rule.new(true, :read, Vehicle, name: 'foo')
+        expect(rule).not_to be_catch_all
+      end
+
+      it 'is false when conditions are ActiveRecord Scope' do
+        rule = CanCan::Rule.new(true, :read, Vehicle, Vehicle.where(name: 'foo'))
+        expect(rule).not_to be_catch_all
+      end
+    end
+
+    describe 'when STI is used' do
+      around do |example|
+        connect_db
+        ActiveRecord::Migration.verbose = false
+
+        ActiveRecord::Base.transaction do
+          ActiveRecord::Schema.define do
+            create_table(:vehicles) do |t|
+              t.string :type
+            end
+          end
+
+          class ApplicationRecord < ActiveRecord::Base
+            self.abstract_class = true
+          end
+
+          class Vehicle < ApplicationRecord; end
+          class Airplane < Vehicle; end
+          class Car < Vehicle; end
+          class MotorBike < Vehicle; end
+          example.run
+        end
+      end
+
+      it 'is true when subject is base class and no conditions are specified' do
+        rule = CanCan::Rule.new(true, :read, Vehicle)
+        expect(rule).to be_catch_all
+      end
+
+      it 'is true when subject is base class and conditions are specified' do
+        rule = CanCan::Rule.new(true, :read, Vehicle, foo: :bar)
+        expect(rule).not_to be_catch_all
+      end
+
+      it 'is false when subject is subclass even if no conditions are specified' do
+        rule = CanCan::Rule.new(true, :read, Car)
+        expect(rule).not_to be_catch_all
+      end
+
+      it 'is false when subjects includes subclass even if no conditions are specified' do
+        rule = CanCan::Rule.new(true, :read, [Vehicle, Car])
+        expect(rule).not_to be_catch_all
+      end
+    end
+  end
 end
