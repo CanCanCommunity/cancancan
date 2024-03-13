@@ -1416,6 +1416,9 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
       class Vehicle < ApplicationRecord
       end
 
+      class Airplane < Vehicle
+      end
+
       class Car < Vehicle
       end
 
@@ -1495,6 +1498,21 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
       expect(Vehicle.accessible_by(ability)).to match_array([car])
       expect(Car.accessible_by(ability)).to eq([car])
       expect(Motorbike.accessible_by(ability)).to eq([])
+    end
+
+    it 'allows a selectable scope when permit by two subclasses' do
+      u1 = User.create!(name: 'pippo')
+      Airplane.create!(capacity: 1)
+      car = Car.create!(capacity: 4)
+      mortorbike = Motorbike.create!(capacity: 2)
+
+      ability = Ability.new(u1)
+      ability.can :read, Car
+      ability.can :read, Motorbike
+      expect(Vehicle.accessible_by(ability)).to contain_exactly(car, mortorbike)
+      expect(Airplane.accessible_by(ability)).to be_empty
+      expect(Car.accessible_by(ability)).to contain_exactly(car)
+      expect(Motorbike.accessible_by(ability)).to contain_exactly(mortorbike)
     end
   end
 end
