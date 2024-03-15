@@ -26,6 +26,23 @@ If you'd like to sponsor this library, head to <https://github.com/sponsors/coor
 
 Thank you,
 
-Alessandro Rodi
+<VPTeamMembers size="small" :members="members" />
 
 Head to the [Installation](./installation.md) chapter.
+
+<script setup>
+import { VPTeamMembers } from 'vitepress/theme'
+
+const members = [
+  {
+    avatar: 'https://avatars.githubusercontent.com/u/1319150',
+    name: 'Alessandro Rodi',
+    title: 'Maintainer',
+    sponsor: 'https://github.com/sponsors/coorasse',
+    links: [
+      { icon: 'github', link: 'https://github.com/coorasse' },
+      { icon: 'twitter', link: 'https://twitter.com/coorasse' }
+    ]
+  },
+]
+</script>

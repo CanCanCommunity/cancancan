@@ -195,15 +195,15 @@ Thus you'd probably be best served with inspecting the actual implementation of 
 
 #### Implementation
 
-- [ActiveRecord Base](../lib/cancan/model_adapters/active_record_adapter.rb)
-- [ActiveRecord 4](../lib/cancan/model_adapters/active_record_4_adapter.rb)
-- [ActiveRecord 5](../lib/cancan/model_adapters/active_record_5_adapter.rb)
+- [ActiveRecord Base](https://github.com/CanCanCommunity/cancancan/blob/develop/lib/cancan/model_adapters/active_record_adapter.rb)
+- [ActiveRecord 4](https://github.com/CanCanCommunity/cancancan/blob/develop/lib/cancan/model_adapters/active_record_4_adapter.rb)
+- [ActiveRecord 5](https://github.com/CanCanCommunity/cancancan/blob/develop/lib/cancan/model_adapters/active_record_5_adapter.rb)
 
 #### Tests / Specs
 
-- [ActiveRecord Base](../spec/cancan/model_adapters/active_record_adapter_spec.rb)
-- [ActiveRecord 4](../spec/cancan/model_adapters/active_record_4_adapter_spec.rb)
-- [ActiveRecord 5](../spec/cancan/model_adapters/active_record_5_adapter_spec.rb)
+- [ActiveRecord Base](https://github.com/CanCanCommunity/cancancan/blob/develop/spec/cancan/model_adapters/active_record_adapter_spec.rb)
+- [ActiveRecord 4](https://github.com/CanCanCommunity/cancancan/blob/develop/spec/cancan/model_adapters/active_record_4_adapter_spec.rb)
+- [ActiveRecord 5](https://github.com/CanCanCommunity/cancancan/blob/develop/spec/cancan/model_adapters/active_record_5_adapter_spec.rb)
 
 **Mongoid, the adapter used in this entry as an example, can be found at:**
 
