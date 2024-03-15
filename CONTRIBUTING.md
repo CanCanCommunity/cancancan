@@ -29,6 +29,7 @@ Thanks for you contribution!
 ### Modify the Documentation
 
 The documentation is written in Markdown and is located in the `docs` directory. The documentation is built using [VitePress](https://vitepress.dev).
+VitePress supports all markdown features but also adds a few enhancements, which are documented in the [Markdown Extensions](https://vitepress.dev/guide/markdown).
 
 ```bash
 npm install
