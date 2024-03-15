@@ -8,6 +8,11 @@ hero:
   tagline: The authorization Gem for Ruby on Rails.
   image: 
     src: /cancancan.png
+    style:
+      # for dark mode
+      backgroundColor: '#fff'
+      borderRadius: '50%'
+      padding: '20px'
   actions:
     - theme: brand
       text: Get Started
