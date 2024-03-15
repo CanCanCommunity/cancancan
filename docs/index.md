@@ -55,7 +55,7 @@ _Do you want to sponsor CanCanCan and show your logo here? Check our [Sponsors P
 ## Questions?
 
 If you have any question or doubt regarding CanCanCan which you cannot find the solution to in the
-[documentation](./docs/README.md), please
+[documentation](./README.md), please
 [open a question on Stackoverflow](http://stackoverflow.com/questions/ask?tags=cancancan) with tag
 [cancancan](http://stackoverflow.com/questions/tagged/cancancan)
 
