@@ -15,7 +15,9 @@ hero:
     - theme: alt
       text: Installation
       link: /installation
-
+    - theme: alt
+      text: GitHub
+      link: https://github.com/CanCanCommunity/cancancan
 
 features:
   - title: "🔐 Secure Your Rails: CanCanCan's Authorization Mastery"
