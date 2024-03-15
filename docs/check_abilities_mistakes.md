@@ -14,7 +14,7 @@ cannot? :destroy, @article
 
 What we want to explain you in this chapter is that you can also pass the class instead of a single instance:
 
-```rhtml
+```erb
 <% if can? :create, Project %>
   <%= link_to "New Project", new_project_path %>
 <% end %>
