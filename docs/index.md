@@ -45,6 +45,25 @@ features:
   </a>
 </div>
 
+_Do you want to sponsor CanCanCan and show your logo here? Check our [Sponsors Page](https://github.com/sponsors/coorasse)._
+
+## Questions?
+
+If you have any question or doubt regarding CanCanCan which you cannot find the solution to in the
+[documentation](./docs/README.md), please
+[open a question on Stackoverflow](http://stackoverflow.com/questions/ask?tags=cancancan) with tag
+[cancancan](http://stackoverflow.com/questions/tagged/cancancan)
+
+## Bugs?
+
+If you find a bug please add an [issue on GitHub](https://github.com/CanCanCommunity/cancancan/issues) or fork the project and send a pull request.
+
+## Special Thanks
+
+Thanks to our Sponsors and to all the [CanCanCan contributors](https://github.com/CanCanCommunity/cancancan/contributors).
+See the [CHANGELOG](https://github.com/CanCanCommunity/cancancan/blob/main/CHANGELOG.md) for the full list.
+
+
 <style scoped>
 .sponsors {
   display: flex;

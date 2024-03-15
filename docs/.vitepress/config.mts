@@ -22,7 +22,20 @@ export default defineConfig({
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Docs', link: '/README' },
+      { text: 'Changelog', link: 'https://github.com/CanCanCommunity/cancancan/blob/main/CHANGELOG.md' },
+      {
+        text: 'Screencasts',
+        items: [
+          { text: 'Screencast 1', link: 'http://railscasts.com/episodes/192-authorization-with-cancan' },
+          { text: 'Screencast 2', link: 'https://www.youtube.com/watch?v=cTYu-OjUgDw' }
+        ]
+      },
     ],
+
+    footer: {
+      message: 'Made with ❤️ by the <a href="https://github.com/CanCanCommunity/cancancan/graphs/contributors" target="_blank">CanCanCan community</a>',
+      copyright: `${new Date().getFullYear()} CanCanCan`
+    },
     externalLinkIcon: true,
 
     lastUpdated: {
