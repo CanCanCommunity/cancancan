@@ -35,20 +35,34 @@ features:
 
 ## Our Sponsor
 
-<div class="sponsors">
-  <a href="https://www.pennylane.com/" target="_blank">
-    <img src="/pennylane.svg" alt="Pennylane"/>
-  </a>
-  <a href="https://www.honeybadger.io/" target="_blank">
-    <img src="/honeybadger.svg" alt="Honeybadger"/>
-  </a>
-  <a href="https://jobs.goboony.com/o/full-stack-ruby-on-rails-engineer" target="_blank">
-    <img src="/goboony.png" alt="Goboony"/>
-  </a>
-  <a href="https://www.renuo.ch" target="_blank">
-    <img src="/renuo.png" alt="Renuo AG"/>
-  </a>
-</div>
+<VPSponsors :data="sponsors" />
+
+<script setup>
+import { VPSponsors } from 'vitepress/theme'
+
+let sponsors = [
+  {
+    name: 'Pennylane',
+    img: '/pennylane.svg',
+    url: 'https://www.pennylane.com/'
+  },
+  {
+    name: 'Honeybadger',
+    img: '/honeybadger.svg',
+    url: 'https://www.honeybadger.io/'
+  },
+  {
+    name: 'Goboony',
+    img: '/goboony.png',
+    url: 'https://jobs.goboony.com'
+  },
+  {
+    name: 'Renuo AG',
+    img: '/renuo.png',
+    url: 'https://www.renuo.ch'
+  }
+]
+</script>
 
 _Do you want to sponsor CanCanCan and show your logo here? Check our [Sponsors Page](https://github.com/sponsors/coorasse)._
 
@@ -67,26 +81,3 @@ If you find a bug please add an [issue on GitHub](https://github.com/CanCanCommu
 
 Thanks to our Sponsors and to all the [CanCanCan contributors](https://github.com/CanCanCommunity/cancancan/contributors).
 See the [CHANGELOG](https://github.com/CanCanCommunity/cancancan/blob/main/CHANGELOG.md) for the full list.
-
-
-<style scoped>
-.sponsors {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  flex-wrap: wrap;
-  margin: 2em 0;
-  gap: 10px;
-}
-
-img {
-  height: 100px;
-  width: 200px;
-  padding: 20px;
-  background: white;
-  border-radius: 10px;
-  object-fit: contain;
-  display: block;
-  margin: auto;
-}
-</style>
