@@ -53,7 +53,7 @@ export default defineConfig({
 
     sidebar: [
       {
-        text: 'Summary',
+        text: 'Guide',
         items: [
           { text: 'Introduction', link: '/introduction' },
           { text: 'Installation', link: '/installation' },
