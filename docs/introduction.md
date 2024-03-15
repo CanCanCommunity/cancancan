@@ -38,6 +38,7 @@ const members = [
     avatar: 'https://avatars.githubusercontent.com/u/1319150',
     name: 'Alessandro Rodi',
     title: 'Maintainer',
+    sponsor: 'https://github.com/sponsors/coorasse',
     links: [
       { icon: 'github', link: 'https://github.com/coorasse' },
       { icon: 'twitter', link: 'https://twitter.com/coorasse' }
