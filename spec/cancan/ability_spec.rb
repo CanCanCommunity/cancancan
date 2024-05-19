@@ -17,6 +17,7 @@ describe CanCan::Ability do
 
     unless defined?(NamedUser)
       class NamedUser < ActiveRecord::Base
+        attribute :role, :string # Virtual only
       end
     end
   end
@@ -668,7 +669,7 @@ describe CanCan::Ability do
     @ability.can :read, NamedUser
     @ability.can :read, Array, :special
     @ability.can :action, :subject, :attribute
-    expect(@ability.permitted_attributes(:read, NamedUser)).to eq(%i[id first_name last_name])
+    expect(@ability.permitted_attributes(:read, NamedUser)).to eq(%i[id first_name last_name role])
     expect(@ability.permitted_attributes(:read, Array)).to eq([:special])
     expect(@ability.permitted_attributes(:action, :subject)).to eq([:attribute])
   end
