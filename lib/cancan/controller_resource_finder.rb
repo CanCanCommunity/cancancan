@@ -28,7 +28,8 @@ module CanCan
     end
 
     def id_param
-      @params[id_param_key].to_s if @params[id_param_key].present?
+      return @params[id_param_key].to_s if @params[id_param_key].present?
+      return @params["#{instance_name}_id"].to_s if @params["#{instance_name}_id"].present?
     end
 
     def id_param_key
