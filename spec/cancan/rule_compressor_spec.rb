@@ -137,6 +137,32 @@ describe CanCan::RulesCompressor do
     end
   end
 
+  context 'when STI is in use' do
+    before do
+      class Pet
+      end
+
+      class Cat < Pet
+      end
+
+      class Dog < Pet
+      end
+    end
+
+    let(:rules) do
+      [
+        can(:read, Pet, capacity: 5),
+        can(:read, Cat, capacity: 5),
+        can(:read, Dog, capacity: 6),
+        can(:read, Pet, capacity: 5)
+      ]
+    end
+
+    it 'minimizes the rules, by removing useless previous rules' do
+      expect(described_class.new(rules).rules_collapsed).to eq [rules[1], rules[2], rules[3]]
+    end
+  end
+
   # TODO: not supported yet
   xcontext 'merges rules' do
     let(:rules) do

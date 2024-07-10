@@ -31,9 +31,9 @@ module CanCan
     def simplify(rules)
       seen = Set.new
       rules.reverse_each.filter_map do |rule|
-        next if seen.include?(rule.conditions)
+        next if seen.include?(rule.subjects => rule.conditions)
 
-        seen.add(rule.conditions)
+        seen.add(rule.subjects => rule.conditions)
         rule
       end.reverse
     end
