@@ -3,7 +3,8 @@
 * [#849](https://github.com/CanCanCommunity/cancancan/pull/849): Update tests matrix. ([@coorasse][])
 * [#843](https://github.com/CanCanCommunity/cancancan/pull/843): Compress duplicate rules. ([@MrChoclate][])
 * [#841](https://github.com/CanCanCommunity/cancancan/pull/841): New https://cancancan.dev website. ([@pandermatt][])
-* [#839](https://github.com/CanCanCommunity/cancancan/pull/839): switch from database column detection to Rails attributes detection. ([@kalsan][])
+* [#839](https://github.com/CanCanCommunity/cancancan/pull/839): Switch from database column detection to Rails attributes detection. ([@kalsan][])
+
 ## 3.5.0
 
 * [#653](https://github.com/CanCanCommunity/cancancan/pull/653): Add support for using an nil relation as a condition. ([@ghiculescu][])
