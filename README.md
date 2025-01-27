@@ -32,8 +32,8 @@ of models automatically and reduce duplicated code.
 <br />
 <br />
 <br />
-<a href="https://www.honeybadger.io/" target="_blank">
-  <img src="./logo/honeybadger.svg" alt="Honeybadger" height="45"/>
+<a href="https://membean.com/" target="_blank">
+  <img src="./logo/membean.svg" alt="Membean" height="45"/>
 </a>
 <br/>
 <br/>

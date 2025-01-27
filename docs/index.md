@@ -6,7 +6,7 @@ hero:
   name: CanCanCan
   text: Developer guide
   tagline: The authorization Gem for Ruby on Rails.
-  image: 
+  image:
     src: /cancancan.png
     style:
       # for dark mode
@@ -47,9 +47,9 @@ let sponsors = [
     url: 'https://www.pennylane.com/'
   },
   {
-    name: 'Honeybadger',
-    img: '/honeybadger.svg',
-    url: 'https://www.honeybadger.io/'
+    name: 'Membean',
+    img: '/membean.svg',
+    url: 'https://membean.com/'
   },
   {
     name: 'Goboony',

@@ -32,8 +32,7 @@ export default defineConfig({
     ],
 
     footer: {
-      message: 'Made with ❤️ by the <a href="https://github.com/CanCanCommunity/cancancan/graphs/contributors" target="_blank">CanCanCan community</a>',
-      copyright: `${new Date().getFullYear()} CanCanCan`
+      message: '❤️ <a href="https://github.com/sponsors/coorasse" target="_blank">Please consider sponsoring</a> ❤️'
     },
     externalLinkIcon: true,
 
