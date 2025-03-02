@@ -1426,6 +1426,27 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
       end
     end
 
+    it 'cannot rules are not effecting parent class' do
+      u1 = User.create!(name: 'pippo')
+      ability = Ability.new(u1)
+
+      ability.can :manage, Vehicle
+      ability.cannot :manage, Car
+
+      expect(ability.can?(:index, Vehicle)).to eq(true)
+      expect(ability.can?(:index, Car)).to eq(false)
+    end
+
+    it 'can rules are not effecting parent class' do
+      u1 = User.create!(name: 'pippo')
+      ability = Ability.new(u1)
+
+      ability.can :manage, Car
+
+      expect(ability.can?(:index, Vehicle)).to eq(false)
+      expect(ability.can?(:index, Car)).to eq(true)
+    end
+
     it 'recognises rules applied to the base class' do
       u1 = User.create!(name: 'pippo')
 
