@@ -5,8 +5,9 @@ module CanCan
     protected
 
     def find_resource
-      if @options[:singleton] && parent_resource.respond_to?(name)
-        parent_resource.send(name)
+      singleton_association_name = @options[:through_association] || name
+      if @options[:singleton] && parent_resource.respond_to?(singleton_association_name)
+        parent_resource.send(singleton_association_name)
       elsif @options[:find_by]
         find_resource_using_find_by
       else
