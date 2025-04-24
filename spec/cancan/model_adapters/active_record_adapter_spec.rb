@@ -1514,5 +1514,17 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
       expect(Car.accessible_by(ability)).to contain_exactly(car)
       expect(Motorbike.accessible_by(ability)).to contain_exactly(mortorbike)
     end
+
+    it 'allows access to both base class and subclass when permissions are defined for both' do
+      u1 = User.create!(name: 'pippo')
+      vehicle = Vehicle.create!(capacity: 1)
+      car = Car.create!(capacity: 4)
+
+      ability = Ability.new(u1)
+      ability.can :read, Vehicle
+      ability.can :read, Car
+      expect(Vehicle.accessible_by(ability)).to contain_exactly(vehicle, car)
+      expect(Car.accessible_by(ability)).to contain_exactly(car)
+    end
   end
 end
