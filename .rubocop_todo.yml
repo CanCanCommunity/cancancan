@@ -214,3 +214,6 @@ Style/StringChars:
 Style/StringConcatenation:
   Exclude:
     - 'lib/cancan/rule.rb'
+
+Lint/SafeNavigationChain:
+  Enabled: false

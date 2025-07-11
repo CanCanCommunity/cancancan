@@ -5,6 +5,21 @@ require 'spec_helper'
 describe CanCan::Ability do
   before(:each) do
     (@ability = double).extend(CanCan::Ability)
+
+    connect_db
+    ActiveRecord::Migration.verbose = false
+    ActiveRecord::Schema.define do
+      create_table(:named_users) do |t|
+        t.string :first_name
+        t.string :last_name
+      end
+    end
+
+    unless defined?(NamedUser)
+      class NamedUser < ActiveRecord::Base
+        attribute :role, :string # Virtual only
+      end
+    end
   end
 
   it 'is able to :read anything' do
@@ -651,13 +666,10 @@ describe CanCan::Ability do
   end
 
   it 'returns an array of permitted attributes for a given action and subject' do
-    user_class = Class.new(ActiveRecord::Base)
-    allow(user_class).to receive(:column_names).and_return(%w[first_name last_name])
-    allow(user_class).to receive(:primary_key).and_return('id')
-    @ability.can :read, user_class
+    @ability.can :read, NamedUser
     @ability.can :read, Array, :special
     @ability.can :action, :subject, :attribute
-    expect(@ability.permitted_attributes(:read, user_class)).to eq(%i[first_name last_name])
+    expect(@ability.permitted_attributes(:read, NamedUser)).to eq(%i[id first_name last_name role])
     expect(@ability.permitted_attributes(:read, Array)).to eq([:special])
     expect(@ability.permitted_attributes(:action, :subject)).to eq([:attribute])
   end

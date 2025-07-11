@@ -14,41 +14,38 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby: ['2.6', '2.7', '3.0', 'jruby', 'truffleruby']
-        gemfile: ['gemfiles/activerecord_5.0.2.gemfile', 'gemfiles/activerecord_5.1.0.gemfile', 'gemfiles/activerecord_5.2.2.gemfile', 'gemfiles/activerecord_6.0.0.gemfile', 'gemfiles/activerecord_6.1.0.gemfile', 'gemfiles/activerecord_main.gemfile']
+        ruby: ['2.7', '3.0', '3.1', '3.2', '3.3']
+        gemfile: ['gemfiles/activerecord_5.2.2.gemfile', 'gemfiles/activerecord_6.0.0.gemfile', 'gemfiles/activerecord_6.1.0.gemfile', 'gemfiles/activerecord_7.0.0.gemfile', 'gemfiles/activerecord_7.1.0.gemfile', 'gemfiles/activerecord_main.gemfile']
         include:
+          - gemfile: 'gemfiles/activerecord_7.1.0.gemfile'
+            ruby: '3.3'
+          - gemfile: 'gemfiles/activerecord_7.1.0.gemfile'
+            ruby: '3.0'
           - gemfile: 'gemfiles/activerecord_7.0.0.gemfile'
-            ruby: '3.1'
+            ruby: '3.3'
           - gemfile: 'gemfiles/activerecord_7.0.0.gemfile'
             ruby: '3.0'
           - gemfile: 'gemfiles/activerecord_6.1.0.gemfile'
-            ruby: '3.1'
+            ruby: '3.3'
           - gemfile: 'gemfiles/activerecord_6.1.0.gemfile'
             ruby: '3.0'
         exclude:
           - gemfile: 'gemfiles/activerecord_5.2.2.gemfile'
-            ruby: '3.0' # rails 5.2 can't run on ruby 3.0
-          - gemfile: 'gemfiles/activerecord_5.1.0.gemfile'
-            ruby: '3.0' # rails 5.1 can't run on ruby 3.0
-          - gemfile: 'gemfiles/activerecord_5.0.2.gemfile'
-            ruby: '3.0' # rails 5.0 can't run on ruby 3.0
-          - gemfile: 'gemfiles/activerecord_5.0.2.gemfile'
-            ruby: '3.0' # rails 5.0 can't run on ruby 3.0
-          - gemfile: 'gemfiles/activerecord_5.0.2.gemfile'
-            ruby: 'truffleruby' # TruffleRuby 21.0 targets Ruby 2.7, same as above
-          - gemfile: 'gemfiles/activerecord_5.1.0.gemfile'
-            ruby: 'truffleruby' # TruffleRuby 21.0 targets Ruby 2.7, same as above
+            ruby: '3.0'
           - gemfile: 'gemfiles/activerecord_5.2.2.gemfile'
-            ruby: 'truffleruby' # TruffleRuby 21.0 targets Ruby 2.7, same as above
+            ruby: '3.1'
+          - gemfile: 'gemfiles/activerecord_5.2.2.gemfile'
+            ruby: '3.2'
+          - gemfile: 'gemfiles/activerecord_5.2.2.gemfile'
+            ruby: '3.3'
+          - gemfile: 'gemfiles/activerecord_7.0.0.gemfile'
+            ruby: '2.7'
+          - gemfile: 'gemfiles/activerecord_7.1.0.gemfile'
+            ruby: '2.7'
           - gemfile: 'gemfiles/activerecord_main.gemfile'
-            ruby: '2.6' # rails 7+ requires ruby 3.0+
-          - gemfile: 'gemfiles/activerecord_5.0.2.gemfile'
-            ruby: 'jruby' # this *should* work - there's a test failure; it's not incompatible like the other excludes. could be an issue in Rails 5.0.2?
-          - gemfile: 'gemfiles/activerecord_6.1.0.gemfile'
-            ruby: 'jruby' # this *should* work. it seems like there's an issue with rails 6 on jruby.
+            ruby: '2.7'
           - gemfile: 'gemfiles/activerecord_main.gemfile'
-            ruby: 'jruby' # this *should* work. it seems like there's an issue with rails 6 on jruby.
-
+            ruby: '3.0'
     env:
       BUNDLE_GEMFILE: ${{ matrix.gemfile }}
 
@@ -84,10 +81,10 @@ jobs:
           bundler-cache: true
 
       - name: Run tests on sqlite
-        run: DB=sqlite bundle exec rake
+        run: DB=sqlite bundle exec rspec
 
       - name: Run tests on postgres
-        run: DB=postgres bundle exec rake
+        run: DB=postgres bundle exec rspec
 
   lint:
     name: Lint

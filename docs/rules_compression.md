@@ -52,4 +52,4 @@ becomes
 # nothing
 ```
 
-These optimizations allow you to follow the strategy of ["Give Permissions, don't take them"](https://github.com/CanCanCommunity/cancancan/wiki/Defining-Abilities%3A-Best-Practices#give-permissions-dont-take-them-away) and automatically ignore previous rules when they are not needed.
+These optimizations allow you to follow the strategy of ["Give Permissions, don't take them"](https://github.com/CanCanCommunity/cancancan/blob/develop/docs/define_abilities_best_practices.md#give-permissions-dont-take-them-away) and automatically ignore previous rules when they are not needed.

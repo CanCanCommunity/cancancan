@@ -61,7 +61,7 @@ RSpec.describe CanCan::Rule do
       end
 
       before do
-        ActiveRecord::Base.establish_connection(adapter: 'sqlite3', database: ':memory:')
+        connect_db
         ActiveRecord::Migration.verbose = false
         ActiveRecord::Schema.define do
           create_table(:watermelons) do |t|

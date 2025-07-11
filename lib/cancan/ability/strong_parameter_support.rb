@@ -31,7 +31,7 @@ module CanCan
         klass = subject_class?(subject) ? subject : subject.class
         # empty attributes is an 'all'
         if rule.attributes.empty? && klass < ActiveRecord::Base
-          klass.column_names.map(&:to_sym) - Array(klass.primary_key)
+          klass.attribute_names.map(&:to_sym) - Array(klass.primary_key)
         else
           rule.attributes
         end

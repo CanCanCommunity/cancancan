@@ -7,7 +7,7 @@
 [![Code Climate Badge](https://codeclimate.com/github/CanCanCommunity/cancancan.svg)](https://codeclimate.com/github/CanCanCommunity/cancancan)
 
 [Developer guide](./docs/README.md) |
-[RDocs](http://rdoc.info/projects/CanCanCommunity/cancancan) |
+[RDocs](https://www.rubydoc.info/github/CanCanCommunity/cancancan) |
 [Screencast 1](http://railscasts.com/episodes/192-authorization-with-cancan) |
 [Screencast 2](https://www.youtube.com/watch?v=cTYu-OjUgDw)
 
@@ -26,20 +26,14 @@ of models automatically and reduce duplicated code.
 
 ## Our sponsors
 <br/>
-<a href="https://www.renuo.ch" target="_blank">
-  <img src="./logo/renuo.png" alt="Renuo AG" height="50"/>
+<a href="https://www.pennylane.com/" target="_blank">
+  <img src="./logo/pennylane.svg" alt="Pennylane" height="50"/>
 </a>
-<br/>
-<br/>
-<br/>
-<a href="https://www.moderntreasury.com" target="_blank"  style="display:inline">
-  <img src="./logo/modern_treasury.svg" alt="Modern Treasury" height="40"/>
-</a>
-<br/>
-<br/>
-<br/>
-<a href="https://bullettrain.co" target="_blank">
-  <img src="./logo/bullet_train.png" alt="Bullet Train" height="50"/>
+<br />
+<br />
+<br />
+<a href="https://membean.com/" target="_blank">
+  <img src="./logo/membean.svg" alt="Membean" height="45"/>
 </a>
 <br/>
 <br/>
@@ -50,20 +44,8 @@ of models automatically and reduce duplicated code.
 <br />
 <br />
 <br />
-<a href="https://newrelic.com/" target="_blank">
-  <img src="./logo/new_relic.png" alt="NewRelic" height="45"/>
-</a>
-<br />
-<br />
-<br />
-<a href="https://www.ontra.ai" target="_blank">
-  <img src="./logo/ontra.png" alt="Ontra" height="70"/>
-</a>
-<br />
-<br />
-<br />
-<a href="https://www.honeybadger.io/" target="_blank">
-  <img src="./logo/honeybadger.svg" alt="Honeybadger" height="45"/>
+<a href="https://www.renuo.ch" target="_blank">
+  <img src="./logo/renuo.png" alt="Renuo AG" height="50"/>
 </a>
 <br />
 <br />

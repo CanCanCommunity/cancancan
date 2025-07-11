@@ -39,7 +39,7 @@ If you're using ActiveAdmin don't forget to add `role` to the `user.rb` list of 
 
 Now you can provide a select-menu for choosing the roles in the view.
 
-```rhtml
+```erb
 <!-- in users/_form.html.erb -->
 <%= f.collection_select(:role, User::ROLES, :to_s, lambda{|i| i.to_s.humanize}) %>
 ```
@@ -89,7 +89,7 @@ If you're using devise, don't forget to add `attr_accessible :roles` to your use
 
 You can use checkboxes in the view for setting these roles.
 
-```rhtml
+```erb
 <% for role in User::ROLES %>
   <%= check_box_tag "user[roles][#{role}]", role, @user.roles.include?(role), {:name => "user[roles][]"}%>
   <%= label_tag "user_roles_#{role}", role.to_s.humanize %><br />

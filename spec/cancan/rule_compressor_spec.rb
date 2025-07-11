@@ -87,8 +87,7 @@ describe CanCan::RulesCompressor do
     end
   end
 
-  # TODO: not supported yet
-  xcontext 'duplicate rules' do
+  context 'duplicate rules' do
     let(:rules) do
       [can(:read, Blog, id: 4),
        can(:read, Blog, id: 1),
@@ -99,7 +98,42 @@ describe CanCan::RulesCompressor do
     end
 
     it 'minimizes the rules, by removing duplicates' do
-      expect(described_class.new(rules).rules_collapsed).to eq [rules[0], rules[1], rules[2], rules[4]]
+      expect(described_class.new(rules).rules_collapsed).to eq [rules[0], rules[1], rules[4], rules[5]]
+    end
+  end
+
+  context 'duplicates rules with cannot' do
+    let(:rules) do
+      [can(:read, Blog, id: 1),
+       cannot(:read, Blog, id: 1)]
+    end
+
+    it 'minimizes the rules, by removing useless previous rules' do
+      expect(described_class.new(rules).rules_collapsed).to eq [rules[1]]
+    end
+  end
+
+  context 'duplicates rules with cannot and can again' do
+    let(:rules) do
+      [can(:read, Blog, id: [1, 2]),
+       cannot(:read, Blog, id: 1),
+       can(:read, Blog, id: 1)]
+    end
+
+    it 'minimizes the rules, by removing useless previous rules' do
+      expect(described_class.new(rules).rules_collapsed).to eq [rules[0], rules[2]]
+    end
+  end
+
+  context 'duplicates rules with 2 cannot' do
+    let(:rules) do
+      [can(:read, Blog),
+       cannot(:read, Blog, id: 1),
+       cannot(:read, Blog, id: 1)]
+    end
+
+    it 'minimizes the rules, by removing useless previous rules' do
+      expect(described_class.new(rules).rules_collapsed).to eq [rules[0], rules[2]]
     end
   end
 

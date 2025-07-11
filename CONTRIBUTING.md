@@ -2,7 +2,7 @@
 
 ### Reporting an Issue
 
-1. If you have any questions about CanCanCan, search the [Wiki](https://github.com/cancancommunity/cancancan/wiki) or
+1. If you have any questions about CanCanCan, search the [Developer guide](./docs/README.md) or
 use [Stack Overflow](http://stackoverflow.com/questions/tagged/cancancan).
 Do not post questions here.
 
@@ -25,3 +25,19 @@ Please make sure you have test coverage for anything you add or fix!
 Please add a CHANGELOG entry with any relevant tags for issues, pull-requests, and authors.
 
 Thanks for you contribution!
+
+### Modify the Documentation
+
+The documentation is written in Markdown and is located in the `docs` directory. The documentation is built using [VitePress](https://vitepress.dev).
+VitePress supports all markdown features but also adds a few enhancements, which are documented in the [Markdown Extensions](https://vitepress.dev/guide/markdown).
+
+```bash
+npm install
+npm run dev
+
+# build for production, resulting in a static site in docs/.vitepress/dist
+npm run build
+```
+
+Before submitting a pull request, please make sure the documentation builds correctly using `npm run build`.
+Most likely the build will fail if there are any syntax errors in the markdown files or dead links.

@@ -13,3 +13,6 @@ Gemfile.lock
 .ruby-version
 .ruby-gemset
 /tmp
+.vitepress/cache
+node_modules
+.vitepress/dist
