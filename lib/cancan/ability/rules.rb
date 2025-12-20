@@ -52,7 +52,7 @@ module CanCan
           positions.compact!
           positions.flatten!
           positions.sort!
-          positions.map { |i| @rules[i] }
+          @rules.values_at(*positions)
         end
       end
 
