@@ -72,12 +72,15 @@ module CanCan
     #
     # Also see the RSpec Matchers to aid in testing.
     def can?(action, subject, attribute = nil, *extra_args)
-      match = extract_subjects(subject).lazy.map do |a_subject|
-        relevant_rules_for_match(action, a_subject).detect do |rule|
-          rule.matches_conditions?(action, a_subject, attribute, *extra_args) && rule.matches_attributes?(attribute)
+      extract_subjects(subject).each do |a_subject|
+        relevant_rules_for_match(action, a_subject).each do |rule|
+          next if !rule.matches_conditions?(action, a_subject, attribute, *extra_args) || !rule.matches_attributes?(attribute)
+
+          return rule.base_behavior
         end
-      end.reject(&:nil?).first
-      match ? match.base_behavior : false
+      end
+
+      false
     end
 
     # Convenience method which works the same as "can?" but returns the opposite value.
