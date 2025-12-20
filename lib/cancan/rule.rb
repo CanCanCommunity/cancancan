@@ -13,7 +13,8 @@ module CanCan
     include Relevant
     include ParameterValidators
     attr_reader :base_behavior, :subjects, :actions, :conditions, :attributes, :block
-    attr_writer :expanded_actions, :conditions
+    attr_writer :conditions
+    attr_accessor :expanded_actions
 
     # The first argument when initializing is the base_behavior which is a true/false
     # value. True for "can" and false for "cannot". The next two arguments are the action
@@ -33,6 +34,7 @@ module CanCan
       @attributes = wrap(attributes)
       @conditions = extra_args || {}
       @block = block
+      @expanded_actions = nil
     end
 
     def inspect

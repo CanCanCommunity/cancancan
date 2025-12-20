@@ -36,7 +36,7 @@ module CanCan
         return [] unless @rules
 
         relevant = possible_relevant_rules(subject).select do |rule|
-          rule.expanded_actions = expand_actions(rule.actions)
+          rule.expanded_actions ||= expand_actions(rule.actions)
           rule.relevant? action, subject
         end
         relevant.reverse!.uniq!
