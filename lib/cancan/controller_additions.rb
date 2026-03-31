@@ -264,7 +264,7 @@ module CanCan
           next if options[:unless] && controller.send(options[:unless])
 
           raise AuthorizationNotPerformed,
-                'This action failed the check_authorization because it does not authorize_resource. '\
+                'This action failed the check_authorization because it does not authorize_resource. ' \
                 'Add skip_authorization_check to bypass this check.'
         end
 

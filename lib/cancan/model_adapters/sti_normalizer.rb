@@ -30,8 +30,16 @@ module CanCan
 
         # create a new rule for the subclasses that links on the inheritance_column
         def build_rule_for_subclass(rule, subject)
+          sti_conditions = { subject.inheritance_column => subject.sti_name }
+          new_rule_conditions =
+            if rule.with_scope?
+              rule.conditions.where(sti_conditions)
+            else
+              rule.conditions.merge(sti_conditions)
+            end
+
           CanCan::Rule.new(rule.base_behavior, rule.actions, subject.superclass,
-                           rule.conditions.merge(subject.inheritance_column => subject.sti_name), rule.block)
+                           new_rule_conditions, rule.block)
         end
       end
     end
