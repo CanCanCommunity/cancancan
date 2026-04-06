@@ -88,6 +88,9 @@ module CanCan
     end
 
     def condition_match?(attribute, value)
+      if defined?(ActiveRecord) && value.is_a?(ActiveRecord::Relation)
+        value = value.map { |v| v.attributes.compact_blank.values[0] }
+      end
       case value
       when Hash
         hash_condition_match?(attribute, value)
