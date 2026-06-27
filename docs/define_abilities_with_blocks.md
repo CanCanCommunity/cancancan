@@ -38,7 +38,7 @@ end
 
 ## Block Conditions with ActiveRecord Scopes
 
-It's also possible to pass a scope instead of an SQL string when using a block in an ability.
+It's also possible to pass a scope instead of an SQL string when using a block in an ability. The block is **always required**, as it is called when checking discrete actions like `can` and `authorize`. See also [Defining Abilities: Best Practices](./define_abilities_best_practices.md).
 
 ```ruby
 can :read, Article, Article.published do |article|
