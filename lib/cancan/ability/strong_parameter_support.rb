@@ -10,6 +10,8 @@ module CanCan
       # they are added. The 'reverse' is so that attributes will be added before the
       # 'cannot' rules remove them.
       def permitted_attributes(action, subject)
+        return [] unless can?(action, subject)
+
         relevant_rules(action, subject)
           .reverse
           .select { |rule| rule.matches_conditions? action, subject }

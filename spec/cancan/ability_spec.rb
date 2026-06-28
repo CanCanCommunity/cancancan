@@ -665,6 +665,16 @@ describe CanCan::Ability do
     expect(@ability.can?(:update, Range, :name)).to be(true)
   end
 
+  it 'returns an empty array for permitted_attributes when no ability is defined' do
+    expect(@ability.permitted_attributes(:update, NamedUser)).to eq([])
+  end
+
+  it 'returns an empty array for permitted_attributes if the action is explicitly forbidden' do
+    @ability.can :update, NamedUser
+    @ability.cannot :update, NamedUser # explicitly deny
+    expect(@ability.permitted_attributes(:update, NamedUser)).to eq([])
+  end
+
   it 'returns an array of permitted attributes for a given action and subject' do
     @ability.can :read, NamedUser
     @ability.can :read, Array, :special
