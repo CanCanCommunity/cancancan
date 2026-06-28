@@ -18,11 +18,18 @@ module CanCan
 
       def initialize(model_class, rules)
         super
-        @compressed_rules = if CanCan.rules_compressor_enabled
-                              RulesCompressor.new(@rules.reverse).rules_collapsed.reverse
-                            else
-                              @rules
-                            end
+        base_rules = if CanCan.rules_compressor_enabled
+                       RulesCompressor.new(@rules.reverse).rules_collapsed.reverse
+                     else
+                       @rules
+                     end
+        # Dup each rule so that normalization for this model class does not permanently
+        # alter the shared rule objects. ConditionsNormalizer replaces rule.conditions with
+        # a newly computed hash, which overwrites the shared rule's conditions and corrupts
+        # subsequent can? checks for other models sharing the same rule. Duping the rule
+        # gives each adapter its own Rule shell so the conditions= assignment is local.
+        # See GitHub issue #876.
+        @compressed_rules = base_rules.map(&:dup)
         StiNormalizer.normalize(@compressed_rules)
         ConditionsNormalizer.normalize(model_class, @compressed_rules)
       end

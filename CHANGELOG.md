@@ -1,3 +1,7 @@
+## Unreleased
+
+* [#876](https://github.com/CanCanCommunity/cancancan/issues/876): Fix `accessible_by` permanently overwriting shared rule conditions, causing `can?` to fail for models sharing the same rule. ([@say-apm35][])
+
 ## 3.6.0
 
 * [#849](https://github.com/CanCanCommunity/cancancan/pull/849): Update tests matrix. ([@coorasse][])
