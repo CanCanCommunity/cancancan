@@ -7,6 +7,7 @@ module CanCan
       return call_block_with_all(action, subject, extra_args) if @match_all
       return matches_block_conditions(subject, attribute, *extra_args) if @block
       return matches_non_block_conditions(subject) unless conditions_empty?
+      return subject_descendant?(subject) if subject_class?(subject)
 
       true
     end
@@ -142,6 +143,13 @@ module CanCan
       # which it's `==` implementation will fetch all records for comparison
 
       (@conditions.is_a?(Hash) && @conditions == {}) || @conditions.nil?
+    end
+
+    def subject_descendant?(subject)
+      return true if @subjects.include?(:all)
+
+      subject = subject.values.first if subject.is_a?(Hash)
+      @subjects.any? { |sub| sub.is_a?(Module) && sub >= subject }
     end
   end
 end
