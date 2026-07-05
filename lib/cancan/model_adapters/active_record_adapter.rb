@@ -198,11 +198,11 @@ module CanCan
         conditions = sanitize_sql(conditions_hash)
         case sql
         when true_sql
-          behavior ? true_sql : "not (#{conditions})"
+          behavior ? true_sql : "(not (#{conditions}) OR (#{conditions}) IS NULL)"
         when false_sql
           behavior ? conditions : false_sql
         else
-          behavior ? "(#{conditions}) OR (#{sql})" : "not (#{conditions}) AND (#{sql})"
+          behavior ? "(#{conditions}) OR (#{sql})" : "(not (#{conditions}) OR (#{conditions}) IS NULL) AND (#{sql})"
         end
       end
 
