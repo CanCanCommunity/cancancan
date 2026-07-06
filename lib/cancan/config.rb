@@ -88,11 +88,13 @@ module CanCan
     end
   end
 
-  def self.validate_accessible_by_strategy!(value)
-    return if valid_accessible_by_strategies.include?(value)
-
-    raise ArgumentError, "accessible_by_strategy must be one of #{valid_accessible_by_strategies.join(', ')}"
+def self.validate_accessible_by_strategy!(value)
+  unless value < CanCan::ModelAdapters::Strategies::Base
+    raise ArgumentError, "Invalid strategy: #{value}. It should extend CanCan::ModelAdapters::Strategies::Base."
   end
+
+  return if valid_accessible_by_strategies.include?(value)
+end
 
   def self.does_not_support_subquery_strategy?
     !defined?(CanCan::ModelAdapters::ActiveRecordAdapter) ||
