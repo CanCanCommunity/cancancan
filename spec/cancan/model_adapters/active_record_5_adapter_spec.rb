@@ -25,6 +25,16 @@ if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
               t.integer :color, default: 0, null: false
               t.integer :shape, default: 3, null: false
             end
+
+            create_table(:food) do |t|
+              t.integer :status
+            end
+          end
+
+          unless defined?(Food)
+            class Food < ActiveRecord::Base
+              enum status: %i[rotten good]
+            end
           end
 
           unless defined?(Thing)
@@ -48,6 +58,46 @@ if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
         end
 
         subject(:ability) { Ability.new(nil) }
+
+        context 'when enum allow null values' do
+          let(:rotten) { Food.create(status: :rotten) }
+          let(:good) { Food.create(status: :good) }
+          let(:no_status) { Food.create(status: nil) }
+
+          context 'when the condition contains a single value' do
+            before do
+              ability.can :eat, Food, status: nil
+            end
+
+            it 'can check ability on single models' do
+              is_expected.not_to be_able_to(:eat, rotten)
+              is_expected.to be_able_to(:eat, no_status)
+              is_expected.not_to be_able_to(:eat, good)
+            end
+
+            it 'can use accessible_by helper' do
+              accessible = Food.accessible_by(ability)
+              expect(accessible).to contain_exactly(no_status)
+            end
+          end
+
+          context 'when the condition contains multiple values' do
+            before do
+              ability.can :eat, Food, status: [nil, :good]
+            end
+
+            it 'can check ability on single models' do
+              is_expected.not_to be_able_to(:eat, rotten)
+              is_expected.to be_able_to(:eat, no_status)
+              is_expected.to be_able_to(:eat, good)
+            end
+
+            it 'can use accessible_by helper' do
+              accessible = Food.accessible_by(ability)
+              expect(accessible).to contain_exactly(no_status, good)
+            end
+          end
+        end
 
         context 'when enums use integers as values' do
           let(:red) { Shape.create!(color: :red) }
