@@ -430,6 +430,24 @@ describe CanCan::ControllerResource do
       expect(controller.instance_variable_get(:@model)).to eq(model)
     end
 
+    it 'finds record through has_one association with :through_association and :singleton options' do
+      params[:id] = nil
+
+      model = Model.new
+
+      category = double(custom_model: model)
+      controller.instance_variable_set(:@category, category)
+
+      resource = CanCan::ControllerResource.new(
+        controller,
+        through: :category,
+        through_association: :custom_model,
+        singleton: true,
+      )
+      resource.load_resource
+      expect(controller.instance_variable_get(:@model)).to eq(model)
+    end
+
     it 'loads the model using a custom class' do
       model = Model.new
       allow(Model).to receive(:find).with('123') { model }

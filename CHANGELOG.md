@@ -1,3 +1,7 @@
+## Unreleased
+
+* [#878](https://github.com/CanCanCommunity/cancancan/pull/878): Support `through_association` with `singleton`. ([@cgunther][])
+
 ## 3.6.0
 
 * [#849](https://github.com/CanCanCommunity/cancancan/pull/849): Update tests matrix. ([@coorasse][])
@@ -716,3 +720,4 @@ Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.co
 [@MrChoclate]: https://github.com/MrChoclate
 [@pandermatt]: https://github.com/pandermatt
 [@kalsan]: https://github.com/kalsan
+[@cgunther]: https://github.com/cgunther
