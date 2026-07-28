@@ -12,3 +12,11 @@ cannot :destroy, Project
 will allow the user to do **any** action but destroy the project.
 
 Of course, there's a `cannot?` method to check abilities that is a simple alias for `!can?`.
+
+## Remove all permissions
+
+`cannot` supports the special subject `:all`.
+
+```ruby
+cannot :manage, :all  # user cannot perform any action on any object
+```
