@@ -20,6 +20,17 @@ module CanCan
         end.to_a
       end
 
+      # This method returns all attributes which are explicity disallowed
+      def disallowed_attributes(action, subject)
+        relevant_rules(action, subject)
+          .reverse
+          .select { |rule| rule.matches_conditions? action, subject }
+          .each_with_object(Set.new) do |rule, set|
+            attributes = get_attributes(rule, subject)
+            rule.base_behavior ? set.subtract(attributes) : set.merge(attributes)
+          end.to_a
+      end
+
       private
 
       def subject_class?(subject)
