@@ -48,6 +48,7 @@ RSpec.describe CanCan::ModelAdapters::ConditionsExtractor do
         t.integer :sender_id
         t.integer :receiver_id
         t.integer :supervisor_id
+        t.integer :approver_id
       end
     end
 
@@ -86,6 +87,7 @@ RSpec.describe CanCan::ModelAdapters::ConditionsExtractor do
       belongs_to :sender, class_name: 'User', foreign_key: :sender_id
       belongs_to :receiver, class_name: 'User', foreign_key: :receiver_id
       belongs_to :supervisor, class_name: 'User', foreign_key: :supervisor_id
+      belongs_to :approver, class_name: 'User', foreign_key: :approver_id
     end
   end
 
@@ -144,6 +146,24 @@ RSpec.describe CanCan::ModelAdapters::ConditionsExtractor do
                                articles: { id: 'article1' },
                                receivers_transactions: { id: 'receiver' },
                                articles_users: { id: 'article2' })
+    end
+
+    it 'converts multiple references of same table with incrementing indexes' do
+      original_conditions = [
+        { sender: { mentions: { id: '1' } } },
+        { receiver: { mentions: { id: '1' } } },
+        { supervisor: { mentions: { id: '1' } } },
+        { approver: { mentions: { id: '1' } } }
+      ]
+
+      extractor = described_class.new(Transaction)
+      conditions = original_conditions.map do |condition|
+        extractor.tableize_conditions(condition).dup
+      end
+      expect(conditions).to eq([{ legacy_mentions: { id: '1' } },
+                                { mentions_users: { id: '1' } },
+                                { mentions_users_2: { id: '1' } },
+                                { mentions_users_3: { id: '1' } }])
     end
   end
 end
