@@ -1,5 +1,6 @@
 ## 3.6.0
 
+* [#871](https://github.com/CanCanCommunity/cancancan/pull/871): Make `with_accessible_by_strategy` thread safe ([@NikosVlagoidis][])
 * [#849](https://github.com/CanCanCommunity/cancancan/pull/849): Update tests matrix. ([@coorasse][])
 * [#843](https://github.com/CanCanCommunity/cancancan/pull/843): Compress duplicate rules. ([@MrChoclate][])
 * [#841](https://github.com/CanCanCommunity/cancancan/pull/841): New https://cancancan.dev website. ([@pandermatt][])
@@ -716,3 +717,4 @@ Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.co
 [@MrChoclate]: https://github.com/MrChoclate
 [@pandermatt]: https://github.com/pandermatt
 [@kalsan]: https://github.com/kalsan
+[@NikosVlagoidis]: https://github.com/NikosVlagoidis
