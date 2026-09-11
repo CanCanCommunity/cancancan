@@ -73,11 +73,24 @@ module CanCan
     # Also see the RSpec Matchers to aid in testing.
     def can?(action, subject, attribute = nil, *extra_args)
       match = extract_subjects(subject).lazy.map do |a_subject|
+        rules_for_query = rules_except_cannot_with_attributes(action, a_subject)
+        subject_class = subject_class?(a_subject) ? a_subject : a_subject.class
+        if can_use_accessible_by?(subject_class, a_subject, rules_for_query)
+          next subject_class.accessible_by(self, action).exists?(a_subject.send(subject_class.primary_key)) ? rules_for_query.first : nil
+        end
+
         relevant_rules_for_match(action, a_subject).detect do |rule|
           rule.matches_conditions?(action, a_subject, attribute, *extra_args) && rule.matches_attributes?(attribute)
         end
       end.reject(&:nil?).first
       match ? match.base_behavior : false
+    end
+
+    def can_use_accessible_by?(subject_class, subject, rules)
+      subject_class.respond_to?(:accessible_by) &&
+        defined?(ActiveRecord::Base) && subject.is_a?(ActiveRecord::Base) &&
+        !subject.new_record? &&
+        rules.none?(&:only_block?)
     end
 
     # Convenience method which works the same as "can?" but returns the opposite value.
