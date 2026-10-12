@@ -130,6 +130,40 @@ describe CanCan::ControllerResource do
         expect(controller.instance_variable_get(:@model).name).to eq('foobar')
         expect(controller.instance_variable_get(:@model).category).to eq(category)
       end
+
+      it 'assigns the parent through the association inverse when the resource has no setter for :through' do
+        reflection = double(inverse_of: double(name: :team), options: {})
+        current_team = Class.new.new
+        current_team.class.define_singleton_method(:reflect_on_association) { |n| reflection if n.to_sym == :model }
+        expect_any_instance_of(Model).to receive('team=').with(current_team)
+
+        params[:model] = { name: 'foobar' }
+        controller.instance_variable_set(:@current_team, current_team)
+        resource = CanCan::ControllerResource.new(controller, through: :current_team, singleton: true)
+        resource.load_resource
+        expect(controller.instance_variable_get(:@model).name).to eq('foobar')
+      end
+
+      it 'assigns the parent through the polymorphic association when the resource has no setter for :through' do
+        reflection = double(inverse_of: nil, options: { as: :commentable })
+        post = Class.new.new
+        post.class.define_singleton_method(:reflect_on_association) { |name| reflection if name.to_sym == :comment }
+        expect_any_instance_of(Model).to receive('commentable=').with(post)
+
+        controller.instance_variable_set(:@post, post)
+        resource = CanCan::ControllerResource.new(controller, through: :post, through_association: :comment,
+                                                              singleton: true)
+        resource.load_resource
+      end
+
+      it 'raises an error when the resource has no setter named after :through and the association has no inverse' do
+        current_team = Class.new.new
+        current_team.class.define_singleton_method(:reflect_on_association) { |_name| nil }
+
+        controller.instance_variable_set(:@current_team, current_team)
+        resource = CanCan::ControllerResource.new(controller, through: :current_team, singleton: true)
+        expect { resource.load_resource }.to raise_error(CanCan::Error, /current_team=/)
+      end
     end
 
     it 'builds record through has_one association with :singleton and :shallow options' do

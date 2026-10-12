@@ -37,7 +37,6 @@ The same option applies to singleton resources, for instance `has_one :profile, 
   end
 ```
 
-
 If the resource name (`:project` in this case) does not match the controller, then it will be considered a parent resource. You can manually specify parent/child resources using the `parent: false` option.
 
 ## Securing `through` changes
@@ -115,7 +114,7 @@ class TasksController < ApplicationController
 end
 ```
 
-It will then use the `@project.task` and `@project.build_task` methods for fetching and building respectively.
+It will then use `@project.task` to fetch the record. New records are built with `Task.new` and the parent is assigned through `task.project=`, so the existing record of the `has_one` association is not touched. If the `:through` option does not match a setter on the resource, for instance `through: :current_project`, the parent is assigned through the inverse of the association, so define `inverse_of` on it when Rails cannot infer it.
 
 ## Polymorphic associations
 
