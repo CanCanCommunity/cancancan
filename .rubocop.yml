@@ -27,13 +27,7 @@ Metrics/ClassLength:
   Exclude:
     - 'lib/cancan/model_adapters/active_record_adapter.rb'
 
-# TODO
-# Offense count: 2
-# Configuration parameters: NamePrefix, NamePrefixBlacklist, NameWhitelist.
-# NamePrefix: is_, has_, have_
-# NamePrefixBlacklist: is_, has_, have_
-# NameWhitelist: is_a?
-Naming/PredicateName:
+Naming/PredicatePrefix:
   Exclude:
     - 'spec/**/*'
     - 'lib/cancan/ability.rb'
@@ -45,7 +39,7 @@ Lint/AmbiguousBlockAssociation:
 AllCops:
   NewCops: enable
   SuggestExtensions: false
-  TargetRubyVersion: 3.0
+  TargetRubyVersion: 3.2
   Exclude:
     - 'gemfiles/**/*'
     - 'vendor/**/*'
