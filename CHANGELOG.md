@@ -1,7 +1,11 @@
-## 3.6.1
+## 3.6.2
 
 * [#898](https://github.com/CanCanCommunity/cancancan/pull/898): Do not share `cancan_skipper` between controller subclasses: `skip_authorize_resource` and `skip_load_resource` in a subclass no longer apply to the superclass or sibling controllers. ([@bruno-costanzo][])
 * [#894](https://github.com/CanCanCommunity/cancancan/pull/894): Use `lease_connection` instead of the deprecated `connection` on Rails 7.2+. ([@benaitcheson][])
+
+## 3.6.1
+
+* Fix the 3.6.0 release, which was published without [#839](https://github.com/CanCanCommunity/cancancan/pull/839). ([@coorasse][])
 
 ## 3.6.0
 
