@@ -216,12 +216,15 @@ module CanCan
         when false_sql
           behavior ? [conditions, false] : [false_sql, false]
         else
-          if behavior
-            [or_conditions(conditions, sql, or_chain),
-             true]
-          else
-            ["#{not_conditions(conditions)} AND (#{sql})", false]
-          end
+          merge_with_previous_conditions(behavior, conditions, sql, or_chain)
+        end
+      end
+
+      def merge_with_previous_conditions(behavior, conditions, sql, or_chain)
+        if behavior
+          [or_conditions(conditions, sql, or_chain), true]
+        else
+          ["#{not_conditions(conditions)} AND (#{sql})", false]
         end
       end
 
