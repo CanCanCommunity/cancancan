@@ -1,9 +1,15 @@
+## 3.6.1
+
+* [#898](https://github.com/CanCanCommunity/cancancan/pull/898): Do not share `cancan_skipper` between controller subclasses: `skip_authorize_resource` and `skip_load_resource` in a subclass no longer apply to the superclass or sibling controllers. ([@bruno-costanzo][])
+* [#894](https://github.com/CanCanCommunity/cancancan/pull/894): Use `lease_connection` instead of the deprecated `connection` on Rails 7.2+. ([@benaitcheson][])
+
 ## 3.6.0
 
 * [#849](https://github.com/CanCanCommunity/cancancan/pull/849): Update tests matrix. ([@coorasse][])
 * [#843](https://github.com/CanCanCommunity/cancancan/pull/843): Compress duplicate rules. ([@MrChoclate][])
 * [#841](https://github.com/CanCanCommunity/cancancan/pull/841): New https://cancancan.dev website. ([@pandermatt][])
 * [#839](https://github.com/CanCanCommunity/cancancan/pull/839): Switch from database column detection to Rails attributes detection. ([@kalsan][])
+
 ## 3.5.0
 
 * [#653](https://github.com/CanCanCommunity/cancancan/pull/653): Add support for using an nil relation as a condition. ([@ghiculescu][])
@@ -716,3 +722,5 @@ Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.co
 [@MrChoclate]: https://github.com/MrChoclate
 [@pandermatt]: https://github.com/pandermatt
 [@kalsan]: https://github.com/kalsan
+[@bruno-costanzo]: https://github.com/bruno-costanzo
+[@benaitcheson]: https://github.com/benaitcheson
