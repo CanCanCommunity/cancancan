@@ -212,12 +212,22 @@ module CanCan
         conditions = sanitize_sql(conditions_hash)
         case sql
         when true_sql
-          behavior ? [true_sql, false] : ["not (#{conditions})", false]
+          behavior ? [true_sql, false] : [not_conditions(conditions), false]
         when false_sql
           behavior ? [conditions, false] : [false_sql, false]
         else
-          behavior ? [or_conditions(conditions, sql, or_chain), true] : ["not (#{conditions}) AND (#{sql})", false]
+          if behavior
+            [or_conditions(conditions, sql, or_chain),
+             true]
+          else
+            ["#{not_conditions(conditions)} AND (#{sql})", false]
+          end
         end
+      end
+
+      # A cannot rule only excludes the records that match its conditions: NULL does not match.
+      def not_conditions(conditions)
+        "(#{conditions}) IS NOT TRUE"
       end
 
       def or_conditions(conditions, sql, or_chain)

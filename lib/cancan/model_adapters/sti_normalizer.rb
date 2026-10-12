@@ -7,25 +7,18 @@ module CanCan
     class StiNormalizer
       class << self
         def normalize(rules)
-          rules_cache = []
           return unless defined?(ActiveRecord::Base)
 
-          rules.delete_if do |rule|
-            subjects = rule.subjects.select do |subject|
-              update_rule(subject, rule, rules_cache)
-            end
-            subjects.length == rule.subjects.length
-          end
-          rules_cache.each { |rule| rules.push(rule) }
+          rules.replace(rules.flat_map { |rule| normalized_rules(rule) })
         end
 
         private
 
-        def update_rule(subject, rule, rules_cache)
-          return false unless StiDetector.sti_class?(subject)
-
-          rules_cache.push(build_rule_for_subclass(rule, subject))
-          true
+        # The rules for the subclasses take the place of the original rule, so their precedence is kept.
+        def normalized_rules(rule)
+          sti_subjects = rule.subjects.select { |subject| StiDetector.sti_class?(subject) }
+          subclass_rules = sti_subjects.map { |subject| build_rule_for_subclass(rule, subject) }
+          sti_subjects.length == rule.subjects.length ? subclass_rules : [rule, *subclass_rules]
         end
 
         # create a new rule for the subclasses that links on the inheritance_column
