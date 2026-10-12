@@ -891,6 +891,48 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
     expect(@ability.can?(:read, article)).to be(true)
   end
 
+  describe '#permitted_attributes' do
+    let(:all_attributes) { Article.attribute_names.map(&:to_sym) }
+
+    it 'returns all attributes for a can rule without attributes' do
+      @ability.can :update, Article
+
+      expect(@ability.permitted_attributes(:update, Article)).to match_array(all_attributes)
+    end
+
+    it 'returns no attributes when no rule is defined' do
+      expect(@ability.permitted_attributes(:update, Article)).to eq([])
+    end
+
+    it 'returns no attributes when the action is forbidden' do
+      @ability.cannot :update, Article
+
+      expect(@ability.permitted_attributes(:update, Article)).to eq([])
+    end
+
+    it 'returns no attributes when a cannot rule follows a can rule' do
+      @ability.can :update, Article
+      @ability.cannot :update, Article
+
+      expect(@ability.permitted_attributes(:update, Article)).to eq([])
+    end
+
+    it 'returns no attributes when a cannot rule with conditions matches the record' do
+      @ability.can :update, Article
+      @ability.cannot :update, Article, secret: true
+
+      expect(@ability.permitted_attributes(:update, Article.new(secret: true))).to eq([])
+      expect(@ability.permitted_attributes(:update, Article.new(secret: false))).to match_array(all_attributes)
+    end
+
+    it 'returns no attributes when a can rule with attributes is followed by a cannot rule' do
+      @ability.can :update, Article, [:name]
+      @ability.cannot :update, Article
+
+      expect(@ability.permitted_attributes(:update, Article)).to eq([])
+    end
+  end
+
   context 'with namespaced models' do
     before :each do
       ActiveRecord::Schema.define do
