@@ -88,16 +88,19 @@ module CanCan
     end
 
     def condition_match?(attribute, value)
+      return relation_match?(attribute, value) if defined?(ActiveRecord) && value.is_a?(ActiveRecord::Relation)
+
       case value
-      when Hash
-        hash_condition_match?(attribute, value)
-      when Range
-        value.cover?(attribute)
-      when Enumerable
-        value.include?(attribute)
-      else
-        attribute == value
+      when Hash then hash_condition_match?(attribute, value)
+      when Range then value.cover?(attribute)
+      when Enumerable then value.include?(attribute)
+      else attribute == value
       end
+    end
+
+    # Like Active Record with a relation as condition value: the selected column, or the primary key, is matched.
+    def relation_match?(attribute, relation)
+      relation.where((relation.select_values.first || relation.primary_key) => attribute).exists?
     end
 
     def hash_condition_match?(attribute, value)

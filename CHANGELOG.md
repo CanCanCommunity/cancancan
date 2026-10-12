@@ -1,5 +1,6 @@
 ## Unreleased
 
+* [#890](https://github.com/CanCanCommunity/cancancan/pull/890): Support an Active Record relation as the value of a condition in `can?`: the selected column, or the primary key, is checked with a query, as `accessible_by` already did. ([@olistik][])
 * [#908](https://github.com/CanCanCommunity/cancancan/pull/908): Join consecutive `can` rules in a flat chain of ORs in the SQL conditions, so that many rules on the same model no longer overflow the parser of SQLite. ([@coorasse][])
 * [#907](https://github.com/CanCanCommunity/cancancan/pull/907): Make `with_accessible_by_strategy` thread safe: the strategy chosen in the block no longer leaks into concurrent requests. ([@NikosVlagoidis][], [@coorasse][])
 * [#906](https://github.com/CanCanCommunity/cancancan/pull/906): Keep the conditions of an association when a rule is a scope: `group.posts.accessible_by(ability)` returned the posts of every group matched by the scope. **WARNING**: `accessible_by` called on an association now returns fewer records when the scope of a rule constrains the same column as the association. ([@coorasse][])
@@ -748,3 +749,4 @@ Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.co
 [@mark-young-atg]: https://github.com/mark-young-atg
 [@jaredbeck]: https://github.com/jaredbeck
 [@NikosVlagoidis]: https://github.com/NikosVlagoidis
+[@olistik]: https://github.com/olistik

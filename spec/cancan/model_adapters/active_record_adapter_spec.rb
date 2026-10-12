@@ -276,6 +276,32 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
         expect(Article.accessible_by(@ability)).to match_array([article1])
       end
 
+      it 'matches records for can? when a condition value is an ActiveRecord relation selecting ids' do
+        user = User.create!(name: 'Arthur Dent')
+        article = Article.create!(name: 'How to fly', user: user)
+        other_article = Article.create!(name: 'Mostly Harmless')
+        ability = Ability.new(user)
+
+        ability.can :read, Article, id: Article.where(user_id: user.id).select(:id)
+
+        expect(Article.accessible_by(ability)).to match_array([article])
+        expect(ability.can?(:read, article)).to eq(true)
+        expect(ability.can?(:read, other_article)).to eq(false)
+      end
+
+      it 'matches records for can? when a condition value is an ActiveRecord relation selecting names' do
+        user = User.create!(name: 'Arthur Dent')
+        article = Article.create!(name: 'How to fly', user: user)
+        other_article = Article.create!(name: 'Mostly Harmless')
+        ability = Ability.new(user)
+
+        ability.can :read, Article, name: Article.where(user_id: user.id).select(:name)
+
+        expect(Article.accessible_by(ability)).to match_array([article])
+        expect(ability.can?(:read, article)).to eq(true)
+        expect(ability.can?(:read, other_article)).to eq(false)
+      end
+
       it 'fetches only associated records when using with a scope for conditions' do
         @ability.can :read, Article, Article.where(secret: true)
         category1 = Category.create!(visible: false)

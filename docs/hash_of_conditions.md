@@ -55,6 +55,22 @@ can :read, Project, members: { id: nil }
 
 Almost anything that you can pass to a hash of conditions in ActiveRecord will work here as well.
 
+## Arrays and relations as values
+
+The value of a condition can be an array, in which case the attribute has to match one of its elements:
+
+```ruby
+can :read, Project, id: user.project_ids
+```
+
+It can also be an Active Record relation that selects a single column, or no column at all, in which case the primary key is used:
+
+```ruby
+can :read, Project, id: Project.where(user_id: user.id).select(:id)
+```
+
+`accessible_by` turns the relation into a subquery. `can?` runs one `EXISTS` query per check, so prefer an array when the checks are many and the set of values is small.
+
 ## Traverse associations
 
 All associations can be traversed when defining a rule.
