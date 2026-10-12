@@ -1,3 +1,9 @@
+## 4.0.0 (unreleased)
+
+### Breaking changes
+
+* [#903](https://github.com/CanCanCommunity/cancancan/pull/903): `permitted_attributes` no longer includes the primary key when a rule has no attributes. It was documented to exclude it, but a bug kept `id` in the returned array. If your strong parameters rely on `permitted_attributes` to permit the primary key, add it explicitly, for example `params.require(:project).permit(:id, *current_ability.permitted_attributes(:update, @project))`. ([@coorasse][])
+
 ## Unreleased
 
 * [#842](https://github.com/CanCanCommunity/cancancan/pull/842): Add `disallowed_attributes` to retrieve the attributes forbidden by `cannot` rules. ([@mswiszcz][])

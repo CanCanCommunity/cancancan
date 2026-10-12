@@ -892,9 +892,9 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
   end
 
   describe '#permitted_attributes' do
-    let(:all_attributes) { Article.attribute_names.map(&:to_sym) }
+    let(:all_attributes) { Article.attribute_names.map(&:to_sym) - [:id] }
 
-    it 'returns all attributes for a can rule without attributes' do
+    it 'returns all attributes except the primary key for a can rule without attributes' do
       @ability.can :update, Article
 
       expect(@ability.permitted_attributes(:update, Article)).to match_array(all_attributes)
