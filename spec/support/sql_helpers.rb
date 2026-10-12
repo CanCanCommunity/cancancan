@@ -35,7 +35,9 @@ module SQLHelpers
   # The same in-memory SQLite database can survive establish_connection, so start every example from a blank schema.
   def drop_all_tables
     connection = ActiveRecord::Base.connection
-    connection.tables.each { |table| connection.drop_table(table, force: :cascade) }
+    connection.disable_referential_integrity do
+      connection.tables.each { |table| connection.drop_table(table, force: :cascade) }
+    end
   end
 
   def connect_postgres
