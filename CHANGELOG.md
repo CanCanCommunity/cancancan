@@ -1,5 +1,6 @@
 ## Unreleased
 
+* [#903](https://github.com/CanCanCommunity/cancancan/pull/903): `permitted_attributes` no longer includes the primary key when a rule has no attributes. **WARNING**: if your strong parameters rely on `permitted_attributes` to permit `id`, add it explicitly. ([@coorasse][])
 * [#902](https://github.com/CanCanCommunity/cancancan/pull/902): Do not change the rules of the ability in `accessible_by`: a rule shared by several models kept the conditions normalized for the first queried model. ([@bruno-costanzo][])
 * Remove the VitePress documentation website: the documentation lives in the `docs` folder as plain Markdown. ([@coorasse][])
 
