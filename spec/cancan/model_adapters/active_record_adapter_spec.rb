@@ -933,6 +933,47 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
     end
   end
 
+  describe '#disallowed_attributes' do
+    it 'returns the attributes forbidden by a cannot rule' do
+      @ability.can :update, Article
+      @ability.cannot :update, Article, %i[secret priority]
+
+      expect(@ability.disallowed_attributes(:update, Article)).to match_array(%i[secret priority])
+    end
+
+    it 'returns all attributes when a cannot rule has no attributes' do
+      @ability.cannot :update, Article
+
+      expect(@ability.disallowed_attributes(:update, Article))
+        .to include(*(Article.attribute_names.map(&:to_sym) - [:id]))
+    end
+
+    it 'returns no attributes when no rule is defined' do
+      expect(@ability.disallowed_attributes(:update, Article)).to eq([])
+    end
+
+    it 'returns no attributes when a can rule only allows some attributes' do
+      @ability.can :update, Article, [:name]
+
+      expect(@ability.disallowed_attributes(:update, Article)).to eq([])
+    end
+
+    it 'does not return attributes allowed again by a later can rule' do
+      @ability.cannot :update, Article, [:secret]
+      @ability.can :update, Article, [:secret]
+
+      expect(@ability.disallowed_attributes(:update, Article)).to eq([])
+    end
+
+    it 'applies the conditions of the cannot rule to the record' do
+      @ability.can :update, Article
+      @ability.cannot :update, Article, [:secret], published: true
+
+      expect(@ability.disallowed_attributes(:update, Article.new(published: true))).to eq([:secret])
+      expect(@ability.disallowed_attributes(:update, Article.new(published: false))).to eq([])
+    end
+  end
+
   context 'with namespaced models' do
     before :each do
       ActiveRecord::Schema.define do

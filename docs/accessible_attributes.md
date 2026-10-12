@@ -35,3 +35,23 @@ params
   .require(:book)
   .permit(current_ability.permitted_attributes(:read, @book))
 ```
+
+## Disallowed attributes
+
+`disallowed_attributes` is the opposite of `permitted_attributes`: it returns the attributes that a `cannot` rule forbids and no later `can` rule allows again.
+
+```ruby
+can :update, Product
+cannot :update, Product, [:price]
+
+current_ability.disallowed_attributes(:update, @product)
+#=> [:price]
+```
+
+It is useful as a deny list when the input contains keys that are not attributes of the model, for example a GraphQL input object with translated fields: `permitted_attributes` would not include them, while `disallowed_attributes` only removes what is explicitly forbidden.
+
+```ruby
+attributes.except(*current_ability.disallowed_attributes(:update, @product))
+```
+
+An empty result does not mean that the action is allowed: when no rule is defined, nothing is disallowed either. Always authorize the action itself with `authorize!` or `can?`.
