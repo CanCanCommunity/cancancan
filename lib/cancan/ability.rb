@@ -72,12 +72,10 @@ module CanCan
     #
     # Also see the RSpec Matchers to aid in testing.
     def can?(action, subject, attribute = nil, *extra_args)
-      match = extract_subjects(subject).lazy.map do |a_subject|
-        relevant_rules_for_match(action, a_subject).detect do |rule|
-          rule.matches_conditions?(action, a_subject, attribute, *extra_args) && rule.matches_attributes?(attribute)
-        end
-      end.reject(&:nil?).first
-      match ? match.base_behavior : false
+      results = extract_subjects(subject).lazy.map do |a_subject|
+        subject_can?(action, a_subject, attribute, *extra_args)
+      end
+      results.reject(&:nil?).first || false
     end
 
     # Convenience method which works the same as "can?" but returns the opposite value.
@@ -303,7 +301,7 @@ module CanCan
     def alternative_subjects(subject)
       subject = subject.class unless subject.is_a?(Module)
       if subject.respond_to?(:subclasses) && defined?(ActiveRecord::Base) && subject < ActiveRecord::Base
-        [:all, *(subject.ancestors + subject.subclasses), subject.class.to_s]
+        [:all, *(subject.ancestors + subject.descendants), subject.class.to_s]
       else
         [:all, *subject.ancestors, subject.class.to_s]
       end

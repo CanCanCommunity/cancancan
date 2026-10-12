@@ -1,6 +1,6 @@
 ## Unreleased
 
-* [#909](https://github.com/CanCanCommunity/cancancan/pull/909): Make `accessible_by` consistent with `can?` for `cannot` rules: rules on STI subclasses keep their precedence, and records with NULL in a column of the conditions are no longer excluded. **WARNING**: `accessible_by` returns more records when a `cannot` rule has conditions on a nullable column. ([@coorasse][], [@0llirocks][])
+* [#909](https://github.com/CanCanCommunity/cancancan/pull/909): Make `can?` and `accessible_by` consistent for `cannot` rules and single table inheritance: a `cannot` rule on a subclass keeps its precedence in `accessible_by`, records with NULL in a column of a `cannot` condition are no longer excluded, rules on subclasses of subclasses reach the base class, and a class check passes when the class or any of its subclasses is allowed. **WARNING**: `accessible_by` returns more records when a `cannot` rule has conditions on a nullable column, and `can?` on an STI base class no longer fails because a subclass is forbidden. ([@coorasse][], [@0llirocks][], [@kevinluo201][])
 * [#880](https://github.com/CanCanCommunity/cancancan/pull/880): Fix `accessible_by` with rules on STI subclasses: a rule on a subclass without conditions no longer discards the rules defined before it, and rules with the same conditions on different subjects are no longer compressed into one. ([@takayamaki][], [@sjoulbak][])
 * [#890](https://github.com/CanCanCommunity/cancancan/pull/890): Support an Active Record relation as the value of a condition in `can?`: the selected column, or the primary key, is checked with a query, as `accessible_by` already did. ([@olistik][])
 * [#908](https://github.com/CanCanCommunity/cancancan/pull/908): Join consecutive `can` rules in a flat chain of ORs in the SQL conditions, so that many rules on the same model no longer overflow the parser of SQLite. ([@coorasse][])
@@ -755,3 +755,4 @@ Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.co
 [@takayamaki]: https://github.com/takayamaki
 [@sjoulbak]: https://github.com/sjoulbak
 [@0llirocks]: https://github.com/0llirocks
+[@kevinluo201]: https://github.com/kevinluo201

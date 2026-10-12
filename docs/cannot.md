@@ -46,4 +46,6 @@ can? :read, Motorbike.first   # => true
 can? :read, Car.first         # => false
 Vehicle.accessible_by(ability)  # => all the vehicles except the cars
 Car.accessible_by(ability)      # => no records
+can? :read, Vehicle             # => true, some vehicles can be read
+can? :read, Car                 # => false
 ```

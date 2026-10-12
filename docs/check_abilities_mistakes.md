@@ -41,6 +41,16 @@ The reason for this behavior is because of the controller `index` action. Since 
 
 That is why passing a class to `can?` will return `true`.
 
+The same applies to the subclasses of a model that uses single table inheritance: the check on the base class passes when the user can access the base class or any of its subclasses, which is also when `accessible_by` on the base class can return records.
+
+```ruby
+can :read, Car   # Car < Vehicle
+
+can? :read, Vehicle   # => true, the user can read some vehicles
+can? :read, Car       # => true
+can? :read, Motorbike # => false
+```
+
 The code answering the question "can the user update all the articles?" would be something like:
 
 ```ruby

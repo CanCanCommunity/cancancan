@@ -1750,5 +1750,69 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
       expect(ability.can?(:read, big_car)).to be(false)
       expect(ability.can?(:read, small_car)).to be(true)
     end
+
+    it 'applies a rule defined on a subclass of a subclass to the base class' do
+      u1 = User.create!(name: 'pippo')
+      Vehicle.create!
+      Motorbike.create!
+      suzuki = Suzuki.create!
+
+      ability = Ability.new(u1)
+      ability.can :read, Suzuki
+      expect(Vehicle.accessible_by(ability)).to contain_exactly(suzuki)
+      expect(Motorbike.accessible_by(ability)).to contain_exactly(suzuki)
+      expect(ability.can?(:read, Vehicle)).to be(true)
+      expect(ability.can?(:read, Motorbike)).to be(true)
+      expect(ability.can?(:read, Car)).to be(false)
+    end
+
+    describe 'checking a class' do
+      let(:ability) { Ability.new(User.create!(name: 'pippo')) }
+
+      it 'passes when the class is allowed, even if a subclass is forbidden' do
+        ability.can :read, Vehicle
+        ability.cannot :read, Car
+        expect(ability.can?(:read, Vehicle)).to be(true)
+        expect(ability.can?(:read, Motorbike)).to be(true)
+        expect(ability.can?(:read, Car)).to be(false)
+      end
+
+      it 'passes when a subclass is forbidden with conditions' do
+        ability.can :read, Vehicle
+        ability.cannot :read, Car, capacity: 4
+        expect(ability.can?(:read, Vehicle)).to be(true)
+        expect(ability.can?(:read, Car)).to be(true)
+      end
+
+      it 'passes when a subclass is allowed' do
+        ability.can :read, Car
+        expect(ability.can?(:read, Vehicle)).to be(true)
+        expect(ability.can?(:read, Car)).to be(true)
+        expect(ability.can?(:read, Motorbike)).to be(false)
+      end
+
+      it 'fails when the only allowed subclass is forbidden again' do
+        ability.can :read, Car
+        ability.cannot :read, Car
+        expect(ability.can?(:read, Vehicle)).to be(false)
+        expect(ability.can?(:read, Car)).to be(false)
+      end
+
+      it 'passes when a subclass is allowed after the class is forbidden' do
+        ability.cannot :read, Vehicle
+        ability.can :read, Car
+        expect(ability.can?(:read, Vehicle)).to be(true)
+        expect(ability.can?(:read, Car)).to be(true)
+        expect(ability.can?(:read, Motorbike)).to be(false)
+      end
+
+      it 'passes for a subclass when one of its subclasses is forbidden' do
+        ability.can :read, Motorbike
+        ability.cannot :read, Suzuki
+        expect(ability.can?(:read, Motorbike)).to be(true)
+        expect(ability.can?(:read, Suzuki)).to be(false)
+        expect(ability.can?(:read, Vehicle)).to be(true)
+      end
+    end
   end
 end
