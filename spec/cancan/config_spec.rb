@@ -19,6 +19,31 @@ RSpec.describe CanCan do
     it 'rejects unknown strategies' do
       expect { CanCan.accessible_by_strategy = :unknown }.to raise_error(ArgumentError)
     end
+
+    it 'accepts every built-in strategy' do
+      CanCan.valid_accessible_by_strategies.each do |strategy|
+        CanCan.accessible_by_strategy = strategy
+
+        expect(CanCan.accessible_by_strategy).to eq(strategy)
+      end
+    end
+
+    it 'accepts a subclass of CanCan::ModelAdapters::Strategies::Base' do
+      strategy = Class.new(CanCan::ModelAdapters::Strategies::Base)
+
+      CanCan.accessible_by_strategy = strategy
+
+      expect(CanCan.accessible_by_strategy).to eq(strategy)
+    end
+
+    it 'rejects a class that is not a strategy' do
+      expect { CanCan.accessible_by_strategy = String }
+        .to raise_error(ArgumentError, /or a subclass of CanCan::ModelAdapters::Strategies::Base/)
+    end
+
+    it 'rejects a string' do
+      expect { CanCan.accessible_by_strategy = 'left_join' }.to raise_error(ArgumentError)
+    end
   end
 
   describe '.with_accessible_by_strategy' do
@@ -52,6 +77,15 @@ RSpec.describe CanCan do
 
     it 'rejects unknown strategies' do
       expect { CanCan.with_accessible_by_strategy(:unknown) { nil } }.to raise_error(ArgumentError)
+    end
+
+    it 'accepts a subclass of CanCan::ModelAdapters::Strategies::Base' do
+      strategy = Class.new(CanCan::ModelAdapters::Strategies::Base)
+
+      strategy_in_block = CanCan.with_accessible_by_strategy(strategy) { CanCan.accessible_by_strategy }
+
+      expect(strategy_in_block).to eq(strategy)
+      expect(CanCan.accessible_by_strategy).to eq(:subquery)
     end
 
     it 'does not leak the override into other threads' do

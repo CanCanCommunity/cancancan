@@ -26,8 +26,10 @@ module CanCan
       end
 
       def strategy_class
-        strategy_class_name = CanCan.accessible_by_strategy.to_s.camelize
-        CanCan::ModelAdapters::Strategies.const_get(strategy_class_name)
+        strategy = CanCan.accessible_by_strategy
+        return strategy if strategy.is_a?(Class)
+
+        CanCan::ModelAdapters::Strategies.const_get(strategy.to_s.camelize)
       end
 
       def sanitize_sql(conditions)

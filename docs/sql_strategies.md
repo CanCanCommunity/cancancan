@@ -65,3 +65,23 @@ WHERE "articles"."id" IN
    LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
    WHERE "users"."name" = 'pippo')
 ```
+
+## Custom strategies
+
+If none of the built-in strategies fits your needs, you can write your own: subclass
+`CanCan::ModelAdapters::Strategies::Base`, implement `execute!` and return the relation.
+The class is accepted wherever a strategy symbol is: globally, in a block or on a single call.
+
+```ruby
+class InnerJoinStrategy < CanCan::ModelAdapters::Strategies::Base
+  def execute!
+    relation.joins(joins).distinct
+  end
+end
+
+CanCan.accessible_by_strategy = InnerJoinStrategy
+Article.accessible_by(current_ability, strategy: InnerJoinStrategy)
+```
+
+Inside `execute!` you have access to `relation` (the records filtered by the conditions of the rules),
+`joins` (the associations referenced by the conditions), `where_conditions` and `model_class`.
