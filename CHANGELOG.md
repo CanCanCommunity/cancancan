@@ -1,5 +1,6 @@
 ## Unreleased
 
+* [#906](https://github.com/CanCanCommunity/cancancan/pull/906): Keep the conditions of an association when a rule is a scope: `group.posts.accessible_by(ability)` returned the posts of every group matched by the scope. **WARNING**: `accessible_by` called on an association now returns fewer records when the scope of a rule constrains the same column as the association. ([@coorasse][])
 * [#694](https://github.com/CanCanCommunity/cancancan/pull/694): Document that `cannot` supports the `:all` subject. ([@jaredbeck][])
 * [#852](https://github.com/CanCanCommunity/cancancan/pull/852): Add `changelog_uri` to the gemspec, so rubygems.org links to the changelog. ([@mark-young-atg][])
 * [#842](https://github.com/CanCanCommunity/cancancan/pull/842): Add `disallowed_attributes` to retrieve the attributes forbidden by `cannot` rules. ([@mswiszcz][])
