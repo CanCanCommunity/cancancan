@@ -26,7 +26,7 @@ Kernel.const_get(rspec_module)::Matchers.define :be_able_to do |*args|
   match_when_negated do |ability|
     actions = args.first
     if actions.is_a? Array
-      raise CanCan::ImplementationRemoved, "`expect(...).not_to be_able_to(:action_a, :action_b)` is not supported: " \
+      raise CanCan::ImplementationRemoved, '`expect(...).not_to be_able_to(:action_a, :action_b)` is not supported: ' \
                                            'it passes as soon as one action is forbidden, which is ambiguous. ' \
                                            'Write one expectation per action instead.'
     else
