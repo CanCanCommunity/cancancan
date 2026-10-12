@@ -1,3 +1,9 @@
+## 4.0.0 (unreleased)
+
+### Breaking changes
+
+* [#903](https://github.com/CanCanCommunity/cancancan/pull/903): `permitted_attributes` no longer includes the primary key when a rule has no attributes. It was documented to exclude it, but a bug kept `id` in the returned array. If your strong parameters rely on `permitted_attributes` to permit the primary key, add it explicitly, for example `params.require(:project).permit(:id, *current_ability.permitted_attributes(:update, @project))`. ([@coorasse][])
+
 ## Unreleased
 
 * [#909](https://github.com/CanCanCommunity/cancancan/pull/909): Make `can?` and `accessible_by` consistent for `cannot` rules and single table inheritance: a `cannot` rule on a subclass keeps its precedence in `accessible_by`, records with NULL in a column of a `cannot` condition are no longer excluded, rules on subclasses of subclasses reach the base class, and a class check passes when the class or any of its subclasses is allowed. **WARNING**: `accessible_by` returns more records when a `cannot` rule has conditions on a nullable column, and `can?` on an STI base class no longer fails because a subclass is forbidden. ([@coorasse][], [@0llirocks][], [@kevinluo201][])
