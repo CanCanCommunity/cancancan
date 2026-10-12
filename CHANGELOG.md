@@ -1,5 +1,6 @@
 ## Unreleased
 
+* [#908](https://github.com/CanCanCommunity/cancancan/pull/908): Join consecutive `can` rules in a flat chain of ORs in the SQL conditions, so that many rules on the same model no longer overflow the parser of SQLite. ([@coorasse][])
 * [#907](https://github.com/CanCanCommunity/cancancan/pull/907): Make `with_accessible_by_strategy` thread safe: the strategy chosen in the block no longer leaks into concurrent requests. ([@NikosVlagoidis][], [@coorasse][])
 * [#906](https://github.com/CanCanCommunity/cancancan/pull/906): Keep the conditions of an association when a rule is a scope: `group.posts.accessible_by(ability)` returned the posts of every group matched by the scope. **WARNING**: `accessible_by` called on an association now returns fewer records when the scope of a rule constrains the same column as the association. ([@coorasse][])
 * [#694](https://github.com/CanCanCommunity/cancancan/pull/694): Document that `cannot` supports the `:all` subject. ([@jaredbeck][])

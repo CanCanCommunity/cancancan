@@ -122,9 +122,11 @@ module CanCan
       end
 
       def extract_multiple_conditions(conditions_extractor, rules)
-        rules.reverse.inject(false_sql) do |sql, rule|
-          merge_conditions(sql, conditions_extractor.tableize_conditions(rule.conditions).dup, rule.base_behavior)
+        sql, = rules.reverse.inject([false_sql, false]) do |(sql, or_chain), rule|
+          conditions_hash = conditions_extractor.tableize_conditions(rule.conditions).dup
+          merge_conditions(sql, or_chain, conditions_hash, rule.base_behavior)
         end
+        sql
       end
 
       def database_records
@@ -195,24 +197,31 @@ module CanCan
               "Instead use a hash or SQL for #{rule_found.actions.first} #{rule_found.subjects.first} ability."
       end
 
-      def merge_conditions(sql, conditions_hash, behavior)
+      # Returns the merged sql and whether it is a flat chain of OR conditions.
+      def merge_conditions(sql, or_chain, conditions_hash, behavior)
         if conditions_hash.blank?
-          behavior ? true_sql : false_sql
+          [behavior ? true_sql : false_sql, false]
         else
-          merge_non_empty_conditions(behavior, conditions_hash, sql)
+          merge_non_empty_conditions(behavior, conditions_hash, sql, or_chain)
         end
       end
 
-      def merge_non_empty_conditions(behavior, conditions_hash, sql)
+      # Consecutive `can` rules are joined in a flat chain of ORs, so that the nesting of the query only grows
+      # when `can` and `cannot` rules alternate. Deeply nested conditions overflow the parser of SQLite.
+      def merge_non_empty_conditions(behavior, conditions_hash, sql, or_chain)
         conditions = sanitize_sql(conditions_hash)
         case sql
         when true_sql
-          behavior ? true_sql : "not (#{conditions})"
+          behavior ? [true_sql, false] : ["not (#{conditions})", false]
         when false_sql
-          behavior ? conditions : false_sql
+          behavior ? [conditions, false] : [false_sql, false]
         else
-          behavior ? "(#{conditions}) OR (#{sql})" : "not (#{conditions}) AND (#{sql})"
+          behavior ? [or_conditions(conditions, sql, or_chain), true] : ["not (#{conditions}) AND (#{sql})", false]
         end
+      end
+
+      def or_conditions(conditions, sql, or_chain)
+        "(#{conditions}) OR #{or_chain ? sql : "(#{sql})"}"
       end
 
       def false_sql
