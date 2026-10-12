@@ -17,17 +17,26 @@ module SQLHelpers
     # ActiveRecord::Base.logger = Logger.new(STDOUT)
     ActiveRecord::Base.logger = nil
     if sqlite?
-      ActiveRecord::Base.establish_connection(adapter: 'sqlite3', database: ':memory:')
+      connect_sqlite
     elsif postgres?
       connect_postgres
-    elsif ENV['DB'].nil?
-      raise StandardError, "ENV['DB'] not specified"
     else
-      raise StandardError, "database not supported: #{ENV['DB']}.  Try DB='sqlite' or DB='postgres'"
+      raise StandardError, "database not supported: #{ENV['DB'].inspect}. Try DB='sqlite' or DB='postgres'"
     end
+    drop_all_tables
   end
 
   private
+
+  def connect_sqlite
+    ActiveRecord::Base.establish_connection(adapter: 'sqlite3', database: ':memory:')
+  end
+
+  # The same in-memory SQLite database can survive establish_connection, so start every example from a blank schema.
+  def drop_all_tables
+    connection = ActiveRecord::Base.connection
+    connection.tables.each { |table| connection.drop_table(table, force: :cascade) }
+  end
 
   def connect_postgres
     ActiveRecord::Base.establish_connection(adapter: 'postgresql', host: 'localhost',

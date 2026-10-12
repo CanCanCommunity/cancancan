@@ -29,20 +29,20 @@ if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
 
           unless defined?(Thing)
             class Thing < ActiveRecord::Base
-              enum size: { big: 'big', medium: 'average', small: 'small' }
+              define_enum :size, { big: 'big', medium: 'average', small: 'small' }
             end
           end
 
           unless defined?(Shape)
             class Shape < ActiveRecord::Base
-              enum color: %i[red green blue]
+              define_enum :color, %i[red green blue]
             end
           end
 
           unless defined?(Disc)
             class Disc < ActiveRecord::Base
-              enum color: %i[red green blue]
-              enum shape: { triangle: 3, rectangle: 4 }
+              define_enum :color, %i[red green blue]
+              define_enum :shape, { triangle: 3, rectangle: 4 }
             end
           end
         end

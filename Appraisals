@@ -19,6 +19,7 @@ appraise 'activerecord_6.0.0' do
   gem 'actionpack', '~> 6.0.0', require: 'action_pack'
   gem 'activerecord', '~> 6.0.0', require: 'active_record'
   gem 'activesupport', '~> 6.0.0', require: 'active_support/all'
+  gem 'concurrent-ruby', '< 1.3.5'
 
   platforms :jruby do
     gem 'activerecord-jdbcsqlite3-adapter'
@@ -36,6 +37,7 @@ appraise 'activerecord_6.1.0' do
   gem 'actionpack', '~> 6.1.0', require: 'action_pack'
   gem 'activerecord', '~> 6.1.0', require: 'active_record'
   gem 'activesupport', '~> 6.1.0', require: 'active_support/all'
+  gem 'concurrent-ruby', '< 1.3.5'
 
   platforms :jruby do
     gem 'activerecord-jdbcsqlite3-adapter'
@@ -98,6 +100,6 @@ appraise 'activerecord_main' do
 
   platforms :ruby, :mswin, :mingw do
     gem 'pg', '~> 1.5.6'
-    gem 'sqlite3', '>= 2.0'
+    gem 'sqlite3', '>= 2.1'
   end
 end
