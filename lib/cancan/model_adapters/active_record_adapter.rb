@@ -23,6 +23,8 @@ module CanCan
                             else
                               @rules
                             end
+        # The normalizers change the rules. Work on copies, so the rules of the ability stay the same.
+        @compressed_rules = @compressed_rules.map(&:dup)
         StiNormalizer.normalize(@compressed_rules)
         ConditionsNormalizer.normalize(model_class, @compressed_rules)
       end
