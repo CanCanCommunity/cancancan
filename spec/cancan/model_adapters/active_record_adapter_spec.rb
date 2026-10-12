@@ -1580,6 +1580,9 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
       class Vehicle < ApplicationRecord
       end
 
+      class Airplane < Vehicle
+      end
+
       class Car < Vehicle
       end
 
@@ -1659,6 +1662,50 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
       expect(Vehicle.accessible_by(ability)).to match_array([car])
       expect(Car.accessible_by(ability)).to eq([car])
       expect(Motorbike.accessible_by(ability)).to eq([])
+    end
+
+    it 'allows a selectable scope when permit by two subclasses' do
+      u1 = User.create!(name: 'pippo')
+      Airplane.create!(capacity: 1)
+      car = Car.create!(capacity: 4)
+      mortorbike = Motorbike.create!(capacity: 2)
+
+      ability = Ability.new(u1)
+      ability.can :read, Car
+      ability.can :read, Motorbike
+      expect(Vehicle.accessible_by(ability)).to contain_exactly(car, mortorbike)
+      expect(Airplane.accessible_by(ability)).to be_empty
+      expect(Car.accessible_by(ability)).to contain_exactly(car)
+      expect(Motorbike.accessible_by(ability)).to contain_exactly(mortorbike)
+    end
+
+    it 'allows access to both base class and subclass when permissions are defined for both' do
+      u1 = User.create!(name: 'pippo')
+      vehicle = Vehicle.create!(capacity: 1)
+      car = Car.create!(capacity: 4)
+
+      ability = Ability.new(u1)
+      ability.can :read, Vehicle
+      ability.can :read, Car
+      expect(Vehicle.accessible_by(ability)).to contain_exactly(vehicle, car)
+      expect(Car.accessible_by(ability)).to contain_exactly(car)
+    end
+
+    it 'applies rules defined on the base class and on several subclasses' do
+      u1 = User.create!(name: 'pippo')
+      vehicle = Vehicle.create!
+      car = Car.create!
+      motorbike = Motorbike.create!
+      suzuki = Suzuki.create!
+
+      ability = Ability.new(u1)
+      ability.can :read, Vehicle
+      ability.can :read, Car
+      ability.can :read, Motorbike
+      ability.can :read, Suzuki
+      expect(Vehicle.accessible_by(ability)).to contain_exactly(vehicle, car, motorbike, suzuki)
+      expect(Motorbike.accessible_by(ability)).to contain_exactly(motorbike, suzuki)
+      expect(Suzuki.accessible_by(ability)).to contain_exactly(suzuki)
     end
   end
 end

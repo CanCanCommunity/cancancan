@@ -86,4 +86,56 @@ RSpec.describe CanCan::Rule do
       end
     end
   end
+
+  describe '#catch_all?' do
+    it 'is true when no conditions are specified' do
+      rule = CanCan::Rule.new(true, :read, Integer, nil)
+      expect(rule).to be_catch_all
+    end
+
+    it 'is false when conditions are specified' do
+      rule = CanCan::Rule.new(true, :read, Integer, foo: :bar)
+      expect(rule).not_to be_catch_all
+    end
+
+    describe 'when the subject is an ActiveRecord class' do
+      before do
+        connect_db
+        ActiveRecord::Migration.verbose = false
+        ActiveRecord::Schema.define do
+          create_table(:vehicles) do |t|
+            t.string :name
+            t.string :type
+          end
+        end
+        stub_const('Vehicle', Class.new(ActiveRecord::Base))
+        stub_const('Car', Class.new(Vehicle))
+      end
+
+      it 'is true when no conditions are specified' do
+        rule = CanCan::Rule.new(true, :read, Vehicle)
+        expect(rule).to be_catch_all
+      end
+
+      it 'is false when conditions are specified' do
+        rule = CanCan::Rule.new(true, :read, Vehicle, name: 'foo')
+        expect(rule).not_to be_catch_all
+      end
+
+      it 'is false when the conditions are a scope' do
+        rule = CanCan::Rule.new(true, :read, Vehicle, Vehicle.where(name: 'foo'))
+        expect(rule).not_to be_catch_all
+      end
+
+      it 'is false when the subject is an STI subclass even without conditions' do
+        rule = CanCan::Rule.new(true, :read, Car)
+        expect(rule).not_to be_catch_all
+      end
+
+      it 'is false when the subjects include an STI subclass even without conditions' do
+        rule = CanCan::Rule.new(true, :read, [Vehicle, Car])
+        expect(rule).not_to be_catch_all
+      end
+    end
+  end
 end
