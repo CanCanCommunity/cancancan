@@ -881,6 +881,16 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
     end
   end
 
+  it 'does not change the rules of the ability when it builds a query' do
+    @ability.can :read, [Article, User], comments: { spam: false }
+    article = Article.create!
+    Comment.create!(article: article, spam: false)
+
+    User.accessible_by(@ability)
+
+    expect(@ability.can?(:read, article)).to be(true)
+  end
+
   context 'with namespaced models' do
     before :each do
       ActiveRecord::Schema.define do
