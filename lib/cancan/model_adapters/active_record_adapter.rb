@@ -129,7 +129,7 @@ module CanCan
 
       def database_records
         if override_scope
-          @model_class.where(nil).merge(override_scope)
+          merge_override_scope
         elsif @model_class.respond_to?(:where) && @model_class.respond_to?(:joins)
           build_relation(conditions)
         else
@@ -171,6 +171,13 @@ module CanCan
             base_hash[key] = value
           end
         end
+      end
+
+      # `merge` replaces the conditions of the base relation on the columns the scope also constrains,
+      # so the conditions of an association like `category.articles` are applied again afterwards.
+      def merge_override_scope
+        base = @model_class.where(nil)
+        base.merge(override_scope).where(base.where_values_hash)
       end
 
       def override_scope
