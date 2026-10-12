@@ -1,3 +1,9 @@
+## 4.0.0 (unreleased)
+
+### Breaking changes
+
+* [#903](https://github.com/CanCanCommunity/cancancan/pull/903): `permitted_attributes` no longer includes the primary key when a rule has no attributes. It was documented to exclude it, but a bug kept `id` in the returned array. If your strong parameters rely on `permitted_attributes` to permit the primary key, add it explicitly, for example `params.require(:project).permit(:id, *current_ability.permitted_attributes(:update, @project))`. ([@coorasse][])
+
 ## Unreleased
 
 * [#902](https://github.com/CanCanCommunity/cancancan/pull/902): Do not change the rules of the ability in `accessible_by`: a rule shared by several models kept the conditions normalized for the first queried model. ([@bruno-costanzo][])
