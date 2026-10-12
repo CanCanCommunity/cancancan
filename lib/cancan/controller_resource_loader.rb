@@ -24,7 +24,7 @@ module CanCan
     protected
 
     def new_actions
-      %i[new create] + Array(@options[:new])
+      %i[new create] + Array(@options[:new]).map(&:to_sym)
     end
 
     def resource_params_by_key(key)

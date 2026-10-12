@@ -117,7 +117,7 @@ module CanCan
     end
 
     def collection_actions
-      [:index] + Array(@options[:collection])
+      [:index] + Array(@options[:collection]).map(&:to_sym)
     end
 
     def save_actions
@@ -127,7 +127,7 @@ module CanCan
     private
 
     def action_exists_in?(options)
-      Array(options).include?(@params[:action].to_sym)
+      Array(options).map(&:to_sym).include?(@params[:action].to_sym)
     end
 
     def adapter
