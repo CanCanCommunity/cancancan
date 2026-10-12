@@ -1,5 +1,6 @@
 ## Unreleased
 
+* [#902](https://github.com/CanCanCommunity/cancancan/pull/902): Do not change the rules of the ability in `accessible_by`: a rule shared by several models kept the conditions normalized for the first queried model. ([@bruno-costanzo][])
 * Remove the VitePress documentation website: the documentation lives in the `docs` folder as plain Markdown. ([@coorasse][])
 
 ## 3.6.2
