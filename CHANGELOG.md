@@ -1,5 +1,6 @@
 ## Unreleased
 
+* [#909](https://github.com/CanCanCommunity/cancancan/pull/909): Make `accessible_by` consistent with `can?` for `cannot` rules: rules on STI subclasses keep their precedence, and records with NULL in a column of the conditions are no longer excluded. **WARNING**: `accessible_by` returns more records when a `cannot` rule has conditions on a nullable column. ([@coorasse][], [@0llirocks][])
 * [#880](https://github.com/CanCanCommunity/cancancan/pull/880): Fix `accessible_by` with rules on STI subclasses: a rule on a subclass without conditions no longer discards the rules defined before it, and rules with the same conditions on different subjects are no longer compressed into one. ([@takayamaki][], [@sjoulbak][])
 * [#890](https://github.com/CanCanCommunity/cancancan/pull/890): Support an Active Record relation as the value of a condition in `can?`: the selected column, or the primary key, is checked with a query, as `accessible_by` already did. ([@olistik][])
 * [#908](https://github.com/CanCanCommunity/cancancan/pull/908): Join consecutive `can` rules in a flat chain of ORs in the SQL conditions, so that many rules on the same model no longer overflow the parser of SQLite. ([@coorasse][])
@@ -753,3 +754,4 @@ Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.co
 [@olistik]: https://github.com/olistik
 [@takayamaki]: https://github.com/takayamaki
 [@sjoulbak]: https://github.com/sjoulbak
+[@0llirocks]: https://github.com/0llirocks
