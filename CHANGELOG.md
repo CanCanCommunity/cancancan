@@ -1,5 +1,6 @@
 ## Unreleased
 
+* [#694](https://github.com/CanCanCommunity/cancancan/pull/694): Document that `cannot` supports the `:all` subject. ([@jaredbeck][])
 * [#852](https://github.com/CanCanCommunity/cancancan/pull/852): Add `changelog_uri` to the gemspec, so rubygems.org links to the changelog. ([@mark-young-atg][])
 * [#842](https://github.com/CanCanCommunity/cancancan/pull/842): Add `disallowed_attributes` to retrieve the attributes forbidden by `cannot` rules. ([@mswiszcz][])
 * [#904](https://github.com/CanCanCommunity/cancancan/pull/904): Assign the parent of a singleton resource through the inverse of the association when the resource has no setter named after the `through` option. ([@coorasse][])
@@ -742,3 +743,4 @@ Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.co
 [@cgunther]: https://github.com/cgunther
 [@mswiszcz]: https://github.com/mswiszcz
 [@mark-young-atg]: https://github.com/mark-young-atg
+[@jaredbeck]: https://github.com/jaredbeck
