@@ -285,6 +285,17 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
         expect(category1.articles.accessible_by(@ability)).to match_array([article1])
       end
 
+      it 'keeps the conditions of the association when the scope constrains the same column' do
+        category1 = Category.create!
+        category2 = Category.create!
+        @ability.can :read, Article, Article.where(category_id: [category1.id, category2.id])
+        article1 = Article.create!(category: category1)
+        Article.create!(category: category2)
+
+        expect(category1.articles.accessible_by(@ability)).to match_array([article1])
+        expect(Article.accessible_by(@ability).count).to eq(2)
+      end
+
       it 'raises an exception when trying to merge scope with other conditions' do
         @ability.can :read, Article, published: true
         @ability.can :read, Article, Article.where(secret: true)
