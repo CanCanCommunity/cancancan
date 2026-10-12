@@ -29,6 +29,19 @@ expect(ability).to be_able_to(:destroy, Project.new(user: user))
 expect(ability).not_to be_able_to(:destroy, Project.new)
 ```
 
+The matcher accepts an array of actions, which passes only when all of them are allowed:
+
+```ruby
+expect(ability).to be_able_to(%i[read update], Project.new(user: user))
+```
+
+The negated form does not accept an array, because it would pass as soon as one action is forbidden. Write one expectation per action:
+
+```ruby
+expect(ability).not_to be_able_to(:update, Project.new)
+expect(ability).not_to be_able_to(:destroy, Project.new)
+```
+
 Pro way 😉
 
 ```ruby
