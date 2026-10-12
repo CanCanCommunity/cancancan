@@ -159,17 +159,10 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
       end
 
       it 'is for only active record classes' do
-        if ActiveRecord.version > Gem::Version.new('5')
-          expect(CanCan::ModelAdapters::ActiveRecord5Adapter).to_not be_for_class(Object)
-          expect(CanCan::ModelAdapters::ActiveRecord5Adapter).to be_for_class(Article)
-          expect(CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article))
-            .to eq(CanCan::ModelAdapters::ActiveRecord5Adapter)
-        elsif ActiveRecord.version > Gem::Version.new('4')
-          expect(CanCan::ModelAdapters::ActiveRecord4Adapter).to_not be_for_class(Object)
-          expect(CanCan::ModelAdapters::ActiveRecord4Adapter).to be_for_class(Article)
-          expect(CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article))
-            .to eq(CanCan::ModelAdapters::ActiveRecord4Adapter)
-        end
+        expect(CanCan::ModelAdapters::ActiveRecordAdapter).to_not be_for_class(Object)
+        expect(CanCan::ModelAdapters::ActiveRecordAdapter).to be_for_class(Article)
+        expect(CanCan::ModelAdapters::AbstractAdapter.adapter_class(Article))
+          .to eq(CanCan::ModelAdapters::ActiveRecordAdapter)
       end
 
       it 'finds record' do
@@ -690,32 +683,24 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
     end
   end
 
-  unless CanCan::ModelAdapters::ActiveRecordAdapter.version_lower?('5.0.0')
-    context 'base behaviour subquery specific' do
-      before :each do
-        CanCan.accessible_by_strategy = :subquery
-      end
+  context 'base behaviour subquery specific' do
+    before :each do
+      CanCan.accessible_by_strategy = :subquery
+    end
 
-      it 'allows ordering via relations' do
-        @ability.can :read, Comment, article: { category: { visible: true } }
-        comment1 = Comment.create!(article: Article.create!(name: 'B', category: Category.create!(visible: true)))
-        comment2 = Comment.create!(article: Article.create!(name: 'A', category: Category.create!(visible: true)))
-        Comment.create!(article: Article.create!(category: Category.create!(visible: false)))
+    it 'allows ordering via relations' do
+      @ability.can :read, Comment, article: { category: { visible: true } }
+      comment1 = Comment.create!(article: Article.create!(name: 'B', category: Category.create!(visible: true)))
+      comment2 = Comment.create!(article: Article.create!(name: 'A', category: Category.create!(visible: true)))
+      Comment.create!(article: Article.create!(category: Category.create!(visible: false)))
 
-        # doesn't work without explicitly calling a join on AR 5+,
-        # but does before that (where we don't use subqueries at all)
-        if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
-          expect { Comment.accessible_by(@ability).order('articles.name').to_a }
-            .to raise_error(ActiveRecord::StatementInvalid)
-        else
-          expect(Comment.accessible_by(@ability).order('articles.name'))
-            .to match_array([comment2, comment1])
-        end
+      # doesn't work without explicitly calling a join
+      expect { Comment.accessible_by(@ability).order('articles.name').to_a }
+        .to raise_error(ActiveRecord::StatementInvalid)
 
-        # works with the explicit join
-        expect(Comment.accessible_by(@ability).joins(:article).order('articles.name'))
-          .to match_array([comment2, comment1])
-      end
+      # works with the explicit join
+      expect(Comment.accessible_by(@ability).joins(:article).order('articles.name'))
+        .to match_array([comment2, comment1])
     end
   end
 
@@ -735,40 +720,25 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
       # works without explicitly calling a join
       expect(Comment.accessible_by(@ability).order('articles.name')).to match_array([comment2, comment1])
 
-      # works with the explicit join in AR 5.2+ and AR 4.2
-      if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.2.0')
-        expect(Comment.accessible_by(@ability).joins(:article).order('articles.name'))
-          .to match_array([comment2, comment1])
-      elsif CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
-        expect { Comment.accessible_by(@ability).joins(:article).order('articles.name').to_a }
-          .to raise_error(ActiveRecord::StatementInvalid)
-      else
-        expect(Comment.accessible_by(@ability).joins(:article).order('articles.name'))
-          .to match_array([comment2, comment1])
-      end
+      # works with the explicit join
+      expect(Comment.accessible_by(@ability).joins(:article).order('articles.name'))
+        .to match_array([comment2, comment1])
     end
 
     # this fails on Postgres. see https://github.com/CanCanCommunity/cancancan/pull/608
-    it 'fails to order via relations in postgres on AR 5+' do
+    it 'fails to order via relations in postgres' do
       skip unless postgres?
 
       @ability.can :read, Comment, article: { category: { visible: true } }
-      comment1 = Comment.create!(article: Article.create!(name: 'B', category: Category.create!(visible: true)))
-      comment2 = Comment.create!(article: Article.create!(name: 'A', category: Category.create!(visible: true)))
+      Comment.create!(article: Article.create!(name: 'B', category: Category.create!(visible: true)))
+      Comment.create!(article: Article.create!(name: 'A', category: Category.create!(visible: true)))
       Comment.create!(article: Article.create!(category: Category.create!(visible: false)))
 
-      if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
-        # doesn't work with or without the join
-        expect { Comment.accessible_by(@ability).order('articles.name').to_a }
-          .to raise_error(ActiveRecord::StatementInvalid)
-        expect { Comment.accessible_by(@ability).joins(:article).order('articles.name').to_a }
-          .to raise_error(ActiveRecord::StatementInvalid)
-      else
-        expect(Comment.accessible_by(@ability).order('articles.name'))
-          .to match_array([comment2, comment1])
-        expect(Comment.accessible_by(@ability).joins(:article).order('articles.name'))
-          .to match_array([comment2, comment1])
-      end
+      # doesn't work with or without the join
+      expect { Comment.accessible_by(@ability).order('articles.name').to_a }
+        .to raise_error(ActiveRecord::StatementInvalid)
+      expect { Comment.accessible_by(@ability).joins(:article).order('articles.name').to_a }
+        .to raise_error(ActiveRecord::StatementInvalid)
     end
   end
 
@@ -784,12 +754,10 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
 
     expect(Article.accessible_by(@ability)).to eq([])
 
-    if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
-      expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
+    expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
   SELECT "articles".*
   FROM "articles"
   WHERE 1=0))
-    end
   end
 
   it 'allows a nil to be used as a condition for a has_many - with join' do
@@ -804,14 +772,12 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
 
     expect(Article.accessible_by(@ability)).to eq([a1])
 
-    if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
-      expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
+    expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
   SELECT "articles".*
   FROM "articles"
   WHERE "articles"."id" IN (SELECT "articles"."id" FROM "articles"
     LEFT OUTER JOIN "comments" ON "comments"."article_id" = "articles"."id"
     WHERE "comments"."id" IS NULL)))
-    end
   end
 
   it 'allows several nils to be used as a condition for a has_many - with join' do
@@ -826,14 +792,12 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
 
     expect(Article.accessible_by(@ability)).to eq([a1])
 
-    if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
-      expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
+    expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
   SELECT "articles".*
   FROM "articles"
   WHERE "articles"."id" IN (SELECT "articles"."id" FROM "articles"
     LEFT OUTER JOIN "comments" ON "comments"."article_id" = "articles"."id"
     WHERE "comments"."id" IS NULL AND "comments"."spam" IS NULL)))
-    end
   end
 
   it 'doesn\'t permit anything if a nil is used as a condition for a has_many alongside other attributes' do
@@ -854,14 +818,12 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
 
     expect(Article.accessible_by(@ability)).to eq([])
 
-    if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
-      expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
+    expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
   SELECT "articles".*
   FROM "articles"
   WHERE "articles"."id" IN (SELECT "articles"."id" FROM "articles"
     LEFT OUTER JOIN "comments" ON "comments"."article_id" = "articles"."id"
     WHERE "comments"."id" IS NULL AND "comments"."spam" = #{true_v})))
-    end
   end
 
   it 'doesn\'t permit if a nil is used as a condition for a has_many alongside other attributes - false case' do
@@ -882,14 +844,12 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
 
     expect(Article.accessible_by(@ability)).to eq([])
 
-    if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
-      expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
+    expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
   SELECT "articles".*
   FROM "articles"
   WHERE "articles"."id" IN (SELECT "articles"."id" FROM "articles"
     LEFT OUTER JOIN "comments" ON "comments"."article_id" = "articles"."id"
     WHERE "comments"."id" IS NULL AND "comments"."spam" = #{false_v})))
-    end
   end
 
   it 'allows a nil to be used as a condition for a has_many when combined with other conditions' do
@@ -908,14 +868,12 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
 
     expect(Article.accessible_by(@ability).sort_by(&:id)).to eq([a1, a2].sort_by(&:id))
 
-    if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
-      expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
+    expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
   SELECT "articles".*
   FROM "articles"
   WHERE "articles"."id" IN (SELECT "articles"."id" FROM "articles"
     LEFT OUTER JOIN "comments" ON "comments"."article_id" = "articles"."id"
     WHERE (("comments"."id" IS NULL) OR ("comments"."spam" = #{true_v})))))
-    end
   end
 
   it 'allows a nil to be used as a condition for a has_many alongside other attributes on the parent' do
@@ -935,14 +893,12 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
 
     expect(Article.accessible_by(@ability)).to eq([a1])
 
-    if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
-      expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
+    expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
   SELECT "articles".*
   FROM "articles"
   WHERE "articles"."id" IN (SELECT "articles"."id" FROM "articles"
     LEFT OUTER JOIN "comments" ON "comments"."article_id" = "articles"."id"
     WHERE "articles"."secret" = #{true_v} AND "comments"."id" IS NULL)))
-    end
   end
 
   it 'allows an empty array to be used as a condition for a belongs_to; this never returns true' do
@@ -957,12 +913,10 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
 
     expect(Article.accessible_by(@ability)).to eq([])
 
-    if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
-      expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
+    expect(@ability.model_adapter(Article, :read)).to generate_sql(%(
   SELECT "articles".*
   FROM "articles"
   WHERE 1=0))
-    end
   end
 
   it 'does not change the rules of the ability when it builds a query' do
@@ -1288,36 +1242,32 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
     end
   end
 
-  unless CanCan::ModelAdapters::ActiveRecordAdapter.version_lower?('5.0.0')
-    context 'has_many through is defined and referenced differently - subquery strategy' do
-      before do
-        CanCan.accessible_by_strategy = :subquery
-      end
+  context 'has_many through is defined and referenced differently - subquery strategy' do
+    before do
+      CanCan.accessible_by_strategy = :subquery
+    end
 
-      it 'recognises it and simplifies the query' do
-        u1 = User.create!(name: 'pippo')
-        u2 = User.create!(name: 'paperino')
+    it 'recognises it and simplifies the query' do
+      u1 = User.create!(name: 'pippo')
+      u2 = User.create!(name: 'paperino')
 
-        a1 = Article.create!(mentioned_users: [u1])
-        a2 = Article.create!(mentioned_users: [u2])
+      a1 = Article.create!(mentioned_users: [u1])
+      a2 = Article.create!(mentioned_users: [u2])
 
-        ability = Ability.new(u1)
-        ability.can :read, Article, mentioned_users: { name: u1.name }
-        ability.can :read, Article, mentions: { user: { name: u2.name } }
-        expect(Article.accessible_by(ability)).to match_array([a1, a2])
-        if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
-          expect(ability.model_adapter(Article, :read)).to generate_sql(%(
-    SELECT "articles".*
+      ability = Ability.new(u1)
+      ability.can :read, Article, mentioned_users: { name: u1.name }
+      ability.can :read, Article, mentions: { user: { name: u2.name } }
+      expect(Article.accessible_by(ability)).to match_array([a1, a2])
+      expect(ability.model_adapter(Article, :read)).to generate_sql(%(
+  SELECT "articles".*
+  FROM "articles"
+  WHERE "articles"."id" IN
+  (SELECT "articles"."id"
     FROM "articles"
-    WHERE "articles"."id" IN
-    (SELECT "articles"."id"
-      FROM "articles"
-      LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
-      LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
-      WHERE (("users"."name" = 'paperino') OR ("users"."name" = 'pippo')))
-    ))
-        end
-      end
+    LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
+    LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
+    WHERE (("users"."name" = 'paperino') OR ("users"."name" = 'pippo')))
+  ))
     end
   end
 
@@ -1338,109 +1288,105 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
       ability.can :read, Article, mentions: { user: { name: u2.name } }
       expect(Article.accessible_by(ability)).to match_array([a1, a2])
 
-      if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
-        expect(ability.model_adapter(Article, :read)).to generate_sql(%(
+      expect(ability.model_adapter(Article, :read)).to generate_sql(%(
   SELECT DISTINCT "articles".*
   FROM "articles"
   LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
   LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
   WHERE (("users"."name" = 'paperino') OR ("users"."name" = 'pippo'))))
-      end
     end
   end
 
-  if CanCan::ModelAdapters::ActiveRecordAdapter.version_greater_or_equal?('5.0.0')
-    context 'switching strategies' do
-      before do
-        CanCan.accessible_by_strategy = :left_join # default - should be ignored in these tests
-      end
+  context 'switching strategies' do
+    before do
+      CanCan.accessible_by_strategy = :left_join # default - should be ignored in these tests
+    end
 
-      it 'allows you to switch strategies with a keyword argument' do
-        u = User.create!(name: 'pippo')
-        Article.create!(mentioned_users: [u])
+    it 'allows you to switch strategies with a keyword argument' do
+      u = User.create!(name: 'pippo')
+      Article.create!(mentioned_users: [u])
 
-        ability = Ability.new(u)
-        ability.can :read, Article, mentions: { user: { name: u.name } }
+      ability = Ability.new(u)
+      ability.can :read, Article, mentions: { user: { name: u.name } }
 
-        subquery_sql = Article.accessible_by(ability, strategy: :subquery).to_sql
-        left_join_sql = Article.accessible_by(ability, strategy: :left_join).to_sql
+      subquery_sql = Article.accessible_by(ability, strategy: :subquery).to_sql
+      left_join_sql = Article.accessible_by(ability, strategy: :left_join).to_sql
 
-        expect(subquery_sql.strip.squeeze(' ')).to eq(%(
-    SELECT "articles".*
+      expect(subquery_sql.strip.squeeze(' ')).to eq(%(
+  SELECT "articles".*
+  FROM "articles"
+  WHERE "articles"."id" IN
+  (SELECT "articles"."id"
     FROM "articles"
-    WHERE "articles"."id" IN
-    (SELECT "articles"."id"
-      FROM "articles"
-      LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
-      LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
-      WHERE "users"."name" = 'pippo')
-    ).gsub(/\s+/, ' ').strip)
+    LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
+    LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
+    WHERE "users"."name" = 'pippo')
+  ).gsub(/\s+/, ' ').strip)
 
-        expect(left_join_sql.strip.squeeze(' ')).to eq(%(
+      expect(left_join_sql.strip.squeeze(' ')).to eq(%(
   SELECT DISTINCT "articles".*
   FROM "articles"
   LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
   LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
   WHERE "users"."name" = 'pippo').gsub(/\s+/, ' ').strip)
-      end
+    end
 
-      it 'allows you to switch strategies with a block' do
-        u = User.create!(name: 'pippo')
-        Article.create!(mentioned_users: [u])
+    it 'allows you to switch strategies with a block' do
+      u = User.create!(name: 'pippo')
+      Article.create!(mentioned_users: [u])
 
-        ability = Ability.new(u)
-        ability.can :read, Article, mentions: { user: { name: u.name } }
+      ability = Ability.new(u)
+      ability.can :read, Article, mentions: { user: { name: u.name } }
 
-        subquery_sql = CanCan.with_accessible_by_strategy(:subquery) { Article.accessible_by(ability).to_sql }
-        left_join_sql = CanCan.with_accessible_by_strategy(:left_join) { Article.accessible_by(ability).to_sql }
+      subquery_sql = CanCan.with_accessible_by_strategy(:subquery) { Article.accessible_by(ability).to_sql }
+      left_join_sql = CanCan.with_accessible_by_strategy(:left_join) { Article.accessible_by(ability).to_sql }
 
-        expect(subquery_sql.strip.squeeze(' ')).to eq(%(
-    SELECT "articles".*
+      expect(subquery_sql.strip.squeeze(' ')).to eq(%(
+  SELECT "articles".*
+  FROM "articles"
+  WHERE "articles"."id" IN
+  (SELECT "articles"."id"
     FROM "articles"
-    WHERE "articles"."id" IN
-    (SELECT "articles"."id"
-      FROM "articles"
-      LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
-      LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
-      WHERE "users"."name" = 'pippo')
-    ).gsub(/\s+/, ' ').strip)
+    LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
+    LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
+    WHERE "users"."name" = 'pippo')
+  ).gsub(/\s+/, ' ').strip)
 
-        expect(left_join_sql.strip.squeeze(' ')).to eq(%(
+      expect(left_join_sql.strip.squeeze(' ')).to eq(%(
   SELECT DISTINCT "articles".*
   FROM "articles"
   LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
   LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
   WHERE "users"."name" = 'pippo').gsub(/\s+/, ' ').strip)
-      end
+    end
 
-      it 'allows you to switch strategies with a block, and to_sql called outside the block' do
-        u = User.create!(name: 'pippo')
-        Article.create!(mentioned_users: [u])
+    it 'allows you to switch strategies with a block, and to_sql called outside the block' do
+      u = User.create!(name: 'pippo')
+      Article.create!(mentioned_users: [u])
 
-        ability = Ability.new(u)
-        ability.can :read, Article, mentions: { user: { name: u.name } }
+      ability = Ability.new(u)
+      ability.can :read, Article, mentions: { user: { name: u.name } }
 
-        subquery_sql = CanCan.with_accessible_by_strategy(:subquery) { Article.accessible_by(ability) }.to_sql
-        left_join_sql = CanCan.with_accessible_by_strategy(:left_join) { Article.accessible_by(ability) }.to_sql
+      subquery_sql = CanCan.with_accessible_by_strategy(:subquery) { Article.accessible_by(ability) }.to_sql
+      left_join_sql = CanCan.with_accessible_by_strategy(:left_join) { Article.accessible_by(ability) }.to_sql
 
-        expect(subquery_sql.strip.squeeze(' ')).to eq(%(
-    SELECT "articles".*
+      expect(subquery_sql.strip.squeeze(' ')).to eq(%(
+  SELECT "articles".*
+  FROM "articles"
+  WHERE "articles"."id" IN
+  (SELECT "articles"."id"
     FROM "articles"
-    WHERE "articles"."id" IN
-    (SELECT "articles"."id"
-      FROM "articles"
-      LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
-      LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
-      WHERE "users"."name" = 'pippo')
-    ).gsub(/\s+/, ' ').strip)
+    LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
+    LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
+    WHERE "users"."name" = 'pippo')
+  ).gsub(/\s+/, ' ').strip)
 
-        expect(left_join_sql.strip.squeeze(' ')).to eq(%(
+      expect(left_join_sql.strip.squeeze(' ')).to eq(%(
   SELECT DISTINCT "articles".*
   FROM "articles"
   LEFT OUTER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
   LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
   WHERE "users"."name" = 'pippo').gsub(/\s+/, ' ').strip)
-      end
     end
   end
 
