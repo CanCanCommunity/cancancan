@@ -28,6 +28,16 @@ If the name of the association doesn't match the resource name, for instance `ha
   end
 ```
 
+The same option applies to singleton resources, for instance `has_one :profile, class_name: 'Account'`:
+
+```ruby
+  class AccountsController < ApplicationController
+    load_and_authorize_resource :user
+    load_and_authorize_resource :account, through: :user, through_association: :profile, singleton: true
+  end
+```
+
+
 If the resource name (`:project` in this case) does not match the controller, then it will be considered a parent resource. You can manually specify parent/child resources using the `parent: false` option.
 
 ## Securing `through` changes

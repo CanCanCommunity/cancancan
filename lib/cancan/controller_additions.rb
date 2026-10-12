@@ -74,7 +74,8 @@ module CanCan
       #
       # [:+through_association+]
       #   The name of the association to fetch the child records through the parent resource.
-      #   This is normally not needed because it defaults to the pluralized resource name.
+      #   This is normally not needed because it defaults to the pluralized resource name,
+      #   or to the singular resource name when +:singleton+ is used.
       #
       # [:+shallow+]
       #   Pass +true+ to allow this resource to be loaded directly when parent is +nil+. Defaults to +false+.
