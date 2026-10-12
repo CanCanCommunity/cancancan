@@ -50,4 +50,3 @@ AllCops:
     - 'gemfiles/**/*'
     - 'vendor/**/*'
     - 'Appraisals'
-    - 'node_modules/**/*'

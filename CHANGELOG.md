@@ -1,3 +1,7 @@
+## Unreleased
+
+* Remove the VitePress documentation website: the documentation lives in the `docs` folder as plain Markdown. ([@coorasse][])
+
 ## 3.6.2
 
 * [#898](https://github.com/CanCanCommunity/cancancan/pull/898): Do not share `cancan_skipper` between controller subclasses: `skip_authorize_resource` and `skip_load_resource` in a subclass no longer apply to the superclass or sibling controllers. ([@bruno-costanzo][])
