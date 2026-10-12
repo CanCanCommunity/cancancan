@@ -393,6 +393,40 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
         expect(@ability.model_adapter(Article, :read)).to generate_sql(%(SELECT "articles".* FROM "articles"))
       end
 
+      it 'joins consecutive can rules in a flat chain of ORs' do
+        @ability.can :read, Article, id: 1
+        @ability.can :read, Article, id: 2
+        @ability.can :read, Article, id: 3
+        expect(@ability.model_adapter(Article, :read).conditions)
+          .to eq(%[("#{@article_table}"."id" = 3) OR ("#{@article_table}"."id" = 2) OR ("#{@article_table}"."id" = 1)])
+      end
+
+      it 'keeps the precedence of a can rule following a cannot rule' do
+        @ability.can :read, Article, id: 1
+        @ability.can :read, Article, id: 2
+        @ability.cannot :read, Article, secret: true
+        @ability.can :read, Article, published: true
+        expect(@ability.model_adapter(Article, :read).conditions)
+          .to eq(%[("#{@article_table}"."published" = #{true_v}) OR ] +
+                   %[(not ("#{@article_table}"."secret" = #{true_v}) AND ] +
+                   %[(("#{@article_table}"."id" = 2) OR ("#{@article_table}"."id" = 1)))])
+
+        secret = Article.create!(id: 1, secret: true, published: false)
+        article2 = Article.create!(id: 2, secret: false, published: false)
+        published_secret = Article.create!(id: 3, secret: true, published: true)
+        Article.create!(id: 4, secret: false, published: false)
+        expect(Article.accessible_by(@ability)).to match_array([article2, published_secret])
+        expect(Article.accessible_by(@ability)).not_to include(secret)
+      end
+
+      it 'fetches records with hundreds of can rules' do
+        300.times { |i| @ability.can :read, Article, priority: i + 1 }
+        first = Article.create!(priority: 1)
+        last = Article.create!(priority: 300)
+        Article.create!(priority: 301)
+        expect(Article.accessible_by(@ability)).to match_array([first, last])
+      end
+
       it 'returns appropriate sql conditions in complex case with nested joins' do
         @ability.can :read, Comment, article: { category: { visible: true } }
         expect(@ability.model_adapter(Comment, :read).conditions).to eq(Category.table_name.to_sym => { visible: true })
