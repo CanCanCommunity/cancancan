@@ -35,6 +35,9 @@ module CanCan
       def relevant_rules(action, subject)
         return [] unless @rules
 
+        # Actions are symbols in the rules, so 'destroy' must also match a `cannot :destroy`.
+        action = action.to_sym if action.is_a?(String)
+
         relevant = possible_relevant_rules(subject).select do |rule|
           rule.expanded_actions = expand_actions(rule.actions)
           rule.relevant? action, subject

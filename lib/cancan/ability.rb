@@ -73,6 +73,7 @@ module CanCan
     #
     # Also see the RSpec Matchers to aid in testing.
     def can?(action, subject, attribute = nil, *extra_args)
+      action = action.to_sym if action.is_a?(String)
       results = extract_subjects(subject).lazy.map do |a_subject|
         subject_can?(action, a_subject, attribute, *extra_args)
       end
