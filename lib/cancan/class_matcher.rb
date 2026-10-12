@@ -16,7 +16,7 @@ class SubjectClassMatcher
     if has_subclasses
       return matches unless StiDetector.sti_class?(sub)
 
-      matches || subject.subclasses.include?(sub)
+      matches || subject.descendants.include?(sub)
     else
       matches
     end

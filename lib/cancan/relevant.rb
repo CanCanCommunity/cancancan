@@ -8,6 +8,10 @@ module CanCan
       @match_all || (matches_action?(action) && matches_subject?(subject))
     end
 
+    def only_for_subclasses_of?(klass)
+      !@subjects.empty? && @subjects.all? { |subject| subject.is_a?(Class) && subject < klass }
+    end
+
     private
 
     def matches_action?(action)

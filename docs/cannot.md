@@ -20,3 +20,32 @@ Of course, there's a `cannot?` method to check abilities that is a simple alias 
 ```ruby
 cannot :manage, :all  # user cannot perform any action on any object
 ```
+
+## Conditions and NULL values
+
+A `cannot` rule with conditions only removes the records that match them. A record whose column is `NULL` does not match, so it stays accessible, both for `can?` and for `accessible_by`:
+
+```ruby
+can :read, Article
+cannot :read, Article, secret: true
+
+can? :read, Article.new(secret: true)   # => false
+can? :read, Article.new(secret: nil)    # => true
+Article.accessible_by(ability)          # => the articles where secret is false or NULL
+```
+
+## Single table inheritance
+
+Rules can be defined on the subclasses of a model that uses single table inheritance. A `cannot` rule on a subclass removes its records from the queries on the base class as well:
+
+```ruby
+can :read, Vehicle
+cannot :read, Car
+
+can? :read, Motorbike.first   # => true
+can? :read, Car.first         # => false
+Vehicle.accessible_by(ability)  # => all the vehicles except the cars
+Car.accessible_by(ability)      # => no records
+can? :read, Vehicle             # => true, some vehicles can be read
+can? :read, Car                 # => false
+```

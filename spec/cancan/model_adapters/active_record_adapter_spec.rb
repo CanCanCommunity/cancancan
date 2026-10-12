@@ -401,7 +401,7 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
         @ability.cannot :read, Article, published: false, secret: true
         expect(@ability.model_adapter(Article, :read).conditions)
           .to orderlessly_match(
-            %["not (#{@article_table}"."published" = #{false_v} AND "#{@article_table}"."secret" = #{true_v})]
+            %[("#{@article_table}"."published" = #{false_v} AND "#{@article_table}"."secret" = #{true_v}) IS NOT TRUE]
           )
       end
 
@@ -411,7 +411,7 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
         @ability.can :update, Article, published: true
         @ability.cannot :update, Article, secret: true
         expect(@ability.model_adapter(Article, :update).conditions)
-          .to eq(%[not ("#{@article_table}"."secret" = #{true_v}) ] +
+          .to eq(%[("#{@article_table}"."secret" = #{true_v}) IS NOT TRUE ] +
                    %[AND (("#{@article_table}"."published" = #{true_v}) ] +
                    %[OR ("#{@article_table}"."id" = 1))])
         expect(@ability.model_adapter(Article, :manage).conditions).to eq(id: 1)
@@ -434,7 +434,7 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
         @ability.can :read, Article, published: true
         expect(@ability.model_adapter(Article, :read).conditions)
           .to eq(%[("#{@article_table}"."published" = #{true_v}) OR ] +
-                   %[(not ("#{@article_table}"."secret" = #{true_v}) AND ] +
+                   %[(("#{@article_table}"."secret" = #{true_v}) IS NOT TRUE AND ] +
                    %[(("#{@article_table}"."id" = 2) OR ("#{@article_table}"."id" = 1)))])
 
         secret = Article.create!(id: 1, secret: true, published: false)
@@ -451,6 +451,19 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
         last = Article.create!(priority: 300)
         Article.create!(priority: 301)
         expect(Article.accessible_by(@ability)).to match_array([first, last])
+      end
+
+      it 'does not exclude records with NULL in the column of a cannot rule, like can? does' do
+        @ability.can :read, Article
+        @ability.cannot :read, Article, secret: true
+        secret = Article.create!(secret: true)
+        public = Article.create!(secret: false)
+        unknown = Article.create!(secret: nil)
+
+        expect(Article.accessible_by(@ability)).to match_array([public, unknown])
+        expect(@ability.can?(:read, secret)).to be(false)
+        expect(@ability.can?(:read, public)).to be(true)
+        expect(@ability.can?(:read, unknown)).to be(true)
       end
 
       it 'returns appropriate sql conditions in complex case with nested joins' do
@@ -1706,6 +1719,100 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
       expect(Vehicle.accessible_by(ability)).to contain_exactly(vehicle, car, motorbike, suzuki)
       expect(Motorbike.accessible_by(ability)).to contain_exactly(motorbike, suzuki)
       expect(Suzuki.accessible_by(ability)).to contain_exactly(suzuki)
+    end
+
+    it 'excludes the records of a subclass forbidden by a cannot rule, like can? does' do
+      u1 = User.create!(name: 'pippo')
+      vehicle = Vehicle.create!
+      car = Car.create!
+      motorbike = Motorbike.create!
+
+      ability = Ability.new(u1)
+      ability.can :read, Vehicle
+      ability.cannot :read, Car
+      expect(Vehicle.accessible_by(ability)).to contain_exactly(vehicle, motorbike)
+      expect(Car.accessible_by(ability)).to be_empty
+      expect(ability.can?(:read, vehicle)).to be(true)
+      expect(ability.can?(:read, motorbike)).to be(true)
+      expect(ability.can?(:read, car)).to be(false)
+    end
+
+    it 'applies the conditions of a cannot rule defined on a subclass' do
+      u1 = User.create!(name: 'pippo')
+      vehicle = Vehicle.create!
+      small_car = Car.create!(capacity: 2)
+      big_car = Car.create!(capacity: 4)
+
+      ability = Ability.new(u1)
+      ability.can :read, Vehicle
+      ability.cannot :read, Car, capacity: 4
+      expect(Vehicle.accessible_by(ability)).to contain_exactly(vehicle, small_car)
+      expect(ability.can?(:read, big_car)).to be(false)
+      expect(ability.can?(:read, small_car)).to be(true)
+    end
+
+    it 'applies a rule defined on a subclass of a subclass to the base class' do
+      u1 = User.create!(name: 'pippo')
+      Vehicle.create!
+      Motorbike.create!
+      suzuki = Suzuki.create!
+
+      ability = Ability.new(u1)
+      ability.can :read, Suzuki
+      expect(Vehicle.accessible_by(ability)).to contain_exactly(suzuki)
+      expect(Motorbike.accessible_by(ability)).to contain_exactly(suzuki)
+      expect(ability.can?(:read, Vehicle)).to be(true)
+      expect(ability.can?(:read, Motorbike)).to be(true)
+      expect(ability.can?(:read, Car)).to be(false)
+    end
+
+    describe 'checking a class' do
+      let(:ability) { Ability.new(User.create!(name: 'pippo')) }
+
+      it 'passes when the class is allowed, even if a subclass is forbidden' do
+        ability.can :read, Vehicle
+        ability.cannot :read, Car
+        expect(ability.can?(:read, Vehicle)).to be(true)
+        expect(ability.can?(:read, Motorbike)).to be(true)
+        expect(ability.can?(:read, Car)).to be(false)
+      end
+
+      it 'passes when a subclass is forbidden with conditions' do
+        ability.can :read, Vehicle
+        ability.cannot :read, Car, capacity: 4
+        expect(ability.can?(:read, Vehicle)).to be(true)
+        expect(ability.can?(:read, Car)).to be(true)
+      end
+
+      it 'passes when a subclass is allowed' do
+        ability.can :read, Car
+        expect(ability.can?(:read, Vehicle)).to be(true)
+        expect(ability.can?(:read, Car)).to be(true)
+        expect(ability.can?(:read, Motorbike)).to be(false)
+      end
+
+      it 'fails when the only allowed subclass is forbidden again' do
+        ability.can :read, Car
+        ability.cannot :read, Car
+        expect(ability.can?(:read, Vehicle)).to be(false)
+        expect(ability.can?(:read, Car)).to be(false)
+      end
+
+      it 'passes when a subclass is allowed after the class is forbidden' do
+        ability.cannot :read, Vehicle
+        ability.can :read, Car
+        expect(ability.can?(:read, Vehicle)).to be(true)
+        expect(ability.can?(:read, Car)).to be(true)
+        expect(ability.can?(:read, Motorbike)).to be(false)
+      end
+
+      it 'passes for a subclass when one of its subclasses is forbidden' do
+        ability.can :read, Motorbike
+        ability.cannot :read, Suzuki
+        expect(ability.can?(:read, Motorbike)).to be(true)
+        expect(ability.can?(:read, Suzuki)).to be(false)
+        expect(ability.can?(:read, Vehicle)).to be(true)
+      end
     end
   end
 end
