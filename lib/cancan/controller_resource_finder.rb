@@ -29,7 +29,9 @@ module CanCan
     end
 
     def id_param
-      @params[id_param_key].to_s if @params[id_param_key].present?
+      # A whitespace-only id is blank but given, so it must also be looked up.
+      id = @params[id_param_key].to_s
+      id unless id.empty?
     end
 
     def id_param_key

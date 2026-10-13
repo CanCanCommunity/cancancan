@@ -455,6 +455,13 @@ describe CanCan::ControllerResource do
       expect(controller.instance_variable_get(:@model)).to be_nil
     end
 
+    it 'tries to load resource if params[:id] is only whitespace' do
+      params.merge!(action: 'show', id: ' ')
+      allow(Model).to receive(:find).with(' ').and_raise(ActiveRecord::RecordNotFound)
+      resource = CanCan::ControllerResource.new(controller)
+      expect { resource.load_resource }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
     it 'finds record through has_one association with :singleton and :shallow options' do
       model = Model.new
       allow(Model).to receive(:find).with('123') { model }
