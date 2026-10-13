@@ -322,6 +322,31 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
         expect(Article.accessible_by(@ability).count).to eq(2)
       end
 
+      it 'keeps the conditions of the base relation on a subquery when using a scope for conditions' do
+        category1 = Category.create!
+        category2 = Category.create!
+        @ability.can :read, Article, Article.where(secret: true)
+        article1 = Article.create!(secret: true, category: category1)
+        Article.create!(secret: true, category: category2)
+        Article.create!(secret: false, category: category1)
+
+        articles = Article.where(category: Category.where(id: category1.id)).accessible_by(@ability)
+        expect(articles).to match_array([article1])
+      end
+
+      it 'does not apply again the conditions of the default scope that the scope for conditions removes' do
+        stub_const('PublicArticle', Class.new(ActiveRecord::Base) do
+          self.table_name = 'articles'
+          default_scope { where(secret: false) }
+        end)
+        @ability.can :read, PublicArticle, PublicArticle.unscope(where: :secret).where(published: true)
+        article1 = PublicArticle.create!(published: true, secret: false)
+        article2 = PublicArticle.create!(published: true, secret: true)
+        PublicArticle.create!(published: false, secret: false)
+
+        expect(PublicArticle.accessible_by(@ability)).to match_array([article1, article2])
+      end
+
       it 'raises an exception when trying to merge scope with other conditions' do
         @ability.can :read, Article, published: true
         @ability.can :read, Article, Article.where(secret: true)

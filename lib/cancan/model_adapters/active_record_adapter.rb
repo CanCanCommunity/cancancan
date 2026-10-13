@@ -200,10 +200,14 @@ module CanCan
       end
 
       # `merge` replaces the conditions of the base relation on the columns the scope also constrains,
-      # so the conditions of an association like `category.articles` are applied again afterwards.
+      # so the conditions it dropped, like the one of an association like `category.articles`, are applied again.
+      # The conditions the scope removes with `unscope`, like the ones of a default scope, stay removed.
       def merge_override_scope
+        merged = @model_class.where(nil).merge(override_scope)
         base = @model_class.where(nil)
-        base.merge(override_scope).where(base.where_values_hash)
+        base = base.unscope(*override_scope.unscope_values) if override_scope.unscope_values.any?
+        dropped = base.where_clause.send(:predicates) - merged.where_clause.send(:predicates)
+        dropped.inject(merged) { |relation, predicate| relation.where(predicate) }
       end
 
       def override_scope
