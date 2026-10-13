@@ -646,6 +646,21 @@ describe CanCan::Ability do
     expect(@ability.can?(:update, Object, 'name')).to be(true)
   end
 
+  it 'allows strings when checking actions' do
+    @ability.can :manage, :all
+    @ability.cannot :destroy, Integer
+    expect(@ability.can?('destroy', 123)).to be(false)
+    expect(@ability.can?('read', 123)).to be(true)
+  end
+
+  it 'allows strings when defining actions and aliases' do
+    @ability.alias_action 'publish', to: 'update'
+    @ability.can :manage, :all
+    @ability.cannot 'update', Integer
+    expect(@ability.can?(:update, 123)).to be(false)
+    expect(@ability.can?(:publish, 123)).to be(false)
+  end
+
   it 'passes attribute to block; nil if no attribute given' do
     @ability.can :update, Range do |_range, attribute|
       attribute == :name

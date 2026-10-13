@@ -52,6 +52,14 @@ describe CanCan::ControllerResource do
       expect(controller.instance_variable_get(:@model)).to eq(:some_model)
     end
 
+    it 'builds a resource when on custom new action given as a string' do
+      params.merge!(action: 'build', id: '123')
+      allow(Model).to receive(:new) { :some_model }
+      resource = CanCan::ControllerResource.new(controller, new: 'build')
+      resource.load_resource
+      expect(controller.instance_variable_get(:@model)).to eq(:some_model)
+    end
+
     it 'only authorizes :show action on parent resource' do
       model = Model.new
       allow(Model).to receive(:find).with('123') { model }
@@ -291,6 +299,14 @@ describe CanCan::ControllerResource do
       params.merge!(action: 'sort', id: '123')
 
       resource = CanCan::ControllerResource.new(controller, collection: %i[sort list])
+      resource.load_resource
+      expect(controller.instance_variable_get(:@model)).to be_nil
+    end
+
+    it 'does not build a single resource when on custom collection action given as a string' do
+      params.merge!(action: 'sort', id: '123')
+
+      resource = CanCan::ControllerResource.new(controller, collection: 'sort')
       resource.load_resource
       expect(controller.instance_variable_get(:@model)).to be_nil
     end
@@ -702,6 +718,18 @@ describe CanCan::ControllerResource do
     params[:action] = 'other_action'
     expect(CanCan::ControllerResource.new(controller).skip?(:authorize)).to be(false)
     expect(CanCan::ControllerResource.new(controller, :model).skip?(:authorize)).to be(true)
+  end
+
+  it 'skips resource behavior for :only and :except actions given as strings' do
+    allow(controller_class).to receive(:cancan_skipper) do
+      { authorize: { model: { except: 'destroy' } }, load: { model: { only: 'index' } } }
+    end
+    params[:action] = 'destroy'
+    expect(CanCan::ControllerResource.new(controller, :model).skip?(:authorize)).to be_falsey
+    expect(CanCan::ControllerResource.new(controller, :model).skip?(:load)).to be_falsey
+    params[:action] = 'index'
+    expect(CanCan::ControllerResource.new(controller, :model).skip?(:authorize)).to be(true)
+    expect(CanCan::ControllerResource.new(controller, :model).skip?(:load)).to be(true)
   end
 
   it 'skips loading and authorization' do

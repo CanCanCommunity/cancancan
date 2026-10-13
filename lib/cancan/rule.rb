@@ -28,7 +28,7 @@ module CanCan
       raise Error, "Subject is required for #{action}" if action && subject.nil?
 
       @base_behavior = base_behavior
-      @actions = wrap(action)
+      @actions = wrap(action).map(&:to_sym)
       @subjects = wrap(subject)
       @attributes = wrap(attributes)
       @conditions = extra_args || {}
