@@ -135,6 +135,7 @@ module CanCan
       def database_records
         return @model_class.none if where_conditions == :none
         return @model_class.all if where_conditions == :all
+
         relation = @model_class.where(where_node)
         return relation unless joins.present?
 
