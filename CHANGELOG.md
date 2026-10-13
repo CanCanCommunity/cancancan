@@ -91,7 +91,7 @@
 
 #### `can?` matches the ranges in an array of values
 
-* [#613](https://github.com/CanCanCommunity/cancancan/issues/613): `can?` matches a value against the ranges in an array of values, as `accessible_by` already did. The ranges were compared with `==` and never matched, so `can?` denied records that `accessible_by` returned. When the attribute is itself a range, it now matches a range of the array that covers it. ([@coorasse][])
+* [#924](https://github.com/CanCanCommunity/cancancan/pull/924): `can?` matches a value against the ranges in an array of values, as `accessible_by` already did. The ranges were compared with `==` and never matched, so `can?` denied records that `accessible_by` returned. When the attribute is itself a range, it now matches a range of the array that covers it. ([@coorasse][])
 
   ```ruby
   can :read, Product, stock: [1.., nil]
