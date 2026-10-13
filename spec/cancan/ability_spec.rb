@@ -131,6 +131,16 @@ describe CanCan::Ability do
       .to raise_error(CanCan::Error, "You can't specify target (show) as alias because it is real action name")
   end
 
+  it 'raises an Error if alias target is :manage' do
+    expect { @ability.alias_action :read, to: :manage }
+      .to raise_error(CanCan::Error, "You can't specify target (manage) as alias because it is a reserved action")
+  end
+
+  it 'raises an Error if an action is aliased to itself' do
+    expect { @ability.alias_action :approve, to: :approve }
+      .to raise_error(CanCan::Error, "You can't alias the action (approve) to itself")
+  end
+
   it 'always calls block with arguments when passing no arguments to can' do
     @ability.can do |action, object_class, object|
       expect(action).to eq(:foo)
@@ -879,14 +889,14 @@ describe CanCan::Ability do
     it 'adds the aliased actions from the given ability' do
       @ability.alias_action :show, to: :see
       (another_ability = double).extend(CanCan::Ability)
-      another_ability.alias_action :create, :update, to: :manage
+      another_ability.alias_action :create, :update, to: :modify
 
       @ability.merge(another_ability)
       expect(@ability.aliased_actions).to eq(
         read: %i[index show],
         create: %i[new],
         update: %i[edit],
-        manage: %i[create update],
+        modify: %i[create update],
         see: %i[show]
       )
     end
