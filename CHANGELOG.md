@@ -8,6 +8,7 @@
 
 ## Unreleased
 
+* [#812](https://github.com/CanCanCommunity/cancancan/issues/812): Check the conditions on an association that is not loaded with one query in `can?`, instead of loading all of its records: `can :read, Author, books: { user: user }` no longer loads every book of the author. An association that is already loaded is still checked in memory without queries. **WARNING**: the keys below such an association must be columns or associations, as `accessible_by` requires, and NULL columns of the records below it are matched as in `accessible_by`. ([@oboxodo][], [@coorasse][])
 * [#909](https://github.com/CanCanCommunity/cancancan/pull/909): Make `can?` and `accessible_by` consistent for `cannot` rules and single table inheritance: a `cannot` rule on a subclass keeps its precedence in `accessible_by`, records with NULL in a column of a `cannot` condition are no longer excluded, rules on subclasses of subclasses reach the base class, and a class check passes when the class or any of its subclasses is allowed. **WARNING**: `accessible_by` returns more records when a `cannot` rule has conditions on a nullable column, and `can?` on an STI base class no longer fails because a subclass is forbidden. ([@coorasse][], [@0llirocks][], [@kevinluo201][])
 * [#880](https://github.com/CanCanCommunity/cancancan/pull/880): Fix `accessible_by` with rules on STI subclasses: a rule on a subclass without conditions no longer discards the rules defined before it, and rules with the same conditions on different subjects are no longer compressed into one. ([@takayamaki][], [@sjoulbak][])
 * [#890](https://github.com/CanCanCommunity/cancancan/pull/890): Support an Active Record relation as the value of a condition in `can?`: the selected column, or the primary key, is checked with a query, as `accessible_by` already did. ([@olistik][])
@@ -762,6 +763,7 @@ Please read the [guide on migrating from CanCanCan 2.x to 3.0](https://github.co
 [@jaredbeck]: https://github.com/jaredbeck
 [@NikosVlagoidis]: https://github.com/NikosVlagoidis
 [@olistik]: https://github.com/olistik
+[@oboxodo]: https://github.com/oboxodo
 [@takayamaki]: https://github.com/takayamaki
 [@sjoulbak]: https://github.com/sjoulbak
 [@0llirocks]: https://github.com/0llirocks
