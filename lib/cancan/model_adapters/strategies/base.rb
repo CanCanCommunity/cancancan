@@ -8,10 +8,12 @@ module CanCan
           :compressed_rules,
           :extract_multiple_conditions,
           :joins,
+          :merge_rules,
           :model_class,
           :quoted_primary_key,
           :quoted_aliased_table_name,
           :quoted_table_name,
+          :rule_conditions,
           to: :adapter
         )
         delegate :connection, :quoted_primary_key, to: :model_class

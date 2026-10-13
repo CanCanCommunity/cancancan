@@ -426,7 +426,8 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
         @ability.cannot :read, Article, published: false, secret: true
         expect(@ability.model_adapter(Article, :read).conditions)
           .to orderlessly_match(
-            %[("#{@article_table}"."published" = #{false_v} AND "#{@article_table}"."secret" = #{true_v}) IS NOT TRUE]
+            %[NOT ("#{@article_table}"."id" IN (SELECT "#{@article_table}"."id" FROM "#{@article_table}" ] +
+            %[WHERE ("#{@article_table}"."published" = #{false_v} AND "#{@article_table}"."secret" = #{true_v})))]
           )
       end
 
@@ -436,7 +437,8 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
         @ability.can :update, Article, published: true
         @ability.cannot :update, Article, secret: true
         expect(@ability.model_adapter(Article, :update).conditions)
-          .to eq(%[("#{@article_table}"."secret" = #{true_v}) IS NOT TRUE ] +
+          .to eq(%[NOT ("#{@article_table}"."id" IN (SELECT "#{@article_table}"."id" FROM "#{@article_table}" ] +
+                   %[WHERE ("#{@article_table}"."secret" = #{true_v}))) ] +
                    %[AND (("#{@article_table}"."published" = #{true_v}) ] +
                    %[OR ("#{@article_table}"."id" = 1))])
         expect(@ability.model_adapter(Article, :manage).conditions).to eq(id: 1)
@@ -459,7 +461,8 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
         @ability.can :read, Article, published: true
         expect(@ability.model_adapter(Article, :read).conditions)
           .to eq(%[("#{@article_table}"."published" = #{true_v}) OR ] +
-                   %[(("#{@article_table}"."secret" = #{true_v}) IS NOT TRUE AND ] +
+                   %[(NOT ("#{@article_table}"."id" IN (SELECT "#{@article_table}"."id" FROM "#{@article_table}" ] +
+                   %[WHERE ("#{@article_table}"."secret" = #{true_v}))) AND ] +
                    %[(("#{@article_table}"."id" = 2) OR ("#{@article_table}"."id" = 1)))])
 
         secret = Article.create!(id: 1, secret: true, published: false)
