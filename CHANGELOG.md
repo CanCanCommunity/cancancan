@@ -19,17 +19,19 @@
   Article.accessible_by(ability)
   ```
 
-  A `cannot` rule with a scope now excludes the records of the scope, like a `cannot` rule with hash conditions. The scope used to be passed through as it was, so the documentation told to pass the inverse scope. Invert such scopes:
+  A `cannot` rule with a scope now excludes the records of the scope, like a `cannot` rule with hash conditions. In 3.x the scope was used as the records that remain accessible, so the scope had to select the opposite of what the rule says. Take a user who cannot read discontinued products:
 
   ```ruby
+  # 3.x: the scope selects the products the user can read, so it must be inverted
   can :read, Product
-
-  # 3.x: the scope selects the accessible products
   cannot :read, Product, Product.where(discontinued: false)
 
-  # 4.0: the scope selects the forbidden products, like `cannot :read, Product, discontinued: true`
+  # 4.0: the scope selects the products the user cannot read, like the hash condition `discontinued: true`
+  can :read, Product
   cannot :read, Product, Product.where(discontinued: true)
   ```
+
+  If you keep a 3.x rule as it is, `accessible_by` returns the opposite records: only the discontinued products.
 
   Only the records of a scope matter: a scope with `joins`, `limit`, `group` or other clauses that select its records is used as a subquery on the primary key, and its `includes`, `order` and `select` no longer apply to the query.
 
