@@ -72,10 +72,13 @@ module CanCan
     #
     # Also see the RSpec Matchers to aid in testing.
     def can?(action, subject, attribute = nil, *extra_args)
-      results = extract_subjects(subject).lazy.map do |a_subject|
-        subject_permission(action, a_subject, attribute, *extra_args)
+      extract_subjects(subject).each do |a_subject|
+        permission = subject_permission(action, a_subject, attribute, *extra_args)
+        next if permission.nil?
+
+        return permission
       end
-      results.reject(&:nil?).first || false
+      false
     end
 
     # Convenience method which works the same as "can?" but returns the opposite value.
@@ -250,6 +253,7 @@ module CanCan
         add_rule(rule.dup)
       end
       @aliased_actions = aliased_actions.merge(ability.aliased_actions)
+      forget_expanded_actions
       self
     end
 
@@ -303,9 +307,9 @@ module CanCan
     def alternative_subjects(subject)
       subject = subject.class unless subject.is_a?(Module)
       if subject.respond_to?(:subclasses) && defined?(ActiveRecord::Base) && subject < ActiveRecord::Base
-        [:all, *(subject.ancestors + subject.descendants), subject.class.to_s]
+        [:all, *(subject.ancestors + subject.descendants), subject.class.name]
       else
-        [:all, *subject.ancestors, subject.class.to_s]
+        [:all, *subject.ancestors, subject.class.name]
       end
     end
   end
