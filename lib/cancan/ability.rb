@@ -49,8 +49,9 @@ module CanCan
     #
     # Any additional arguments will be passed into the "can" block definition. This
     # can be used to pass more information about the user's request for example.
+    # The block is not called when a class is passed instead of an instance.
     #
-    #   can? :create, Project, request.remote_ip
+    #   can? :create, @project, request.remote_ip
     #
     #   can :create, Project do |project, remote_ip|
     #     # ...

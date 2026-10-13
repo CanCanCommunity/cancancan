@@ -36,7 +36,7 @@
 
 ## 3.5.0
 
-* [#653](https://github.com/CanCanCommunity/cancancan/pull/653): Add support for using an nil relation as a condition. ([@ghiculescu][])
+* [#653](https://github.com/CanCanCommunity/cancancan/pull/653): Add support for using an nil relation as a condition. **WARNING**: a condition on a `has_many` association where all values are `nil` now also matches the records without associated records, as `accessible_by` already did. ([@ghiculescu][])
 * [#702](https://github.com/CanCanCommunity/cancancan/pull/702): Support scopes of STI classes as ability conditions. ([@honigc][])
 * [#798](https://github.com/CanCanCommunity/cancancan/pull/798): Allow disabling of rules compressor via `CanCan.rules_compressor_enabled = false`. ([@coorasse][])
 * [#814](https://github.com/CanCanCommunity/cancancan/pull/814): Fix issue with polymorphic associations. ([@WriterZephos][])

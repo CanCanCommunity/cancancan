@@ -57,6 +57,8 @@ Add this to your Gemfile:
 
 and run the `bundle install` command.
 
+CanCanCan 3.x is tested with Ruby 2.7+ and Active Record 5.2 to 8.1. Active Record is not a dependency of the gem, since abilities can be defined on any Ruby object, so Bundler cannot check its version for you.
+
 ## Define Abilities
 
 User permissions are defined in an `Ability` class.

@@ -56,3 +56,9 @@ The code answering the question "can the user update all the articles?" would be
 ```ruby
 Article.accessible_by(current_ability).count == Article.count
 ```
+
+and the one answering "is there any article the user can update right now?":
+
+```ruby
+Article.accessible_by(current_ability, :update).exists?
+```

@@ -66,6 +66,8 @@ class ArticlesController < ApplicationController
 end
 ```
 
+> `authorize_resource` checks `@article` only if it is already loaded. Otherwise it checks the `Article` class, which ignores the conditions of the rules, as explained in [Avoid common mistakes](./check_abilities_mistakes.md). Make sure that the `before_action` loading the record is declared before `authorize_resource`.
+
 the second helper method is `load_resource` that will perform the loading of the model automatically based on the name of the controller. The code above can be refactored like that:
 
 ```ruby
@@ -128,6 +130,21 @@ class ArticlesController < ApplicationController
 end
 ```
 
+## Member and collection actions
+
+CanCanCan considers an action a member action when `params[:id]` is present: it loads that record and authorizes it. Any other action is a collection action, authorized on the class.
+This matters for custom actions. A route nested in `resources :articles`, like `get :status`, generates `/articles/:article_id/status` and has no `params[:id]`, so `@article` would not be loaded nor checked. Declare it as a member route instead:
+
+```ruby
+resources :articles do
+  member do
+    get :status # /articles/:id/status
+  end
+end
+```
+
+If the route uses another parameter, set it with the `id_param` option, as explained in [Custom find](./changing_defaults.md#custom-find).
+
 ## Strong parameters
 
 You have to sanitize inputs before saving the record, in actions such as `:create` and `:update`.
@@ -146,6 +163,16 @@ end
 
 def article_params
   params.require(:article).permit(:body)
+end
+```
+
+Since the record is authorized as it is stored, if your rules have conditions on attributes that the user can change, authorize it again after assigning the new values:
+
+```ruby
+def update
+  @article.assign_attributes(article_params)
+  authorize! :update, @article
+  @article.save
 end
 ```
 
