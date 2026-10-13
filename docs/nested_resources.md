@@ -37,7 +37,7 @@ The same option applies to singleton resources, for instance `has_one :profile, 
   end
 ```
 
-If the resource name (`:project` in this case) does not match the controller, then it will be considered a parent resource. You can manually specify parent/child resources using the `parent: false` option.
+If the resource name (`:project` in this case) does not match the controller, it is considered a parent resource when another resource is loaded `through` it or when the request has a parameter named after it, such as `project_id`. A parent resource is loaded with `params[:project_id]` and authorized with the `:show` action (see `:parent_action`). You can manually specify parent/child resources using the `parent: true` and `parent: false` options.
 
 ## Securing `through` changes
 

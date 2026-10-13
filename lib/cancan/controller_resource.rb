@@ -13,6 +13,7 @@ module CanCan
     def self.add_before_action(controller_class, method, *args)
       options = args.extract_options!
       resource_name = args.first
+      controller_class.send(:add_cancan_parent_names, options[:through]) if options[:through]
       before_action_method = before_callback_name(options)
       controller_class.send(before_action_method, options.slice(:only, :except, :if, :unless)) do |controller|
         controller.class.cancan_resource_class
@@ -43,7 +44,10 @@ module CanCan
     end
 
     def parent?
-      @options.key?(:parent) ? @options[:parent] : @name && @name != name_from_controller.to_sym
+      return @options[:parent] if @options.key?(:parent)
+      return false unless @name && @name != name_from_controller.to_sym
+
+      @params.key?(:"#{@name}_id") || @controller.class.cancan_parent_names.include?(@name.to_sym)
     end
 
     protected
