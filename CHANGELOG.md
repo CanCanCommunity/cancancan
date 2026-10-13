@@ -31,7 +31,7 @@
   cannot :read, Product, Product.where(discontinued: true)
   ```
 
-  If you keep a 3.x rule as it is, `accessible_by` returns the opposite records: only the discontinued products.
+  If you keep a 3.x rule as it is, `accessible_by` returns the opposite records: only the discontinued products. To help with the upgrade, every `cannot` rule with a scope is reported once with a warning, until the rules are reviewed and the warning is disabled with `CanCan.warn_on_cannot_rules_with_scope = false`.
 
   Only the records of a scope matter: a scope with `joins`, `limit`, `group` or other clauses that select its records is used as a subquery on the primary key, and its `includes`, `order` and `select` no longer apply to the query.
 
@@ -46,7 +46,7 @@
   Article.accessible_by(ability)
   ```
 
-  A scope with conditions on a joined table, or with a join or a limit, is no longer treated as a rule without conditions, which silently discarded the rules defined before it. `ActiveRecordAdapter#conditions`, which is not public API, returns the SQL of a single scope rule instead of the scope, and `'1=0'` instead of `'t'='f'` when no record is accessible.
+  A scope with conditions on a joined table, or with a join or a limit, is no longer treated as a rule without conditions, which silently discarded the rules defined before it. `ActiveRecordAdapter#conditions`, which is not public API, returns the SQL of a single scope rule instead of the scope, and `'1=0'` instead of `'t'='f'` when no record is accessible. A custom strategy receives `where_conditions` as an Arel node, to pass to `where`, instead of an array of conditions.
 
 #### The RSpec matcher cannot be negated with several actions
 

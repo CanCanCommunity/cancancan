@@ -121,4 +121,5 @@ Article.accessible_by(current_ability, strategy: InnerJoinStrategy)
 ```
 
 Inside `execute!` you have access to `relation` (the records filtered by the conditions of the rules),
-`joins` (the associations referenced by the conditions), `where_conditions` and `model_class`.
+`joins` (the associations referenced by the conditions), `where_conditions` (the conditions of the rules as an
+Arel node, to pass to `where`) and `model_class`.

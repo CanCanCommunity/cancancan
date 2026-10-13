@@ -123,7 +123,7 @@ module CanCan
       #   # => "("self_managed" = 't') IS NOT TRUE AND (("manager_id" = 1) OR ("id" = 1))"
       #
       def conditions
-        return single_rule_conditions if single_hash_rule?
+        return single_rule_conditions if single_can_rule?
 
         case where_conditions
         when :all then {}
@@ -237,7 +237,7 @@ module CanCan
         Arel::Nodes::Grouping.new(node)
       end
 
-      def single_hash_rule?
+      def single_can_rule?
         @compressed_rules.size == 1 && @compressed_rules.first.base_behavior && !@compressed_rules.first.with_scope?
       end
 

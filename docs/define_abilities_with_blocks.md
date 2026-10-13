@@ -60,6 +60,15 @@ cannot :read, Product, Product.where(discontinued: true) do |product|
 end
 ```
 
+Until version 4.0 the scope of a `cannot` definition selected the records that remained accessible, so it had to be
+inverted. When upgrading, every `cannot` definition with a scope is reported once with a warning. Review them and
+disable the warning:
+
+```ruby
+# config/initializers/cancan.rb
+CanCan.warn_on_cannot_rules_with_scope = false
+```
+
 A couple of caveats:
 
 - A scope with `joins`, `limit` or other clauses that select its records is used as a subquery on the primary
