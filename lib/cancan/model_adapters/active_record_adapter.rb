@@ -18,15 +18,15 @@ module CanCan
 
       def initialize(model_class, rules)
         super
-        @compressed_rules = if CanCan.rules_compressor_enabled
-                              RulesCompressor.new(@rules.reverse).rules_collapsed.reverse
-                            else
-                              @rules
-                            end
         # The normalizers change the rules. Work on copies, so the rules of the ability stay the same.
-        @compressed_rules = @compressed_rules.map(&:dup)
-        StiNormalizer.normalize(@compressed_rules)
-        ConditionsNormalizer.normalize(model_class, @compressed_rules)
+        normalized_rules = @rules.map(&:dup)
+        StiNormalizer.normalize(model_class, normalized_rules)
+        ConditionsNormalizer.normalize(model_class, normalized_rules)
+        @compressed_rules = if CanCan.rules_compressor_enabled
+                              RulesCompressor.new(normalized_rules.reverse).rules_collapsed.reverse
+                            else
+                              normalized_rules
+                            end
       end
 
       class << self
@@ -123,11 +123,28 @@ module CanCan
       end
 
       def extract_multiple_conditions(conditions_extractor, rules)
+        merge_rules(rules) do |rule|
+          rule.base_behavior ? rule_conditions(conditions_extractor, rule) : matching_records_conditions(rule)
+        end
+      end
+
+      # Merges the SQL of each rule given by the block, nil when the rule has no conditions.
+      # Like can?, the rules defined later take precedence.
+      def merge_rules(rules)
         sql, = rules.reverse.inject([false_sql, false]) do |(sql, or_chain), rule|
-          conditions_hash = conditions_extractor.tableize_conditions(rule.conditions).dup
-          merge_conditions(sql, or_chain, conditions_hash, rule.base_behavior, conditions_extractor)
+          conditions = yield rule
+          if conditions.nil?
+            [rule.base_behavior ? true_sql : false_sql, false]
+          else
+            merge_non_empty_conditions(rule.base_behavior, conditions, sql, or_chain)
+          end
         end
         sql
+      end
+
+      def rule_conditions(conditions_extractor, rule)
+        conditions_hash = conditions_extractor.tableize_conditions(rule.conditions).dup
+        sanitize_sql(conditions_hash, conditions_extractor) unless conditions_hash.blank?
       end
 
       def database_records
@@ -148,11 +165,12 @@ module CanCan
         build_joins_relation(relation, *where_conditions)
       end
 
-      # Returns the associations used in conditions for the :joins option of a search.
+      # Returns the associations used in the conditions of the can rules for the :joins option of a search.
+      # The cannot rules are checked in subqueries with their own joins.
       # See ModelAdditions#accessible_by
       def joins
         joins_hash = {}
-        @compressed_rules.reverse_each do |rule|
+        @compressed_rules.select(&:base_behavior).reverse_each do |rule|
           deep_merge(joins_hash, rule.associations_hash)
         end
         deep_clean(joins_hash) unless joins_hash.empty?
@@ -213,7 +231,9 @@ module CanCan
       def override_scope
         conditions = @compressed_rules.map(&:conditions).compact
         return unless conditions.any? { |c| c.is_a?(ActiveRecord::Relation) }
-        return conditions.first if conditions.size == 1
+        if conditions.size == 1
+          return @compressed_rules.first.base_behavior ? conditions.first : @model_class.none
+        end
 
         raise_override_scope_error
       end
@@ -225,15 +245,19 @@ module CanCan
               "Instead use a hash or SQL for #{rule_found.actions.first} #{rule_found.subjects.first} ability."
       end
 
-      # Returns the merged sql and whether it is a flat chain of OR conditions.
-      def merge_conditions(sql, or_chain, conditions_hash, behavior, conditions_extractor)
-        if conditions_hash.blank?
-          [behavior ? true_sql : false_sql, false]
-        else
-          merge_non_empty_conditions(behavior, sanitize_sql(conditions_hash, conditions_extractor), sql, or_chain)
-        end
+      # A cannot rule excludes a record when any of its associated records matches, and not when its conditions
+      # are NULL, so it is checked on the records of a subquery instead of on each joined row.
+      def matching_records_conditions(rule)
+        joins = rule.associations_hash
+        conditions = rule_conditions(ConditionsExtractor.new(@model_class, nil, joins), rule)
+        return if conditions.nil?
+
+        primary_key = @model_class.arel_table[@model_class.primary_key]
+        subquery = @model_class.unscoped { @model_class.left_joins(joins).where(conditions).select(primary_key) }
+        "#{@model_class.quoted_table_name}.#{@model_class.quoted_primary_key} IN (#{subquery.to_sql})"
       end
 
+      # Returns the merged sql and whether it is a flat chain of OR conditions.
       # Consecutive `can` rules are joined in a flat chain of ORs, so that the nesting of the query only grows
       # when `can` and `cannot` rules alternate. Deeply nested conditions overflow the parser of SQLite.
       def merge_non_empty_conditions(behavior, conditions, sql, or_chain)
@@ -255,9 +279,8 @@ module CanCan
         end
       end
 
-      # A cannot rule only excludes the records that match its conditions: NULL does not match.
       def not_conditions(conditions)
-        "(#{conditions}) IS NOT TRUE"
+        "NOT (#{conditions})"
       end
 
       def or_conditions(conditions, sql, or_chain)

@@ -66,11 +66,11 @@ end
 This is really useful if you have complex conditions which require `joins`. A couple of caveats:
 
 - You cannot use this with multiple `can` definitions that match the same action and model since it is not possible to combine them. An exception will be raised when that is the case.
-- If you use this with `cannot`, the scope needs to be the inverse since it's passed directly through. For example, if you don't want someone to read discontinued products the scope will need to fetch non discontinued ones:
+- A `cannot` rule with a scope does not return any record in `accessible_by`, like a `cannot` rule without a `can` rule. To hide some records, define the records that can be read with a `can` rule instead. For example, if you don't want someone to read discontinued products:
 
 ```ruby
-cannot :read, Product, Product.where(discontinued: false) do |product|
-  product.discontinued?
+can :read, Product, Product.where(discontinued: false) do |product|
+  !product.discontinued?
 end
 ```
 

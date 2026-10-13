@@ -14,20 +14,13 @@ module CanCan
         end
 
         def double_exists_sql
-          double_exists_sql = ''
-
-          compressed_rules.each_with_index do |rule, index|
-            double_exists_sql << ' OR ' if index.positive?
-            double_exists_sql << "EXISTS (#{sub_query_for_rule(rule).to_sql})"
-          end
-
-          double_exists_sql
+          merge_rules(compressed_rules) { |rule| "EXISTS (#{sub_query_for_rule(rule).to_sql})" }
         end
 
         def sub_query_for_rule(rule)
           joins_hash, left_joins_hash = extract_joins_from_rule(rule)
           conditions_extractor = ConditionsExtractor.new(model_class, joins_hash, left_joins_hash)
-          rule_where_conditions = extract_multiple_conditions(conditions_extractor, [rule])
+          rule_where_conditions = rule_conditions(conditions_extractor, rule)
           sub_query_for_rules_and_join_hashes(rule_where_conditions, joins_hash, left_joins_hash)
         end
 
