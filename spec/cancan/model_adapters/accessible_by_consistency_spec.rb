@@ -167,6 +167,18 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
     end
   end
 
+  it 'checks in a subquery only the cannot rules on a has_many association' do
+    ability.can :read, Story
+    ability.cannot :read, Story, secret: true
+    ability.cannot :read, Story, replies: { spam: true }
+    adapter = ability.model_adapter(Story, :read)
+
+    expect(adapter.conditions).to match(
+      /\A\("stories"\."id" IN \(SELECT .+\)\) IS NOT TRUE AND \(\("stories"\."secret" = \S+\) IS NOT TRUE\)\z/
+    )
+    expect(adapter.joins).to be_nil
+  end
+
   it 'does not return the records of a cannot rule defined with a scope' do
     Story.create!(secret: true)
     ability.cannot :read, Story, Story.where(secret: true)
