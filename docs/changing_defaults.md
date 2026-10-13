@@ -146,7 +146,20 @@ class ProductsController < ActionController::Base
   skip_authorize_resource only: :new
 end
 ```
-Both `skip_authorize_resource` and `skip_load_resource` support `:if` and `:unless` options. Either one takes a method name as a symbol or a lambda/proc. This option will be called to determine if the authorization/loading will be performed.
+All three methods also support the `:if` and `:unless` options. Either one takes a method name as a symbol or a
+lambda/proc, which is evaluated on the controller instance. The behavior is skipped only if `:if` returns a truthy
+value, and only if `:unless` returns a falsy value. Like in a `before_action`, all the given options must match:
+
+```ruby
+class ProductsController < ActionController::Base
+  load_and_authorize_resource
+  skip_authorize_resource only: :index, if: :admin?
+  skip_load_resource unless: -> { request.format.html? }
+end
+```
+
+Here the authorization is skipped on `index` only when `admin?` returns true, and the loading is skipped on every
+action unless the request asks for HTML.
 
 ### Custom class name
 
