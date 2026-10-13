@@ -1170,6 +1170,15 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
       expect(@ability).not_to be_able_to(:read, draft)
     end
 
+    it 'applies the rules when accessible_by gets the action as a string' do
+      @ability.can :read, Article
+      @ability.cannot :read, Article, name: :draft
+
+      expect(Article.accessible_by(@ability, 'read')).to match_array([published])
+      expect(@ability).not_to be_able_to('read', draft)
+      expect(@ability).to be_able_to('read', published)
+    end
+
     it 'matches an array of symbols' do
       @ability.can :read, Article
       @ability.cannot :read, Article, name: %i[draft archived]
