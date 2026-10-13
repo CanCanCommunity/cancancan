@@ -103,7 +103,7 @@
 
 #### A resource named differently than the controller is a parent only when it is nested
 
-* [#791](https://github.com/CanCanCommunity/cancancan/issues/791): A resource whose name does not match the controller is a parent resource only when another resource of the controller is loaded `through` it, or when the request has a parameter named after it, such as `book_id`. Every resource named differently than the controller was considered a parent, so it was loaded with `params[:book_id]` and authorized with `:show` instead of the action of the controller: an `update` passed with a `:read` permission. ([@enmanuelm19][], [@coorasse][])
+* [#925](https://github.com/CanCanCommunity/cancancan/pull/925): A resource whose name does not match the controller is a parent resource only when another resource of the controller is loaded `through` it, or when the request has a parameter named after it, such as `book_id`. Every resource named differently than the controller was considered a parent, so it was loaded with `params[:book_id]` and authorized with `:show` instead of the action of the controller: an `update` passed with a `:read` permission. ([@enmanuelm19][], [@coorasse][])
 
   ```ruby
   class BookServicesController < ApplicationController
