@@ -1032,7 +1032,7 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
   end
 
   describe '#permitted_attributes' do
-    let(:all_attributes) { Article.attribute_names.map(&:to_sym) }
+    let(:all_attributes) { Article.attribute_names.map(&:to_sym) - [:id] }
 
     it 'returns all attributes for a can rule without attributes' do
       @ability.can :update, Article
@@ -1067,6 +1067,13 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
 
     it 'returns no attributes when a can rule with attributes is followed by a cannot rule' do
       @ability.can :update, Article, [:name]
+      @ability.cannot :update, Article
+
+      expect(@ability.permitted_attributes(:update, Article)).to eq([])
+    end
+
+    it 'returns no attributes when a cannot rule follows a can rule with attributes that are not columns' do
+      @ability.can :update, Article, %i[name password]
       @ability.cannot :update, Article
 
       expect(@ability.permitted_attributes(:update, Article)).to eq([])

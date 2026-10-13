@@ -664,6 +664,24 @@ describe CanCan::ControllerResource do
     expect(resource).to_not be_parent
   end
 
+  it 'does not be a parent resource when a string name is provided which matches controller' do
+    resource = CanCan::ControllerResource.new(controller, 'model')
+    expect(resource).to_not be_parent
+  end
+
+  it 'authorizes the destroy action on the resource when a string name is provided' do
+    params.merge!(action: 'destroy', id: '123')
+    model = Model.new
+    allow(Model).to receive(:find).with('123') { model }
+    expect(controller).to receive(:authorize!).with(:destroy, model)
+    CanCan::ControllerResource.new(controller, 'model').load_and_authorize_resource
+  end
+
+  it 'skips the resource when a string name is provided' do
+    allow(controller_class).to receive(:cancan_skipper) { { authorize: { model: {} } } }
+    expect(CanCan::ControllerResource.new(controller, 'model').skip?(:authorize)).to be(true)
+  end
+
   it 'is parent if specified in options' do
     resource = CanCan::ControllerResource.new(controller, :model, parent: true)
     expect(resource).to be_parent

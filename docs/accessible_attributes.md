@@ -38,7 +38,8 @@ params
 
 ## Rules without attributes
 
-A `can` rule without attributes permits every attribute of the model, as it allows the action on the whole record:
+A `can` rule without attributes permits every attribute of the model except the primary key, as it allows the
+action on the whole record:
 
 ```ruby
 can :update, Book
