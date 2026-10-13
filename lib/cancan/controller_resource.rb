@@ -1,12 +1,14 @@
 # frozen_string_literal: true
 
 require_relative 'controller_resource_loader.rb'
+require_relative 'controller_resource_skipper.rb'
 module CanCan
   # Handle the load and authorization controller logic
   # so we don't clutter up all controllers with non-interface methods.
   # This class is used internally, so you do not need to call methods directly on it.
   class ControllerResource # :nodoc:
     include ControllerResourceLoader
+    include ControllerResourceSkipper
 
     def self.add_before_action(controller_class, method, *args)
       options = args.extract_options!
@@ -42,14 +44,6 @@ module CanCan
 
     def parent?
       @options.key?(:parent) ? @options[:parent] : @name && @name != name_from_controller.to_sym
-    end
-
-    def skip?(behavior)
-      return false unless (options = @controller.class.cancan_skipper[behavior][@name])
-
-      options == {} ||
-        options[:except] && !action_exists_in?(options[:except]) ||
-        action_exists_in?(options[:only])
     end
 
     protected
@@ -125,10 +119,6 @@ module CanCan
     end
 
     private
-
-    def action_exists_in?(options)
-      Array(options).include?(@params[:action].to_sym)
-    end
 
     def adapter
       ModelAdapters::AbstractAdapter.adapter_class(resource_class)
