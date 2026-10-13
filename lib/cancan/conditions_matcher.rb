@@ -94,9 +94,14 @@ module CanCan
       case value
       when Hash then hash_condition_match?(attribute, value)
       when Range then value.cover?(attribute)
-      when Enumerable then value.include?(attribute)
-      else attribute == value
+      when Enumerable then value.any? { |element| value_match?(attribute, element) }
+      else value_match?(attribute, value)
       end
+    end
+
+    # Like Active Record in the SQL conditions, a symbol matches the string with the same name.
+    def value_match?(attribute, value)
+      attribute == value || (value.is_a?(Symbol) && attribute == value.to_s)
     end
 
     # Like Active Record with a relation as condition value: the selected column, or the primary key, is matched.
