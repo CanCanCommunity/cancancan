@@ -163,13 +163,15 @@ action unless the request asks for HTML.
 
 ### Custom class name
 
-If the model is named differently than the controller, then you may explicitly name the model that should be loaded; however, you must specify that it is not a parent in a nested routing situation, ie:
+If the model is named differently than the controller, then you may explicitly name the model that should be loaded:
 
 ```ruby
 class ArticlesController < ApplicationController
-  load_and_authorize_resource :post, parent: false
+  load_and_authorize_resource :post
 end
 ```
+
+The post is loaded with `params[:id]` and authorized with the action of the controller. It is considered a parent resource, loaded with `params[:post_id]` and authorized with `:show`, only when another resource is loaded `through` it or when the request has a `post_id` parameter. Pass `parent: false` to never treat it as a parent.
 
 If the model class is namespaced differently than the controller you will need to specify the `:class` option.
 
