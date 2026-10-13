@@ -1149,6 +1149,47 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
     end
   end
 
+  context 'when conditions use symbols for string columns' do
+    let(:draft) { Article.create!(name: 'draft') }
+    let(:published) { Article.create!(name: 'published') }
+
+    it 'applies a cannot rule in can? as in accessible_by' do
+      @ability.can :read, Article
+      @ability.cannot :read, Article, name: :draft
+
+      expect(Article.accessible_by(@ability)).to match_array([published])
+      expect(@ability).not_to be_able_to(:read, draft)
+      expect(@ability).to be_able_to(:read, published)
+    end
+
+    it 'applies a can rule in can? as in accessible_by' do
+      @ability.can :read, Article, name: :published
+
+      expect(Article.accessible_by(@ability)).to match_array([published])
+      expect(@ability).to be_able_to(:read, published)
+      expect(@ability).not_to be_able_to(:read, draft)
+    end
+
+    it 'matches an array of symbols' do
+      @ability.can :read, Article
+      @ability.cannot :read, Article, name: %i[draft archived]
+
+      expect(Article.accessible_by(@ability)).to match_array([published])
+      expect(@ability).not_to be_able_to(:read, draft)
+      expect(@ability).to be_able_to(:read, published)
+    end
+
+    it 'matches symbols in the conditions of an association' do
+      category = Category.create!(name: 'drafts')
+      article = Article.create!(category: category)
+      @ability.can :read, Article
+      @ability.cannot :read, Article, category: { name: :drafts }
+
+      expect(Article.accessible_by(@ability)).to be_empty
+      expect(@ability).not_to be_able_to(:read, article)
+    end
+  end
+
   context 'when an association is used to create a rule' do
     before do
       ActiveRecord::Schema.define do
