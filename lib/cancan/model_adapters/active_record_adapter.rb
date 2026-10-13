@@ -112,19 +112,13 @@ module CanCan
       #   query(:manage, User).conditions # => "not (self_managed = 't') AND ((manager_id = 1) OR (id = 1))"
       #
       def conditions
-        conditions_extractor = ConditionsExtractor.new(@model_class)
-        if @compressed_rules.size == 1 && @compressed_rules.first.base_behavior
-          # Return the conditions directly if there's just one definition
-          conditions_extractor.tableize_conditions(@compressed_rules.first.conditions).dup
-        else
-          extract_multiple_conditions(conditions_extractor, @compressed_rules)
-        end
+        extract_conditions(ConditionsExtractor.new(@model_class, joins))
       end
 
       def extract_multiple_conditions(conditions_extractor, rules)
         sql, = rules.reverse.inject([false_sql, false]) do |(sql, or_chain), rule|
           conditions_hash = conditions_extractor.tableize_conditions(rule.conditions).dup
-          merge_conditions(sql, or_chain, conditions_hash, rule.base_behavior)
+          merge_conditions(sql, or_chain, conditions_hash, rule.base_behavior, conditions_extractor)
         end
         sql
       end
@@ -133,7 +127,7 @@ module CanCan
         if override_scope
           merge_override_scope
         elsif @model_class.respond_to?(:where) && @model_class.respond_to?(:joins)
-          build_relation(conditions)
+          build_relation(where_conditions)
         else
           @model_class.all(conditions: conditions, joins: joins)
         end
@@ -158,6 +152,29 @@ module CanCan
       end
 
       private
+
+      def extract_conditions(conditions_extractor)
+        if @compressed_rules.size == 1 && @compressed_rules.first.base_behavior
+          # Return the conditions directly if there's just one definition
+          conditions_extractor.tableize_conditions(@compressed_rules.first.conditions).dup
+        else
+          extract_multiple_conditions(conditions_extractor, @compressed_rules)
+        end
+      end
+
+      # Active Record cannot find the model of an aliased table in a hash of conditions,
+      # so the conditions on associations are converted to SQL with the model of each table.
+      def where_conditions
+        conditions_extractor = ConditionsExtractor.new(@model_class, joins)
+        conditions = extract_conditions(conditions_extractor)
+        return conditions unless conditions.is_a?(Hash) && conditions.values.any? { |value| value.is_a?(Hash) }
+
+        where_node(conditions, conditions_extractor)
+      end
+
+      def where_node(conditions, conditions_extractor)
+        sanitize_sql(conditions, conditions_extractor)
+      end
 
       # Removes empty hashes and moves everything into arrays.
       def deep_clean(joins_hash)
@@ -198,18 +215,17 @@ module CanCan
       end
 
       # Returns the merged sql and whether it is a flat chain of OR conditions.
-      def merge_conditions(sql, or_chain, conditions_hash, behavior)
+      def merge_conditions(sql, or_chain, conditions_hash, behavior, conditions_extractor)
         if conditions_hash.blank?
           [behavior ? true_sql : false_sql, false]
         else
-          merge_non_empty_conditions(behavior, conditions_hash, sql, or_chain)
+          merge_non_empty_conditions(behavior, sanitize_sql(conditions_hash, conditions_extractor), sql, or_chain)
         end
       end
 
       # Consecutive `can` rules are joined in a flat chain of ORs, so that the nesting of the query only grows
       # when `can` and `cannot` rules alternate. Deeply nested conditions overflow the parser of SQLite.
-      def merge_non_empty_conditions(behavior, conditions_hash, sql, or_chain)
-        conditions = sanitize_sql(conditions_hash)
+      def merge_non_empty_conditions(behavior, conditions, sql, or_chain)
         case sql
         when true_sql
           behavior ? [true_sql, false] : [not_conditions(conditions), false]
@@ -245,7 +261,7 @@ module CanCan
         sanitize_sql(['?=?', true, true])
       end
 
-      def sanitize_sql(conditions)
+      def sanitize_sql(conditions, _conditions_extractor = nil)
         @model_class.send(:sanitize_sql, conditions)
       end
     end

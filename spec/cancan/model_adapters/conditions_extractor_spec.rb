@@ -148,6 +148,22 @@ RSpec.describe CanCan::ModelAdapters::ConditionsExtractor do
                                articles_users: { id: 'article2' })
     end
 
+    it 'gives an alias to the associations without conditions' do
+      conditions = described_class.new(Transaction).tableize_conditions(sender: { articles: { user: { id: 1 } } })
+      expect(conditions).to eq(users_articles: { id: 1 })
+    end
+
+    it 'gives an alias to the through tables' do
+      conditions = described_class.new(Article).tableize_conditions(mentioned_users: { mentions: { id: 1 } })
+      expect(conditions).to eq(mentions_users: { id: 1 })
+    end
+
+    it 'gives the aliases in the order of the joins' do
+      extractor = described_class.new(Transaction, [:receiver, { sender: [:articles] }])
+      conditions = extractor.tableize_conditions(sender: { id: 1, articles: { id: 2 } }, receiver: { id: 3 })
+      expect(conditions).to eq(senders_transactions: { id: 1 }, articles: { id: 2 }, users: { id: 3 })
+    end
+
     it 'converts multiple references of same table with incrementing indexes' do
       original_conditions = [
         { sender: { mentions: { id: '1' } } },

@@ -25,9 +25,9 @@ module CanCan
         end
 
         def sub_query_for_rule(rule)
-          conditions_extractor = ConditionsExtractor.new(model_class)
-          rule_where_conditions = extract_multiple_conditions(conditions_extractor, [rule])
           joins_hash, left_joins_hash = extract_joins_from_rule(rule)
+          conditions_extractor = ConditionsExtractor.new(model_class, joins_hash, left_joins_hash)
+          rule_where_conditions = extract_multiple_conditions(conditions_extractor, [rule])
           sub_query_for_rules_and_join_hashes(rule_where_conditions, joins_hash, left_joins_hash)
         end
 
