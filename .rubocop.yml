@@ -25,6 +25,7 @@ Metrics/BlockLength:
 
 Metrics/ClassLength:
   Exclude:
+    - 'lib/cancan/controller_resource.rb'
     - 'lib/cancan/model_adapters/active_record_adapter.rb'
 
 Metrics/ModuleLength:

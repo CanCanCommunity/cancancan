@@ -1,5 +1,6 @@
 ## 3.7.0
 
+* Merge the `ControllerResourceLoader`, `ControllerResourceBuilder`, `ControllerResourceFinder`, `ControllerResourceNameFinder` and `ControllerResourceSanitizer` modules into `CanCan::ControllerResource`, and call the params method of the controller only once per request: it was called once more for every attribute set by the conditions of the ability. **WARNING**: the five modules no longer exist; override their methods in a subclass of `CanCan::ControllerResource` instead. ([@coorasse][])
 * Expand the actions again after `alias_action`, `clear_aliased_actions` and `merge`: `can?` kept using the aliases expanded by a previous check, so `clear_aliased_actions` did not remove `can :read` from `can?(:index, Model)`. ([@coorasse][])
 * Raise an error when an action is aliased to `:manage`, which granted every action, or to itself, which looped forever. ([@coorasse][])
 * Do not include the primary key in `permitted_attributes` for a rule without attributes, remove every attribute with a `cannot` rule without attributes, including those that are not columns, and accept a hash subject instead of raising a `TypeError`. **WARNING**: `permitted_attributes` no longer returns `:id`. ([@coorasse][])

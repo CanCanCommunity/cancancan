@@ -76,6 +76,14 @@ describe CanCan::ControllerResource do
       params.merge!(action: 'create')
     end
 
+    it 'calls the params method of the controller only once' do
+      ability.can(:create, Model, name: 'from conditions')
+      allow(controller).to receive(:create_params).and_return({})
+      CanCan::ControllerResource.new(controller).load_resource
+      expect(controller).to have_received(:create_params).once
+      expect(controller.instance_variable_get(:@model).name).to eq('from conditions')
+    end
+
     # Rails includes namespace in params, see issue #349
     it 'creates through the namespaced params' do
       module MyEngine
