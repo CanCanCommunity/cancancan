@@ -93,9 +93,13 @@ module CanCan
       case value
       when Hash then hash_condition_match?(attribute, value)
       when Range then value.cover?(attribute)
-      when Enumerable then value.include?(attribute)
+      when Enumerable then value.any? { |element| element_match?(attribute, element) }
       else attribute == value
       end
+    end
+
+    def element_match?(attribute, element)
+      element.is_a?(Range) ? element.cover?(attribute) : element == attribute
     end
 
     # Like Active Record with a relation as condition value: the selected column, or the primary key, is matched.
