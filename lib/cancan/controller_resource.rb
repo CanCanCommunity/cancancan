@@ -26,7 +26,7 @@ module CanCan
       @controller = controller
       @params = controller.params
       @options = args.extract_options!
-      @name = args.first
+      @name = args.first&.to_sym
     end
 
     def load_and_authorize_resource

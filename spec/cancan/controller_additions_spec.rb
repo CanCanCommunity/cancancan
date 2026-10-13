@@ -141,6 +141,12 @@ describe CanCan::ControllerAdditions do
     expect(@controller_class.cancan_skipper[:load][:article]).to eq({})
   end
 
+  it 'skip_load_and_authorize_resource adds itself to the cancan skipper with a string model name as a symbol' do
+    @controller_class.skip_load_and_authorize_resource('project')
+    expect(@controller_class.cancan_skipper[:load][:project]).to eq({})
+    expect(@controller_class.cancan_skipper[:authorize][:project]).to eq({})
+  end
+
   it 'skip_load_and_authorize_resource adds itself to the cancan skipper with given model name and options' do
     @controller_class.skip_load_and_authorize_resource(:project, only: %i[index show])
     expect(@controller_class.cancan_skipper[:load][:project]).to eq(only: %i[index show])

@@ -303,7 +303,7 @@ module CanCan
       # its own. Assign a copy, so a skip in a subclass does not change the superclass or sibling classes.
       def add_cancan_skip(behavior, name, options)
         skipper = cancan_skipper
-        self._cancan_skipper = skipper.merge(behavior => skipper[behavior].merge(name => options))
+        self._cancan_skipper = skipper.merge(behavior => skipper[behavior].merge(name&.to_sym => options))
       end
     end
 
