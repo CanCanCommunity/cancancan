@@ -34,7 +34,7 @@ module CanCan
       # This way one can use params[:action] in the controller to determine the permission.
       def alias_action(*args)
         target = args.pop[:to]
-        validate_target(target)
+        validate_target(target, args)
         aliased_actions[target] ||= []
         aliased_actions[target] += args
         forget_expanded_actions

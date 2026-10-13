@@ -165,9 +165,11 @@ module CanCan
     end
 
     # User shouldn't specify targets with names of real actions or it will cause Seg fault
-    def validate_target(target)
+    def validate_target(target, actions = [])
       error_message = "You can't specify target (#{target}) as alias because it is real action name"
       raise Error, error_message if aliased_actions.values.flatten.include? target
+      raise Error, "You can't specify target (#{target}) as alias because it is a reserved action" if target == :manage
+      raise Error, "You can't alias the action (#{target}) to itself" if actions.include?(target)
     end
 
     def model_adapter(model_class, action)
