@@ -732,6 +732,11 @@ describe CanCan::Ability do
       expect(@ability.unauthorized_message(:update, :missing)).to be_nil
     end
 
+    it 'uses the aliases of an action given as a string in i18n' do
+      I18n.backend.store_translations :en, unauthorized: { read: { array: 'foo' } }
+      expect(@ability.unauthorized_message('index', Array)).to eq('foo')
+    end
+
     it "uses model's name in i18n" do
       class Account
         include ActiveModel::Model
