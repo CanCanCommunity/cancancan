@@ -45,7 +45,16 @@ module CanCan
           false
         end
 
+        def parent_condition_keys(parent, child)
+          [parent_condition_name(parent, child), parent_child_foreign_key(parent, child)].compact
+        end
+
         def parent_child_conditions(parent, child, all_conditions)
+          foreign_key = parent_child_foreign_key(parent, child)
+          foreign_key.nil? ? nil : all_conditions[foreign_key]
+        end
+
+        def parent_child_foreign_key(parent, child)
           child_class = child.is_a?(Class) ? child : child.class
           parent_class = parent.is_a?(Class) ? parent : parent.class
 
@@ -56,11 +65,9 @@ module CanCan
 
           # Search again in case of polymorphic associations, this time matching on the :has_many side
           # via the :as option, as well as klass
-          foreign_key ||= parent_class.reflect_on_all_associations(:has_many).find do |has_many_assoc|
+          foreign_key || parent_class.reflect_on_all_associations(:has_many).find do |has_many_assoc|
             matching_parent_child_polymorphic_association(has_many_assoc, child_class)
           end&.foreign_key&.to_sym
-
-          foreign_key.nil? ? nil : all_conditions[foreign_key]
         end
 
         def matching_parent_child_polymorphic_association(parent_assoc, child_class)

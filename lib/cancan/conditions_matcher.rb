@@ -41,10 +41,11 @@ module CanCan
 
       adapter = model_adapter(parent)
 
-      parent_condition_name = adapter.parent_condition_name(parent, child)
+      # Like for a class, a "cannot" with conditions on the child does not stop the check.
+      return false unless @base_behavior || adapter.conditions_only_on_parent?(parent, child, @conditions)
 
-      matches_base_parent_conditions = matches_conditions_hash?(parent,
-                                                                @conditions[parent_condition_name] || {})
+      parent_conditions = @conditions[adapter.parent_condition_name(parent, child)] || {}
+      matches_base_parent_conditions = matches_conditions_hash?(parent, parent_conditions)
 
       matches_base_parent_conditions &&
         (!adapter.override_nested_subject_conditions_matching?(parent, child, @conditions) ||

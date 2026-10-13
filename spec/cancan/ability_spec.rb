@@ -885,5 +885,18 @@ describe CanCan::Ability do
       expect(@ability.can?(:read, 1 => Symbol)).to be(true)
       expect(@ability.can?(:read, 2 => Symbol)).to be(false)
     end
+
+    it 'is authorized when a cannot condition doesn\'t concern the parent' do
+      @ability.can :read, Symbol
+      @ability.cannot :read, Symbol, whatever: true
+      expect(@ability.can?(:read, 1 => Symbol)).to be(true)
+    end
+
+    it 'verifies the parent against a cannot condition' do
+      @ability.can :read, Symbol
+      @ability.cannot :read, Symbol, integer: 1
+      expect(@ability.can?(:read, 1 => Symbol)).to be(false)
+      expect(@ability.can?(:read, 2 => Symbol)).to be(true)
+    end
   end
 end

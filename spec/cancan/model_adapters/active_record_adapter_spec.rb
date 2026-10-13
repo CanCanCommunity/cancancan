@@ -688,6 +688,37 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
         end
       end
     end
+
+    context 'when a cannot rule has conditions' do
+      let(:ability) { Ability.new(user1).tap { |ability| ability.can :index, Comment } }
+
+      it 'does not deny the class when the conditions are on the child' do
+        ability.cannot :index, Comment, spam: true
+
+        expect(ability.can?(:index, Comment)).to eq(true)
+        expect(ability.can?(:index, { @article1 => Comment })).to eq(true)
+      end
+
+      it 'does not deny the class when the conditions are on the parent and the child' do
+        ability.cannot :index, Comment, spam: true, article: { user_id: user1.id }
+
+        expect(ability.can?(:index, { @article1 => Comment })).to eq(true)
+      end
+
+      it 'denies the class when the conditions are on the parent only' do
+        ability.cannot :index, Comment, article: { user_id: user1.id }
+
+        expect(ability.can?(:index, { @article1 => Comment })).to eq(false)
+        expect(ability.can?(:index, { @article2 => Comment })).to eq(true)
+      end
+
+      it 'denies the class when the conditions are on the parent id only' do
+        ability.cannot :index, Comment, article_id: @article1.id
+
+        expect(ability.can?(:index, { @article1 => Comment })).to eq(false)
+        expect(ability.can?(:index, { @article2 => Comment })).to eq(true)
+      end
+    end
   end
 
   unless CanCan::ModelAdapters::ActiveRecordAdapter.version_lower?('5.0.0')

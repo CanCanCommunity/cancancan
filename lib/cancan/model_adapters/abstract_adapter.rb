@@ -40,6 +40,15 @@ module CanCan
         parent.class.name.downcase.to_sym
       end
 
+      # Override if conditions on the parent could be under other keys, like a foreign key
+      def self.parent_condition_keys(parent, child)
+        [parent_condition_name(parent, child)]
+      end
+
+      def self.conditions_only_on_parent?(parent, child, conditions)
+        conditions.is_a?(Hash) && (conditions.keys.map(&:to_sym) - parent_condition_keys(parent, child)).empty?
+      end
+
       # Used above override_conditions_hash_matching to determine if this model adapter will override the
       # matching behavior for nested subject.
       # If this returns true then nested_subject_matches_conditions? will be called.
