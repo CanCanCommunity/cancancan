@@ -142,12 +142,12 @@ module CanCan
         strategy_class.new(adapter: self, relation: relation, where_conditions: where_node).execute!
       end
 
-      # Returns the associations used in the conditions of the can rules for the :joins option of a search.
-      # The cannot rules are checked in subqueries with their own joins.
+      # Returns the associations used in conditions for the :joins option of a search.
+      # The cannot rules on a has_many association are checked in subqueries with their own joins.
       # See ModelAdditions#accessible_by
       def joins
         joins_hash = {}
-        @compressed_rules.select(&:base_behavior).reverse_each do |rule|
+        @compressed_rules.reject { |rule| collection_cannot?(rule) }.reverse_each do |rule|
           deep_merge(joins_hash, rule.associations_hash)
         end
         deep_clean(joins_hash) unless joins_hash.empty?
@@ -215,16 +215,29 @@ module CanCan
         @where_conditions ||= begin
           conditions_extractor = ConditionsExtractor.new(@model_class)
           merge_rules do |rule|
-            if rule.base_behavior || rule.associations_hash.empty?
-              rule_conditions(rule, conditions_extractor)
-            else
+            if collection_cannot?(rule)
               matching_records_conditions(rule)
+            else
+              rule_conditions(rule, conditions_extractor)
             end
           end
         end
       end
 
-      # A cannot rule on associations excludes a record when any of its associated records matches,
+      def collection_cannot?(rule)
+        !rule.base_behavior && collection_association?(@model_class, rule.associations_hash)
+      end
+
+      def collection_association?(model_class, associations)
+        associations.any? do |name, nested|
+          reflection = model_class.reflect_on_association(name)
+          next false if reflection.nil? || reflection.polymorphic?
+
+          reflection.collection? || collection_association?(reflection.klass, nested)
+        end
+      end
+
+      # A cannot rule on a has_many association excludes a record when any of its associated records matches,
       # so it is checked on the records of a subquery instead of on each joined row.
       def matching_records_conditions(rule)
         conditions = rule_conditions(rule)
