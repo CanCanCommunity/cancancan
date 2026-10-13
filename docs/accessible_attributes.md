@@ -36,6 +36,24 @@ params
   .permit(current_ability.permitted_attributes(:read, @book))
 ```
 
+## Rules without attributes
+
+A `can` rule without attributes permits every attribute of the model, as it allows the action on the whole record:
+
+```ruby
+can :update, Book
+
+current_ability.permitted_attributes(:update, @book)
+#=> [:title, :author_id, :published, ...]
+```
+
+When you use `permitted_attributes` in Strong Parameters, list the attributes in the rules, otherwise every column of the
+table is accepted. A spec on `permitted_attributes` makes sure that a list is not forgotten:
+
+```ruby
+expect(ability.permitted_attributes(:update, book)).to eq(%i[title published])
+```
+
 ## Checks without an attribute
 
 A `can` rule with attributes also allows the action on the object itself, and its conditions are used by `accessible_by`:
