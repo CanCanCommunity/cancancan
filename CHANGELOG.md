@@ -2,11 +2,90 @@
 
 ### Breaking changes
 
+#### Ruby 3.2+ and Rails 8.0+
+
 * Drop support for Ruby < 3.2 and Rails < 8.0. The `ActiveRecord4Adapter` and `ActiveRecord5Adapter` classes are merged into `ActiveRecordAdapter`, and `:subquery` is always the default `accessible_by_strategy`. ([@coorasse][])
-* [#796](https://github.com/CanCanCommunity/cancancan/pull/796): The RSpec matcher raises `CanCan::ImplementationRemoved` when negated with several actions, as in `expect(ability).not_to be_able_to(%i[read update], article)`. It passed as soon as one action was forbidden, which was often misread as all actions being forbidden. Write one expectation per action instead. ([@coorasse][])
-* [#717](https://github.com/CanCanCommunity/cancancan/pull/717): Build the conditions of `accessible_by` with Arel instead of SQL strings, so that rules with an Active Record scope can be combined with other rules: `accessible_by` no longer raises `Unable to merge an Active Record scope with other conditions`. A `cannot` rule with a scope now excludes the records of the scope, like a `cannot` rule with hash conditions: it used to pass the scope through, so a scope that selected the allowed records must now select the forbidden ones. A scope with `joins`, `limit` or other clauses that select its records is used as a subquery on the primary key, and only the records of a scope matter: its `includes`, `order` and `select` no longer apply to the query. `ActiveRecordAdapter#conditions`, which is not public API, returns the SQL of a single scope rule instead of the scope, and `'1=0'` instead of `'t'='f'` when no record is accessible. ([@mamhoff][], [@coorasse][])
-* [#903](https://github.com/CanCanCommunity/cancancan/pull/903): `permitted_attributes` no longer includes the primary key when a rule has no attributes. It was documented to exclude it, but a bug kept `id` in the returned array. If your strong parameters rely on `permitted_attributes` to permit the primary key, add it explicitly, for example `params.require(:project).permit(:id, *current_ability.permitted_attributes(:update, @project))`. ([@coorasse][])
-* [#808](https://github.com/CanCanCommunity/cancancan/pull/808): `skip_load_resource`, `skip_authorize_resource` and `skip_load_and_authorize_resource` combine the `:only` and `:except` options with AND, like `before_action` does. They were combined with OR: `skip_authorize_resource only: :index, except: :show` skipped every action but `show`. If you passed both options and relied on that, pass only `:except` to keep the old behavior. ([@coorasse][])
+
+#### Active Record scopes can be combined with other rules
+
+* [#717](https://github.com/CanCanCommunity/cancancan/pull/717): The conditions of `accessible_by` are built with Arel instead of SQL strings, so a rule with an Active Record scope can be combined with other rules. ([@mamhoff][], [@coorasse][])
+
+  ```ruby
+  can :read, Article, published: true
+  can :read, Article, Article.where(author: user)
+
+  # 3.x: raises "Unable to merge an Active Record scope with other conditions"
+  # 4.0: returns the published articles and the articles of the user
+  Article.accessible_by(ability)
+  ```
+
+  A `cannot` rule with a scope now excludes the records of the scope, like a `cannot` rule with hash conditions. The scope used to be passed through as it was, so the documentation told to pass the inverse scope. Invert such scopes:
+
+  ```ruby
+  can :read, Product
+
+  # 3.x: the scope selects the accessible products
+  cannot :read, Product, Product.where(discontinued: false)
+
+  # 4.0: the scope selects the forbidden products, like `cannot :read, Product, discontinued: true`
+  cannot :read, Product, Product.where(discontinued: true)
+  ```
+
+  Only the records of a scope matter: a scope with `joins`, `limit`, `group` or other clauses that select its records is used as a subquery on the primary key, and its `includes`, `order` and `select` no longer apply to the query.
+
+  ```ruby
+  can :read, Article, Article.includes(:comments).joins(:category).where(categories: { visible: true }).order(:title)
+  can :read, Article, author: user
+
+  # 4.0: the inner join applies to the first rule only, the order and the eager loading are dropped
+  # SELECT articles.* FROM articles
+  # WHERE (articles.id IN (SELECT articles.id FROM articles INNER JOIN categories ... WHERE categories.visible = TRUE))
+  #    OR (articles.author_id = 1)
+  Article.accessible_by(ability)
+  ```
+
+  A scope with conditions on a joined table, or with a join or a limit, is no longer treated as a rule without conditions, which silently discarded the rules defined before it. `ActiveRecordAdapter#conditions`, which is not public API, returns the SQL of a single scope rule instead of the scope, and `'1=0'` instead of `'t'='f'` when no record is accessible.
+
+#### The RSpec matcher cannot be negated with several actions
+
+* [#796](https://github.com/CanCanCommunity/cancancan/pull/796): The RSpec matcher raises `CanCan::ImplementationRemoved` when negated with several actions. It passed as soon as one action was forbidden, which was often misread as all actions being forbidden. Write one expectation per action instead. ([@coorasse][])
+
+  ```ruby
+  # 3.x: passes as soon as one of the actions is forbidden
+  expect(ability).not_to be_able_to(%i[read update], article)
+
+  # 4.0: raises CanCan::ImplementationRemoved. Write instead:
+  expect(ability).not_to be_able_to(:read, article)
+  expect(ability).not_to be_able_to(:update, article)
+  ```
+
+#### `permitted_attributes` excludes the primary key
+
+* [#903](https://github.com/CanCanCommunity/cancancan/pull/903): `permitted_attributes` no longer includes the primary key when a rule has no attributes. It was documented to exclude it, but a bug kept `id` in the returned array. If your strong parameters rely on `permitted_attributes` to permit the primary key, add it explicitly. ([@coorasse][])
+
+  ```ruby
+  can :update, Project
+
+  # 3.x: [:id, :name, :description, ...]
+  # 4.0: [:name, :description, ...]
+  current_ability.permitted_attributes(:update, @project)
+
+  # Permit the primary key explicitly when you need it
+  params.require(:project).permit(:id, *current_ability.permitted_attributes(:update, @project))
+  ```
+
+#### `:only` and `:except` of the skip helpers are combined with AND
+
+* [#808](https://github.com/CanCanCommunity/cancancan/pull/808): `skip_load_resource`, `skip_authorize_resource` and `skip_load_and_authorize_resource` combine the `:only` and `:except` options with AND, like `before_action` does. They were combined with OR. If you passed both options and relied on that, pass only `:except` to keep the old behavior. ([@coorasse][])
+
+  ```ruby
+  # 3.x: skips every action but `show`
+  # 4.0: skips no action, since no action is both `index` and not `show`
+  skip_authorize_resource only: :index, except: :show
+
+  # Keep the old behavior
+  skip_authorize_resource except: :show
+  ```
 
 ### Other changes
 
