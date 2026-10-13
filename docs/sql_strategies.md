@@ -66,6 +66,43 @@ WHERE "articles"."id" IN
    WHERE "users"."name" = 'pippo')
 ```
 
+## :joined_alias_exists_subquery
+
+The records are joined with an alias of their own table, and the conditions are checked in an `EXISTS`
+subquery on the alias. This can be faster than `:subquery` on large tables.
+
+```sql
+SELECT "articles".*
+FROM "articles"
+JOIN "articles" AS "articles_alias" ON "articles_alias"."id" = "articles"."id"
+WHERE (EXISTS (SELECT 1
+  FROM "articles"
+  LEFT OUTER JOIN "mentions" ON "mentions"."article_id" = "articles"."id"
+  LEFT OUTER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
+  WHERE "users"."name" = 'pippo' AND ("articles"."id" = "articles_alias"."id")
+  LIMIT 1))
+```
+
+## :joined_alias_each_rule_as_exists_subquery
+
+Like `:joined_alias_exists_subquery`, but with one `EXISTS` subquery per `can` definition, joined with `OR`, and
+with inner joins instead of left outer joins when the conditions do not check for a missing association.
+
+**WARNING**: this strategy ignores `cannot` definitions. Only use it when the permissions of the model are made of
+`can` definitions.
+
+```sql
+SELECT "articles".*
+FROM "articles"
+JOIN "articles" AS "articles_alias" ON "articles_alias"."id" = "articles"."id"
+WHERE (EXISTS (SELECT 1
+  FROM "articles"
+  INNER JOIN "mentions" ON "mentions"."article_id" = "articles"."id"
+  INNER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
+  WHERE ("articles"."id" = "articles_alias"."id") AND "users"."name" = 'pippo'
+  LIMIT 1))
+```
+
 ## Custom strategies
 
 If none of the built-in strategies fits your needs, you can write your own: subclass
