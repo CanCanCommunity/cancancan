@@ -47,6 +47,10 @@ module CanCan
   #                ensures records are unique using `distinct`. Note that
   #                `distinct` is not reliable in some cases. See
   #                https://github.com/CanCanCommunity/cancancan/pull/605
+  # - :joined_alias_exists_subquery, :joined_alias_each_rule_as_exists_subquery -
+  #                Build an EXISTS subquery on an aliased table.
+  # - a subclass of CanCan::ModelAdapters::Strategies::Base - Your own
+  #                strategy. Implement `execute!` and return the relation.
   def self.accessible_by_strategy
     Thread.current[:cancan_accessible_by_strategy_override] ||
       @accessible_by_strategy ||
@@ -92,8 +96,16 @@ module CanCan
 
   def self.validate_accessible_by_strategy!(value)
     return if valid_accessible_by_strategies.include?(value)
+    return if custom_accessible_by_strategy?(value)
 
-    raise ArgumentError, "accessible_by_strategy must be one of #{valid_accessible_by_strategies.join(', ')}"
+    raise ArgumentError, "accessible_by_strategy must be one of #{valid_accessible_by_strategies.join(', ')} " \
+                         'or a subclass of CanCan::ModelAdapters::Strategies::Base'
+  end
+
+  def self.custom_accessible_by_strategy?(value)
+    value.is_a?(Class) &&
+      defined?(CanCan::ModelAdapters::Strategies::Base) &&
+      value < CanCan::ModelAdapters::Strategies::Base
   end
 
   def self.does_not_support_subquery_strategy?

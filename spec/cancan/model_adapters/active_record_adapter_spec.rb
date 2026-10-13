@@ -1413,6 +1413,38 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
   WHERE "users"."name" = 'pippo').gsub(/\s+/, ' ').strip)
       end
 
+      it 'allows a subclass of CanCan::ModelAdapters::Strategies::Base as strategy' do
+        u = User.create!(name: 'pippo')
+        article = Article.create!(mentioned_users: [u])
+        Article.create!(mentioned_users: [User.create!(name: 'pluto')])
+
+        ability = Ability.new(u)
+        ability.can :read, Article, mentions: { user: { name: u.name } }
+
+        inner_join_strategy = Class.new(CanCan::ModelAdapters::Strategies::Base) do
+          def execute!
+            relation.joins(joins).distinct
+          end
+        end
+
+        expected_sql = %(
+    SELECT DISTINCT "articles".*
+    FROM "articles"
+    INNER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
+    INNER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
+    WHERE "users"."name" = 'pippo').gsub(/\s+/, ' ').strip
+
+        keyword_sql = Article.accessible_by(ability, strategy: inner_join_strategy).to_sql
+        block_sql = CanCan.with_accessible_by_strategy(inner_join_strategy) { Article.accessible_by(ability).to_sql }
+        CanCan.accessible_by_strategy = inner_join_strategy
+        global_sql = Article.accessible_by(ability).to_sql
+
+        expect(keyword_sql.strip.squeeze(' ')).to eq(expected_sql)
+        expect(block_sql.strip.squeeze(' ')).to eq(expected_sql)
+        expect(global_sql.strip.squeeze(' ')).to eq(expected_sql)
+        expect(Article.accessible_by(ability)).to eq([article])
+      end
+
       it 'allows you to switch strategies with a block, and to_sql called outside the block' do
         u = User.create!(name: 'pippo')
         Article.create!(mentioned_users: [u])

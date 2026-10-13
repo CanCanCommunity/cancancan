@@ -14,8 +14,8 @@ module CanCan
       def self.matches_condition?(subject, name, value)
         return super if Array.wrap(value).all? { |x| x.is_a? Integer }
 
-        attribute = subject.send(name)
-        raw_attribute = subject.class.send(name.to_s.pluralize)[attribute]
+        attribute = subject.send(name).to_s
+        raw_attribute = subject.class.send(name.to_s.pluralize)[attribute].to_s
         !(Array(value).map(&:to_s) & [attribute, raw_attribute]).empty?
       end
 
@@ -26,8 +26,10 @@ module CanCan
       end
 
       def strategy_class
-        strategy_class_name = CanCan.accessible_by_strategy.to_s.camelize
-        CanCan::ModelAdapters::Strategies.const_get(strategy_class_name)
+        strategy = CanCan.accessible_by_strategy
+        return strategy if strategy.is_a?(Class)
+
+        CanCan::ModelAdapters::Strategies.const_get(strategy.to_s.camelize)
       end
 
       def sanitize_sql(conditions)
