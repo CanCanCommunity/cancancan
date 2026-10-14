@@ -76,3 +76,5 @@ def current_ability
   @current_ability ||= ReadAbility.new(current_user).merge(WriteAbility.new(current_user))
 end
 ```
+
+Blocks are Ruby closures, so they keep running in the ability that defined them: a `can?` call inside a block of `WriteAbility` checks only the rules of `WriteAbility`, also after the merge. If a block needs rules defined in another ability, define them in the same class, for example by inheriting from the other ability and calling `super`.

@@ -26,14 +26,8 @@ of models automatically and reduce duplicated code.
 
 ## Our sponsors
 <br/>
-<a href="https://www.pennylane.com/" target="_blank">
-  <img src="./logo/pennylane.svg" alt="Pennylane" height="50"/>
-</a>
-<br />
-<br />
-<br />
-<a href="https://www.honeybadger.io/" target="_blank">
-  <img src="./logo/honeybadger.svg" alt="Honeybadger" height="45"/>
+<a href="https://membean.com/" target="_blank">
+  <img src="./logo/membean.svg" alt="Membean" height="45"/>
 </a>
 <br/>
 <br/>
@@ -62,6 +56,8 @@ Add this to your Gemfile:
     gem 'cancancan'
 
 and run the `bundle install` command.
+
+CanCanCan 3.x is tested with Ruby 2.7+ and Active Record 5.2 to 8.1. Active Record is not a dependency of the gem, since abilities can be defined on any Ruby object, so Bundler cannot check its version for you.
 
 ## Define Abilities
 

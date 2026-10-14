@@ -25,7 +25,12 @@ Metrics/BlockLength:
 
 Metrics/ClassLength:
   Exclude:
+    - 'lib/cancan/controller_resource.rb'
     - 'lib/cancan/model_adapters/active_record_adapter.rb'
+
+Metrics/ModuleLength:
+  Exclude:
+    - 'lib/cancan/conditions_matcher.rb'
 
 # TODO
 # Offense count: 2
@@ -50,4 +55,3 @@ AllCops:
     - 'gemfiles/**/*'
     - 'vendor/**/*'
     - 'Appraisals'
-    - 'node_modules/**/*'

@@ -35,6 +35,9 @@ module CanCan
       def relevant_rules(action, subject)
         return [] unless @rules
 
+        # Actions are symbols in the rules, so 'destroy' must also match a `cannot :destroy`.
+        action = action.to_sym if action.is_a?(String)
+
         relevant = possible_relevant_rules(subject).select do |rule|
           rule.expanded_actions = expand_actions(rule.actions)
           rule.relevant? action, subject
@@ -56,8 +59,32 @@ module CanCan
         end
       end
 
+      # Returns nil when no rule matches. A class that uses single table inheritance is checked together with
+      # its subclasses, each one with the rules of its own ancestors: the check passes when any of them passes,
+      # which is also when `accessible_by` can return records.
+      def subject_can?(action, subject, attribute, *extra_args)
+        results = sti_classes(subject).map do |klass|
+          matching_rule(action, klass, attribute, *extra_args)&.base_behavior
+        end
+        results.compact.empty? ? nil : results.any?
+      end
+
+      def matching_rule(action, subject, attribute, *extra_args)
+        relevant_rules_for_match(action, subject).detect do |rule|
+          rule.matches_conditions?(action, subject, attribute, *extra_args) && rule.matches_attributes?(attribute)
+        end
+      end
+
+      def sti_classes(subject)
+        return [subject] unless defined?(ActiveRecord::Base) && subject.is_a?(Class) && subject < ActiveRecord::Base
+
+        [subject, *subject.descendants.select { |klass| StiDetector.sti_class?(klass) }]
+      end
+
       def relevant_rules_for_match(action, subject)
-        relevant_rules(action, subject).each do |rule|
+        rules = relevant_rules(action, subject)
+        rules = rules.reject { |rule| rule.only_for_subclasses_of?(subject) } if subject.is_a?(Class)
+        rules.each do |rule|
           next unless rule.only_raw_sql?
 
           raise Error,

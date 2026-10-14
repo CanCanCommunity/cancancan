@@ -53,7 +53,35 @@ If you want to a negative match, you can pass in `nil`.
 can :read, Project, members: { id: nil }
 ```
 
+This is also true for any condition on a `has_many` association where all values are `nil`: it matches the records with no associated records at all. For example, `can :read, Document, authors: { user_id: nil }` allows documents with an author without user, but also documents without authors. Add `cannot :read, Document, authors: { id: nil }` to exclude the latter.
+
 Almost anything that you can pass to a hash of conditions in ActiveRecord will work here as well.
+
+A nested hash always refers to an association, so keys inside a `json` or `jsonb` column cannot be used as conditions. Expose the key as a column instead, for example with a stored generated column, and use it as any other attribute:
+
+```ruby
+# migration
+t.virtual :shop_id, type: :integer, as: "(data->>'shop_id')::int", stored: true
+
+# ability
+can :read, Product, shop_id: user.shop_id
+```
+
+## Arrays and relations as values
+
+The value of a condition can be an array, in which case the attribute has to match one of its elements:
+
+```ruby
+can :read, Project, id: user.project_ids
+```
+
+It can also be an Active Record relation that selects a single column, or no column at all, in which case the primary key is used:
+
+```ruby
+can :read, Project, id: Project.where(user_id: user.id).select(:id)
+```
+
+`accessible_by` turns the relation into a subquery. `can?` runs one `EXISTS` query per check, so prefer an array when the checks are many and the set of values is small.
 
 ## Traverse associations
 

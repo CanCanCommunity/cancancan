@@ -52,6 +52,14 @@ describe CanCan::ControllerResource do
       expect(controller.instance_variable_get(:@model)).to eq(:some_model)
     end
 
+    it 'builds a resource when on custom new action given as a string' do
+      params.merge!(action: 'build', id: '123')
+      allow(Model).to receive(:new) { :some_model }
+      resource = CanCan::ControllerResource.new(controller, new: 'build')
+      resource.load_resource
+      expect(controller.instance_variable_get(:@model)).to eq(:some_model)
+    end
+
     it 'only authorizes :show action on parent resource' do
       model = Model.new
       allow(Model).to receive(:find).with('123') { model }
@@ -66,6 +74,14 @@ describe CanCan::ControllerResource do
   context 'on create actions' do
     before :each do
       params.merge!(action: 'create')
+    end
+
+    it 'calls the params method of the controller only once' do
+      ability.can(:create, Model, name: 'from conditions')
+      allow(controller).to receive(:create_params).and_return({})
+      CanCan::ControllerResource.new(controller).load_resource
+      expect(controller).to have_received(:create_params).once
+      expect(controller.instance_variable_get(:@model).name).to eq('from conditions')
     end
 
     # Rails includes namespace in params, see issue #349
@@ -129,6 +145,40 @@ describe CanCan::ControllerResource do
         resource.load_resource
         expect(controller.instance_variable_get(:@model).name).to eq('foobar')
         expect(controller.instance_variable_get(:@model).category).to eq(category)
+      end
+
+      it 'assigns the parent through the association inverse when the resource has no setter for :through' do
+        reflection = double(inverse_of: double(name: :team), options: {})
+        current_team = Class.new.new
+        current_team.class.define_singleton_method(:reflect_on_association) { |n| reflection if n.to_sym == :model }
+        expect_any_instance_of(Model).to receive('team=').with(current_team)
+
+        params[:model] = { name: 'foobar' }
+        controller.instance_variable_set(:@current_team, current_team)
+        resource = CanCan::ControllerResource.new(controller, through: :current_team, singleton: true)
+        resource.load_resource
+        expect(controller.instance_variable_get(:@model).name).to eq('foobar')
+      end
+
+      it 'assigns the parent through the polymorphic association when the resource has no setter for :through' do
+        reflection = double(inverse_of: nil, options: { as: :commentable })
+        post = Class.new.new
+        post.class.define_singleton_method(:reflect_on_association) { |name| reflection if name.to_sym == :comment }
+        expect_any_instance_of(Model).to receive('commentable=').with(post)
+
+        controller.instance_variable_set(:@post, post)
+        resource = CanCan::ControllerResource.new(controller, through: :post, through_association: :comment,
+                                                              singleton: true)
+        resource.load_resource
+      end
+
+      it 'raises an error when the resource has no setter named after :through and the association has no inverse' do
+        current_team = Class.new.new
+        current_team.class.define_singleton_method(:reflect_on_association) { |_name| nil }
+
+        controller.instance_variable_set(:@current_team, current_team)
+        resource = CanCan::ControllerResource.new(controller, through: :current_team, singleton: true)
+        expect { resource.load_resource }.to raise_error(CanCan::Error, /current_team=/)
       end
     end
 
@@ -257,6 +307,14 @@ describe CanCan::ControllerResource do
       params.merge!(action: 'sort', id: '123')
 
       resource = CanCan::ControllerResource.new(controller, collection: %i[sort list])
+      resource.load_resource
+      expect(controller.instance_variable_get(:@model)).to be_nil
+    end
+
+    it 'does not build a single resource when on custom collection action given as a string' do
+      params.merge!(action: 'sort', id: '123')
+
+      resource = CanCan::ControllerResource.new(controller, collection: 'sort')
       resource.load_resource
       expect(controller.instance_variable_get(:@model)).to be_nil
     end
@@ -421,11 +479,36 @@ describe CanCan::ControllerResource do
       expect(controller.instance_variable_get(:@model)).to be_nil
     end
 
+    it 'tries to load resource if params[:id] is only whitespace' do
+      params.merge!(action: 'show', id: ' ')
+      allow(Model).to receive(:find).with(' ').and_raise(ActiveRecord::RecordNotFound)
+      resource = CanCan::ControllerResource.new(controller)
+      expect { resource.load_resource }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
     it 'finds record through has_one association with :singleton and :shallow options' do
       model = Model.new
       allow(Model).to receive(:find).with('123') { model }
 
       resource = CanCan::ControllerResource.new(controller, through: :category, singleton: true, shallow: true)
+      resource.load_resource
+      expect(controller.instance_variable_get(:@model)).to eq(model)
+    end
+
+    it 'finds record through has_one association with :through_association and :singleton options' do
+      params[:id] = nil
+
+      model = Model.new
+
+      category = double(custom_model: model)
+      controller.instance_variable_set(:@category, category)
+
+      resource = CanCan::ControllerResource.new(
+        controller,
+        through: :category,
+        through_association: :custom_model,
+        singleton: true
+      )
       resource.load_resource
       expect(controller.instance_variable_get(:@model)).to eq(model)
     end
@@ -589,6 +672,24 @@ describe CanCan::ControllerResource do
     expect(resource).to_not be_parent
   end
 
+  it 'does not be a parent resource when a string name is provided which matches controller' do
+    resource = CanCan::ControllerResource.new(controller, 'model')
+    expect(resource).to_not be_parent
+  end
+
+  it 'authorizes the destroy action on the resource when a string name is provided' do
+    params.merge!(action: 'destroy', id: '123')
+    model = Model.new
+    allow(Model).to receive(:find).with('123') { model }
+    expect(controller).to receive(:authorize!).with(:destroy, model)
+    CanCan::ControllerResource.new(controller, 'model').load_and_authorize_resource
+  end
+
+  it 'skips the resource when a string name is provided' do
+    allow(controller_class).to receive(:cancan_skipper) { { authorize: { model: {} } } }
+    expect(CanCan::ControllerResource.new(controller, 'model').skip?(:authorize)).to be(true)
+  end
+
   it 'is parent if specified in options' do
     resource = CanCan::ControllerResource.new(controller, :model, parent: true)
     expect(resource).to be_parent
@@ -643,6 +744,18 @@ describe CanCan::ControllerResource do
     params[:action] = 'other_action'
     expect(CanCan::ControllerResource.new(controller).skip?(:authorize)).to be(false)
     expect(CanCan::ControllerResource.new(controller, :model).skip?(:authorize)).to be(true)
+  end
+
+  it 'skips resource behavior for :only and :except actions given as strings' do
+    allow(controller_class).to receive(:cancan_skipper) do
+      { authorize: { model: { except: 'destroy' } }, load: { model: { only: 'index' } } }
+    end
+    params[:action] = 'destroy'
+    expect(CanCan::ControllerResource.new(controller, :model).skip?(:authorize)).to be_falsey
+    expect(CanCan::ControllerResource.new(controller, :model).skip?(:load)).to be_falsey
+    params[:action] = 'index'
+    expect(CanCan::ControllerResource.new(controller, :model).skip?(:authorize)).to be(true)
+    expect(CanCan::ControllerResource.new(controller, :model).skip?(:load)).to be(true)
   end
 
   it 'skips loading and authorization' do

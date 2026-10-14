@@ -29,6 +29,16 @@ expect(ability).to be_able_to(:destroy, Project.new(user: user))
 expect(ability).not_to be_able_to(:destroy, Project.new)
 ```
 
+The matcher calls `can?`, so when you pass a class the conditions of the rules are ignored. To test the conditions, check instances or the records returned by `accessible_by`:
+
+```ruby
+can :index, Product, brand_id: user.brand_ids
+
+expect(ability).to be_able_to(:index, Product.new(brand_id: allowed_brand.id))
+expect(ability).not_to be_able_to(:index, Product.new(brand_id: other_brand.id))
+expect(Product.accessible_by(ability, :index)).to contain_exactly(allowed_product)
+```
+
 Pro way 😉
 
 ```ruby

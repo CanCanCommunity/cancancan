@@ -10,7 +10,8 @@ Gem::Specification.new do |s|
   s.authors     = ['Alessandro Rodi (Renuo AG)', 'Bryan Rite', 'Ryan Bates', 'Richard Wilson']
   s.email       = 'alessandro.rodi@renuo.ch'
   s.homepage    = 'https://github.com/CanCanCommunity/cancancan'
-  s.metadata = { 'funding_uri' => 'https://github.com/sponsors/coorasse' }
+  s.metadata = { 'changelog_uri' => 'https://github.com/CanCanCommunity/cancancan/blob/develop/CHANGELOG.md',
+                 'funding_uri' => 'https://github.com/sponsors/coorasse' }
   s.summary     = 'Simple authorization solution for Rails.'
   s.description = 'Simple authorization solution for Rails. All permissions are stored in a single location.'
   s.platform    = Gem::Platform::RUBY
@@ -23,7 +24,7 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency 'appraisal', '~> 2.0', '>= 2.0.0'
   s.add_development_dependency 'bundler', '~> 2.0'
-  s.add_development_dependency 'rake', '~> 10.1', '>= 10.1.1'
+  s.add_development_dependency 'rake'
   s.add_development_dependency 'rspec', '~> 3.2', '>= 3.2.0'
   s.add_development_dependency 'rubocop', '~> 1.31.1'
 end

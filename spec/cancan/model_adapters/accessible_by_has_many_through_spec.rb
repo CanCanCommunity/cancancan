@@ -34,6 +34,12 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecord5Adapter do
         t.integer :user_id
         t.timestamps null: false
       end
+
+      create_table(:memberships) do |t|
+        t.integer :post_id
+        t.integer :user_id
+        t.string :role
+      end
     end
 
     class User < ActiveRecord::Base
@@ -46,6 +52,8 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecord5Adapter do
       belongs_to :user
       has_many :likes
       has_many :editors
+      has_many :memberships
+      has_many :admins, -> { where(memberships: { role: 'admin' }) }, through: :memberships, source: :user
     end
 
     class Like < ActiveRecord::Base
@@ -54,6 +62,11 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecord5Adapter do
     end
 
     class Editor < ActiveRecord::Base
+      belongs_to :user
+      belongs_to :post
+    end
+
+    class Membership < ActiveRecord::Base
       belongs_to :user
       belongs_to :post
     end
@@ -99,6 +112,17 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecord5Adapter do
         it 'adds the where clause correctly' do
           posts = Post.accessible_by(ability).where(published: true)
           expect(posts.length).to eq 1
+        end
+      end
+
+      describe 'has_many through association with a scope' do
+        it 'keeps the scope of the association' do
+          Membership.create!(user: @user1, post: @post1, role: 'viewer')
+          Membership.create!(user: @user1, post: @post3, role: 'admin')
+          admin_ability = double.extend(CanCan::Ability)
+          admin_ability.can :read, Post, admins: { id: @user1.id }
+
+          expect(Post.accessible_by(admin_ability)).to contain_exactly(@post3)
         end
       end
     end

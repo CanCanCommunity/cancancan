@@ -96,11 +96,11 @@ can :read, Article, published: true
 
 return unless user.present?
 
-can [:read, :update], Article, user: user
+can [:read, :update], Article, user: user # merges the two rules above
 
 return unless user.admin?
 
-can [:read, :update], Article
+can [:read, :update], Article # merges the two rules above
 ```
 
 Now that we know the basics of defining and checking abilities, let's check what are the possible actions.
@@ -143,7 +143,7 @@ can [:read, :update], Article, user: user
 
 return unless user.admin?
 
-can :manage, Article
+can :manage, Article # was can [:read, :update], Article
 ```
 
 and say that the administrators are able to perform any action on the articles.
@@ -187,6 +187,8 @@ can :manage, :all
 and give all possible permissions to the administrator.
 
 Note that the code above allows the administrator to also `:read, :admin_dashboard`. `:manage` means literally **any** action, not only CRUD ones.
+
+For the same reason, `:manage` and `:all` are reserved: `:manage` cannot name one specific action. If a controller has an action called `manage`, `can :manage, Article` grants everything and no rule can grant only that action, so give the action another name.
 
 > You **must and should** always check for specific permissions, but you don't need to define all of them if not needed.
 

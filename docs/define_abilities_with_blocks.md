@@ -22,6 +22,23 @@ end
 can? :update, Project # returns true!
 ```
 
+Additional arguments passed to `can?` are passed to the block, again only when an instance is checked:
+
+```ruby
+can :create, Project do |project, remote_ip|
+  remote_ip.start_with?("10.")
+end
+
+can? :create, @project, request.remote_ip # calls the block
+can? :create, Project, request.remote_ip # does not call the block
+```
+
+To write the block with curly braces, put the arguments in parentheses. Without them, Ruby passes the block to `Project` instead of `can` and raises a `NoMethodError`:
+
+```ruby
+can(:update, Project) { |project| project.priority < 3 }
+```
+
 ## Fetching Records
 
 A block's conditions are only executable through Ruby. If you are [Fetching Records](./fetching_records.md) using `accessible_by` it will raise an exception.
@@ -38,7 +55,7 @@ end
 
 ## Block Conditions with ActiveRecord Scopes
 
-It's also possible to pass a scope instead of an SQL string when using a block in an ability.
+It's also possible to pass a scope instead of an SQL string when using a block in an ability. The block is **always required**, as it is called when checking discrete actions like `can` and `authorize`. See also [Defining Abilities: Best Practices](./define_abilities_best_practices.md).
 
 ```ruby
 can :read, Article, Article.published do |article|

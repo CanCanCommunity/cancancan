@@ -147,6 +147,19 @@ class ProductsController < ActionController::Base
 end
 ```
 
+Every call to `authorize_resource` or `load_and_authorize_resource` adds a new `before_action`, so calling it again in a subclass does not replace the one inherited from the parent controller. To change its options, skip the inherited one and give a name to the new one, so that the skip does not apply to it:
+
+```ruby
+class ApplicationController < ActionController::Base
+  authorize_resource
+end
+
+class ReportsController < ApplicationController
+  skip_authorize_resource
+  authorize_resource :report, class: "Analytics::Report"
+end
+```
+
 ### Custom class name
 
 If the model is named differently than the controller, then you may explicitly name the model that should be loaded; however, you must specify that it is not a parent in a nested routing situation, ie:
@@ -156,6 +169,8 @@ class ArticlesController < ApplicationController
   load_and_authorize_resource :post, parent: false
 end
 ```
+
+> **Warning**: without `parent: false`, a resource named differently than the controller is treated as the parent of a [nested resource](./nested_resources.md) and is always authorized with the `:show` action. In the example above, a user who can only read posts would be allowed to call `update`.
 
 If the model class is namespaced differently than the controller you will need to specify the `:class` option.
 
@@ -170,9 +185,17 @@ end
 If you want to fetch a resource by something other than `id` it can be done so using the `find_by` option.
 
 ```ruby
-load_resource find_by: => :permalink # will use find_by!(permalink: params[:id])
+load_resource find_by: :permalink # will use find_by!(permalink: params[:id])
 authorize_resource
 ```
+
+`find_by` only changes the column, the value is still read from `params[:id]`. If your route uses another parameter, for example with `resources :books, param: :uuid`, pass it with `id_param`:
+
+```ruby
+load_and_authorize_resource find_by: :uuid, id_param: :uuid # will use find_by!(uuid: params[:uuid])
+```
+
+CanCanCan considers an action a member action, and loads a single record, only when the id parameter is present. Without `id_param`, `show` and `edit` would load the collection instead, and authorize the action on the class.
 
 ### Override loading
 
@@ -190,6 +213,9 @@ class BooksController < ApplicationController
   end
 end
 ```
+
+The instance variable must be set to a record: if it is `nil`, CanCanCan loads the resource again. Use `find`, which raises `ActiveRecord::RecordNotFound`, instead of `find_by`.
+The instance variable is used only for member actions, so when the record is identified by another parameter than `:id`, set `id_param` as explained in [Custom find](#custom-find).
 
 ## check_authorization
 

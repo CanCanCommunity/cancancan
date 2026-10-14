@@ -49,8 +49,9 @@ module CanCan
     #
     # Any additional arguments will be passed into the "can" block definition. This
     # can be used to pass more information about the user's request for example.
+    # The block is not called when a class is passed instead of an instance.
     #
-    #   can? :create, Project, request.remote_ip
+    #   can? :create, @project, request.remote_ip
     #
     #   can :create, Project do |project, remote_ip|
     #     # ...
@@ -72,12 +73,11 @@ module CanCan
     #
     # Also see the RSpec Matchers to aid in testing.
     def can?(action, subject, attribute = nil, *extra_args)
-      match = extract_subjects(subject).lazy.map do |a_subject|
-        relevant_rules_for_match(action, a_subject).detect do |rule|
-          rule.matches_conditions?(action, a_subject, attribute, *extra_args) && rule.matches_attributes?(attribute)
-        end
-      end.reject(&:nil?).first
-      match ? match.base_behavior : false
+      action = action.to_sym if action.is_a?(String)
+      results = extract_subjects(subject).lazy.map do |a_subject|
+        subject_can?(action, a_subject, attribute, *extra_args)
+      end
+      results.reject(&:nil?).first || false
     end
 
     # Convenience method which works the same as "can?" but returns the opposite value.
@@ -162,9 +162,11 @@ module CanCan
     end
 
     # User shouldn't specify targets with names of real actions or it will cause Seg fault
-    def validate_target(target)
+    def validate_target(target, actions = [])
       error_message = "You can't specify target (#{target}) as alias because it is real action name"
       raise Error, error_message if aliased_actions.values.flatten.include? target
+      raise Error, "You can't specify target (#{target}) as alias because it is a reserved action" if target == :manage
+      raise Error, "You can't alias the action (#{target}) to itself" if actions.include?(target)
     end
 
     def model_adapter(model_class, action)
@@ -250,6 +252,7 @@ module CanCan
         add_rule(rule.dup)
       end
       @aliased_actions = aliased_actions.merge(ability.aliased_actions)
+      @expanded_actions = nil
       self
     end
 
@@ -303,9 +306,9 @@ module CanCan
     def alternative_subjects(subject)
       subject = subject.class unless subject.is_a?(Module)
       if subject.respond_to?(:subclasses) && defined?(ActiveRecord::Base) && subject < ActiveRecord::Base
-        [:all, *(subject.ancestors + subject.subclasses), subject.class.to_s]
+        [:all, *(subject.ancestors + subject.descendants)]
       else
-        [:all, *subject.ancestors, subject.class.to_s]
+        [:all, *subject.ancestors]
       end
     end
   end

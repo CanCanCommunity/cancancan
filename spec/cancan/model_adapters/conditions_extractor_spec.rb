@@ -48,6 +48,7 @@ RSpec.describe CanCan::ModelAdapters::ConditionsExtractor do
         t.integer :sender_id
         t.integer :receiver_id
         t.integer :supervisor_id
+        t.integer :approver_id
       end
     end
 
@@ -86,6 +87,7 @@ RSpec.describe CanCan::ModelAdapters::ConditionsExtractor do
       belongs_to :sender, class_name: 'User', foreign_key: :sender_id
       belongs_to :receiver, class_name: 'User', foreign_key: :receiver_id
       belongs_to :supervisor, class_name: 'User', foreign_key: :supervisor_id
+      belongs_to :approver, class_name: 'User', foreign_key: :approver_id
     end
   end
 
@@ -144,6 +146,40 @@ RSpec.describe CanCan::ModelAdapters::ConditionsExtractor do
                                articles: { id: 'article1' },
                                receivers_transactions: { id: 'receiver' },
                                articles_users: { id: 'article2' })
+    end
+
+    it 'gives an alias to the associations without conditions' do
+      conditions = described_class.new(Transaction).tableize_conditions(sender: { articles: { user: { id: 1 } } })
+      expect(conditions).to eq(users_articles: { id: 1 })
+    end
+
+    it 'gives an alias to the through tables' do
+      conditions = described_class.new(Article).tableize_conditions(mentioned_users: { mentions: { id: 1 } })
+      expect(conditions).to eq(mentions_users: { id: 1 })
+    end
+
+    it 'gives the aliases in the order of the joins' do
+      extractor = described_class.new(Transaction, [:receiver, { sender: [:articles] }])
+      conditions = extractor.tableize_conditions(sender: { id: 1, articles: { id: 2 } }, receiver: { id: 3 })
+      expect(conditions).to eq(senders_transactions: { id: 1 }, articles: { id: 2 }, users: { id: 3 })
+    end
+
+    it 'converts multiple references of same table with incrementing indexes' do
+      original_conditions = [
+        { sender: { mentions: { id: '1' } } },
+        { receiver: { mentions: { id: '1' } } },
+        { supervisor: { mentions: { id: '1' } } },
+        { approver: { mentions: { id: '1' } } }
+      ]
+
+      extractor = described_class.new(Transaction)
+      conditions = original_conditions.map do |condition|
+        extractor.tableize_conditions(condition).dup
+      end
+      expect(conditions).to eq([{ legacy_mentions: { id: '1' } },
+                                { mentions_users: { id: '1' } },
+                                { mentions_users_2: { id: '1' } },
+                                { mentions_users_3: { id: '1' } }])
     end
   end
 end

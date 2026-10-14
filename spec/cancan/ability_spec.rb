@@ -131,6 +131,16 @@ describe CanCan::Ability do
       .to raise_error(CanCan::Error, "You can't specify target (show) as alias because it is real action name")
   end
 
+  it 'raises an Error if alias target is :manage' do
+    expect { @ability.alias_action :read, to: :manage }
+      .to raise_error(CanCan::Error, "You can't specify target (manage) as alias because it is a reserved action")
+  end
+
+  it 'raises an Error if an action is aliased to itself' do
+    expect { @ability.alias_action :approve, to: :approve }
+      .to raise_error(CanCan::Error, "You can't alias the action (approve) to itself")
+  end
+
   it 'always calls block with arguments when passing no arguments to can' do
     @ability.can do |action, object_class, object|
       expect(action).to eq(:foo)
@@ -304,6 +314,20 @@ describe CanCan::Ability do
     @ability.alias_action :update, to: :modify
     @ability.clear_aliased_actions
     expect(@ability.aliased_actions[:modify]).to be_nil
+  end
+
+  it 'does not expand cleared aliased actions after a check' do
+    @ability.can :read, Integer
+    expect(@ability.can?(:index, Integer)).to be(true)
+    @ability.clear_aliased_actions
+    expect(@ability.can?(:index, Integer)).to be(false)
+  end
+
+  it 'expands aliased actions added after a check' do
+    @ability.can :modify, Integer
+    expect(@ability.can?(:update, Integer)).to be(false)
+    @ability.alias_action :update, to: :modify
+    expect(@ability.can?(:update, Integer)).to be(true)
   end
 
   it 'passes additional arguments to block from can?' do
@@ -646,6 +670,21 @@ describe CanCan::Ability do
     expect(@ability.can?(:update, Object, 'name')).to be(true)
   end
 
+  it 'allows strings when checking actions' do
+    @ability.can :manage, :all
+    @ability.cannot :destroy, Integer
+    expect(@ability.can?('destroy', 123)).to be(false)
+    expect(@ability.can?('read', 123)).to be(true)
+  end
+
+  it 'allows strings when defining actions and aliases' do
+    @ability.alias_action 'publish', to: 'update'
+    @ability.can :manage, :all
+    @ability.cannot 'update', Integer
+    expect(@ability.can?(:update, 123)).to be(false)
+    expect(@ability.can?(:publish, 123)).to be(false)
+  end
+
   it 'passes attribute to block; nil if no attribute given' do
     @ability.can :update, Range do |_range, attribute|
       attribute == :name
@@ -669,7 +708,7 @@ describe CanCan::Ability do
     @ability.can :read, NamedUser
     @ability.can :read, Array, :special
     @ability.can :action, :subject, :attribute
-    expect(@ability.permitted_attributes(:read, NamedUser)).to eq(%i[id first_name last_name role])
+    expect(@ability.permitted_attributes(:read, NamedUser)).to eq(%i[first_name last_name role])
     expect(@ability.permitted_attributes(:read, Array)).to eq([:special])
     expect(@ability.permitted_attributes(:action, :subject)).to eq([:attribute])
   end
@@ -689,6 +728,17 @@ describe CanCan::Ability do
     expect(@ability.permitted_attributes(:read, 1..3)).to eq(%i[nil? to_s class])
     expect(@ability.permitted_attributes(:read, 2..5)).to eq([:class])
     expect(@ability.permitted_attributes(:read, 2..4)).to eq(%i[class to_s])
+  end
+
+  it 'removes the attributes of a can rule when a cannot rule has no attributes' do
+    @ability.can :update, Range, %i[first last]
+    @ability.cannot :update, Range
+    expect(@ability.permitted_attributes(:update, Range)).to eq([])
+  end
+
+  it 'returns permitted attributes for a hash subject' do
+    @ability.can :read, NamedUser
+    expect(@ability.permitted_attributes(:read, Array => NamedUser)).to eq(%i[first_name last_name role])
   end
 
   it 'respects inheritance when checking permitted attributes' do
@@ -715,6 +765,11 @@ describe CanCan::Ability do
       expect(@ability.unauthorized_message(:update, Array)).to eq('foo')
       expect(@ability.unauthorized_message(:update, [1, 2, 3])).to eq('foo')
       expect(@ability.unauthorized_message(:update, :missing)).to be_nil
+    end
+
+    it 'uses the aliases of an action given as a string in i18n' do
+      I18n.backend.store_translations :en, unauthorized: { read: { array: 'foo' } }
+      expect(@ability.unauthorized_message('index', Array)).to eq('foo')
     end
 
     it "uses model's name in i18n" do
@@ -819,14 +874,14 @@ describe CanCan::Ability do
     it 'adds the aliased actions from the given ability' do
       @ability.alias_action :show, to: :see
       (another_ability = double).extend(CanCan::Ability)
-      another_ability.alias_action :create, :update, to: :manage
+      another_ability.alias_action :create, :update, to: :modify
 
       @ability.merge(another_ability)
       expect(@ability.aliased_actions).to eq(
         read: %i[index show],
         create: %i[new],
         update: %i[edit],
-        manage: %i[create update],
+        modify: %i[create update],
         see: %i[show]
       )
     end
@@ -843,6 +898,16 @@ describe CanCan::Ability do
         update: %i[edit],
         see: %i[show]
       )
+    end
+
+    it 'expands the aliased actions from the given ability after a check' do
+      @ability.can :modify, Integer
+      expect(@ability.can?(:update, Integer)).to be(false)
+      (another_ability = double).extend(CanCan::Ability)
+      another_ability.alias_action :update, to: :modify
+
+      @ability.merge(another_ability)
+      expect(@ability.can?(:update, Integer)).to be(true)
     end
 
     it 'can add an empty ability' do
@@ -884,6 +949,19 @@ describe CanCan::Ability do
       @ability.can :read, Symbol, integer: { to_i: 1 }
       expect(@ability.can?(:read, 1 => Symbol)).to be(true)
       expect(@ability.can?(:read, 2 => Symbol)).to be(false)
+    end
+
+    it 'is authorized when a cannot condition doesn\'t concern the parent' do
+      @ability.can :read, Symbol
+      @ability.cannot :read, Symbol, whatever: true
+      expect(@ability.can?(:read, 1 => Symbol)).to be(true)
+    end
+
+    it 'verifies the parent against a cannot condition' do
+      @ability.can :read, Symbol
+      @ability.cannot :read, Symbol, integer: 1
+      expect(@ability.can?(:read, 1 => Symbol)).to be(false)
+      expect(@ability.can?(:read, 2 => Symbol)).to be(true)
     end
   end
 end

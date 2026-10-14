@@ -23,6 +23,8 @@ module CanCan
                             else
                               @rules
                             end
+        # The normalizers change the rules. Work on copies, so the rules of the ability stay the same.
+        @compressed_rules = @compressed_rules.map(&:dup)
         StiNormalizer.normalize(@compressed_rules)
         ConditionsNormalizer.normalize(model_class, @compressed_rules)
       end
@@ -43,7 +45,16 @@ module CanCan
           false
         end
 
+        def parent_condition_keys(parent, child)
+          [parent_condition_name(parent, child), parent_child_foreign_key(parent, child)].compact
+        end
+
         def parent_child_conditions(parent, child, all_conditions)
+          foreign_key = parent_child_foreign_key(parent, child)
+          foreign_key.nil? ? nil : all_conditions[foreign_key]
+        end
+
+        def parent_child_foreign_key(parent, child)
           child_class = child.is_a?(Class) ? child : child.class
           parent_class = parent.is_a?(Class) ? parent : parent.class
 
@@ -54,11 +65,9 @@ module CanCan
 
           # Search again in case of polymorphic associations, this time matching on the :has_many side
           # via the :as option, as well as klass
-          foreign_key ||= parent_class.reflect_on_all_associations(:has_many).find do |has_many_assoc|
+          foreign_key || parent_class.reflect_on_all_associations(:has_many).find do |has_many_assoc|
             matching_parent_child_polymorphic_association(has_many_assoc, child_class)
           end&.foreign_key&.to_sym
-
-          foreign_key.nil? ? nil : all_conditions[foreign_key]
         end
 
         def matching_parent_child_polymorphic_association(parent_assoc, child_class)
@@ -110,26 +119,22 @@ module CanCan
       #   query(:manage, User).conditions # => "not (self_managed = 't') AND ((manager_id = 1) OR (id = 1))"
       #
       def conditions
-        conditions_extractor = ConditionsExtractor.new(@model_class)
-        if @compressed_rules.size == 1 && @compressed_rules.first.base_behavior
-          # Return the conditions directly if there's just one definition
-          conditions_extractor.tableize_conditions(@compressed_rules.first.conditions).dup
-        else
-          extract_multiple_conditions(conditions_extractor, @compressed_rules)
-        end
+        extract_conditions(ConditionsExtractor.new(@model_class, joins))
       end
 
       def extract_multiple_conditions(conditions_extractor, rules)
-        rules.reverse.inject(false_sql) do |sql, rule|
-          merge_conditions(sql, conditions_extractor.tableize_conditions(rule.conditions).dup, rule.base_behavior)
+        sql, = rules.reverse.inject([false_sql, false]) do |(sql, or_chain), rule|
+          conditions_hash = conditions_extractor.tableize_conditions(rule.conditions).dup
+          merge_conditions(sql, or_chain, conditions_hash, rule.base_behavior, conditions_extractor)
         end
+        sql
       end
 
       def database_records
         if override_scope
-          @model_class.where(nil).merge(override_scope)
+          merge_override_scope
         elsif @model_class.respond_to?(:where) && @model_class.respond_to?(:joins)
-          build_relation(conditions)
+          build_relation(where_conditions)
         else
           @model_class.all(conditions: conditions, joins: joins)
         end
@@ -155,6 +160,29 @@ module CanCan
 
       private
 
+      def extract_conditions(conditions_extractor)
+        if @compressed_rules.size == 1 && @compressed_rules.first.base_behavior
+          # Return the conditions directly if there's just one definition
+          conditions_extractor.tableize_conditions(@compressed_rules.first.conditions).dup
+        else
+          extract_multiple_conditions(conditions_extractor, @compressed_rules)
+        end
+      end
+
+      # Active Record cannot find the model of an aliased table in a hash of conditions,
+      # so the conditions on associations are converted to SQL with the model of each table.
+      def where_conditions
+        conditions_extractor = ConditionsExtractor.new(@model_class, joins)
+        conditions = extract_conditions(conditions_extractor)
+        return conditions unless conditions.is_a?(Hash) && conditions.values.any? { |value| value.is_a?(Hash) }
+
+        where_node(conditions, conditions_extractor)
+      end
+
+      def where_node(conditions, conditions_extractor)
+        sanitize_sql(conditions, conditions_extractor)
+      end
+
       # Removes empty hashes and moves everything into arrays.
       def deep_clean(joins_hash)
         joins_hash.map { |name, nested| nested.empty? ? name : { name => deep_clean(nested) } }
@@ -169,6 +197,17 @@ module CanCan
             base_hash[key] = value
           end
         end
+      end
+
+      # `merge` replaces the conditions of the base relation on the columns the scope also constrains,
+      # so the conditions it dropped, like the one of an association like `category.articles`, are applied again.
+      # The conditions the scope removes with `unscope`, like the ones of a default scope, stay removed.
+      def merge_override_scope
+        merged = @model_class.where(nil).merge(override_scope)
+        base = @model_class.where(nil)
+        base = base.unscope(*override_scope.unscope_values) if override_scope.unscope_values.any?
+        dropped = base.where_clause.send(:predicates) - merged.where_clause.send(:predicates)
+        dropped.inject(merged) { |relation, predicate| relation.where(predicate) }
       end
 
       def override_scope
@@ -186,24 +225,43 @@ module CanCan
               "Instead use a hash or SQL for #{rule_found.actions.first} #{rule_found.subjects.first} ability."
       end
 
-      def merge_conditions(sql, conditions_hash, behavior)
+      # Returns the merged sql and whether it is a flat chain of OR conditions.
+      def merge_conditions(sql, or_chain, conditions_hash, behavior, conditions_extractor)
         if conditions_hash.blank?
-          behavior ? true_sql : false_sql
+          [behavior ? true_sql : false_sql, false]
         else
-          merge_non_empty_conditions(behavior, conditions_hash, sql)
+          merge_non_empty_conditions(behavior, sanitize_sql(conditions_hash, conditions_extractor), sql, or_chain)
         end
       end
 
-      def merge_non_empty_conditions(behavior, conditions_hash, sql)
-        conditions = sanitize_sql(conditions_hash)
+      # Consecutive `can` rules are joined in a flat chain of ORs, so that the nesting of the query only grows
+      # when `can` and `cannot` rules alternate. Deeply nested conditions overflow the parser of SQLite.
+      def merge_non_empty_conditions(behavior, conditions, sql, or_chain)
         case sql
         when true_sql
-          behavior ? true_sql : "not (#{conditions})"
+          behavior ? [true_sql, false] : [not_conditions(conditions), false]
         when false_sql
-          behavior ? conditions : false_sql
+          behavior ? [conditions, false] : [false_sql, false]
         else
-          behavior ? "(#{conditions}) OR (#{sql})" : "not (#{conditions}) AND (#{sql})"
+          merge_with_previous_conditions(behavior, conditions, sql, or_chain)
         end
+      end
+
+      def merge_with_previous_conditions(behavior, conditions, sql, or_chain)
+        if behavior
+          [or_conditions(conditions, sql, or_chain), true]
+        else
+          ["#{not_conditions(conditions)} AND (#{sql})", false]
+        end
+      end
+
+      # A cannot rule only excludes the records that match its conditions: NULL does not match.
+      def not_conditions(conditions)
+        "(#{conditions}) IS NOT TRUE"
+      end
+
+      def or_conditions(conditions, sql, or_chain)
+        "(#{conditions}) OR #{or_chain ? sql : "(#{sql})"}"
       end
 
       def false_sql
@@ -214,7 +272,7 @@ module CanCan
         sanitize_sql(['?=?', true, true])
       end
 
-      def sanitize_sql(conditions)
+      def sanitize_sql(conditions, _conditions_extractor = nil)
         @model_class.send(:sanitize_sql, conditions)
       end
     end

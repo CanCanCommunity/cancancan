@@ -39,6 +39,8 @@ RSpec.describe CanCan::ModelAdapters::ConditionsNormalizer do
       has_many :comments, through: :spread_comments
       has_many :mentions
       has_many :mentioned_users, through: :mentions, source: :user
+      has_many :mentioned_pippos, -> { where(name: 'pippo') }, through: :mentions, source: :user
+      has_many :mentioned_authors, ->(article) { where(id: article.id) }, through: :mentions, source: :user
       has_many :attachments, as: :record
     end
 
@@ -84,6 +86,18 @@ RSpec.describe CanCan::ModelAdapters::ConditionsNormalizer do
     rule = CanCan::Rule.new(true, :read, Blob, articles: { id: 11 })
     CanCan::ModelAdapters::ConditionsNormalizer.normalize(Blob, [rule])
     expect(rule.conditions).to eq(articles: { id: 11 })
+  end
+
+  it 'does not simplify has_many through associations with a scope' do
+    rule = CanCan::Rule.new(true, :read, Article, mentioned_pippos: { id: 11 })
+    CanCan::ModelAdapters::ConditionsNormalizer.normalize(Article, [rule])
+    expect(rule.conditions).to eq(mentioned_pippos: { id: 11 })
+  end
+
+  it 'simplifies has_many through associations with a scope that takes the record' do
+    rule = CanCan::Rule.new(true, :read, Article, mentioned_authors: { id: 11 })
+    CanCan::ModelAdapters::ConditionsNormalizer.normalize(Article, [rule])
+    expect(rule.conditions).to eq(mentions: { user: { id: 11 } })
   end
 
   it 'normalizes the has_one through associations' do

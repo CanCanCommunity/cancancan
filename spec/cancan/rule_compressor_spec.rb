@@ -137,6 +137,25 @@ describe CanCan::RulesCompressor do
     end
   end
 
+  context 'rules with the same conditions on different subjects' do
+    before do
+      stub_const('Pet', Class.new)
+      stub_const('Cat', Class.new(Pet))
+      stub_const('Dog', Class.new(Pet))
+    end
+
+    let(:rules) do
+      [can(:read, Pet, capacity: 5),
+       can(:read, Cat, capacity: 5),
+       can(:read, Dog, capacity: 6),
+       can(:read, Pet, capacity: 5)]
+    end
+
+    it 'only removes the rule duplicated on the same subject' do
+      expect(described_class.new(rules).rules_collapsed).to eq [rules[1], rules[2], rules[3]]
+    end
+  end
+
   # TODO: not supported yet
   xcontext 'merges rules' do
     let(:rules) do

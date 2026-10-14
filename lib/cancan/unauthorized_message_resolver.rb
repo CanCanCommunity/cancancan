@@ -3,6 +3,7 @@
 module CanCan
   module UnauthorizedMessageResolver
     def unauthorized_message(action, subject)
+      action = action.to_sym if action.is_a?(String)
       subject = subject.values.last if subject.is_a?(Hash)
       keys = unauthorized_message_keys(action, subject)
       variables = {}

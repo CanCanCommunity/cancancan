@@ -33,10 +33,12 @@ module CanCan
       #
       # This way one can use params[:action] in the controller to determine the permission.
       def alias_action(*args)
-        target = args.pop[:to]
-        validate_target(target)
+        target = args.pop[:to]&.to_sym
+        actions = args.map(&:to_sym)
+        validate_target(target, actions)
         aliased_actions[target] ||= []
-        aliased_actions[target] += args
+        aliased_actions[target] += actions
+        @expanded_actions = nil
       end
 
       # Returns a hash of aliased actions. The key is the target and the value is an array of actions aliasing the key.
@@ -47,6 +49,7 @@ module CanCan
       # Removes previously aliased actions including the defaults.
       def clear_aliased_actions
         @aliased_actions = {}
+        @expanded_actions = nil
       end
 
       private

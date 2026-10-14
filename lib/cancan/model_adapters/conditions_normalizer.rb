@@ -41,7 +41,15 @@ module CanCan
         end
 
         def normalizable_association?(reflection)
-          reflection.options[:through].present? && !reflection.options[:source_type].present?
+          reflection.options[:through].present? &&
+            !reflection.options[:source_type].present? &&
+            !joinable_with_scope?(reflection)
+        end
+
+        # A through association with its own scope is not exploded, because its parts do not keep
+        # that scope. Active Record joins it with the scope, unless the scope takes the record as argument.
+        def joinable_with_scope?(reflection)
+          reflection.scope.present? && reflection.scope.arity.zero?
         end
       end
     end

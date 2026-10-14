@@ -170,7 +170,6 @@ Style/RedundantFileExtensionInRequire:
   Exclude:
     - 'lib/cancan/ability.rb'
     - 'lib/cancan/controller_resource.rb'
-    - 'lib/cancan/controller_resource_loader.rb'
     - 'lib/cancan/rule.rb'
     - 'lib/cancan/rules_compressor.rb'
 
@@ -185,14 +184,6 @@ Style/RedundantFreeze:
 Style/RedundantRegexpEscape:
   Exclude:
     - 'spec/changelog_spec.rb'
-
-# Offense count: 1
-# This cop supports safe auto-correction (--auto-correct).
-# Configuration parameters: ConvertCodeThatCanStartToReturnNil, AllowedMethods.
-# AllowedMethods: present?, blank?, presence, try, try!
-Style/SafeNavigation:
-  Exclude:
-    - 'lib/cancan/controller_resource_builder.rb'
 
 # Offense count: 3
 # This cop supports unsafe auto-correction (--auto-correct-all).

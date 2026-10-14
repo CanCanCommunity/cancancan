@@ -28,7 +28,18 @@ If the name of the association doesn't match the resource name, for instance `ha
   end
 ```
 
+The same option applies to singleton resources, for instance `has_one :profile, class_name: 'Account'`:
+
+```ruby
+  class AccountsController < ApplicationController
+    load_and_authorize_resource :user
+    load_and_authorize_resource :account, through: :user, through_association: :profile, singleton: true
+  end
+```
+
 If the resource name (`:project` in this case) does not match the controller, then it will be considered a parent resource. You can manually specify parent/child resources using the `parent: false` option.
+
+> **Warning**: a parent resource is always authorized with the `:show` action, whatever the action of the controller. If a resource with a different name than the controller is not a parent, pass `parent: false`, otherwise it will be authorized with `:show` also for actions like `update` or `destroy`.
 
 ## Securing `through` changes
 
@@ -105,7 +116,13 @@ class TasksController < ApplicationController
 end
 ```
 
-It will then use the `@project.task` and `@project.build_task` methods for fetching and building respectively.
+It will then use `@project.task` to fetch the record. New records are built with `Task.new` and the parent is assigned through `task.project=`, so the existing record of the `has_one` association is not touched. If the `:through` option does not match a setter on the resource, for instance `through: :current_project`, the parent is assigned through the inverse of the association, so define `inverse_of` on it when Rails cannot infer it.
+
+If the project has no task, `@task` is `nil` and the action is authorized on `{ @project => Task }`, as for actions without an instance. No error is raised: if you want to respond with a 404, check it in the controller.
+
+```ruby
+before_action -> { raise ActiveRecord::RecordNotFound unless @task }, only: :show
+```
 
 ## Polymorphic associations
 

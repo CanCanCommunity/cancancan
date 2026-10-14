@@ -276,6 +276,32 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
         expect(Article.accessible_by(@ability)).to match_array([article1])
       end
 
+      it 'matches records for can? when a condition value is an ActiveRecord relation selecting ids' do
+        user = User.create!(name: 'Arthur Dent')
+        article = Article.create!(name: 'How to fly', user: user)
+        other_article = Article.create!(name: 'Mostly Harmless')
+        ability = Ability.new(user)
+
+        ability.can :read, Article, id: Article.where(user_id: user.id).select(:id)
+
+        expect(Article.accessible_by(ability)).to match_array([article])
+        expect(ability.can?(:read, article)).to eq(true)
+        expect(ability.can?(:read, other_article)).to eq(false)
+      end
+
+      it 'matches records for can? when a condition value is an ActiveRecord relation selecting names' do
+        user = User.create!(name: 'Arthur Dent')
+        article = Article.create!(name: 'How to fly', user: user)
+        other_article = Article.create!(name: 'Mostly Harmless')
+        ability = Ability.new(user)
+
+        ability.can :read, Article, name: Article.where(user_id: user.id).select(:name)
+
+        expect(Article.accessible_by(ability)).to match_array([article])
+        expect(ability.can?(:read, article)).to eq(true)
+        expect(ability.can?(:read, other_article)).to eq(false)
+      end
+
       it 'fetches only associated records when using with a scope for conditions' do
         @ability.can :read, Article, Article.where(secret: true)
         category1 = Category.create!(visible: false)
@@ -283,6 +309,42 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
         article1 = Article.create!(secret: true, category: category1)
         Article.create!(secret: true, category: category2)
         expect(category1.articles.accessible_by(@ability)).to match_array([article1])
+      end
+
+      it 'keeps the conditions of the association when the scope constrains the same column' do
+        category1 = Category.create!
+        category2 = Category.create!
+        @ability.can :read, Article, Article.where(category_id: [category1.id, category2.id])
+        article1 = Article.create!(category: category1)
+        Article.create!(category: category2)
+
+        expect(category1.articles.accessible_by(@ability)).to match_array([article1])
+        expect(Article.accessible_by(@ability).count).to eq(2)
+      end
+
+      it 'keeps the conditions of the base relation on a subquery when using a scope for conditions' do
+        category1 = Category.create!
+        category2 = Category.create!
+        @ability.can :read, Article, Article.where(secret: true)
+        article1 = Article.create!(secret: true, category: category1)
+        Article.create!(secret: true, category: category2)
+        Article.create!(secret: false, category: category1)
+
+        articles = Article.where(category: Category.where(id: category1.id)).accessible_by(@ability)
+        expect(articles).to match_array([article1])
+      end
+
+      it 'does not apply again the conditions of the default scope that the scope for conditions removes' do
+        stub_const('PublicArticle', Class.new(ActiveRecord::Base) do
+          self.table_name = 'articles'
+          default_scope { where(secret: false) }
+        end)
+        @ability.can :read, PublicArticle, PublicArticle.unscope(where: :secret).where(published: true)
+        article1 = PublicArticle.create!(published: true, secret: false)
+        article2 = PublicArticle.create!(published: true, secret: true)
+        PublicArticle.create!(published: false, secret: false)
+
+        expect(PublicArticle.accessible_by(@ability)).to match_array([article1, article2])
       end
 
       it 'raises an exception when trying to merge scope with other conditions' do
@@ -364,7 +426,7 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
         @ability.cannot :read, Article, published: false, secret: true
         expect(@ability.model_adapter(Article, :read).conditions)
           .to orderlessly_match(
-            %["not (#{@article_table}"."published" = #{false_v} AND "#{@article_table}"."secret" = #{true_v})]
+            %[("#{@article_table}"."published" = #{false_v} AND "#{@article_table}"."secret" = #{true_v}) IS NOT TRUE]
           )
       end
 
@@ -374,12 +436,59 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
         @ability.can :update, Article, published: true
         @ability.cannot :update, Article, secret: true
         expect(@ability.model_adapter(Article, :update).conditions)
-          .to eq(%[not ("#{@article_table}"."secret" = #{true_v}) ] +
+          .to eq(%[("#{@article_table}"."secret" = #{true_v}) IS NOT TRUE ] +
                    %[AND (("#{@article_table}"."published" = #{true_v}) ] +
                    %[OR ("#{@article_table}"."id" = 1))])
         expect(@ability.model_adapter(Article, :manage).conditions).to eq(id: 1)
         expect(@ability.model_adapter(Article, :read).conditions).to eq({})
         expect(@ability.model_adapter(Article, :read)).to generate_sql(%(SELECT "articles".* FROM "articles"))
+      end
+
+      it 'joins consecutive can rules in a flat chain of ORs' do
+        @ability.can :read, Article, id: 1
+        @ability.can :read, Article, id: 2
+        @ability.can :read, Article, id: 3
+        expect(@ability.model_adapter(Article, :read).conditions)
+          .to eq(%[("#{@article_table}"."id" = 3) OR ("#{@article_table}"."id" = 2) OR ("#{@article_table}"."id" = 1)])
+      end
+
+      it 'keeps the precedence of a can rule following a cannot rule' do
+        @ability.can :read, Article, id: 1
+        @ability.can :read, Article, id: 2
+        @ability.cannot :read, Article, secret: true
+        @ability.can :read, Article, published: true
+        expect(@ability.model_adapter(Article, :read).conditions)
+          .to eq(%[("#{@article_table}"."published" = #{true_v}) OR ] +
+                   %[(("#{@article_table}"."secret" = #{true_v}) IS NOT TRUE AND ] +
+                   %[(("#{@article_table}"."id" = 2) OR ("#{@article_table}"."id" = 1)))])
+
+        secret = Article.create!(id: 1, secret: true, published: false)
+        article2 = Article.create!(id: 2, secret: false, published: false)
+        published_secret = Article.create!(id: 3, secret: true, published: true)
+        Article.create!(id: 4, secret: false, published: false)
+        expect(Article.accessible_by(@ability)).to match_array([article2, published_secret])
+        expect(Article.accessible_by(@ability)).not_to include(secret)
+      end
+
+      it 'fetches records with hundreds of can rules' do
+        300.times { |i| @ability.can :read, Article, priority: i + 1 }
+        first = Article.create!(priority: 1)
+        last = Article.create!(priority: 300)
+        Article.create!(priority: 301)
+        expect(Article.accessible_by(@ability)).to match_array([first, last])
+      end
+
+      it 'does not exclude records with NULL in the column of a cannot rule, like can? does' do
+        @ability.can :read, Article
+        @ability.cannot :read, Article, secret: true
+        secret = Article.create!(secret: true)
+        public = Article.create!(secret: false)
+        unknown = Article.create!(secret: nil)
+
+        expect(Article.accessible_by(@ability)).to match_array([public, unknown])
+        expect(@ability.can?(:read, secret)).to be(false)
+        expect(@ability.can?(:read, public)).to be(true)
+        expect(@ability.can?(:read, unknown)).to be(true)
       end
 
       it 'returns appropriate sql conditions in complex case with nested joins' do
@@ -602,6 +711,37 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
           expect(ability.can?(:manage, { @comment2 => Attachment })).to eq(false)
           expect(ability.can?(:manage, { @comment2 => @comment_attachment2 })).to eq(false)
         end
+      end
+    end
+
+    context 'when a cannot rule has conditions' do
+      let(:ability) { Ability.new(user1).tap { |ability| ability.can :index, Comment } }
+
+      it 'does not deny the class when the conditions are on the child' do
+        ability.cannot :index, Comment, spam: true
+
+        expect(ability.can?(:index, Comment)).to eq(true)
+        expect(ability.can?(:index, { @article1 => Comment })).to eq(true)
+      end
+
+      it 'does not deny the class when the conditions are on the parent and the child' do
+        ability.cannot :index, Comment, spam: true, article: { user_id: user1.id }
+
+        expect(ability.can?(:index, { @article1 => Comment })).to eq(true)
+      end
+
+      it 'denies the class when the conditions are on the parent only' do
+        ability.cannot :index, Comment, article: { user_id: user1.id }
+
+        expect(ability.can?(:index, { @article1 => Comment })).to eq(false)
+        expect(ability.can?(:index, { @article2 => Comment })).to eq(true)
+      end
+
+      it 'denies the class when the conditions are on the parent id only' do
+        ability.cannot :index, Comment, article_id: @article1.id
+
+        expect(ability.can?(:index, { @article1 => Comment })).to eq(false)
+        expect(ability.can?(:index, { @article2 => Comment })).to eq(true)
       end
     end
   end
@@ -881,6 +1021,106 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
     end
   end
 
+  it 'does not change the rules of the ability when it builds a query' do
+    @ability.can :read, [Article, User], comments: { spam: false }
+    article = Article.create!
+    Comment.create!(article: article, spam: false)
+
+    User.accessible_by(@ability)
+
+    expect(@ability.can?(:read, article)).to be(true)
+  end
+
+  describe '#permitted_attributes' do
+    let(:all_attributes) { Article.attribute_names.map(&:to_sym) - [:id] }
+
+    it 'returns all attributes for a can rule without attributes' do
+      @ability.can :update, Article
+
+      expect(@ability.permitted_attributes(:update, Article)).to match_array(all_attributes)
+    end
+
+    it 'returns no attributes when no rule is defined' do
+      expect(@ability.permitted_attributes(:update, Article)).to eq([])
+    end
+
+    it 'returns no attributes when the action is forbidden' do
+      @ability.cannot :update, Article
+
+      expect(@ability.permitted_attributes(:update, Article)).to eq([])
+    end
+
+    it 'returns no attributes when a cannot rule follows a can rule' do
+      @ability.can :update, Article
+      @ability.cannot :update, Article
+
+      expect(@ability.permitted_attributes(:update, Article)).to eq([])
+    end
+
+    it 'returns no attributes when a cannot rule with conditions matches the record' do
+      @ability.can :update, Article
+      @ability.cannot :update, Article, secret: true
+
+      expect(@ability.permitted_attributes(:update, Article.new(secret: true))).to eq([])
+      expect(@ability.permitted_attributes(:update, Article.new(secret: false))).to match_array(all_attributes)
+    end
+
+    it 'returns no attributes when a can rule with attributes is followed by a cannot rule' do
+      @ability.can :update, Article, [:name]
+      @ability.cannot :update, Article
+
+      expect(@ability.permitted_attributes(:update, Article)).to eq([])
+    end
+
+    it 'returns no attributes when a cannot rule follows a can rule with attributes that are not columns' do
+      @ability.can :update, Article, %i[name password]
+      @ability.cannot :update, Article
+
+      expect(@ability.permitted_attributes(:update, Article)).to eq([])
+    end
+  end
+
+  describe '#disallowed_attributes' do
+    it 'returns the attributes forbidden by a cannot rule' do
+      @ability.can :update, Article
+      @ability.cannot :update, Article, %i[secret priority]
+
+      expect(@ability.disallowed_attributes(:update, Article)).to match_array(%i[secret priority])
+    end
+
+    it 'returns all attributes when a cannot rule has no attributes' do
+      @ability.cannot :update, Article
+
+      expect(@ability.disallowed_attributes(:update, Article))
+        .to include(*(Article.attribute_names.map(&:to_sym) - [:id]))
+    end
+
+    it 'returns no attributes when no rule is defined' do
+      expect(@ability.disallowed_attributes(:update, Article)).to eq([])
+    end
+
+    it 'returns no attributes when a can rule only allows some attributes' do
+      @ability.can :update, Article, [:name]
+
+      expect(@ability.disallowed_attributes(:update, Article)).to eq([])
+    end
+
+    it 'does not return attributes allowed again by a later can rule' do
+      @ability.cannot :update, Article, [:secret]
+      @ability.can :update, Article, [:secret]
+
+      expect(@ability.disallowed_attributes(:update, Article)).to eq([])
+    end
+
+    it 'applies the conditions of the cannot rule to the record' do
+      @ability.can :update, Article
+      @ability.cannot :update, Article, [:secret], published: true
+
+      expect(@ability.disallowed_attributes(:update, Article.new(published: true))).to eq([:secret])
+      expect(@ability.disallowed_attributes(:update, Article.new(published: false))).to eq([])
+    end
+  end
+
   context 'with namespaced models' do
     before :each do
       ActiveRecord::Schema.define do
@@ -938,6 +1178,56 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
       valid_course = Course.create!(start_at: Time.now)
 
       expect(Course.accessible_by(@ability)).to match_array([valid_course])
+    end
+  end
+
+  context 'when conditions use symbols for string columns' do
+    let(:draft) { Article.create!(name: 'draft') }
+    let(:published) { Article.create!(name: 'published') }
+
+    it 'applies a cannot rule in can? as in accessible_by' do
+      @ability.can :read, Article
+      @ability.cannot :read, Article, name: :draft
+
+      expect(Article.accessible_by(@ability)).to match_array([published])
+      expect(@ability).not_to be_able_to(:read, draft)
+      expect(@ability).to be_able_to(:read, published)
+    end
+
+    it 'applies a can rule in can? as in accessible_by' do
+      @ability.can :read, Article, name: :published
+
+      expect(Article.accessible_by(@ability)).to match_array([published])
+      expect(@ability).to be_able_to(:read, published)
+      expect(@ability).not_to be_able_to(:read, draft)
+    end
+
+    it 'applies the rules when accessible_by gets the action as a string' do
+      @ability.can :read, Article
+      @ability.cannot :read, Article, name: :draft
+
+      expect(Article.accessible_by(@ability, 'read')).to match_array([published])
+      expect(@ability).not_to be_able_to('read', draft)
+      expect(@ability).to be_able_to('read', published)
+    end
+
+    it 'matches an array of symbols' do
+      @ability.can :read, Article
+      @ability.cannot :read, Article, name: %i[draft archived]
+
+      expect(Article.accessible_by(@ability)).to match_array([published])
+      expect(@ability).not_to be_able_to(:read, draft)
+      expect(@ability).to be_able_to(:read, published)
+    end
+
+    it 'matches symbols in the conditions of an association' do
+      category = Category.create!(name: 'drafts')
+      article = Article.create!(category: category)
+      @ability.can :read, Article
+      @ability.cannot :read, Article, category: { name: :drafts }
+
+      expect(Article.accessible_by(@ability)).to be_empty
+      expect(@ability).not_to be_able_to(:read, article)
     end
   end
 
@@ -1236,6 +1526,38 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
   WHERE "users"."name" = 'pippo').gsub(/\s+/, ' ').strip)
       end
 
+      it 'allows a subclass of CanCan::ModelAdapters::Strategies::Base as strategy' do
+        u = User.create!(name: 'pippo')
+        article = Article.create!(mentioned_users: [u])
+        Article.create!(mentioned_users: [User.create!(name: 'pluto')])
+
+        ability = Ability.new(u)
+        ability.can :read, Article, mentions: { user: { name: u.name } }
+
+        inner_join_strategy = Class.new(CanCan::ModelAdapters::Strategies::Base) do
+          def execute!
+            relation.joins(joins).distinct
+          end
+        end
+
+        expected_sql = %(
+    SELECT DISTINCT "articles".*
+    FROM "articles"
+    INNER JOIN "legacy_mentions" ON "legacy_mentions"."article_id" = "articles"."id"
+    INNER JOIN "users" ON "users"."id" = "legacy_mentions"."user_id"
+    WHERE "users"."name" = 'pippo').gsub(/\s+/, ' ').strip
+
+        keyword_sql = Article.accessible_by(ability, strategy: inner_join_strategy).to_sql
+        block_sql = CanCan.with_accessible_by_strategy(inner_join_strategy) { Article.accessible_by(ability).to_sql }
+        CanCan.accessible_by_strategy = inner_join_strategy
+        global_sql = Article.accessible_by(ability).to_sql
+
+        expect(keyword_sql.strip.squeeze(' ')).to eq(expected_sql)
+        expect(block_sql.strip.squeeze(' ')).to eq(expected_sql)
+        expect(global_sql.strip.squeeze(' ')).to eq(expected_sql)
+        expect(Article.accessible_by(ability)).to eq([article])
+      end
+
       it 'allows you to switch strategies with a block, and to_sql called outside the block' do
         u = User.create!(name: 'pippo')
         Article.create!(mentioned_users: [u])
@@ -1416,6 +1738,9 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
       class Vehicle < ApplicationRecord
       end
 
+      class Airplane < Vehicle
+      end
+
       class Car < Vehicle
       end
 
@@ -1495,6 +1820,144 @@ RSpec.describe CanCan::ModelAdapters::ActiveRecordAdapter do
       expect(Vehicle.accessible_by(ability)).to match_array([car])
       expect(Car.accessible_by(ability)).to eq([car])
       expect(Motorbike.accessible_by(ability)).to eq([])
+    end
+
+    it 'allows a selectable scope when permit by two subclasses' do
+      u1 = User.create!(name: 'pippo')
+      Airplane.create!(capacity: 1)
+      car = Car.create!(capacity: 4)
+      mortorbike = Motorbike.create!(capacity: 2)
+
+      ability = Ability.new(u1)
+      ability.can :read, Car
+      ability.can :read, Motorbike
+      expect(Vehicle.accessible_by(ability)).to contain_exactly(car, mortorbike)
+      expect(Airplane.accessible_by(ability)).to be_empty
+      expect(Car.accessible_by(ability)).to contain_exactly(car)
+      expect(Motorbike.accessible_by(ability)).to contain_exactly(mortorbike)
+    end
+
+    it 'allows access to both base class and subclass when permissions are defined for both' do
+      u1 = User.create!(name: 'pippo')
+      vehicle = Vehicle.create!(capacity: 1)
+      car = Car.create!(capacity: 4)
+
+      ability = Ability.new(u1)
+      ability.can :read, Vehicle
+      ability.can :read, Car
+      expect(Vehicle.accessible_by(ability)).to contain_exactly(vehicle, car)
+      expect(Car.accessible_by(ability)).to contain_exactly(car)
+    end
+
+    it 'applies rules defined on the base class and on several subclasses' do
+      u1 = User.create!(name: 'pippo')
+      vehicle = Vehicle.create!
+      car = Car.create!
+      motorbike = Motorbike.create!
+      suzuki = Suzuki.create!
+
+      ability = Ability.new(u1)
+      ability.can :read, Vehicle
+      ability.can :read, Car
+      ability.can :read, Motorbike
+      ability.can :read, Suzuki
+      expect(Vehicle.accessible_by(ability)).to contain_exactly(vehicle, car, motorbike, suzuki)
+      expect(Motorbike.accessible_by(ability)).to contain_exactly(motorbike, suzuki)
+      expect(Suzuki.accessible_by(ability)).to contain_exactly(suzuki)
+    end
+
+    it 'excludes the records of a subclass forbidden by a cannot rule, like can? does' do
+      u1 = User.create!(name: 'pippo')
+      vehicle = Vehicle.create!
+      car = Car.create!
+      motorbike = Motorbike.create!
+
+      ability = Ability.new(u1)
+      ability.can :read, Vehicle
+      ability.cannot :read, Car
+      expect(Vehicle.accessible_by(ability)).to contain_exactly(vehicle, motorbike)
+      expect(Car.accessible_by(ability)).to be_empty
+      expect(ability.can?(:read, vehicle)).to be(true)
+      expect(ability.can?(:read, motorbike)).to be(true)
+      expect(ability.can?(:read, car)).to be(false)
+    end
+
+    it 'applies the conditions of a cannot rule defined on a subclass' do
+      u1 = User.create!(name: 'pippo')
+      vehicle = Vehicle.create!
+      small_car = Car.create!(capacity: 2)
+      big_car = Car.create!(capacity: 4)
+
+      ability = Ability.new(u1)
+      ability.can :read, Vehicle
+      ability.cannot :read, Car, capacity: 4
+      expect(Vehicle.accessible_by(ability)).to contain_exactly(vehicle, small_car)
+      expect(ability.can?(:read, big_car)).to be(false)
+      expect(ability.can?(:read, small_car)).to be(true)
+    end
+
+    it 'applies a rule defined on a subclass of a subclass to the base class' do
+      u1 = User.create!(name: 'pippo')
+      Vehicle.create!
+      Motorbike.create!
+      suzuki = Suzuki.create!
+
+      ability = Ability.new(u1)
+      ability.can :read, Suzuki
+      expect(Vehicle.accessible_by(ability)).to contain_exactly(suzuki)
+      expect(Motorbike.accessible_by(ability)).to contain_exactly(suzuki)
+      expect(ability.can?(:read, Vehicle)).to be(true)
+      expect(ability.can?(:read, Motorbike)).to be(true)
+      expect(ability.can?(:read, Car)).to be(false)
+    end
+
+    describe 'checking a class' do
+      let(:ability) { Ability.new(User.create!(name: 'pippo')) }
+
+      it 'passes when the class is allowed, even if a subclass is forbidden' do
+        ability.can :read, Vehicle
+        ability.cannot :read, Car
+        expect(ability.can?(:read, Vehicle)).to be(true)
+        expect(ability.can?(:read, Motorbike)).to be(true)
+        expect(ability.can?(:read, Car)).to be(false)
+      end
+
+      it 'passes when a subclass is forbidden with conditions' do
+        ability.can :read, Vehicle
+        ability.cannot :read, Car, capacity: 4
+        expect(ability.can?(:read, Vehicle)).to be(true)
+        expect(ability.can?(:read, Car)).to be(true)
+      end
+
+      it 'passes when a subclass is allowed' do
+        ability.can :read, Car
+        expect(ability.can?(:read, Vehicle)).to be(true)
+        expect(ability.can?(:read, Car)).to be(true)
+        expect(ability.can?(:read, Motorbike)).to be(false)
+      end
+
+      it 'fails when the only allowed subclass is forbidden again' do
+        ability.can :read, Car
+        ability.cannot :read, Car
+        expect(ability.can?(:read, Vehicle)).to be(false)
+        expect(ability.can?(:read, Car)).to be(false)
+      end
+
+      it 'passes when a subclass is allowed after the class is forbidden' do
+        ability.cannot :read, Vehicle
+        ability.can :read, Car
+        expect(ability.can?(:read, Vehicle)).to be(true)
+        expect(ability.can?(:read, Car)).to be(true)
+        expect(ability.can?(:read, Motorbike)).to be(false)
+      end
+
+      it 'passes for a subclass when one of its subclasses is forbidden' do
+        ability.can :read, Motorbike
+        ability.cannot :read, Suzuki
+        expect(ability.can?(:read, Motorbike)).to be(true)
+        expect(ability.can?(:read, Suzuki)).to be(false)
+        expect(ability.can?(:read, Vehicle)).to be(true)
+      end
     end
   end
 end

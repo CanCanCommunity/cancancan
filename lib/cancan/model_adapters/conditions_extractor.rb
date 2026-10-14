@@ -1,74 +1,130 @@
 # frozen_string_literal: true
 
 # this class is responsible of converting the hash of conditions
-# in "where conditions" to generate the sql query
-# it consists of a names_cache that helps calculating the next name given to the association
-# it tries to reflect the behavior of ActiveRecord when generating aliases for tables.
+# in "where conditions" to generate the sql query.
+# Every association is given the table alias that ActiveRecord gives it when joining the associations,
+# so it walks the joins in the same order and registers every joined table, through tables included.
 module CanCan
   module ModelAdapters
     class ConditionsExtractor
-      def initialize(model_class)
-        @names_cache = { model_class.table_name => [] }.with_indifferent_access
+      # Pass the associations given to `joins` and then to `left_joins`, as they are joined by ActiveRecord.
+      def initialize(model_class, *joins)
         @root_model_class = model_class
+        @aliases = Hash.new(0)
+        @aliases[model_class.table_name] = 1
+        @table_aliases = {}
+        @joined_tables = {}
+        @model_classes = {}
+        joins.each { |associations| register_joins(model_class, joins_tree(associations), []) }
       end
 
-      def tableize_conditions(conditions, model_class = @root_model_class, path_to_key = 0)
+      def tableize_conditions(conditions, model_class = @root_model_class, path = [])
         return conditions unless conditions.is_a? Hash
 
         conditions.each_with_object({}) do |(key, value), result_hash|
           if value.is_a? Hash
-            result_hash.merge!(calculate_result_hash(key, model_class, path_to_key, result_hash, value))
+            tableize_association(model_class, path + [key.to_sym], value, result_hash)
           else
             result_hash[key] = value
           end
-          result_hash
         end
+      end
+
+      # The model class of a table alias returned by tableize_conditions.
+      def model_class_for(table_alias)
+        @model_classes[table_alias.to_s]
       end
 
       private
 
-      def calculate_result_hash(key, model_class, path_to_key, result_hash, value)
-        reflection = model_class.reflect_on_association(key)
-        nested_resulted = calculate_nested(model_class, result_hash, key, value.dup, path_to_key)
-        association_class = reflection.klass.name.constantize
-        tableize_conditions(nested_resulted, association_class, "#{path_to_key}_#{key}")
+      def tableize_association(model_class, path, conditions, result_hash)
+        reflection = model_class.reflect_on_association(path.last)
+        table_alias = @table_aliases[path] || register_association(model_class, reflection, path)
+        nested, values = conditions.partition { |_key, value| value.is_a? Hash }.map(&:to_h)
+        result_hash[table_alias.to_sym] = values unless values.empty?
+        result_hash.merge!(tableize_conditions(nested, reflection.klass, path))
       end
 
-      def calculate_nested(model_class, result_hash, relation_name, value, path_to_key)
-        value.each_with_object({}) do |(k, v), nested|
-          if v.is_a? Hash
-            value.delete(k)
-            nested[k] = v
-          else
-            table_alias = generate_table_alias(model_class, relation_name, path_to_key)
-            result_hash[table_alias] = value
-          end
-          nested
+      def joins_tree(joins)
+        case joins
+        when Hash then joins.to_h { |name, nested| [name.to_sym, joins_tree(nested)] }
+        when Array then joins.each_with_object({}) { |nested, tree| tree.deep_merge!(joins_tree(nested)) }
+        when nil then {}
+        else { joins.to_sym => {} }
         end
       end
 
-      def generate_table_alias(model_class, relation_name, path_to_key)
-        table_alias = model_class.reflect_on_association(relation_name).table_name.to_sym
+      # Mirrors ActiveRecord::Associations::JoinDependency#walk: the associations already joined come first.
+      def register_joins(model_class, tree, path)
+        joined, missing = tree.partition { |name, _nested| @table_aliases.key?(path + [name]) }
+        (joined + missing).each do |name, nested|
+          reflection = model_class.reflect_on_association(name)
+          next if reflection.nil? || reflection.polymorphic?
 
-        if already_used?(table_alias, relation_name, path_to_key)
-          table_alias = "#{relation_name.to_s.pluralize}_#{model_class.table_name}".to_sym
-
-          index = 1
-          while already_used?(table_alias, relation_name, path_to_key)
-            table_alias = "#{table_alias}_#{index += 1}".to_sym
-          end
+          register_association(model_class, reflection, path + [name]) unless @table_aliases.key?(path + [name])
+          register_joins(reflection.klass, nested, path + [name])
         end
-        add_to_cache(table_alias, relation_name, path_to_key)
       end
 
-      def already_used?(table_alias, relation_name, path_to_key)
-        @names_cache[table_alias].try(:exclude?, "#{path_to_key}_#{relation_name}")
+      def register_association(parent_class, reflection, path)
+        chain = reflection.chain
+        table_alias = nil
+        chain.each_index do |index|
+          table, reused = join_table(parent_class, chain, index)
+          table_alias ||= table
+          break if reused
+        end
+        @model_classes[table_alias] = reflection.klass
+        @table_aliases[path] = table_alias
       end
 
-      def add_to_cache(table_alias, relation_name, path_to_key)
-        @names_cache[table_alias] ||= []
-        @names_cache[table_alias] << "#{path_to_key}_#{relation_name}"
-        table_alias
+      # Mirrors ActiveRecord::Associations::JoinDependency#make_constraints
+      def join_table(parent_class, chain, index)
+        root = index.zero?
+        remaining_chain = chain[index..]
+        table, terminated = @joined_tables[remaining_chain]
+        return reuse_joined_table(remaining_chain, table, root) if reuse_joined_table?(table, root, terminated)
+
+        table = aliased_table_for(chain[index].klass.table_name) do
+          name = chain[index].alias_candidate(parent_class.table_name)
+          root ? name : "#{name}_join"
+        end
+        @joined_tables[remaining_chain] ||= [table, root]
+        [table, false]
+      end
+
+      def reuse_joined_table(remaining_chain, table, root)
+        @joined_tables[remaining_chain] = [table, root] if root
+        [table, true]
+      end
+
+      # ActiveRecord reuses the through tables of the associations already joined since version 6.1
+      def reuse_joined_table?(table, root, terminated)
+        table && (!root || !terminated) && ActiveRecordAdapter.version_greater_or_equal?('6.1.0')
+      end
+
+      # Mirrors ActiveRecord::Associations::AliasTracker#aliased_table_for
+      def aliased_table_for(table_name)
+        if @aliases[table_name].zero?
+          @aliases[table_name] = 1
+          return table_name
+        end
+
+        aliased_name = yield[0...table_alias_length].tr('.', '_')
+        count = @aliases[aliased_name] += 1
+        count > 1 ? "#{aliased_name[0, table_alias_length - 2]}_#{count}" : aliased_name
+      end
+
+      def table_alias_length
+        @table_alias_length ||= connection.table_alias_length
+      end
+
+      def connection
+        if @root_model_class.respond_to?(:lease_connection)
+          @root_model_class.lease_connection
+        else
+          @root_model_class.connection
+        end
       end
     end
   end

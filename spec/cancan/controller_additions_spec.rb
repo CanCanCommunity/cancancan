@@ -141,6 +141,12 @@ describe CanCan::ControllerAdditions do
     expect(@controller_class.cancan_skipper[:load][:article]).to eq({})
   end
 
+  it 'skip_load_and_authorize_resource adds itself to the cancan skipper with a string model name as a symbol' do
+    @controller_class.skip_load_and_authorize_resource('project')
+    expect(@controller_class.cancan_skipper[:load][:project]).to eq({})
+    expect(@controller_class.cancan_skipper[:authorize][:project]).to eq({})
+  end
+
   it 'skip_load_and_authorize_resource adds itself to the cancan skipper with given model name and options' do
     @controller_class.skip_load_and_authorize_resource(:project, only: %i[index show])
     expect(@controller_class.cancan_skipper[:load][:project]).to eq(only: %i[index show])
@@ -166,6 +172,33 @@ describe CanCan::ControllerAdditions do
 
       expect(@sub_controller_class.cancan_skipper[:load][nil]).to eq(only: %i[index show])
       expect(@sub_controller_class.cancan_skipper[:authorize][nil]).to eq(only: %i[index show])
+    end
+
+    it 'does not change the super_class or sibling classes when a sub_class skips' do
+      sibling_controller_class = Class.new(@super_controller_class)
+
+      @sub_controller_class.skip_authorize_resource(:project)
+      @sub_controller_class.skip_load_resource(:project)
+
+      expect(@sub_controller_class.cancan_skipper[:authorize][:project]).to eq({})
+      expect(@sub_controller_class.cancan_skipper[:load][:project]).to eq({})
+      [@super_controller_class, sibling_controller_class].each do |controller_class|
+        expect(controller_class.cancan_skipper[:authorize]).not_to have_key(:project)
+        expect(controller_class.cancan_skipper[:load]).not_to have_key(:project)
+      end
+    end
+
+    it 'does not change the super_class when its skipper was read before a sub_class skips' do
+      controller_class = Class.new
+      allow(controller_class).to receive(:helper_method)
+      controller_class.send(:include, CanCan::ControllerAdditions)
+      sub_controller_class = Class.new(controller_class)
+      controller_class.cancan_skipper
+
+      sub_controller_class.skip_authorize_resource
+
+      expect(sub_controller_class.cancan_skipper[:authorize][nil]).to eq({})
+      expect(controller_class.cancan_skipper[:authorize]).not_to have_key(nil)
     end
   end
 end

@@ -74,7 +74,8 @@ module CanCan
       #
       # [:+through_association+]
       #   The name of the association to fetch the child records through the parent resource.
-      #   This is normally not needed because it defaults to the pluralized resource name.
+      #   This is normally not needed because it defaults to the pluralized resource name,
+      #   or to the singular resource name when +:singleton+ is used.
       #
       # [:+shallow+]
       #   Pass +true+ to allow this resource to be loaded directly when parent is +nil+. Defaults to +false+.
@@ -213,7 +214,7 @@ module CanCan
       def skip_load_resource(*args)
         options = args.extract_options!
         name = args.first
-        cancan_skipper[:load][name] = options
+        add_cancan_skip(:load, name, options)
       end
 
       # Skip the authorization behavior of CanCan. This is useful when using +load_and_authorize_resource+ but want to
@@ -229,7 +230,7 @@ module CanCan
       def skip_authorize_resource(*args)
         options = args.extract_options!
         name = args.first
-        cancan_skipper[:authorize][name] = options
+        add_cancan_skip(:authorize, name, options)
       end
 
       # Add this to a controller to ensure it performs authorization through +authorize+! or +authorize_resource+ call.
@@ -294,6 +295,15 @@ module CanCan
 
       def cancan_skipper
         self._cancan_skipper ||= { authorize: {}, load: {} }
+      end
+
+      private
+
+      # _cancan_skipper is a class_attribute: a subclass shares the hash of its superclass until it assigns
+      # its own. Assign a copy, so a skip in a subclass does not change the superclass or sibling classes.
+      def add_cancan_skip(behavior, name, options)
+        skipper = cancan_skipper
+        self._cancan_skipper = skipper.merge(behavior => skipper[behavior].merge(name&.to_sym => options))
       end
     end
 
