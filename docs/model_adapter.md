@@ -13,7 +13,7 @@ CanCanCan provides maintained adapters for the following model types:
 
 Due to its flexible and extendable system of adapters, it is easy to implement a custom adapter if the currently provided adapters do not suffice.
 
-To facilitate an easy implementation of a new adapter CanCanCan provides you with an [Abstract Adapter](https://github.com/CanCanCommunity/cancancan/blob/develop/lib/cancan/model_adapters/abstract_adapter.rb) you can extend and build upon. This design allows for dynamic adapter handling and a decoupled handling of information.
+To facilitate an easy implementation of a new adapter CanCanCan provides you with an [Abstract Adapter](https://github.com/CanCanCommunity/cancancan/blob/main/lib/cancan/model_adapters/abstract_adapter.rb) you can extend and build upon. This design allows for dynamic adapter handling and a decoupled handling of information.
 
 ### The Abstract Adapter
 
@@ -195,15 +195,15 @@ Thus you'd probably be best served with inspecting the actual implementation of 
 
 #### Implementation
 
-- [ActiveRecord Base](https://github.com/CanCanCommunity/cancancan/blob/develop/lib/cancan/model_adapters/active_record_adapter.rb)
-- [ActiveRecord 4](https://github.com/CanCanCommunity/cancancan/blob/develop/lib/cancan/model_adapters/active_record_4_adapter.rb)
-- [ActiveRecord 5](https://github.com/CanCanCommunity/cancancan/blob/develop/lib/cancan/model_adapters/active_record_5_adapter.rb)
+- [ActiveRecord Base](https://github.com/CanCanCommunity/cancancan/blob/main/lib/cancan/model_adapters/active_record_adapter.rb)
+- [ActiveRecord 4](https://github.com/CanCanCommunity/cancancan/blob/main/lib/cancan/model_adapters/active_record_4_adapter.rb)
+- [ActiveRecord 5](https://github.com/CanCanCommunity/cancancan/blob/main/lib/cancan/model_adapters/active_record_5_adapter.rb)
 
 #### Tests / Specs
 
-- [ActiveRecord Base](https://github.com/CanCanCommunity/cancancan/blob/develop/spec/cancan/model_adapters/active_record_adapter_spec.rb)
-- [ActiveRecord 4](https://github.com/CanCanCommunity/cancancan/blob/develop/spec/cancan/model_adapters/active_record_4_adapter_spec.rb)
-- [ActiveRecord 5](https://github.com/CanCanCommunity/cancancan/blob/develop/spec/cancan/model_adapters/active_record_5_adapter_spec.rb)
+- [ActiveRecord Base](https://github.com/CanCanCommunity/cancancan/blob/main/spec/cancan/model_adapters/active_record_adapter_spec.rb)
+- [ActiveRecord 4](https://github.com/CanCanCommunity/cancancan/blob/main/spec/cancan/model_adapters/active_record_4_adapter_spec.rb)
+- [ActiveRecord 5](https://github.com/CanCanCommunity/cancancan/blob/main/spec/cancan/model_adapters/active_record_5_adapter_spec.rb)
 
 **Mongoid, the adapter used in this entry as an example, can be found at:**
 

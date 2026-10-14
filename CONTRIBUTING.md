@@ -16,9 +16,7 @@ That's it! The more information you give, the more easy it becomes for us to tra
 
 ### Adding new Features or Bugfixes
 
-CanCanCan uses a [git-flow](http://nvie.com/posts/a-successful-git-branching-model/) development model.
-The latest "released" version of CanCanCan, the latest gem version, can always be found on `main`,
-while the next version or nightly is on `develop`.
+Open your pull request against `main`. Changes that break compatibility go to the branch of the next major version, like `4.x`.
 
 Please make sure you have test coverage for anything you add or fix!
 

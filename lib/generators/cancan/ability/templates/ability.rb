@@ -27,6 +27,6 @@ class Ability
     #   can :update, Article, published: true
     #
     # See the wiki for details:
-    # https://github.com/CanCanCommunity/cancancan/blob/develop/docs/define_check_abilities.md
+    # https://github.com/CanCanCommunity/cancancan/blob/main/docs/define_check_abilities.md
   end
 end
